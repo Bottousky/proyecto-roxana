@@ -1,4 +1,4 @@
-import { PUZZLES, initialPuzzleSnapshot, evaluatePuzzle, isSealed } from './puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, evaluatePuzzle, isSealed, stoneIn, stoneRings, RING_HEX } from './puzzle-model.js';
 
 // A circuit as it would be drawn in a field notebook: the symbols the Instituto uses (a cell, a
 // zigzag for a resistance, a circle with a cross for a lamp…), wires drawn square, by hand, a little
@@ -64,7 +64,7 @@ function adjust(x0, x1, y, rnd) {
 }
 
 /** One symbol between two terminals (all bench pieces lie left to right), with its leads. */
-function symbol(c, a, b, state, rnd) {
+function symbol(c, a, b, state, rnd, knob) {
   const y = a.y, cx = (a.x + b.x) / 2, w = Math.min(96, (b.x - a.x) * .55), x0 = cx - w / 2, x1 = cx + w / 2;
   const lead = (from, to) => twice([{ x: from, y }, { x: to, y }], rnd, 'sk-ink');
   let body = '', leads = lead(a.x, x0) + lead(x1, b.x), note = '';
@@ -96,14 +96,21 @@ function symbol(c, a, b, state, rnd) {
       if (bad) note = `<text class="sk-red-note" x="${cx}" y="${y + 92}">óxido</text>`;
       break;
     }
-    default: body = zig(x0, x1, y, rnd) + (c.valueKey ? adjust(x0, x1, y, rnd) : '');
+    default: {
+      // A stone in a socket: the zigzag with its rings painted across it. An empty socket keeps its copper strap.
+      const st = stoneIn(knob, state.values?.[c.valueKey]);
+      if (st?.strap) { body = twice([{ x: x0, y }, { x: x1, y }], rnd, 'sk-ink') + `<path class="sk-pencil" d="M${x0 + 4} ${y - 9} H${x1 - 4} M${x0 + 4} ${y + 9} H${x1 - 4}"/>`; note = `<text class="sk-value" x="${cx}" y="${y + 50}">puente</text>`; break; }
+      body = st ? `<rect class="sk-stone" x="${f(x0)}" y="${y - 17}" width="${f(w)}" height="34" rx="17"/>` + stoneRings(st.value).map((ring, i) => `<rect class="sk-ring" x="${f(x0 + w * [.2, .33, .46, .72][i] + rnd() * 1.2)}" y="${y - 16}" width="${f(w * .08)}" height="32" fill="${RING_HEX[ring]}"/>`).join('') + `<rect class="sk-ink" x="${f(x0)}" y="${y - 17}" width="${f(w)}" height="34" rx="17" fill="none"/>`
+        : zig(x0, x1, y, rnd) + (c.valueKey ? adjust(x0, x1, y, rnd) : '');
+    }
   }
   return leads + body + note;
 }
 
 /** The resistance a piece has on this montage, or null when the notebook doesn't write one. */
-function ohms(c, state) {
+function ohms(c, state, knob) {
   const r = c.valueKey ? state.values?.[c.valueKey] : c.resistance;
+  if (stoneIn(knob, r)?.strap) return null;
   if (c.kind === 'cloth' || c.kind === 'switch' || (c.kind === 'joint' && c.resistance <= 1)) return null;
   return Number.isFinite(r) ? r : null;
 }
@@ -165,6 +172,7 @@ export function renderSchematic(id, snapshot, { mode = 'after', caption } = {}) 
   const xs = p.ports.map(n => n.x), ys = p.ports.map(n => n.y), bottom = wires.some(w => w.includes('negative')) ? Math.max(455, ...ys.map(y => y + 70)) : Math.max(...ys);
   const placed = p.components.filter(c => P[c.a] && P[c.b]).map(c => ({ c, a: P[c.a], b: P[c.b], cx: (P[c.a].x + P[c.b].x) / 2, y: P[c.a].y }));
   const pieces = placed.map(({ c, a, b, cx, y }) => {
+    const knob = p.knobs?.find(k => k.key === c.valueKey);
     const name = c.label.replace(/ · .*/, ''), branch = result?.solution.branches[c.id];
     const reading = result && branch && (c.goal || (p.constraints ?? []).some(k => k.branch === c.id)) && Math.abs(branch.current ?? 0) > .01
       ? `${num(Math.abs(branch.voltage), 1)} V · ${num(Math.abs(branch.current), 2)} A` : '';
@@ -173,7 +181,7 @@ export function renderSchematic(id, snapshot, { mode = 'after', caption } = {}) 
     // A label never runs into its neighbour's: the hand writes smaller when the row is tight.
     const room = Math.min(Infinity, ...placed.filter(o => o !== placed.find(q => q.c === c) && Math.abs(o.y - y) < 30).map(o => Math.abs(o.cx - cx) - 18));
     const size = Math.max(28, Math.min(42, 42 * room / width(name, 42)));
-    return `<g class="sk-piece">${symbol(c, a, b, state, rnd)}<text class="sk-label" x="${cx}" y="${y - 34 - LIFT(c)}"${size < 42 ? ` style="font-size:${f(size)}px"` : ''}>${esc(name)}</text>${figures(cx, y, ohms(c, state), reading, { room: below - (y + 84), crossed: (x0, x1) => uprights.some(([u, v]) => u.x > x0 && u.x < x1 && Math.min(u.y, v.y) < y + 50 && Math.max(u.y, v.y) > y + 26) })}</g>`;
+    return `<g class="sk-piece">${symbol(c, a, b, state, rnd, knob)}<text class="sk-label" x="${cx}" y="${y - 34 - LIFT(c)}"${size < 42 ? ` style="font-size:${f(size)}px"` : ''}>${esc(name)}</text>${figures(cx, y, ohms(c, state, knob), reading, { room: below - (y + 84), crossed: (x0, x1) => uprights.some(([u, v]) => u.x > x0 && u.x < x1 && Math.min(u.y, v.y) < y + 50 && Math.max(u.y, v.y) > y + 26) })}</g>`;
   }).join('');
 
   // Conventional current leaves «+»: one small arrow on the first lead, when something flows.
@@ -203,6 +211,7 @@ const SYMBOLS = {
   power: '<circle class="sk-ink" cx="40" cy="34" r="13"/><path class="sk-red" d="M40 4 v10 M22 10 l6 8 M58 10 l-6 8"/>',
   heat: '<path class="sk-ink" d="M4 40 H76"/><path class="sk-red" d="M24 30 q6 -7 0 -14 q-6 -7 0 -14 M40 30 q6 -7 0 -14 q-6 -7 0 -14 M56 30 q6 -7 0 -14 q-6 -7 0 -14"/>',
   ohm: omega(22, 48, 1.5, 'sk-ink'),
+  rings: '<path class="sk-ink" d="M2 30 H12 M68 30 H78"/><rect class="sk-ink" x="12" y="17" width="56" height="26" rx="12"/>' + ['marron', 'negro', 'negro', 'oro'].map((c, i) => `<rect x="${[21, 30, 39, 54][i]}" y="18" width="5" height="24" fill="${RING_HEX[c]}"/>`).join(''),
   loopsum: '<rect class="sk-ink" x="8" y="10" width="64" height="40" rx="4"/><path class="sk-blue" d="M30 6 l8 4 l-8 4"/><text class="sk-red-note" x="40" y="38">Σ</text>',
   nodesum: '<path class="sk-ink" d="M4 30 H40 M40 30 L74 8 M40 30 H76 M40 30 L74 52"/><circle class="sk-node" cx="40" cy="30" r="5"/><path class="sk-blue" d="M14 24 h12 m-5 -4 l5 4 l-5 4"/>',
   node: '<path class="sk-ink" d="M4 30 H40 L74 10 M40 30 L74 50"/><circle class="sk-node" cx="40" cy="30" r="5"/>',

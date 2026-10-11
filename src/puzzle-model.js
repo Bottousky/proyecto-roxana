@@ -6,6 +6,30 @@ const component = (id, label, a, b, resistance, extra = {}) => ({ id, label, a, 
 const sourcePorts = [port('positive', 'Fuente +', 85, 125), port('negative', 'Retorno −', 85, 375)];
 const goal = (minVoltage, maxVoltage, minCurrent = 0, maxCurrent = Infinity) => ({ minVoltage, maxVoltage, minCurrent, maxCurrent });
 
+// ── Piedras de freno ────────────────────────────────────────────────────────────────────────
+// Resistors as Ohmdal keeps them: ceramic stones with painted rings. The rings write the value as two
+// digits and how many zeros follow; the gold ring says the stone may lie by 5 %. Each stone has its own
+// true value inside that margin: the weighing instrument reads it, and the bench's physics uses it.
+export const RING_COLORS = ['negro', 'marron', 'rojo', 'naranja', 'amarillo', 'verde', 'azul', 'violeta', 'gris', 'blanco'];
+/** The four rings of a stone: first digit, second digit, how many zeros, and the gold of ±5 %. */
+export function stoneRings(nominal) {
+  const zeros = Math.max(0, Math.floor(Math.log10(nominal)) - 1), digits = Math.round(nominal / 10 ** zeros);
+  return [RING_COLORS[Math.floor(digits / 10)], RING_COLORS[digits % 10], RING_COLORS[zeros], 'oro'];
+}
+/** Paint for each ring, its name, and the letter Lumen scratches beside it (he can't tell red from green). */
+export const RING_HEX = { negro: '#1d1b19', marron: '#6b3d1f', rojo: '#b3261e', naranja: '#d9701c', amarillo: '#e1b52a', verde: '#3d7a3a', azul: '#2c5aa0', violeta: '#6d3d8f', gris: '#8a8a8a', blanco: '#f2efe6', oro: '#c9a23a' };
+export const RING_NAMES = { negro: 'negro', marron: 'marrón', rojo: 'rojo', naranja: 'naranja', amarillo: 'amarillo', verde: 'verde', azul: 'azul', violeta: 'violeta', gris: 'gris', blanco: 'blanco', oro: 'oro' };
+export const RING_MARKS = { negro: 'N', marron: 'M', rojo: 'R', naranja: 'Na', amarillo: 'A', verde: 'V', azul: 'Az', violeta: 'Vi', gris: 'G', blanco: 'B', oro: 'O' };
+/** A stone said by its rings, as someone who can't read them yet would: «marrón, negro, negro y oro». */
+export function ringWords(nominal) { const r = stoneRings(nominal).map(c => RING_NAMES[c]); return `${r.slice(0, 3).join(', ')} y ${r[3]}`; }
+const stone = (value, actual) => ({ value, actual });
+/** An empty socket keeps a copper strap across it: no brake at all. */
+const STRAP = { value: 0, actual: 0, strap: true };
+/** The positions a control can take: the stones in its socket, or the notches of a dial. */
+export function knobChoices(k) { return k.stones ? k.stones.map(st => st.value) : Array.from({ length: Math.round((k.max - k.min) / k.step) + 1 }, (_, i) => k.min + i * k.step); }
+/** The stone sitting in a socket, if the control is one. */
+export function stoneIn(k, value) { return k?.stones?.find(st => st.value === value) ?? null; }
+
 // Every bench is a designed puzzle, not a sandbox: an explicit brief with checks, the installation's
 // own wires soldered in place («sealed»), a fixed number of cables in hand («cables» counts every
 // movable wire on the board), and dials with few, meaningful notches. «solve» is the canonical
@@ -46,11 +70,12 @@ export const PUZZLES = {
     title: 'El cerrojo que escucha', place: 'CALZADA · MECANISMO DE LA PUERTA', subtitle: 'El cerrojo golpea hacia el lado equivocado.', voltage: 12, protection: 1.5,
     brief: 'Hacé que el cerrojo avance hacia la marca → con fuerza firme. Podés mover los dos cables de la bobina y girar su freno. Sentido y fuerza son dos cosas distintas.',
     ports: [...sourcePorts, port('trimA', 'Freno A', 300, 165), port('trimB', 'Freno B', 525, 165), port('latchIn', 'Avance +', 635, 325), port('latchOut', 'Avance −', 860, 325)],
-    components: [component('trim', 'Freno resistivo', 'trimA', 'trimB', 8, { valueKey: 'brake', kind: 'resistor' }), component('latch', 'Bobina del cerrojo', 'latchIn', 'latchOut', 16, { kind: 'coil', polarized: true, goal: goal(7.3, 9.1, .46, .57) })],
-    knobs: [{ key: 'brake', label: 'Freno de la bobina', min: 0, max: 20, step: 4, initial: 0, unit: 'Ω', description: 'Más freno deja pasar menos corriente: el cerrojo empuja con menos fuerza.' }],
+    components: [component('trim', 'Piedra de freno', 'trimA', 'trimB', 10, { valueKey: 'brake', kind: 'resistor' }), component('latch', 'Bobina del cerrojo', 'latchIn', 'latchOut', 14, { kind: 'coil', polarized: true, goal: goal(6.3, 7.8, .46, .57) })],
+    // The socket holds a copper strap; Edda's pouch has four stones. Only the brown-black-black one gives a firm push.
+    knobs: [{ key: 'brake', label: 'Zócalo del freno', socket: 'La bolsa de Edda', stones: [STRAP, stone(10, 10.1), stone(22, 21.7), stone(47, 47.6), stone(100, 98.5)], min: 0, max: 100, initial: 0, unit: 'Ω', description: 'Una piedra con más freno deja pasar menos corriente: el cerrojo empuja con menos fuerza.' }],
     initialWires: [['positive', 'trimA'], ['trimB', 'latchOut'], ['latchIn', 'negative']], sealed: [['positive', 'trimA']], cables: 2,
     criteria: [{ text: 'Empuja hacia la marca de avance →', met: (r, s) => on(r, s) && branchOf(r, 'latch').current > .05 }, { text: 'Con fuerza firme: ni tiembla ni golpea', met: (r, s) => { const i = Math.abs(branchOf(r, 'latch').current); return on(r, s) && i >= .46 && i <= .57; } }],
-    solve: s => { s.wires = [['positive', 'trimA'], ['trimB', 'latchIn'], ['latchOut', 'negative']]; s.values.brake = 8; },
+    solve: s => { s.wires = [['positive', 'trimA'], ['trimB', 'latchIn'], ['latchOut', 'negative']]; s.values.brake = 10; },
     lesson: 'El pestillo de este cerrojo es un imán: por eso el sentido de la corriente en la bobina decide si lo empuja o lo atrae. Una bobina que sólo mueve hierro atrae igual con cualquier sentido. La resistencia en serie regula la fuerza sin cambiar el camino.',
     observation: 'Las marcas del cerrojo dicen AVANCE →. Su pestillo es un imán, y ahora golpea hacia atrás.',
   },
@@ -146,7 +171,9 @@ export const PUZZLES = {
     constraints: [{ branch: 'lower', minCurrent: .05 }],
     // Nereo needs a rule the next keeper can check: how much the tap drops when the lens is connected.
     proof: { id: 'loadEffect', who: 'Nereo', parts: ['tapUnloaded', 'tapLoaded'], measure: { between: ['tap', 'negative'], load: ['lensIn', 'tap'] }, request: 'Nereo quiere dejar escrito cuánto cambia la toma al conectar la lente: medila sin la lente y con la lente.', recorded: 'Medí la toma sin la lente y con la lente conectada: al cargarla, la tensión baja.' },
-    knobs: [{ key: 'upper', label: 'Freno de la lente', min: 6, max: 36, step: 6, initial: 24, unit: 'Ω', description: 'El brazo superior del divisor. Calibralo con la lente conectada: ella también forma parte de la red.' }],
+    // The upper arm is a socket: the old stone (red-yellow-black) and the keeper's three spares. The 12 Ω one
+    // gives the golden light even if it lies its 5 %: that is what the gold ring is for.
+    knobs: [{ key: 'upper', label: 'Zócalo del brazo superior', socket: 'La caja del farero', stones: [stone(10, 10.2), stone(12, 12.2), stone(15, 14.7), stone(24, 24)], min: 10, max: 24, initial: 24, unit: 'Ω', description: 'El brazo superior del divisor. Elegí su piedra con la lente conectada: ella también forma parte de la red.' }],
     initialWires: [['positive', 'upperA'], ['lowerB', 'negative'], ['positive', 'lensIn'], ['lensOut', 'negative']],
     sealed: [['positive', 'upperA'], ['lowerB', 'negative'], ['lensOut', 'negative']], cables: 1,
     criteria: [{ text: 'Nereo anotó cuánto baja la toma con la lente', met: r => r.proven }, { text: 'La lente da una luz dorada y estable', met: r => r.solved }],
@@ -192,7 +219,8 @@ export function normalizePuzzleSnapshot(id, saved) {
   for (let i = uniqueWires.length - 1; i >= 0; i--) if (!isSealed(id, uniqueWires[i]) && (!canJoin(id, ...uniqueWires[i]) || ++movable > (p.cables ?? Infinity))) { if (canJoin(id, ...uniqueWires[i])) movable--; uniqueWires.splice(i, 1); }
   const normalized = { ...initial, evidence: normalizeBenchEvidence(saved.evidence), wires: uniqueWires, sourceOn: typeof saved.sourceOn === 'boolean' ? saved.sourceOn : initial.sourceOn, tripped: !!saved.tripped, completed: !!saved.completed,
     switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, typeof saved.switches?.[s.key] === 'boolean' ? saved.switches[s.key] : s.initial])),
-    values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, Number.isFinite(saved.values?.[k.key]) ? Math.max(k.min, Math.min(k.max, Math.round(saved.values[k.key] / k.step) * k.step)) : k.initial])),
+    // A value always sits on a notch, or is a stone the socket has (the nearest one, for saves from before sockets).
+    values: Object.fromEntries((p.knobs ?? []).map(k => { const v = saved.values?.[k.key]; return [k.key, Number.isFinite(v) ? knobChoices(k).reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a)) : k.initial]; })),
     hints: Number.isFinite(saved.hints) ? Math.max(0, Math.min(HINT_STEPS, Math.floor(saved.hints))) : 0,
     meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) || (saved.meter?.branch === 'source' && p.tally?.parts.includes('source')) ? saved.meter.branch : null },
   };
@@ -226,11 +254,18 @@ export function normalizePuzzleSnapshot(id, saved) {
   return normalized;
 }
 
+/** What a piece really brakes on this montage: a stone brakes its own true value, not what its rings say. */
+export function pieceResistance(id, c, state) {
+  if (!c.valueKey) return c.resistance;
+  const v = state.values[c.valueKey], st = stoneIn(PUZZLES[id].knobs?.find(k => k.key === c.valueKey), v);
+  return st ? st.actual : v;
+}
+
 export function puzzleNetwork(id, state, powered = state.sourceOn && !state.tripped) {
   const p = PUZZLES[id];
   return { nodes: p.ports.map(n => n.id), ground: 'negative',
     sources: powered ? [{ id: 'source', positive: 'positive', negative: 'negative', voltage: p.voltage }] : [],
-    resistors: [...p.components.map(c => ({ id: c.id, a: c.a, b: c.b, resistance: c.valueKey ? state.values[c.valueKey] : c.resistance, enabled: c.switchKey ? state.switches[c.switchKey] : true })), ...state.wires.map((w, i) => ({ id: `wire${i}`, a: w[0], b: w[1], resistance: .035 }))],
+    resistors: [...p.components.map(c => ({ id: c.id, a: c.a, b: c.b, resistance: pieceResistance(id, c, state), enabled: c.switchKey ? state.switches[c.switchKey] : true })), ...state.wires.map((w, i) => ({ id: `wire${i}`, a: w[0], b: w[1], resistance: .035 }))],
   };
 }
 

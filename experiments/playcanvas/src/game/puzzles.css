@@ -122,6 +122,20 @@
 .wb-knob-notches i{flex:1;border-radius:2px;background:#56604f;box-shadow:inset 0 1px 1px #0006}
 .wb-knob-notches i.on{background:linear-gradient(#f1d895,#c19d58)}
 .wb-knob-track:has(input:focus-visible){outline:2px solid #f6e2ad;outline-offset:3px;border-radius:3px}
+.wb-socket{display:flex;flex-wrap:nowrap;justify-content:center;gap:3px}
+.wb-stone{display:grid;justify-items:center;gap:1px;width:clamp(40px,5cqw,56px);padding:3px 2px 2px;border:1px solid #ac926655;border-radius:8px;background:#1d2e24;cursor:pointer}
+.wb-stone svg{display:block;width:100%;height:auto}
+.wb-stone small{font-size:clamp(9px,1cqw,11px);color:#d9cda6;line-height:1}
+.wb-stone:hover:not(:disabled){background:#a59c5040}
+.wb-stone.is-in{border-color:#f1d895;background:#3a4a2f;box-shadow:0 0 0 2px #f1d89555 inset}
+.wb-stone:focus-visible{outline:2px solid #f6e2ad;outline-offset:2px}
+.wb-stone:disabled{cursor:default;opacity:.75}
+/* Lumen's notches: a letter per ring, only for whoever asks for them in the settings. */
+.wb-ring-mark{display:none;font:700 17px/1 Georgia,serif;fill:#f6ead0;stroke:#1a1410;stroke-width:3px;paint-order:stroke;text-anchor:middle}
+.wb-stone-marks{display:none;gap:3px;font:700 clamp(9px,1.05cqw,11px)/1 Georgia,serif;color:#f1e4c2}
+.wb-stone-marks i{font-style:normal}
+.lumen-marks .wb-ring-mark{display:inline}
+.lumen-marks .wb-stone-marks{display:flex}
 .wb-knob output{min-width:26px;font-size:clamp(10px,1.1cqw,12px);color:#d9cda6;text-align:right}
 .wb-switch{display:inline-flex;align-items:center;gap:7px;padding:.35cqw .9cqw;border:1px solid #91805d88;border-radius:14px;background:#0e211d;font-size:clamp(10px,1.1cqw,12px)}
 .wb-switch i{width:24px;height:14px;border-radius:8px;background:#5b5f52;position:relative}

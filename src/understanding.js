@@ -37,6 +37,8 @@ export const WORDS = {
     text: 'Cuál borne es + y cuál −. Un imán o un motor responden distinto según por dónde entre la corriente.' },
   resistencia: { world: 'El freno', term: 'Resistencia', unit: 'ohmio (Ω)', symbol: 'resistor', from: 'gate',
     text: 'Cuánto le cuesta a la corriente atravesar algo. Con el mismo empuje, más resistencia deja pasar menos. La unidad lleva el nombre de Georg Ohm, que midió esto en 1827.' },
+  anillos: { world: 'Los anillos de las piedras', term: 'Código de colores · tolerancia', unit: '±5 %', symbol: 'rings', from: 'gate',
+    text: 'Los anillos escriben un número: dos cifras y cuántos ceros les siguen. El último, dorado, dice cuánto puede correrse la piedra de lo escrito: un 5 %, para arriba o para abajo.' },
   tension: { world: 'La fuerza, el empuje', term: 'Tensión', unit: 'voltio (V)', symbol: 'battery', from: 'pump',
     text: 'La diferencia de empuje entre dos puntos. Por eso siempre se mide entre dos lugares, nunca en uno solo.' },
   caida: { world: 'Lo que se pierde en el camino', term: 'Caída de tensión', unit: 'voltio (V)', symbol: 'drop', from: 'pump',
@@ -98,13 +100,13 @@ const REVEALS = {
     return {
       cards: [
         { spot: ['latch'], title: 'Un imán a pedido', words: ['polaridad'],
-          text: 'La bobina es cobre enrollado. Mientras la corriente la recorre, se vuelve un imán; si la recorre al revés, el imán se invierte. El pestillo también es un imán: un sentido lo empuja, el otro lo atrae.' },
-        { spot: ['latch'], title: 'Sentido no es fuerza',
-          text: 'Por eso dar vuelta los cables cambió hacia dónde empujaba, no cuánto. La misma corriente, en sentido contrario.' },
+          text: 'La bobina es cobre enrollado: mientras la corriente la recorre, es un imán. El pestillo también es un imán. Por eso dar vuelta los cables cambió hacia dónde empujaba, no cuánto: la misma corriente, en sentido contrario.' },
         { spot: ['trim', 'latch'], title: 'El freno', words: ['resistencia'], tags: { latch: amps(I(now, 'latch')) },
-          text: `El freno es una resistencia: un tramo que cuesta atravesar. En cero pasaban ${amps(I(hard, 'latch'))} y el cerrojo golpeaba. Con ${brake} Ω pasan ${amps(I(now, 'latch'))}: firme. En el Instituto se mide en ohmios, Ω. Sí, como yo. No lo elegí.` },
+          text: `Una piedra de freno es una resistencia: un tramo que cuesta atravesar. Con el puente de cobre pasaban ${amps(I(hard, 'latch'))} y el cerrojo golpeaba. Con la piedra de ${brake} Ω pasan ${amps(I(now, 'latch'))}: firme. En el Instituto se mide en ohmios, Ω. Sí, como yo. No lo elegí.` },
+        { spot: ['trim'], title: 'Lo que dicen los anillos', words: ['anillos'],
+          text: brake === 10 ? 'Marrón, negro, negro: 1, 0 y ningún cero. Diez ohmios. La abuela de Edda leía «temperamento»; los anillos escriben un número, con dos cifras y cuántos ceros le siguen. El dorado avisa que la piedra puede correrse un poco.' : `Los anillos de esta piedra escriben ${brake} Ω: dos cifras y cuántos ceros les siguen. El dorado avisa que la piedra puede correrse un poco.` },
       ],
-      question: 'La bobina también frena un poco. Si duplicaras el freno, ¿pasaría exactamente la mitad de corriente?',
+      question: 'La piedra roja, roja, negra frena 22 Ω. ¿Cuánto frenaría una roja, roja, marrón?',
     };
   },
   pump: ({ now, before }) => {
@@ -182,7 +184,7 @@ const REVEALS = {
         { spot: ['lens', 'lower'], title: 'La carga cambia el reparto', tags: { lower: `con lente ${volts(V(loaded, 'lower'))}` },
           text: `Al conectar la lente, ella y el brazo inferior quedan lado a lado: juntos frenan menos y se quedan con menos empuje. Con el ajuste de antes, la toma bajó a ${volts(V(loaded, 'lower'))}. Calibrar en vacío no alcanzaba.` },
         { spot: ['upper', 'lens'], title: 'Calibrar con la lente puesta', tags: { lens: volts(V(now, 'lens')) },
-          text: `Con el brazo superior en ${state.values.upper} Ω, la lente recibe ${volts(V(now, 'lens'))}: luz dorada. Lo que dejó escrito Nereo sirve para revisar: si la toma cambia, algo cambió en la red.` },
+          text: `Con la piedra de ${state.values.upper} Ω en el brazo superior, la lente recibe ${volts(V(now, 'lens'))}: luz dorada. Su anillo dorado dice que puede correrse un 5 %; aun así, la luz queda dorada. Para eso alcanza con que una piedra mienta poco: no hace falta que no mienta nada.` },
       ],
       question: 'Si mañana alguien pone una lente más grande, que frena menos, ¿la toma subirá o bajará?',
     };
@@ -212,7 +214,7 @@ export const CONJUROS = {
   gate: { who: 'EDDA', heir: 'de los guardianes de la Calzada',
     words: 'La Puerta cede a quien le da toda la Luz. Por eso alguien le tendió ese puente.',
     settled: r => !!r.operating.latch,
-    copper: 'Con toda la Luz, el cerrojo golpeaba hacia el lado equivocado. El sentido lo dieron los cables; la fuerza justa, el freno.' },
+    copper: 'Con toda la Luz, el cerrojo golpeaba hacia el lado equivocado. El sentido lo dieron los cables; la fuerza justa, una piedra de freno.' },
   pump: { who: 'VEGA', heir: 'de las operadoras del acueducto',
     words: 'Por donde pasa el agua, pasa la Luz. Unión que deja pasar, no roba.',
     settled: (r, s) => !!s.proofs?.foundLoss,

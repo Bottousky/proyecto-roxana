@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
-import { PUZZLES, HINT_STEPS, initialPuzzleSnapshot, evaluatePuzzle, isPolarized } from '../src/puzzle-model.js';
+import { PUZZLES, HINT_STEPS, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle, isPolarized, stoneRings } from '../src/puzzle-model.js';
+import { getBenchEvidence } from '../src/bench-evidence.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
@@ -188,12 +189,29 @@ test('a loose terminal shows where a path is cut, and the mark goes once the ben
   assert.doesNotMatch(bench('beacon_supply', s).html(), /wb-open/);
 });
 
-test('turning the gate brake, Ohm compares in proportions and does not round them to a rule', () => {
-  const s = initialPuzzleSnapshot('gate'); PUZZLES.gate.solve(s); s.values.brake = 4;
+test('swapping the gate stone, Ohm compares in proportions and does not round them to a rule', () => {
+  const s = initialPuzzleSnapshot('gate'); PUZZLES.gate.solve(s);
   const b = bench('gate', s);
   const previous = globalThis.document;
   globalThis.document = { activeElement: null };
-  try { b.change(state => { state.values.brake = 8; }); } finally { globalThis.document = previous; }
-  assert.match(b.feedback, /Freno de 4 a 8 Ω: el doble/);
-  assert.match(b.feedback, /bajó, pero no a la mitad/, 'the coil also brakes: doubling the brake does not halve the current');
+  try { b.change(state => { state.values.brake = 22; }); } finally { globalThis.document = previous; }
+  assert.match(b.feedback, /De la piedra de 10 Ω a la piedra de 22 Ω: más del doble de freno/);
+  assert.match(b.feedback, /no en la misma proporción: la bobina también frena/, 'the coil also brakes: doubling the brake does not halve the current');
+  assert.match(b.feedback, /0,50 A a 0,34 A/);
+});
+
+test('a socket only takes the stones at hand, and the notebook writes which one went in', () => {
+  const s = initialPuzzleSnapshot('gate'); PUZZLES.gate.solve(s); s.values.brake = 33;
+  assert.equal(normalizePuzzleSnapshot('gate', s).values.brake, 22, 'a value between stones becomes the nearest stone');
+  assert.equal(normalizePuzzleSnapshot('gate', { ...s, values: { brake: 8 } }).values.brake, 10, 'the old 8 Ω dial becomes the 10 Ω stone');
+  assert.deepEqual(stoneRings(10), ['marron', 'negro', 'negro', 'oro']);
+  assert.deepEqual(stoneRings(220), ['rojo', 'rojo', 'marron', 'oro']);
+  assert.deepEqual(stoneRings(47), ['amarillo', 'violeta', 'negro', 'oro']);
+  const b = bench('gate', initialPuzzleSnapshot('gate'));
+  const previous = globalThis.document;
+  globalThis.document = { activeElement: null };
+  try { b.change(state => { state.values.brake = 10; }); } finally { globalThis.document = previous; }
+  assert.match(getBenchEvidence('gate', b.state).map(e => e.text).join(' '), /Zócalo del freno: saqué el puente de cobre; puse la piedra marrón, negro, negro y oro/);
+  // The stone brakes what it really is, a little off its rings: the physics uses 10,1 Ω.
+  assert.ok(Math.abs(evaluatePuzzle('gate', b.state).network.resistors.find(r => r.id === 'trim').resistance - 10.1) < 1e-9);
 });

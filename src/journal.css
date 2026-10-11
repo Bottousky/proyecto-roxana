@@ -243,6 +243,7 @@
 .dj-schematic text:not([text-anchor]),.dj-word-symbol text:not([text-anchor]){text-anchor:middle}
 /* Writing laid over a wire leaves the paper clear around it, as a pen lifted to write. */
 .dj-schematic .sk-label,.dj-schematic .sk-value,.dj-schematic .sk-red-note,.dj-schematic .sk-blue-note{paint-order:stroke;stroke:var(--paper);stroke-width:9px;stroke-linejoin:round}
+.sk-ring{stroke:none;opacity:.92}.sk-stone{fill:#f1e3c2;stroke:none}
 .sk-omega{fill:none;stroke:var(--graphite);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 .sk-label{font-size:42px;font-weight:700;fill:var(--ink-black)}
 .sk-value{font-size:38px;font-weight:700;fill:var(--graphite)}

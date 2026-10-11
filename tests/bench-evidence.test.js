@@ -145,7 +145,9 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   while (movable() >= 0) click({ wire: String(movable()) });
   for (const [a, b] of target.wires.filter(w => !isSealed(id, w))) { bench.touchPort(a); bench.touchPort(b); }
   for (const [key, value] of Object.entries(target.values)) {
-    while (bench.state.values[key] !== value) click({ action: 'knob', key, delta: String(Math.sign(value - bench.state.values[key])) });
+    // A socket takes a stone in one gesture; a dial turns one notch at a time.
+    if (PUZZLES[id].knobs.find(k => k.key === key).stones) { if (bench.state.values[key] !== value) click({ action: 'stone', key, value: String(value) }); }
+    else while (bench.state.values[key] !== value) click({ action: 'knob', key, delta: String(Math.sign(value - bench.state.values[key])) });
   }
   assert.equal(bench.state.sourceOn, true, `${id}: the bench is live without being asked`);
   assert.equal(bench.result.solved, true, id);
@@ -218,14 +220,14 @@ test('the gate closing and its journal page only claim the brake tests the playe
   const page = JOURNAL.find(e => e.id === 'operating_window');
   const said = state => completionLines('gate', state).find(l => l.speaker === 'player').text;
   const fresh = initialPuzzleSnapshot('gate');
-  assert.doesNotMatch(said({ puzzles: { gate: fresh } }), /ajustar/); assert.doesNotMatch(journalText(page, { puzzles: { gate: fresh } }), /extremo no fue/);
-  const moved = { ...fresh, trace: { brake: { min: 6, max: 12 } } };
-  assert.match(said({ puzzles: { gate: moved } }), /ajustar la rueda/); assert.match(journalText(page, { puzzles: { gate: moved } }), /no la llevé a los extremos/);
-  const extreme = { ...fresh, trace: { brake: { min: 0, max: 30 } } };
+  assert.doesNotMatch(said({ puzzles: { gate: fresh } }), /piedra justa/); assert.doesNotMatch(journalText(page, { puzzles: { gate: fresh } }), /extremo no fue/);
+  const moved = { ...fresh, trace: { brake: { min: 10, max: 22 } } };
+  assert.match(said({ puzzles: { gate: moved } }), /piedra justa en el zócalo/); assert.match(journalText(page, { puzzles: { gate: moved } }), /no llegué a la que más frena/);
+  const extreme = { ...fresh, trace: { brake: { min: 0, max: 100 } } };
   assert.equal(journalText(page, { puzzles: { gate: extreme } }), page.text);
   // A save from before the trace existed claims nothing either way.
   const legacy = normalizePuzzleSnapshot('gate', { ...fresh, trace: undefined });
-  assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /rueda/);
+  assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /piedra/);
 });
 
 test('the castle proof: series wiring cannot show the infirmary alone; parallel can, and old commissions keep it', () => {

@@ -269,12 +269,13 @@ export const DIALOGUES = {
   gate_arrival: d(
     ['edda', 'El cerrojo hace fuerza… pero para abajo. ¿No tendría que levantar?'],
     ['edda', 'Mi abuela decía que los guardianes de la Calzada le hablaban a la Puerta: «Cede a quien te da toda la Luz». Alguien les hizo caso: por eso ese puente.'],
+    ['edda', 'Y en el zócalo del cerrojo dejaron un puente de cobre, sin piedra. Traje la bolsa de piedras de freno de mi abuela. Ella las elegía por los anillos, «por el temperamento».'],
     ['player', '¿Qué cambia entre empujar para arriba y para abajo?'],
     ['ohm', 'Puedo mostrar el sentido de la lectura. La placa conserva las marcas de trabajo del cerrojo.'],
     ['edda', 'Bueno. Algo para comparar.']),
   gate_complete: d(
     ['narrator', 'El cerrojo asciende. Por primera vez en años, la Calzada no termina en una pared.'],
-    ['player', 'Cambió el sentido. Y al ajustar la rueda, levantó sin atascarse.'],
+    ['player', 'Cambió el sentido. Y con la piedra justa en el zócalo, levantó sin atascarse.'],
     ['edda', 'Con toda la Luz golpeaba. Le voy a decir a mi abuela que la Puerta prefería que le hablaran más despacio.'],
     ['edda', 'Lo voy a dibujar con las dos posiciones. Si dibujo sólo la buena, después parece que adiviné.'],
     ['edda', 'Del otro lado hay agua. La escuché detrás de la puerta cada vez que vine. No sabés cuánto quería comprobarlo.'],
@@ -824,7 +825,7 @@ export function completionLines(puzzle, state = {}) {
   const lines = DIALOGUES[PUZZLE_STORY[puzzle]?.complete] || [];
   if (puzzle !== 'gate') return lines;
   const brake = gateBrake(state), text = !brake ? 'Cambió el sentido, y el cerrojo levantó.'
-    : brake.min === brake.max ? 'Cambió el sentido. La rueda quedó como estaba, y aun así levantó.' : 'Cambió el sentido. Y al ajustar la rueda, levantó sin atascarse.';
+    : brake.min === brake.max ? 'Cambió el sentido. El zócalo quedó como estaba, y aun así levantó.' : 'Cambió el sentido. Y con la piedra justa en el zócalo, levantó sin atascarse.';
   return lines.map(l => l.speaker === 'player' ? { ...l, text } : l);
 }
 export function journalText(entry, state = {}) {
@@ -842,8 +843,8 @@ export function journalText(entry, state = {}) {
   if (entry.id !== 'operating_window') return entry.text;
   const brake = gateBrake(state);
   if (!brake) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó.';
-  if (brake.min === brake.max) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó. No toqué la rueda del freno: qué hace todavía está por probar.';
-  if (brake.min > 0 && brake.max < 30) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Moví la rueda del freno y cambió cuánto empujaba; no la llevé a los extremos.';
+  if (brake.min === brake.max) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido y levantó. No cambié la piedra del zócalo: qué hace todavía está por probar.';
+  if (brake.min > 0 && brake.max < 100) return 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Probé piedras de freno en el zócalo y cambió cuánto empujaba; no llegué a la que más frena.';
   return entry.text;
 }
 

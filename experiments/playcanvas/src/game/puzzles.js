@@ -1,5 +1,5 @@
 import { measureVoltage, measureResistance } from './electrical.js';
-import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized, montageSignature, tallyReading, tallyCloses } from './puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized, montageSignature, tallyReading, tallyCloses, knobChoices, stoneIn, stoneRings, ringWords, RING_HEX, RING_MARKS } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
 import { CONJUROS, ESTIMATES, estimateChoiceText, estimateVerdict, revealFor, WORDS } from './understanding.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
@@ -18,8 +18,8 @@ export const BENCH_GUIDANCE = {
     steps: [{ how: 'Elegí “Comprobar el camino” y apoyá las puntas en A y B de cada tramo, uno por vez.', tool: 'continuity' }, { how: 'Con tu cable, uní A y B del tramo que no tiene camino.', tool: 'wire' }],
     tools: ['continuity'], voice: 'OHM', hints: ['Por fuera los tres tramos son iguales. Mirarlos no alcanza: hay que preguntarle al cobre.', 'La prueba de camino dice si hay paso entre dos piezas redondas. Funciona con la mesa apagada.', 'Podés probar un tramo por vez, apoyando las puntas en sus dos extremos. Dos van a tener camino; uno, no.', 'Un paso para probar: elegí “Comprobar el camino” y apoyá las puntas en los extremos de cada tramo. Donde diga “Sin camino”, volvé a “Cables” y tendé tu cable entre esos dos extremos.'] },
   gate: { goal: 'Que el cerrojo avance → con fuerza firme.', learned: 'El sentido de la corriente decide hacia dónde empuja el cerrojo; el freno decide con cuánta fuerza.',
-    steps: [{ how: 'El sentido depende de por dónde entra la corriente a la bobina. Tocá sus cables para retirarlos y tendelos de nuevo.', tool: 'wire' }, { how: 'La fuerza la da el freno de la bobina: probá de a una posición.', tool: 'wire' }],
-    tools: ['voltage'], voice: 'OHM', hints: ['El encargo tiene dos partes: hacia dónde empuja y con cuánta fuerza. Conviene resolverlas por separado.', 'El freno cambia la fuerza, nunca el sentido. El sentido depende de por dónde entra la corriente a la bobina.', 'Si la corriente entra por «Avance −», empuja al revés. Invertí los dos cables de la bobina.', 'Un paso para probar: retirá los dos cables que llegan a la bobina y uní «Freno B» con «Avance +» y «Avance −» con «Retorno −». Después girá el freno de a una posición hasta que el cerrojo ni tiemble ni golpee.'] },
+    steps: [{ how: 'El sentido depende de por dónde entra la corriente a la bobina. Tocá sus cables para retirarlos y tendelos de nuevo.', tool: 'wire' }, { how: 'La fuerza la da la piedra del zócalo. Probá las piedras de Edda de a una: sus anillos dicen cuánto frena cada una.', tool: 'wire' }],
+    tools: ['voltage'], voice: 'OHM', hints: ['El encargo tiene dos partes: hacia dónde empuja y con cuánta fuerza. Conviene resolverlas por separado.', 'La piedra cambia la fuerza, nunca el sentido. El sentido depende de por dónde entra la corriente a la bobina.', 'Si la corriente entra por «Avance −», empuja al revés. Invertí los dos cables de la bobina.', 'Un paso para probar: retirá los dos cables que llegan a la bobina y uní «Freno B» con «Avance +» y «Avance −» con «Retorno −». Después probá las piedras de Edda en el zócalo hasta que el cerrojo ni tiemble ni golpee: la de anillos marrón, negro, negro.'] },
   pump: { goal: 'Encontrá el empalme que pierde fuerza y puentealo.', learned: 'Un empalme puede conducir y aun así comerse la fuerza: se descubre comparando sus extremos con la bomba andando.',
     steps: [{ how: 'Elegí “Comparar dos puntos” y apoyá las puntas en A y B de cada empalme, con la bomba andando.', tool: 'voltage' }, { how: 'Vega quiere saber adónde se fueron los 12 V. Compará los dos extremos de cada empalme y de la bomba, en el mismo montaje: ella va sumando.', tool: 'voltage' }, { how: 'Con tu cable, uní A y B del empalme que pierde.', tool: 'wire' }],
     tools: ['voltage'], voice: 'OHM', hints: ['Los tres empalmes conducen: la prueba de camino diría que sí en los tres. La pérdida es otra cosa.', 'Con la bomba trabajando, un empalme sano apenas se nota; uno malo se come parte de la fuerza. Y se entibia.', 'Compará los dos extremos de cada empalme con la bomba andando. Donde haya una diferencia grande, ahí se pierde.', 'Un paso para probar: elegí “Comparar dos puntos” y apoyá las puntas en los extremos de cada empalme. En el que muestre diferencia, volvé a “Cables” y tendé tu cable entre sus dos extremos.'] },
@@ -36,11 +36,25 @@ export const BENCH_GUIDANCE = {
     steps: [...[0, 1, 2].map(() => ({ how: 'Que ninguna voz tenga que atravesar a otra para volver al mar. Como en el Castillo, pero con tres. Tocá un cable para retirarlo.', tool: 'wire' })), { how: 'Nereo quiere anotar la regla de los nudos: con “Medir un camino”, medí cada voz y también lo que sale de la fuente.', tool: 'current' }],
     tools: ['current'], voice: 'OHM', hints: ['Seguí los caminos: la corriente de la campana atraviesa la luz y el giro antes de volver.', 'En el Castillo, cada luz tuvo su propio camino. Acá son tres.', 'Cada voz necesita ida desde «Fuente +» y vuelta a «Retorno −», sin pasar por las otras.', 'Un paso para probar: retirá los dos cables que pasan de un receptor al siguiente. Con tus cuatro cables uní «Óptica −» y «Giro −» con «Retorno −», y «Fuente +» con «Giro +» y con «Señales +».'] },
   beacon_lens: { goal: 'Alimentá la lente desde la toma del divisor y calibrala.', learned: 'Al conectar una carga, la toma del divisor baja: por eso se calibra con la lente puesta.',
-    steps: [{ how: 'Elegí “Comparar dos puntos” y compará «Toma intermedia» con «Retorno −»: una vez así y otra con la lente conectada a la toma.', tool: 'voltage' }, { how: 'Con el cable de la lente en la «Toma intermedia», girá el freno de la lente hasta que la luz sea dorada.', tool: 'wire' }],
-    tools: ['voltage'], voice: 'OHM', hints: ['La lente está unida directo a «Fuente +». El divisor está listo, pero nadie toma de su toma intermedia.', 'Nereo quiere dos lecturas de la toma: una sin la lente y otra con la lente conectada.', 'Con la lente conectada, la toma baja. Por eso el freno se calibra con la lente puesta, no antes.', 'Un paso para probar: compará «Toma intermedia» con «Retorno −». Mové el cable de la lente de «Fuente +» a la «Toma intermedia» y volvé a comparar. Después girá el freno hasta que la luz sea dorada.'] },
+    steps: [{ how: 'Elegí “Comparar dos puntos” y compará «Toma intermedia» con «Retorno −»: una vez así y otra con la lente conectada a la toma.', tool: 'voltage' }, { how: 'Con el cable de la lente en la «Toma intermedia», probá las piedras de repuesto de Nereo en el brazo superior hasta que la luz sea dorada.', tool: 'wire' }],
+    tools: ['voltage'], voice: 'OHM', hints: ['La lente está unida directo a «Fuente +». El divisor está listo, pero nadie toma de su toma intermedia.', 'Nereo quiere dos lecturas de la toma: una sin la lente y otra con la lente conectada.', 'Con la lente conectada, la toma baja. Por eso la piedra del brazo superior se elige con la lente puesta, no antes.', 'Un paso para probar: compará «Toma intermedia» con «Retorno −». Mové el cable de la lente de «Fuente +» a la «Toma intermedia» y volvé a comparar. Después cambiá la piedra del brazo superior hasta que la luz sea dorada: la de anillos marrón, rojo, negro.'] },
 };
 
 const simpleLabel = label => label.replace(/\s*·\s*\d[\d,.]*\s*Ω/g, '').replace('Freno resistivo', 'Mando del cerrojo');
+// ── Piedras de freno, drawn on the bench ─────────────────────────────────────────────────
+const RING_AT = [.24, .38, .52, .78];
+/** A ceramic stone with its four painted rings, centred on (x, y). With «Las marcas de Lumen» each ring carries its letter. */
+function stoneArt(x, y, w, nominal) {
+  const h = Math.max(26, w * .34), rings = stoneRings(nominal), x0 = x - w / 2;
+  return `<g class="wb-stone-art"><rect x="${x0}" y="${y-h/2}" width="${w}" height="${h}" rx="${h/2}" fill="url(#wb-ceramic)" stroke="#6d5a3a" stroke-width="2"/>${rings.map((c, i) => `<path d="M${(x0+w*RING_AT[i]).toFixed(1)} ${(y-h/2+2).toFixed(1)} q2 ${h/2-2} 0 ${h-4} h${(w*.09).toFixed(1)} q-2 ${-(h/2-2)} 0 ${-(h-4)}Z" fill="${RING_HEX[c]}" stroke="#0004"/><text class="wb-ring-mark" x="${(x0+w*RING_AT[i]+w*.045).toFixed(1)}" y="${(y+h/2+19).toFixed(1)}">${RING_MARKS[c]}</text>`).join('')}<ellipse cx="${x-w*.05}" cy="${y-h/4}" rx="${w*.32}" ry="${h*.1}" fill="#fff" opacity=".2"/></g>`;
+}
+/** The same stone, at the size of a button. */
+function stoneIcon(st) {
+  if (st.strap) return '<svg viewBox="0 0 80 34" aria-hidden="true"><rect x="6" y="11" width="68" height="12" rx="3" fill="#b8733c" stroke="#5b3a1c" stroke-width="2"/></svg>';
+  return `<svg viewBox="0 0 80 34" aria-hidden="true"><defs><linearGradient id="wb-ceramic-icon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1e3c2"/><stop offset=".6" stop-color="#d9c398"/><stop offset="1" stop-color="#b59a6a"/></linearGradient></defs><path d="M0 17 H8 M72 17 H80" stroke="#9a8656" stroke-width="3"/>${stoneArt(40, 15, 64, st.value).replace('url(#wb-ceramic)', 'url(#wb-ceramic-icon)').replace(/<text class="wb-ring-mark"[^>]*>[^<]*<\/text>/g, '')}</svg>`;
+}
+/** «saqué la piedra rojo, rojo, negro y oro», «puse el puente de cobre»: what a hand did at a socket. */
+const stoneSaid = (k, value, verb) => { const st = stoneIn(k, value); return st?.strap ? `${verb} el puente de cobre` : `${verb} la piedra ${ringWords(value)}`; };
 const TOOL_NAMES = { wire: 'Mover cables', continuity: 'Comprobar el camino', voltage: 'Comparar dos puntos', current: 'Medir un camino' };
 
 // These observations describe the solved physical state, not proximity to a
@@ -319,17 +333,14 @@ export class PuzzleWorkbench {
     return `<div class="wb-tally ${s.tally?.closed ? 'is-closed' : ''}" aria-label="${escapeHtml(t.title)}"><b>${escapeHtml(t.title)}</b><div class="wb-tally-sum">${cells}<i>=</i><span class="wb-tally-total ${all ? 'is-read' : ''}">${all ? `${fmtN(sum)} ${unit}` : '…'}</span><i>${s.tally?.closed ? '≈' : '¿='}</i>${total}</div></div>`;
   }
 
-  /** Turning the gate's brake, Ohm compares in proportions: how much the brake changed, how much the current. */
+  /** Swapping the gate's stone, Ohm compares in proportions: how much the brake changed, how much the current. */
   proportionNote(before) {
     const value = this.state.values.brake, current = Math.abs(this.result.solution.branches.latch?.current ?? 0);
     if (value === before.value || this.feedback || before.current < .05 || current < .05 || this.state.tripped) return;
-    const ratio = (a, b) => b / a, brake = before.value ? ratio(before.value, value) : null, flow = ratio(before.current, current);
-    const said = n => n === 2 ? 'el doble' : n === .5 ? 'la mitad' : n === 3 ? 'el triple' : null;
-    const amps = n => `${n.toFixed(2).replace('.', ',')} A`;
-    const words = said(brake);
-    this.feedback = words
-      ? `Freno de ${before.value} a ${value} Ω: ${words}. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'bajó' : 'subió'}, pero no ${words === 'el doble' ? 'a la mitad' : words === 'la mitad' ? 'al doble' : 'en la misma proporción'}. La bobina también frena, y ese freno no cambió.`
-      : `Freno de ${before.value} a ${value} Ω. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'más freno, menos corriente' : 'menos freno, más corriente'}.`;
+    const flow = current / before.current, amps = n => `${n.toFixed(2).replace('.', ',')} A`;
+    const stone = (v, from) => (v ? `${from ? 'De' : 'a'} la piedra de ${v} Ω` : `${from ? 'Del' : 'al'} puente de cobre`), times = before.value ? value / before.value : null;
+    const words = times && times > 1.8 ? `más del doble de freno` : times && times < .55 ? `menos de la mitad de freno` : null;
+    this.feedback = `${stone(before.value, true)} ${stone(value)}${words ? `: ${words}` : ''}. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'más freno, menos corriente' : 'menos freno, más corriente'}${words ? `, pero no en la misma proporción: la bobina también frena, y ese freno no cambió` : ''}.`;
   }
 
   // The mark Nereo wrote in the keepers' book meets the instrument.
@@ -377,6 +388,7 @@ export class PuzzleWorkbench {
     for (const wire of s.wires) if (!before.wires.some(w => sameWire(w, wire))) note(`Uní ${this.portLabel(wire[0])} con ${this.portLabel(wire[1])}.`);
     for (const knob of this.puzzle.knobs ?? []) if (s.trace?.[knob.key]) { const t = s.trace[knob.key], v = s.values[knob.key]; t.min = Math.min(t.min, v); t.max = Math.max(t.max, v); }
     for (const knob of this.puzzle.knobs ?? []) if (before.values[knob.key] !== s.values[knob.key]) {
+      if (knob.stones) { note(`${knob.label}: ${stoneSaid(knob, before.values[knob.key], 'saqué')}; ${stoneSaid(knob, s.values[knob.key], 'puse')}.`); continue; }
       const position = value => Math.round((value - knob.min) / knob.step) + 1;
       note(`${simpleLabel(knob.label)}: pasé de la posición ${position(before.values[knob.key])} a la ${position(s.values[knob.key])}.`);
     }
@@ -486,7 +498,7 @@ export class PuzzleWorkbench {
     // A drag that just ended may still produce a click on a terminal it touched: the drop already decided.
     const dropped = this.dragEnded, terminal = el.dataset.port ?? el.dataset.terminal;
     if (dropped && terminal && dropped.ids.includes(terminal) && performance.now() - dropped.at < 300) { this.dragEnded = null; return; }
-    const physicallyChanges = el.dataset.wire !== undefined || ['switch','knob','undo','reset'].includes(el.dataset.action) || ((el.dataset.port || el.dataset.terminal) && this.mode === 'wire');
+    const physicallyChanges = el.dataset.wire !== undefined || ['switch','knob','stone','undo','reset'].includes(el.dataset.action) || ((el.dataset.port || el.dataset.terminal) && this.mode === 'wire');
     if (this.state.completed && physicallyChanges) { this.feedback = 'La instalación está en servicio. Podés medirla, o practicar con una copia para cambiar el montaje.'; this.render(); return; }
     if (el.dataset.port) return this.touchPort(el.dataset.port);
     if (el.dataset.terminal) return this.touchPort(el.dataset.terminal);
@@ -529,6 +541,12 @@ export class PuzzleWorkbench {
     }
     if (action === 'switch' && this.puzzle.switches?.find(sw => sw.key === el.dataset.key)?.external) return;
     if (action === 'switch') { this.feedback = ''; return this.change(s => { s.switches[el.dataset.key] = !s.switches[el.dataset.key]; }, { sound: 'switch' }); }
+    if (action === 'stone') {
+      const knob = this.puzzle.knobs.find(k => k.key === el.dataset.key), value = Number(el.dataset.value);
+      if (!knob || !knobChoices(knob).includes(value) || this.state.values[knob.key] === value) return;
+      this.feedback = '';
+      return this.change(s => { s.values[knob.key] = value; }, { sound: 'switch' });
+    }
     if (action === 'knob') {
       const knob = this.puzzle.knobs.find(k => k.key === el.dataset.key);
       this.feedback = '';
@@ -675,7 +693,7 @@ export class PuzzleWorkbench {
   renderDetails() {
     if (!this.showNumbers) return '';
     const p = this.puzzle, r = this.result, s = this.state;
-    return `<details class="wb-notes" data-drawer="ratings"><summary>Leer las marcas de las piezas</summary><p>Son referencias para comparar con tus mediciones. No hace falta memorizarlas.</p>${p.components.filter(c => !['cloth', 'joint'].includes(c.kind)).map(c => `<p><strong>${escapeHtml(simpleLabel(c.label))}</strong> · ${fmt(c.valueKey ? s.values[c.valueKey] : c.resistance, 1)} Ω${c.goal ? `<br>Marca de trabajo: ${fmt(c.goal.minVoltage, 1)}–${fmt(c.goal.maxVoltage, 1)} V.` : ''}</p>`).join('')}${(p.constraints ?? []).filter(c => c.maxPower !== undefined).map(c => `<p>Tendido: ${fmt(r.solution.branches[c.branch]?.power ?? 0,1)} W · marca máxima ${fmt(c.maxPower,1)} W.</p>`).join('')}<details data-drawer="model"><summary>Cómo funciona este instrumento</summary><p>Red resistiva en corriente continua; los receptores representan su carga nominal. Los cables tienen 0,035 Ω. El voltímetro ideal compara dos puntos. El amperímetro ideal ocupa un tramo de la rama elegida en serie: toda su corriente lo atraviesa. Su resistencia es cero y no altera esta red nominal. En un instrumento real hay que escoger conexión y rango adecuados; aquí el rango es automático. La prueba de continuidad mide toda la red conectada, con la alimentación apagada.</p></details></details>`;
+    return `<details class="wb-notes" data-drawer="ratings"><summary>Leer las marcas de las piezas</summary><p>Son referencias para comparar con tus mediciones. No hace falta memorizarlas.</p>${p.components.filter(c => !['cloth', 'joint'].includes(c.kind)).map(c => `<p><strong>${escapeHtml(simpleLabel(c.label))}</strong> · ${fmt(c.valueKey ? s.values[c.valueKey] : c.resistance, 1)} Ω${(st => st && !st.strap ? ' ±5 % (anillo dorado)' : '')(stoneIn(p.knobs?.find(k => k.key === c.valueKey), s.values[c.valueKey]))}${c.goal ? `<br>Marca de trabajo: ${fmt(c.goal.minVoltage, 1)}–${fmt(c.goal.maxVoltage, 1)} V.` : ''}</p>`).join('')}${(p.constraints ?? []).filter(c => c.maxPower !== undefined).map(c => `<p>Tendido: ${fmt(r.solution.branches[c.branch]?.power ?? 0,1)} W · marca máxima ${fmt(c.maxPower,1)} W.</p>`).join('')}<details data-drawer="model"><summary>Cómo funciona este instrumento</summary><p>Red resistiva en corriente continua; los receptores representan su carga nominal. Los cables tienen 0,035 Ω. El voltímetro ideal compara dos puntos. El amperímetro ideal ocupa un tramo de la rama elegida en serie: toda su corriente lo atraviesa. Su resistencia es cero y no altera esta red nominal. En un instrumento real hay que escoger conexión y rango adecuados; aquí el rango es automático. La prueba de continuidad mide toda la red conectada, con la alimentación apagada.</p></details></details>`;
   }
 
   // Following the copper: pointing at a terminal or a wire lights every terminal
@@ -740,7 +758,7 @@ export class PuzzleWorkbench {
     const glowing = Math.abs(branch?.current ?? 0) > .05 && !this.state.tripped && this.state.sourceOn;
     const nominalCurrent = c.goal ? (c.goal.minCurrent + c.goal.maxCurrent) / 2 : 1;
     const response = glowing ? Math.min(2.4, Math.abs(branch.current) / nominalCurrent) : 0;
-    const resistance = c.valueKey ? this.state.values[c.valueKey] : c.resistance;
+    const resistance = c.valueKey ? this.state.values[c.valueKey] : c.resistance, socket = this.puzzle.knobs?.find(k => k.key === c.valueKey && k.stones);
     const screw = (sx, sy, radius = 5) => `<circle cx="${sx}" cy="${sy}" r="${radius}" fill="url(#wb-brass)" stroke="#332a1b" stroke-width="1"/><path d="M${sx-radius*.6} ${sy+radius*.3} l${radius*1.2} ${-radius*.6}" stroke="#362d21" stroke-width="1.5"/>`;
     const teeth = (radius, count=18) => Array.from({length:count},(_,i)=>`<rect x="${x-4}" y="${y-radius-5}" width="8" height="10" rx="1" fill="url(#wb-brass)" transform="rotate(${i*360/count} ${x} ${y})"/>`).join('');
     let center, labelOffset = 69, specOffset = 69;
@@ -770,6 +788,10 @@ export class PuzzleWorkbench {
       center = `<ellipse cx="${x}" cy="${y+36}" rx="84" ry="10" fill="#0007"/><path d="M${x-70} ${y+30} V${y-14} Q${x} ${y-52} ${x+70} ${y-14} V${y+30} Z" fill="url(#wb-darkMetal)" stroke="url(#wb-brass)" stroke-width="5"/><path d="M${x-34} ${y+30} V${y+2} Q${x} ${y-22} ${x+34} ${y+2} V${y+30} Z" fill="#1a0f0a" stroke="#6b5139" stroke-width="3"/><ellipse cx="${x}" cy="${y+18}" rx="${22+10*heat}" ry="${10+6*heat}" fill="rgb(${Math.round(90+165*heat)},${Math.round(40+120*heat)},${Math.round(20+30*heat)})" opacity="${.35+.65*heat}"/>${screw(x-60,y+20,4)}${screw(x+60,y+20,4)}`;
     } else if (c.kind === 'heater') {
       center = `<rect x="${x-76}" y="${y-35}" width="152" height="72" rx="7" fill="url(#wb-darkMetal)" stroke="url(#wb-brass)" stroke-width="5"/>${Array.from({length:8},(_,i)=>`<path d="M${x-56+i*16} ${y-25} v50" stroke="#596a53" stroke-width="8"/>`).join('')}<path d="M${x-65} ${y+20} H${x+55} q10 0 10 -10 v-6 H${x-55} q-10 0 -10 -10 v-8 H${x+62}" fill="none" stroke="url(#wb-copper)" stroke-width="5"/>${screw(x-68,y-28,4)}${screw(x+68,y-28,4)}${screw(x-68,y+29,4)}${screw(x+68,y+29,4)}`;
+    } else if (socket) {
+      // A felt bed between two brass clamps; the stone (or the copper strap) lies across it.
+      const st = stoneIn(socket, resistance), w = Math.min(150, width);
+      center = `<ellipse cx="${x}" cy="${y+31}" rx="${w/2+14}" ry="9" fill="#0006"/><rect x="${x-w/2-10}" y="${y-27}" width="${w+20}" height="54" rx="10" fill="#3b2a1f" stroke="#8b7755" stroke-width="3"/><rect x="${x-w/2+4}" y="${y-18}" width="${w-8}" height="36" rx="8" fill="#5e2f2a" opacity=".85"/>${[-1,1].map(sign=>`<rect x="${x+sign*(w/2-2)-9}" y="${y-24}" width="18" height="48" rx="4" fill="url(#wb-brass)" stroke="#5a4a30"/>${screw(x+sign*(w/2-2),y-13,4)}${screw(x+sign*(w/2-2),y+13,4)}`).join('')}${st?.strap ? `<rect x="${x-w/2+6}" y="${y-6}" width="${w-12}" height="12" rx="3" fill="url(#wb-copper)" stroke="#5b3a1c"/>` : stoneArt(x, y, w - 30, st?.value ?? resistance)}`;
     } else {
       center = `<ellipse cx="${x}" cy="${y+29}" rx="${width/2+9}" ry="9" fill="#0006"/><rect x="${x-width/2}" y="${y-22}" width="${width}" height="44" rx="16" fill="url(#wb-ceramic)" stroke="#786848" stroke-width="2"/>${[-1,1].map(sign=>`<ellipse cx="${x+sign*(width/2-9)}" cy="${y}" rx="9" ry="23" fill="url(#wb-brass)" stroke="#6a593c" stroke-width="2"/>`).join('')}${Array.from({length:9},(_,i)=>`<path d="M${x-width/2+28+i*(width-56)/8} ${y-21} q-8 21 0 42" fill="none" stroke="url(#wb-copper)" stroke-width="5"/>`).join('')}<path d="M${x-width/2+18} ${y-13} H${x+width/2-18}" stroke="#fff2c777" stroke-width="2"/>`;
     }
@@ -842,7 +864,7 @@ export class PuzzleWorkbench {
     return { kind: 'step', who: voice, text };
   }
 
-  plateOffset(c) { return c.kind === 'orb' ? 136 : c.kind === 'lens' ? 98 : 69; }
+  plateOffset(c) { return c.kind === 'orb' ? 136 : c.kind === 'lens' ? 98 : this.puzzle.knobs?.some(k => k.key === c.valueKey && k.stones) ? 92 : 69; }
   pieceName(c) { return this.puzzle.knobs?.find(k => k.key === c.valueKey)?.label ?? simpleLabel(c.label); }
 
   stateMarkup(c) {
@@ -852,7 +874,17 @@ export class PuzzleWorkbench {
     return `<span class="wb-state is-${status.tone}" title="${escapeHtml(said)}"><i aria-hidden="true">${STATUS_ICON[status.tone]}</i>${escapeHtml(status.word)}</span>`;
   }
 
+  /** A socket: the stones at hand, one fitted. Rings are the only label, unless the numbers are showing. */
+  socketControl(k) {
+    const now = this.state.values[k.key];
+    return `<div class="wb-socket" data-knob-key="${k.key}" role="radiogroup" aria-label="${escapeHtml(`${k.label} · ${k.socket}`)}">${k.stones.map(st => {
+      const on = st.value === now, name = st.strap ? 'Puente de cobre, sin piedra' : `Piedra ${ringWords(st.value)}${this.showNumbers ? ` · ${st.value} Ω` : ''}`;
+      return `<button class="wb-stone ${on ? 'is-in' : ''}" role="radio" aria-checked="${on}" data-action="stone" data-key="${k.key}" data-value="${st.value}" aria-label="${escapeHtml(name)}" title="${escapeHtml(name)}">${stoneIcon(st)}${st.strap ? '' : `<span class="wb-stone-marks" aria-hidden="true">${stoneRings(st.value).map(c => `<i>${RING_MARKS[c]}</i>`).join('')}</span>`}${this.showNumbers ? `<small>${st.strap ? '0' : st.value} Ω</small>` : ''}</button>`;
+    }).join('')}</div>`;
+  }
+
   knobControl(k) {
+    if (k.stones) return this.socketControl(k);
     const s = this.state, positions = Math.round((k.max - k.min) / k.step) + 1, at = Math.round((s.values[k.key] - k.min) / k.step) + 1;
     const readout = this.showNumbers ? `${fmt(s.values[k.key], 0)} ${k.unit}` : `${at}/${positions}`;
     return `<div class="wb-knob" data-knob-key="${k.key}" role="group" aria-label="${escapeHtml(k.label)}"><button data-action="knob" data-key="${k.key}" data-delta="-1" aria-label="${escapeHtml(k.label)}: frenar menos" ${at <= 1 ? 'disabled' : ''}>−</button><span class="wb-knob-track"><input data-knob="${k.key}" type="range" min="${k.min}" max="${k.max}" step="${k.step}" value="${s.values[k.key]}" aria-label="${escapeHtml(k.label)}" aria-valuetext="${this.showNumbers ? `${s.values[k.key]} ${k.unit}` : `Posición ${at} de ${positions}. Hacia la derecha frena más: pasa menos.`}"/><span class="wb-knob-notches" aria-hidden="true">${Array.from({ length: positions }, (_, i) => `<i class="${i < at ? 'on' : ''}"></i>`).join('')}</span></span><button data-action="knob" data-key="${k.key}" data-delta="1" aria-label="${escapeHtml(k.label)}: frenar más" ${at >= positions ? 'disabled' : ''}>+</button><output>${readout}</output></div>`;
@@ -910,7 +942,7 @@ export class PuzzleWorkbench {
     const c1 = { x: pa.x + (pb.x - pa.x) * .2, y: pa.y + sag }, c2 = { x: pb.x - (pb.x - pa.x) * .2, y: pb.y + sag };
     const at = t => { const u = 1 - t; return { x: u ** 3 * pa.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * pb.x, y: u ** 3 * pa.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * pb.y }; };
     const boxes = p.components.flatMap(c => { const a = port(c.a), b = port(c.b), x = (a.x + b.x) / 2, y = (a.y + b.y) / 2, knob = p.knobs?.some(k => k.key === c.valueKey);
-      return [{ x, y: y - this.plateOffset(c), w: 20 + 4.5 * (this.pieceName(c).length + (c.goal ? 14 : 0)), h: knob ? 48 : 22 }, { x, y, w: 80, h: 45 }]; });
+      return [{ x, y: y - this.plateOffset(c), w: 20 + 4.5 * (this.pieceName(c).length + (c.goal ? 14 : 0)), h: knob ? (p.knobs.find(k => k.key === c.valueKey).stones ? 64 : 48) : 22 }, { x, y, w: 80, h: 45 }]; });
     const clear = q => boxes.every(r => Math.abs(q.x - r.x) > r.w || Math.abs(q.y - r.y) > r.h) && p.ports.every(n => Math.hypot(n.x - q.x, n.y - q.y) > 42);
     const { x, y } = [.5, .4, .6, .3, .7, .22, .78, .15, .85].map(at).find(clear) ?? at(.5);
     return `<button class="wb-wire-chip" data-wire="${i}" style="left:${x / 10}%;top:${y / 5}%" aria-label="Retirar el cable entre ${escapeHtml(this.portLabel(w[0]))} y ${escapeHtml(this.portLabel(w[1]))}" title="Retirar este cable">×</button>`;
@@ -929,7 +961,7 @@ export class PuzzleWorkbench {
     if (!this.shell) return;
     this.probeMarks = null;
     for (const c of this.puzzle.components) { const el = this.shell.querySelector(`.wb-plate[data-piece="${c.id}"] .wb-state`); if (el) el.outerHTML = this.stateMarkup(c); }
-    for (const k of this.puzzle.knobs ?? []) this.shell.querySelectorAll(`.wb-knob[data-knob-key="${k.key}"]`).forEach(el => {
+    for (const k of (this.puzzle.knobs ?? []).filter(k => !k.stones)) this.shell.querySelectorAll(`.wb-knob[data-knob-key="${k.key}"]`).forEach(el => {
       const at = Math.round((this.state.values[k.key] - k.min) / k.step) + 1, positions = Math.round((k.max - k.min) / k.step) + 1;
       el.querySelectorAll('.wb-knob-notches i').forEach((i, n) => i.classList.toggle('on', n < at));
       el.querySelector('output').textContent = this.showNumbers ? `${fmt(this.state.values[k.key], 0)} ${k.unit}` : `${at}/${positions}`;
@@ -984,7 +1016,7 @@ export class PuzzleWorkbench {
       <footer class="wb-dock">${card ? this.revealPanel(card, inService) : this.dockMarkup({ say, hintButton, controls, inService, tools, portMarkup, p, s })}</footer>
     </div>`;
     this.shell.querySelectorAll('[data-drawer]').forEach(d => { d.open = drawers[d.dataset.drawer] ?? d.hasAttribute('open'); });
-    if (inService) this.shell.querySelectorAll('[data-action="switch"],[data-action="knob"],input[data-knob],button[data-wire]').forEach(el => { el.disabled = true; });
+    if (inService) this.shell.querySelectorAll('[data-action="switch"],[data-action="knob"],[data-action="stone"],input[data-knob],button[data-wire]').forEach(el => { el.disabled = true; });
     if (previous) {
       const keys = ['port','terminal','branch','action','knob'];
       const key = keys.find(k => previous[k]);
