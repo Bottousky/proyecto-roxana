@@ -27,6 +27,16 @@ function solveProtected(model) {
   return { solution: overloaded ? solveDC(network) : requested, overloaded, requestedCurrent };
 }
 
+/** What the needle says, in plain words: the second half of every reading Ohm shows. */
+function needle({ overloaded, floating, available, voltage, current, open }) {
+  if (overloaded) return 'La aguja salta y se oye el clic de la protección: se pedía demasiado.';
+  if (open && !floating && available) return Math.abs(voltage ?? 0) > .01 ? 'Hay empuje de un lado, pero por un contacto abierto no pasa nada.' : 'Por un contacto abierto no pasa nada.';
+  if (floating) return 'La aguja no se fija: este punto no está unido a nada que empuje.';
+  if (!available) return 'La fuente de acá todavía no da nada.';
+  if (Math.abs(current) < 1e-7) return Math.abs(voltage ?? 0) > .01 ? 'Hay empuje, pero no pasa corriente: le falta la vuelta.' : 'Ni empuje ni paso.';
+  return 'Pasa corriente por acá.';
+}
+
 function fieldResult(model, probe, observation) {
   const { solution, overloaded, requestedCurrent } = solveProtected(model);
   let voltage = measureVoltage(solution, probe.positive, probe.negative ?? 'source−');
@@ -37,11 +47,8 @@ function fieldResult(model, probe, observation) {
   const floating = voltage === null;
   // An observation is available before any optional technical interpretation.
   // In particular, an unsettled probe must never be described as a zero reading.
-  const notice = overloaded ? 'El indicador da un impulso y la salida deja de responder. Podemos cambiar una sola cosa y volver a mirar.'
-    : floating ? 'Ohm no consigue fijar una lectura aquí. Una aguja indecisa no es lo mismo que una aguja en cero.'
-    : !model.available ? 'Ohm no registra actividad en la fuente de esta instalación. Todavía no podemos comprobar cómo responde el resto.'
-    : Math.abs(current) < 1e-7 ? 'El indicador de paso no responde en este tramo. Eso solo no alcanza para encontrar la causa; podemos comparar otro punto.'
-    : 'El indicador de paso responde en este tramo. Queda por observar qué hace el mecanismo cuando lo probamos.';
+  // Ohm says what this very piece is doing, then what the needle shows: never a reading without a place.
+  const notice = `${probe.say ?? ''} ${needle({ overloaded, floating, available: model.available, voltage, current, open: model.resistors.find(r => r.id === probe.branch)?.enabled === false })}`.trim();
   const context = { solution, overloaded, requestedCurrent, voltage, current, sourceCurrent, floating };
   const physicalObservation = typeof observation === 'function' ? observation(context) : observation;
   let electricalObservation;
@@ -51,7 +58,7 @@ function fieldResult(model, probe, observation) {
   else if (Math.abs(current) < 1e-7 && Math.abs(voltage) > .01) electricalObservation = 'Hay tensión en este punto, pero no circula corriente por la rama observada. Una ida presente no reemplaza el retorno.';
   else if (Math.abs(voltage) < .01 && sourceCurrent < 1e-7) electricalObservation = 'Entre estas dos puntas hay 0 V y no circula corriente. La fuente puede conservar tensión en otro punto del recorrido.';
   else electricalObservation = 'La lectura corresponde a estos bornes y a esta rama. Comparar otro punto permite seguir dónde cae la tensión.';
-  return { title: probe.title, voltage, current, powered: model.available && !overloaded && Math.abs(current) > 1e-7,
+  return { title: probe.title, lead: probe.say ?? '', voltage, current, powered: model.available && !overloaded && Math.abs(current) > 1e-7,
     overloaded, notice, observation: `${physicalObservation} ${electricalObservation}`.trim(),
     reference: probe.reference, unit: 'V', sourceVoltage: model.available ? model.voltage : 0, sourceAvailable: model.available,
     floating, requestedCurrent, sourceCurrent, protectionLimit: model.protection, mechanicalReady: probe.mechanicalReady ?? null,
@@ -65,9 +72,9 @@ function workshop(state, object) {
   model.resistors.push(resistor('feed', 'bus', 'bench+', CONTACT, feed), resistor('return', 'bench−', 'source−', CONTACT, back),
     resistor('pilot', 'bench+', 'bench−', 120), resistor('splice', 'bench+', 'lamp+', repaired ? .035 : Infinity), resistor('lamp', 'lamp+', 'bench−', 24));
   const probes = {
-    workshop_feed: { title: 'Poste de alimentación de la mesa', positive: 'bus', branch: 'feed', reference: 'Tensión: borne del lado de la fuente respecto del retorno de la celda. Corriente: rama de alimentación hacia la mesa.' },
-    workshop_return: { title: 'Poste de retorno de la mesa', positive: 'bench−', branch: 'return', reference: 'Tensión: borne del lado de la mesa respecto del retorno de la celda. Corriente positiva: desde la mesa hacia la celda.' },
-    workbench: { title: 'Bornera de entrada del banco', positive: 'bench+', negative: 'bench−', branch: 'lamp', reference: 'Tensión: entre alimentación y retorno del banco, antes de la costura. Corriente: rama de la lámpara.' },
+    workshop_feed: { say: feed ? 'El cierre izquierdo está unido: por acá sale la ida hacia la mesa.' : 'El cierre izquierdo está suelto: la ida no llega a la mesa.', title: 'Poste de alimentación de la mesa', positive: 'bus', branch: 'feed', reference: 'Tensión: borne del lado de la fuente respecto del retorno de la celda. Corriente: rama de alimentación hacia la mesa.' },
+    workshop_return: { say: back ? 'El cierre derecho está unido: por acá vuelve la corriente a la celda.' : 'El cierre derecho está suelto: lo que llegue a la mesa no tiene por dónde volver.', title: 'Poste de retorno de la mesa', positive: 'bench−', branch: 'return', reference: 'Tensión: borne del lado de la mesa respecto del retorno de la celda. Corriente positiva: desde la mesa hacia la celda.' },
+    workbench: { say: repaired ? 'La lámpara del banco tiene su camino entero.' : feed && back ? 'La mesa recibe empuje, pero la lámpara no se entera: algo corta su camino adentro de la tela.' : 'La mesa todavía no tiene ida y vuelta.', title: 'Bornera de entrada del banco', positive: 'bench+', negative: 'bench−', branch: 'lamp', reference: 'Tensión: entre alimentación y retorno del banco, antes de la costura. Corriente: rama de la lámpara.' },
   };
   const probe = probes[object];
   if (!probe) return null;
@@ -82,10 +89,10 @@ function road(state, object) {
   model.resistors.push(resistor('send', 'bus', 'gate+', CONTACT, send), resistor('return', 'gate−', 'source−', CONTACT, back),
     resistor('gate', 'gate+', 'gate−', 16 + value(state, 'gate', 'brake', 8)), resistor('bypass', 'gate+', 'gate−', .12, bypass));
   const probes = {
-    road_send: { title: 'Poste oeste · alimentación', positive: 'bus', branch: 'send', reference: 'Tensión: borne de salida protegido del poste oeste respecto del retorno de la fuente. Corriente: conductor de ida.' },
-    road_return: { title: 'Poste este · retorno', positive: 'gate−', branch: 'return', reference: 'Tensión: lado de la puerta del contacto de retorno respecto del terminal negativo de la fuente. Corriente positiva: regreso a la fuente.' },
-    road_bypass: { title: 'Puente que evita la puerta', positive: 'gate+', negative: 'gate−', branch: 'bypass', reference: 'Tensión: entre las dos líneas del puente. Corriente: sólo la rama del atajo, no la del cerrojo.' },
-    gate_panel: { title: 'Llegada al regulador del cerrojo', positive: 'gate+', negative: 'gate−', branch: 'gate', reference: 'Tensión: entre entrada y retorno del regulador. Corriente: rama en serie del regulador y la bobina; su polaridad interna se examina en el panel.' },
+    road_send: { say: send ? 'El poste oeste está unido: la ida llega hasta la puerta.' : 'El poste oeste está abierto: la ida no llega a la puerta.', title: 'Poste oeste · alimentación', positive: 'bus', branch: 'send', reference: 'Tensión: borne de salida protegido del poste oeste respecto del retorno de la fuente. Corriente: conductor de ida.' },
+    road_return: { say: back ? 'El poste este está unido: desde la puerta hay vuelta a la fuente.' : 'El poste este está abierto: desde la puerta no hay vuelta a la fuente.', title: 'Poste este · retorno', positive: 'gate−', branch: 'return', reference: 'Tensión: lado de la puerta del contacto de retorno respecto del terminal negativo de la fuente. Corriente positiva: regreso a la fuente.' },
+    road_bypass: { say: bypass ? 'Este puente une las dos líneas antes de la puerta: si hubiera ida y vuelta, la corriente volvería por acá sin pasar por el cerrojo. Un atajo así es un cortocircuito.' : 'El puente está levantado: ya no hay atajo, y la corriente tiene que pasar por el cerrojo.', title: 'Puente que evita la puerta', positive: 'gate+', negative: 'gate−', branch: 'bypass', reference: 'Tensión: entre las dos líneas del puente. Corriente: sólo la rama del atajo, no la del cerrojo.' },
+    gate_panel: { say: repaired ? 'El cerrojo empuja hacia la marca, con su piedra de freno.' : 'Acá llegan las dos líneas al cerrojo.', title: 'Llegada al regulador del cerrojo', positive: 'gate+', negative: 'gate−', branch: 'gate', reference: 'Tensión: entre entrada y retorno del regulador. Corriente: rama en serie del regulador y la bobina; su polaridad interna se examina en el panel.' },
   };
   const probe = probes[object];
   if (!probe) return null;
@@ -99,9 +106,9 @@ function spring(state, object) {
   model.resistors.push(resistor('indicator', 'bus', 'source−', 120), resistor('wet-splice', 'bus', 'motor+', repaired ? .035 : 18), resistor('motor', 'motor+', 'motor−', 12), resistor('return', 'motor−', 'source−', CONTACT));
   const availability = !water ? 'El agua está desviada: no impulsa la rueda.' : !coupled ? 'El agua mueve la rueda, pero el acople separa su eje del generador.' : 'El agua impulsa la rueda y el acople transmite el movimiento al generador.';
   const probes = {
-    spring_sluice: { title: 'Canal y rueda del Manantial', positive: 'source+', branch: 'protection', reference: 'La compuerta controla agua, no contactos eléctricos. Tensión: bornes del generador cercano. Corriente: salida hacia baliza y bomba.', mechanicalReady: water && coupled },
-    spring_coupling: { title: 'Acople del generador', positive: 'bus', branch: 'protection', reference: 'Tensión: salida protegida del generador respecto de su retorno. Corriente: alimentación total. El acople transmite movimiento mecánico.', mechanicalReady: water && coupled },
-    pump_panel: { title: 'Bornes de la bomba del Manantial', positive: 'motor+', negative: 'motor−', branch: 'motor', reference: 'Tensión: entre los bornes de la bomba, después del empalme húmedo. Corriente: rama del motor, en su sentido de impulsión.', mechanicalReady: water && coupled },
+    spring_sluice: { say: water ? 'El agua llega a la rueda.' : 'El agua está desviada: la rueda no tiene quién la empuje.', title: 'Canal y rueda del Manantial', positive: 'source+', branch: 'protection', reference: 'La compuerta controla agua, no contactos eléctricos. Tensión: bornes del generador cercano. Corriente: salida hacia baliza y bomba.', mechanicalReady: water && coupled },
+    spring_coupling: { say: coupled ? 'El acople une el eje de la rueda con el generador: si la rueda gira, el generador empuja.' : 'El acople está suelto: la rueda podría girar sin que el generador empuje nada.', title: 'Acople del generador', positive: 'bus', branch: 'protection', reference: 'Tensión: salida protegida del generador respecto de su retorno. Corriente: alimentación total. El acople transmite movimiento mecánico.', mechanicalReady: water && coupled },
+    pump_panel: { say: repaired ? 'La bomba recibe casi todo el empuje.' : water && coupled ? 'La bomba recibe sólo una parte del empuje: algo del camino se queda con el resto.' : 'La bomba espera a que el generador empuje.', title: 'Bornes de la bomba del Manantial', positive: 'motor+', negative: 'motor−', branch: 'motor', reference: 'Tensión: entre los bornes de la bomba, después del empalme húmedo. Corriente: rama del motor, en su sentido de impulsión.', mechanicalReady: water && coupled },
   };
   const probe = probes[object];
   if (!probe) return null;
@@ -116,9 +123,9 @@ function castle(state, object) {
   if (repaired) model.resistors.push(resistor('clinic', 'services+', 'source−', 12), resistor('kitchen', 'services+', 'source−', 12));
   else model.resistors.push(resistor('clinic', 'services+', 'series-node', 12), resistor('kitchen', 'series-node', 'source−', 12));
   const probes = {
-    castle_isolated: { title: 'Acometida oeste · rama dañada', positive: 'west+', branch: 'west-contact', reference: 'Tensión: borne aguas abajo del seccionador oeste respecto del retorno común. Corriente: acometida del archivo, independiente del troncal sano.' },
-    castle_service: { title: 'Troncal de los servicios sanos', positive: 'services+', branch: 'trunk', reference: 'Tensión: entrada de los servicios respecto del retorno común. Corriente: suma de las ramas de enfermería y cocina.' },
-    distribution_panel: { title: 'Entrada al tablero del Castillo', positive: 'services+', branch: 'trunk', reference: 'Tensión: entre entrada del tablero y retorno común. Corriente: troncal sano; no incluye la acometida oeste aislada.' },
+    castle_isolated: { say: damaged ? 'La rama del archivo anegado sigue unida: el agua le ofrece a la corriente un camino demasiado fácil.' : 'La rama del archivo quedó separada: el agua ya no se lleva la corriente.', title: 'Acometida oeste · rama dañada', positive: 'west+', branch: 'west-contact', reference: 'Tensión: borne aguas abajo del seccionador oeste respecto del retorno común. Corriente: acometida del archivo, independiente del troncal sano.' },
+    castle_service: { say: trunk ? 'El troncal de enfermería y cocina está unido.' : 'El troncal de enfermería y cocina está abierto.', title: 'Troncal de los servicios sanos', positive: 'services+', branch: 'trunk', reference: 'Tensión: entrada de los servicios respecto del retorno común. Corriente: suma de las ramas de enfermería y cocina.' },
+    distribution_panel: { say: repaired ? 'Enfermería y cocina tienen cada una su camino.' : 'En el tablero, la enfermería y la cocina comparten un solo camino, una detrás de la otra.', title: 'Entrada al tablero del Castillo', positive: 'services+', branch: 'trunk', reference: 'Tensión: entre entrada del tablero y retorno común. Corriente: troncal sano; no incluye la acometida oeste aislada.' },
   };
   const probe = probes[object];
   if (!probe) return null;
@@ -134,9 +141,9 @@ function terraces(state, object) {
     resistor('root-regulator', 'bus', 'roots+', value(state, 'irrigation', 'warmth', repaired ? 12 : 0)), resistor('roots', 'roots+', 'source−', 24),
     resistor('flow-regulator', 'bus', 'flow+', value(state, 'irrigation', 'flow', repaired ? 12 : 0)), resistor('flow', 'flow+', 'source−', 18));
   const probes = {
-    forge_limited: { title: 'Régimen del horno de Yesca', positive: 'bus', branch: 'forge', reference: 'Tensión: bornes de la resistencia calefactora. Corriente: sólo la rama del horno; el lecho y el riego tienen ramas propias.', mechanicalReady: channel && limited },
-    irrigation_open: { title: 'Canal de los bancales', positive: 'flow+', branch: 'flow', reference: 'La compuerta controla el paso de agua. Tensión: bornes de la bomba asociada. Corriente: rama de esa bomba; abrir el canal no es cerrar un interruptor.', mechanicalReady: channel && limited },
-    irrigation_panel: { title: 'Bomba del invernadero bajo carga', positive: 'flow+', branch: 'flow', reference: 'Tensión: bomba después de su regulador. Corriente: rama de riego; el horno y el calor de raíces toman corriente por otros caminos.', mechanicalReady: channel && limited },
+    forge_limited: { say: limited ? 'El horno de Yesca entra en el tablero de Vega: su parte de la línea se reparte con el riego.' : 'El horno de Yesca toma la línea de la ladera por su cuenta, sin freno.', title: 'Régimen del horno de Yesca', positive: 'bus', branch: 'forge', reference: 'Tensión: bornes de la resistencia calefactora. Corriente: sólo la rama del horno; el lecho y el riego tienen ramas propias.', mechanicalReady: channel && limited },
+    irrigation_open: { say: channel ? 'El canal de los bancales está abierto: el agua de la bomba llega a los cultivos.' : 'El canal está cerrado: la bomba puede andar sin que el agua llegue a los bancales.', title: 'Canal de los bancales', positive: 'flow+', branch: 'flow', reference: 'La compuerta controla el paso de agua. Tensión: bornes de la bomba asociada. Corriente: rama de esa bomba; abrir el canal no es cerrar un interruptor.', mechanicalReady: channel && limited },
+    irrigation_panel: { say: repaired ? 'Raíces, riego y horno se reparten la línea sin calentarla.' : 'Raíces, riego y horno cuelgan de la misma línea de la ladera.', title: 'Bomba del invernadero bajo carga', positive: 'flow+', branch: 'flow', reference: 'Tensión: bomba después de su regulador. Corriente: rama de riego; el horno y el calor de raíces toman corriente por otros caminos.', mechanicalReady: channel && limited },
   };
   const probe = probes[object];
   if (!probe) return null;
@@ -149,8 +156,8 @@ function lake(state, object) {
   const model = makeSupply(24, readFlag(state, 'irrigation'), 2.2);
   model.resistors.push(resistor('send-contact', 'bus', 'shore+', CONTACT, send), resistor('long-feed', 'shore+', 'tower+', 1.2), resistor('tower-pilot', 'tower+', 'tower−', 120), resistor('long-return', 'tower−', 'shore−', 1.2), resistor('return-contact', 'shore−', 'source−', CONTACT, back));
   const probes = {
-    lake_cable: { title: 'Suministro en la orilla', positive: 'bus', branch: 'send-contact', reference: 'Tensión: borne de alimentación antes del contacto del muelle respecto del retorno de la fuente. Corriente: conductor largo de ida.' },
-    lake_return: { title: 'Retorno entre las cañas', positive: 'shore−', branch: 'return-contact', reference: 'Tensión: lado sumergido del contacto respecto del retorno de la fuente. Corriente positiva: desde el Faro hacia la fuente de la orilla.' },
+    lake_cable: { say: send ? 'La bornera del muelle está fija: la ida baja por el agua hacia el Faro.' : 'La bornera del muelle está suelta: nada sale hacia el Faro.', title: 'Suministro en la orilla', positive: 'bus', branch: 'send-contact', reference: 'Tensión: borne de alimentación antes del contacto del muelle respecto del retorno de la fuente. Corriente: conductor largo de ida.' },
+    lake_return: { say: back ? 'El retorno entre las cañas está unido: lo que va al Faro vuelve por acá.' : 'El retorno entre las cañas está suelto: la baliza del fondo puede tener empuje, pero nada vuelve.', title: 'Retorno entre las cañas', positive: 'shore−', branch: 'return-contact', reference: 'Tensión: lado sumergido del contacto respecto del retorno de la fuente. Corriente positiva: desde el Faro hacia la fuente de la orilla.' },
   };
   const probe = probes[object];
   if (!probe) return null;
@@ -164,9 +171,9 @@ function lighthouse(state, object) {
     const model = makeSupply(24, readFlag(state, 'beacon_link') || (readFlag(state,'irrigation') && readFlag(state,'lake_cable') && readFlag(state,'lake_return')), 2.2);
     model.resistors.push(resistor('feed', 'bus', 'line+', CONTACT, feed), resistor('line', 'line+', 'regulator+', supplyFixed ? 3 : 6), resistor('regulator', 'regulator+', 'core+', value(state, 'beacon_supply', 'ballast', supplyFixed ? 1 : 3)), resistor('core', 'core+', 'core−', 12), resistor('return', 'core−', 'source−', CONTACT, back));
     const probes = {
-      tower_feed: { title: 'Faro I · manivela de alimentación', positive: 'bus', branch: 'feed', reference: 'Tensión: salida protegida de la fuente de la base respecto de su retorno. Corriente: ida al núcleo, antes del tendido y su regulador.' },
-      tower_return: { title: 'Faro I · manivela de retorno', positive: 'core−', branch: 'return', reference: 'Tensión: lado del núcleo del contacto de retorno respecto del terminal negativo de la fuente. Corriente: regreso desde el núcleo.' },
-      beacon_supply_panel: { title: 'Faro I · bornes del núcleo', positive: 'core+', negative: 'core−', branch: 'core', reference: 'Tensión: núcleo de alimentación después del tendido y del regulador. Corriente: la misma rama en serie que atraviesa los tres elementos.' },
+      tower_feed: { say: feed ? 'La manivela de ida está unida: la fuente de la base llega al núcleo.' : 'La manivela de ida está abierta.', title: 'Faro I · manivela de alimentación', positive: 'bus', branch: 'feed', reference: 'Tensión: salida protegida de la fuente de la base respecto de su retorno. Corriente: ida al núcleo, antes del tendido y su regulador.' },
+      tower_return: { say: back ? 'La manivela de retorno está unida: el núcleo tiene vuelta a la fuente.' : 'La manivela de retorno está abierta: el núcleo no tiene vuelta.', title: 'Faro I · manivela de retorno', positive: 'core−', branch: 'return', reference: 'Tensión: lado del núcleo del contacto de retorno respecto del terminal negativo de la fuente. Corriente: regreso desde el núcleo.' },
+      beacon_supply_panel: { say: supplyFixed ? 'El núcleo sostiene su sonido grave; los dos tendidos se reparten la corriente.' : 'El núcleo recibe lo que le dejan el tendido y el regulador.', title: 'Faro I · bornes del núcleo', positive: 'core+', negative: 'core−', branch: 'core', reference: 'Tensión: núcleo de alimentación después del tendido y del regulador. Corriente: la misma rama en serie que atraviesa los tres elementos.' },
     };
     return fieldResult(model, probes[object], !feed || !back ? 'La etapa de la base necesita ambos contactos para sostener una corriente por el núcleo.' : supplyFixed ? 'La fuente fue puesta en servicio: el núcleo trabaja con la pérdida real del tendido y la regulación ajustada.' : 'El recorrido exterior está completo. Una parte importante de la tensión cae todavía en el regulador del primer panel.');
   }
@@ -177,9 +184,9 @@ function lighthouse(state, object) {
     if (networkFixed) model.resistors.push(resistor('optic', 'bus', 'source−', 18), resistor('motor', 'bus', 'source−', 36), resistor('signal', 'bus', 'source−', 72));
     else model.resistors.push(resistor('optic', 'bus', 'motor+', 18), resistor('motor', 'motor+', 'signal+', 36), resistor('signal', 'signal+', 'source−', 72));
     const probes = {
-      tower_isolated: { title: 'Faro II · puente de mantenimiento', positive: 'bus', branch: 'maintenance', reference: 'Tensión: entre las dos barras que el puente une o separa. Corriente: exclusivamente el puente de mantenimiento.' },
-      tower_motor: { title: 'Faro II · motor y embrague', positive: networkFixed ? 'bus' : 'motor+', negative: networkFixed ? 'source−' : 'signal+', branch: 'motor', reference: 'Tensión: entre los bornes del motor. Corriente: rama del motor. El embrague transmite movimiento; no abre el circuito eléctrico.', mechanicalReady: coupled },
-      beacon_network_panel: { title: 'Faro II · servicio de la óptica', positive: 'bus', negative: networkFixed ? 'source−' : 'motor+', branch: 'optic', reference: 'Tensión: carga de la cámara óptica. Corriente: su rama; comparar con motor y señal permite distinguir serie y paralelo.', mechanicalReady: coupled && isolated },
+      tower_isolated: { say: isolated ? 'El puente gastado quedó apartado de las barras.' : 'El puente gastado une las dos barras directamente: un atajo que evita a las tres voces.', title: 'Faro II · puente de mantenimiento', positive: 'bus', branch: 'maintenance', reference: 'Tensión: entre las dos barras que el puente une o separa. Corriente: exclusivamente el puente de mantenimiento.' },
+      tower_motor: { say: coupled ? 'El embrague une el motor con la corona.' : 'El motor está desacoplado de la corona: podría girar sin mover la cúpula.', title: 'Faro II · motor y embrague', positive: networkFixed ? 'bus' : 'motor+', negative: networkFixed ? 'source−' : 'signal+', branch: 'motor', reference: 'Tensión: entre los bornes del motor. Corriente: rama del motor. El embrague transmite movimiento; no abre el circuito eléctrico.', mechanicalReady: coupled },
+      beacon_network_panel: { say: networkFixed ? 'Luz, giro y señal tienen cada una su camino.' : 'Luz, giro y señal están en fila: cada una tiene que atravesar a la otra.', title: 'Faro II · servicio de la óptica', positive: 'bus', negative: networkFixed ? 'source−' : 'motor+', branch: 'optic', reference: 'Tensión: carga de la cámara óptica. Corriente: su rama; comparar con motor y señal permite distinguir serie y paralelo.', mechanicalReady: coupled && isolated },
     };
     return fieldResult(model, probes[object], `${isolated ? 'El puente gastado quedó fuera de la distribución.' : 'El puente de mantenimiento sigue uniendo directamente las barras: evita los receptores.'} ${coupled ? 'El embrague une el motor con la corona.' : 'El motor está desacoplado de la corona; una lectura eléctrica por sí sola no demuestra que la cúpula gire.'} ${networkFixed ? 'Óptica, motor y señal tienen ramas independientes.' : 'El reparto entre los tres receptores todavía necesita revisión.'}`);
   }
@@ -187,7 +194,8 @@ function lighthouse(state, object) {
     const shutter = readFlag(state, 'tower_shutter', lensFixed), brakeFree = readFlag(state, 'tower_lens_free', lensFixed);
     const model = makeSupply(18, networkFixed, 2.4);
     model.resistors.push(resistor('upper', 'bus', 'tap', value(state, 'beacon_lens', 'upper', lensFixed ? 12 : 24)), resistor('lower', 'tap', 'source−', 24), resistor('lens', lensFixed ? 'tap' : 'bus', 'source−', 24));
-    const probe = { title: object === 'tower_shutter' ? 'Faro III · obturador de bronce' : object === 'tower_lens_free' ? 'Faro III · freno del conjunto óptico' : 'Faro III · cristal bajo carga',
+    const say = object === 'tower_shutter' ? (shutter ? 'El obturador está abierto: la luz puede salir al lago.' : 'El obturador está cerrado: puede haber luz adentro sin que salga.') : object === 'tower_lens_free' ? (brakeFree ? 'La lente está libre para girar con la corona.' : 'El freno mecánico sujeta la lente.') : lensFixed ? 'La lente toma su empuje de la toma del divisor, con su piedra de 12 Ω arriba.' : 'La lente toma el empuje entero de la fuente.';
+    const probe = { say, title: object === 'tower_shutter' ? 'Faro III · obturador de bronce' : object === 'tower_lens_free' ? 'Faro III · freno del conjunto óptico' : 'Faro III · cristal bajo carga',
       positive: lensFixed ? 'tap' : 'bus', branch: 'lens', mechanicalReady: shutter && brakeFree,
       reference: 'Tensión: entre los bornes eléctricos del cristal de la lente. Corriente: rama del cristal. Obturador y freno actúan sobre luz y movimiento, no sobre los conductores.' };
     return fieldResult(model, probe, `${shutter ? 'Las hojas de bronce dejan salir la luz hacia el lago.' : 'El obturador está cerrado: puede haber luz dentro sin que un haz salga al lago.'} ${brakeFree ? 'La lente puede girar con la corona.' : 'El freno mantiene inmóvil el conjunto óptico.'} ${lensFixed ? 'El divisor está calibrado con el cristal conectado: el propio cristal carga la toma intermedia.' : 'La lente aún necesita su conexión al divisor y la calibración bajo carga.'}`);
@@ -243,11 +251,8 @@ function savedPanelReading(state, object, field) {
   const reference = component
     ? `Tensión: ${puzzle.ports.find(p => p.id === component.a).label} respecto de ${puzzle.ports.find(p => p.id === component.b).label}. Corriente: esta pieza en el montaje guardado, en ese mismo sentido.`
     : `${field.reference} Lectura del montaje guardado en sus bornes nominales de alimentación.`;
-  const notice = overloaded ? 'La protección del montaje quedó abierta. Podés volver a la instalación, cambiar una cosa y probar otra vez.'
-    : !snapshot.sourceOn ? 'La alimentación del montaje está apagada, tal como la dejaste.'
-    : voltage === null ? 'Ohm no consigue fijar una lectura en estos bornes. La aguja indecisa no equivale a cero.'
-    : Math.abs(current) < 1e-7 ? 'Aquí no registra paso de corriente en el montaje que dejaste. Podemos comparar otro punto.'
-    : 'Ohm registra paso de corriente en el montaje que dejaste. Queda por observar cómo responde el mecanismo.';
+  const notice = !snapshot.sourceOn && !overloaded ? `${field.lead} La mesa de este montaje quedó apagada, como la dejaste.`.trim()
+    : `${field.lead} ${needle({ overloaded, floating: voltage === null, available: true, voltage, current })}`.trim();
   return { ...field, voltage, current, reference, notice, observation: notice, floating: voltage === null,
     powered: sourceAvailable && Math.abs(current) > 1e-7, overloaded, sourceAvailable,
     sourceVoltage: sourceAvailable ? puzzle.voltage : 0, sourceCurrent: result.current,

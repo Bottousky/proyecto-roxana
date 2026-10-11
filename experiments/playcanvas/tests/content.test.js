@@ -175,3 +175,12 @@ test("Vega's song is put to the test: coupling the axle before the water gets it
   Object.assign(inOrder, toggleMemory('spring_coupling', inOrder)); inOrder.spring_coupling = true;
   assert.doesNotMatch(resolveDialogue('spring_ready', { flags: inOrder }).map(l => l.text).join(' '), /canto/);
 });
+
+test('an inhabitant notices when the player opens a lever they had just joined', async () => {
+  const { unjoinDialogue, DIALOGUES } = await import('../src/game/content.js');
+  assert.equal(unjoinDialogue('tower_return', { flags: { tower_return: false }, seen: ['nereo_tower'] }), 'unjoin_tower_return');
+  assert.match(DIALOGUES.unjoin_tower_return.map(l => l.text).join(' '), /lo uní yo/);
+  assert.equal(unjoinDialogue('tower_return', { flags: { tower_return: true }, seen: ['nereo_tower'] }), null, 'closing it again says nothing');
+  assert.equal(unjoinDialogue('tower_return', { flags: { tower_return: false }, seen: [] }), null, 'before Nereo joined it, it is just a lever');
+  assert.equal(unjoinDialogue('road_send', { flags: {}, seen: [] }), null);
+});

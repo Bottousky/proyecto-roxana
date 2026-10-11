@@ -93,7 +93,10 @@ export const PUZZLES = {
     boardLabels: { e1a: 'A', e1b: 'B', e2a: 'A', e2b: 'B', e3a: 'A', e3b: 'B' },
     proof: { id: 'foundLoss', who: 'Vega', voltageAcross: ['e2a', 'e2b'], minVoltage: 2, request: 'Vega quiere ver, con la bomba trabajando, la comparación de los dos extremos del empalme que pierde.', recorded: 'Con la bomba trabajando comparé los extremos del empalme 2: ahí se pierde casi toda la tensión.' },
     // Vega wants to know where the 12 V went: every part of the loop measured on one montage, added up.
-    tally: { id: 'loop', kind: 'voltage', who: 'Vega', title: 'La cuenta de la vuelta', parts: ['joint1', 'joint2', 'joint3', 'pump'], request: 'Antes de dejarla andando, Vega quiere saber adónde se fueron los 12 V: compará los extremos de cada empalme y de la bomba, en este mismo montaje, y ella suma.' },
+    tally: { id: 'loop', kind: 'voltage', who: 'Vega', title: 'La cuenta de la vuelta', parts: ['joint1', 'joint2', 'joint3', 'pump'],
+      // Vega sums with the old joint still in place: that is where the 12 V went. A bridged joint is a healthy loop.
+      before: ['e2a', 'e2b'],
+      request: 'Vega quiere la cuenta con el empalme viejo puesto: retirá un momento tu puente, compará los extremos de cada empalme y de la bomba, y ella suma. Después lo volvés a tender.' },
     criteria: [{ text: 'Vega vio en qué empalme se pierde la fuerza', met: r => r.proven }, { text: 'Vega cerró la cuenta de la vuelta: adónde fue cada voltio', met: (r, s) => s.tally?.closed === true }, { text: 'La bomba recibe toda la fuerza: el agua sale plena', met: r => r.operating.pump }],
     solve: s => { s.wires.push(['e2a', 'e2b']); s.proofs = { ...s.proofs, foundLoss: true }; s.tally = { closed: true, readings: {} }; },
     lesson: 'Un empalme puede tener continuidad y aun así perder tensión y calentarse bajo carga. Comparar los extremos de cada tramo con la carga trabajando localiza la pérdida.',

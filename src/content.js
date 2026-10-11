@@ -326,6 +326,12 @@ export const DIALOGUES = {
     ['vega', 'Al revés. Y no se ofendió: arrancó pesada, nada más. Quieta y enganchada, la rueda tiene que mover la máquina entera de golpe. Para eso era el canto.'],
     ['player', 'Se mueve y el indicador encendió. Pero la bomba sigue quieta.'],
     ['vega', 'Como aquella mañana. Acerquémonos antes de pedirle más agua.']),
+  unjoin_workshop_feed: d(['lumen', 'Ese cierre lo encajé yo. Suelto, la mesa se queda sin ida. Mirá lo que quieras y después volvé a encajarlo.']),
+  unjoin_lake_cable: d(['nereo', 'Esa bornera la fijé yo. Suelta, nada baja hacia el Faro. Mirá las balizas, si querés, y volvé a fijarla.']),
+  unjoin_tower_feed: d(['nereo', 'La ida de la base la uní yo. Abierta, el núcleo se queda callado. Cerrala cuando termines de mirar.']),
+  unjoin_tower_return: d(['nereo', 'Ese retorno lo uní yo. Sin vuelta, el núcleo no puede devolver lo que recibe: se queda callado. Cerralo cuando termines de mirar.']),
+  unjoin_tower_shutter: d(['nereo', 'El obturador lo abrí yo. Cerrado, la luz se queda adentro de la torre.']),
+  unjoin_tower_lens_free: d(['nereo', 'El freno de la lente lo solté yo. Si lo volvés a poner, la lente no gira con la corona.']),
   pump_locked: d(['vega', 'Todavía falta transmitir el movimiento. Abrí el canal hacia la rueda y conectá el acople del generador. Son las dos manivelas.']),
   pump_arrival: d(
     ['vega', 'Esa unión junto al agua se entibia cuando la bomba intenta arrancar. Antes no lo hacía.'],
@@ -873,6 +879,21 @@ export function journalText(entry, state = {}) {
 }
 
 // Routine preparations the inhabitants do themselves once a conversation ends.
+/** Levers an inhabitant joined in a conversation: undoing one makes them say something. */
+export const JOINED_BY = {
+  workshop_feed: { by: 'lumen_before', say: 'unjoin_workshop_feed' },
+  lake_cable: { by: 'nereo_lake', say: 'unjoin_lake_cable' },
+  tower_feed: { by: 'nereo_tower', say: 'unjoin_tower_feed' },
+  tower_return: { by: 'nereo_tower', say: 'unjoin_tower_return' },
+  tower_shutter: { by: 'beacon_network_complete', say: 'unjoin_tower_shutter' },
+  tower_lens_free: { by: 'beacon_network_complete', say: 'unjoin_tower_lens_free' },
+};
+/** The line an inhabitant says when the player opens what they had just joined, or null. */
+export function unjoinDialogue(flag, state) {
+  const j = JOINED_BY[flag];
+  return j && !state.flags?.[flag] && (state.seen ?? []).includes(j.by) ? j.say : null;
+}
+
 /** What a hand on a lever remembers beyond the lever itself: the order Vega's song asks for. */
 export function toggleMemory(flag, flags) {
   return flag === 'spring_coupling' && !flags.spring_coupling && !flags.spring_sluice ? { spring_backwards: true } : flag === 'spring_sluice' && !flags.spring_sluice && !flags.spring_coupling ? { spring_backwards: false } : {};

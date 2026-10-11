@@ -143,6 +143,13 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   if (proof?.voltageAcross) probe('voltage', ...proof.voltageAcross);
   // Lumen's break only shows with the bench off (the probe switches it off), before the bridge closes it.
   if (proof?.continuityOpen) probe('continuity', ...proof.continuityOpen);
+  const tally = PUZZLES[id].tally;
+  const takeSum = () => { for (const part of tally.parts) {
+    if (tally.kind === 'voltage') { const c = PUZZLES[id].components.find(x => x.id === part); probe('voltage', c.a, c.b); }
+    else { click({ action: 'mode', mode: 'current' }); bench.handleSliderCommit({ target: { dataset: { meterBranch: '' }, value: part } }); click({ action: 'mode', mode: 'wire' }); }
+  } };
+  // Vega sums with the old joint in place, before the repair: that is where the volts went.
+  if (tally?.before) { takeSum(); assert.equal(bench.state.tally.closed, true, `${id}: the sum closes on the faulty loop`); }
   const movable = () => bench.state.wires.findIndex(w => !isSealed(id, w));
   while (movable() >= 0) click({ wire: String(movable()) });
   for (const [a, b] of target.wires.filter(w => !isSealed(id, w))) { bench.touchPort(a); bench.touchPort(b); }
@@ -176,16 +183,13 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
     assert.equal(bench.state.proofs[proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.proven, true, id);
     if (!PUZZLES[id].tally) assert.equal(bench.result.commissionable, true, id);
   }
-  // Vega's sum and Nereo's knots: every part measured on this montage, then the brief is complete.
-  const tally = PUZZLES[id].tally;
-  if (tally) {
+  // Nereo's knots: every part measured on this montage, then the brief is complete.
+  if (tally && !tally.before) {
     assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the keeper's sum`);
-    for (const part of tally.parts) {
-      if (tally.kind === 'voltage') { const c = PUZZLES[id].components.find(x => x.id === part); probe('voltage', c.a, c.b); }
-      else { click({ action: 'mode', mode: 'current' }); bench.handleSliderCommit({ target: { dataset: { meterBranch: '' }, value: part } }); click({ action: 'mode', mode: 'wire' }); }
-    }
-    assert.equal(bench.state.tally.closed, true, `${id}: the sum closes`); assert.equal(bench.result.commissionable, true, id);
+    takeSum();
+    assert.equal(bench.state.tally.closed, true, `${id}: the sum closes`);
   }
+  if (tally) assert.equal(bench.result.commissionable, true, id);
   assert.ok(bench.result.checks.every(c => c.met), `${id}: every item of the brief is ticked`);
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
   // Measurements are only the ones the player took for a requested proof, never invented.
@@ -250,4 +254,18 @@ test('the castle proof: series wiring cannot show the infirmary alone; parallel 
   assert.equal(evaluatePuzzle('distribution', { ...parallel, switches: { ...parallel.switches, kitchen: true } }).commissionable, false);
   const legacy = normalizePuzzleSnapshot('distribution', { ...parallel, switches: { archive: false, kitchen: true }, completed: true, proofs: undefined });
   assert.equal(legacy.proofs.clinicAlone, true); assert.equal(legacy.completed, true);
+});
+
+test('Vega asks for her sum with the old joint in place: a bridge put first has to come out for a moment', () => {
+  const { bench, click } = controller('pump');
+  const probe = (a, b) => { click({ action: 'mode', mode: 'voltage' }); bench.touchPort(a); bench.touchPort(b); click({ action: 'mode', mode: 'wire' }); };
+  probe('e2a', 'e2b');
+  bench.touchPort('e2a'); bench.touchPort('e2b');
+  for (const [a, b] of [['e1a', 'e1b'], ['e2a', 'e2b'], ['e3a', 'e3b'], ['pumpIn', 'pumpOut']]) probe(a, b);
+  assert.equal(bench.state.tally?.closed ?? false, false, 'a healthy loop is not the sum Vega asked for');
+  assert.match(bench.message(null).text, /retirá un momento tu puente/, 'Vega says so while the pump runs bridged');
+  click({ wire: String(bench.state.wires.findIndex(w => w.includes('e2a') && w.includes('e2b'))) });
+  for (const [a, b] of [['e1a', 'e1b'], ['e2a', 'e2b'], ['e3a', 'e3b'], ['pumpIn', 'pumpOut']]) probe(a, b);
+  assert.equal(bench.state.tally.closed, true);
+  assert.ok(bench.state.tally.readings.joint2 > 6, 'the old joint kept most of the push');
 });

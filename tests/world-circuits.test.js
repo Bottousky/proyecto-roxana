@@ -267,3 +267,13 @@ test('unknown scenery returns no invented reading, and measurement never mutates
   assert.doesNotThrow(() => measureWorld('road', s, 'gate_panel'));
   assert.equal(s.flags.road_bypass, true);
 });
+
+test('Ohm says what each piece is doing: the Calzada bridge is named a short circuit', () => {
+  const bridge = measureWorld('road', state({ workshop: true }), 'road_bypass');
+  assert.match(bridge.notice, /cortocircuito/);
+  assert.doesNotMatch(bridge.notice, /no consigue fijar/);
+  const lifted = measureWorld('road', state({ workshop: true, road_send: true, road_return: true, road_bypass: false }), 'road_bypass');
+  assert.match(lifted.notice, /levantado/); assert.match(lifted.notice, /contacto abierto/);
+  const reed = measureWorld('lake', state({ irrigation: true, lake_cable: true }), 'lake_return');
+  assert.match(reed.notice, /retorno entre las cañas está suelto/);
+});
