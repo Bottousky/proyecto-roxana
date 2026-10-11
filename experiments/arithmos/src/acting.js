@@ -1,14 +1,18 @@
 // Actuación compartida: saltos, desplazamientos, pulsos y objetos tocables.
 
 import {lerp, easeInOut} from './engine/rng.js';
+import {anim} from './engine/anim.js';
+import {hop2, zip2} from './engine/punto.js';
 
 export async function zip(d, dot, x, y, dur = 0.32) {
+  if (anim.level === 2) return zip2(d, dot, x, y, dur); // ?anim=2: mínimo jerk (MIGRATION M4)
   const x0 = dot.x, y0 = dot.y;
   dot.setMode?.('still');
   await d.tween(dur, k => { dot.x = lerp(x0, x, k); dot.y = lerp(y0, y, k); }, easeInOut);
 }
 
 export async function hop(d, o, x, y, {dur = 0.4, h = 40, g, sound = 'tap'} = {}) {
+  if (anim.level === 2) return hop2(d, o, x, y, {dur, h, g, sound}); // ?anim=2: salto de cuatro fases (MIGRATION M4)
   const x0 = o.x, y0 = o.y;
   o.setMode?.('still');
   if (g && sound) sound === 'tap' ? g.audio.tap(0.2, 1.7) : g.audio.punto(sound);

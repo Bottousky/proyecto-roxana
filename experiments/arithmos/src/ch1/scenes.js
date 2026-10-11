@@ -8,12 +8,15 @@ import {
   GROUND, DOOR, STONE, RING, MARKS, FIELD, GRADAS, LINE_X0, LINE_GAP, SHOTS, STAGES, RONDA_IDS, LINO,
   markPos, markRect, student, punto, rondaDot, rondaDance, stopDance, base, markDrawing, art, PAIRED_Y, NAME, nameMarkPos,
 } from './common.js';
+import {anim} from '../engine/anim.js';
+import {hop2, zip2} from '../engine/punto.js';
 
 const stage = name => STAGES.indexOf(name);
 
 // ——— Actuación de puntos ———
 
 async function hop(d, dot, x, y, {dur = 0.36, h = 26, sound = 'hop', g} = {}) {
+  if (anim.level === 2) return hop2(d, dot, x, y, {dur, h, g, sound}); // ?anim=2 (MIGRATION M4)
   const x0 = dot.x, y0 = dot.y;
   dot.setMode('still');
   if (sound && g) sound === 'tap' ? g.audio.tap(0.25, 1.8) : g.audio.punto(sound);
@@ -26,6 +29,7 @@ async function hop(d, dot, x, y, {dur = 0.36, h = 26, sound = 'hop', g} = {}) {
 }
 
 async function zip(d, dot, x, y, dur = 0.32) {
+  if (anim.level === 2) return zip2(d, dot, x, y, dur);
   const x0 = dot.x, y0 = dot.y;
   dot.setMode('still');
   await d.tween(dur, k => {

@@ -6,6 +6,7 @@ import {anim} from './anim.js';
 import {depositStroke, drawDeposit, drawDepositCached, depositTip, depositSpeed} from './deposit.js';
 import {liftTime} from './motion.js';
 import {GLYPHS, glyphGuides, sideGap} from './glyphs.js';
+import {settleShape} from './punto.js';
 
 export class World {
   constructor() {
@@ -171,7 +172,10 @@ export class Drawing {
   }
 
   #cached(scale) {
-    const want = Math.min(4, Math.pow(2, Math.ceil(Math.log2(Math.max(0.25, scale)) * 2) / 2));
+    let want = Math.min(4, Math.pow(2, Math.ceil(Math.log2(Math.max(0.25, scale)) * 2) / 2));
+    // ?anim=2: el lado del mapa de bits ≤ 8192 px (el suelo, que cruza todo el pizarrón, pedía 24 000 px a escala 4: el
+    // lienzo salía de la GPU y estampar sus 6300 estampas trababa 4 s un cuadro, c1.ronda)
+    if (anim.level === 2) want = Math.min(want, 8192 / Math.max(this.bbox.w, this.bbox.h, 1));
     const c = this.cache;
     if (c && c.fade === this.fade && c.scale >= want && c.scale <= want * 2.9) return c;
     const b = this.bbox;
@@ -355,6 +359,7 @@ export class Dot {
   }
 
   setMode(mode, opts = {}) {
+    if (mode !== 'still') { this.settle = null; this.settleNow = null; this.deform = null; }
     this.mode = mode;
     if (opts.home) this.home = [...opts.home];
     if (opts.radius != null) this.wander.radius = opts.radius;
@@ -363,6 +368,12 @@ export class Dot {
   }
 
   update(dt, world) {
+    // ?anim=2: el aterrizaje de un salto sigue en el dibujo (sigue de largo y vuelve; se aplasta con la base apoyada)
+    if (this.settle) {
+      this.settle.t += dt;
+      this.settleNow = settleShape(this.settle, this.settle.t, this.r * 1.2);
+      if (!this.settleNow) this.settle = null;
+    } else this.settleNow = null;
     const px = this.x, py = this.y;
     // con dedo (o movimiento reducido) los blancos casi no se mueven: tocarlos no es un desafío de puntería
     const slow = this.hover ? 0.15 : (world?.calm ?? 1);
@@ -405,7 +416,8 @@ export class Dot {
     if (this.fade <= 0) return;
     const v = frame % 3;
     const tr = this.tremble > 0 ? Math.sin(frame * 2.7 + this.seed) * this.tremble * 2.5 : 0;
-    const x = this.x + tr, y = this.y - this.lift;
+    const so = this.settleNow;
+    const x = this.x + tr + (so ? so[0] : 0), y = this.y - this.lift + (so ? so[1] : 0);
     for (const [tx, ty, a] of this.trail) {
       ctx.save();
       ctx.translate(tx, ty);
@@ -414,9 +426,17 @@ export class Dot {
     }
     ctx.save();
     ctx.translate(x, y);
-    ctx.rotate(this.squashDir);
-    ctx.scale(this.scale * (1 + this.squash), this.scale * (1 - this.squash * 0.55));
-    ctx.rotate(-this.squashDir);
+    const def = this.deform ?? (so ? {sl: so[2], ang: Math.PI / 2} : null);
+    if (def) {
+      // ?anim=2: aplastamiento/estiramiento con área constante a lo largo de `ang` (el del salto), en vez del de velocidad
+      ctx.rotate(def.ang);
+      ctx.scale(this.scale * def.sl, this.scale / def.sl);
+      ctx.rotate(-def.ang);
+    } else {
+      ctx.rotate(this.squashDir);
+      ctx.scale(this.scale * (1 + this.squash), this.scale * (1 - this.squash * 0.55));
+      ctx.rotate(-this.squashDir);
+    }
     drawStrokes(ctx, this.variants[v], 1, this.fade);
     ctx.restore();
     if (this.ring) {

@@ -439,6 +439,7 @@ let lastSig = '';
 const reloadAt = new Set([...(opt('reload') ? ['c1.ronda', 'c1.vuelven', 'c1.gradas', 'c1.nombre'] : []), ...val('reload-at', '').split(',').filter(Boolean)]);
 const reloaded = new Set();
 const fpsSamples = [];
+let fpsWorst = null; // en qué escena cayó el peor promedio de 120 cuadros
 let ended = false;
 let partialReloadDone = false;
 let choiceSig = '';
@@ -471,7 +472,7 @@ for (let iter = 0; iter < 30000; iter++) {
   if (s.fatal) { errors.push(`falla del juego en ${s.seg}: ${s.fatal}`); note(`FALLA: ${s.fatal}`); break; }
   // --until=N: termina cuando empieza el capítulo N + 1
   if (val('until', '') && s.seg?.startsWith(`c${Number(val('until', '0')) + 1}.`)) { ended = true; break; }
-  if (s.fps) fpsSamples.push(s.fps);
+  if (s.fps) { fpsSamples.push(s.fps); if (!fpsWorst || s.fps < fpsWorst.fps) fpsWorst = {fps: +s.fps.toFixed(1), seg: s.seg, mode: s.mode}; }
   if (s.mode === 'title') {
     if (s.flags?.chapterDone) { ended = true; break; }
     await page.click('#title [data-act=new]');
@@ -944,7 +945,7 @@ const summary = {
   final: {mode: final.mode, seg: final.seg},
   journal: evidence.journal.map(e => e.title),
   evidenceKinds: [...new Set(evidence.evidence.map(e => e.kind))],
-  fps: fps.length ? {min: Math.min(...fps).toFixed(1), median: fps.sort((a, b) => a - b)[Math.floor(fps.length / 2)].toFixed(1)} : null,
+  fps: fps.length ? {min: Math.min(...fps).toFixed(1), median: fps.sort((a, b) => a - b)[Math.floor(fps.length / 2)].toFixed(1), worst: fpsWorst} : null,
   errors,
   seconds: (Date.now() - t0) / 1000,
   size: `${W}x${H}`, touch: opt('touch'), route, watch,
