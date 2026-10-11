@@ -70,7 +70,7 @@ for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
   const cx = EXTENT.x0 + (c + .5) * TILE_M, cz = EXTENT.z0 + (r + .5) * TILE_M;
   await page.evaluate(({ cx, cz }) => { window.__ohmdal.world.camera.setPosition(cx, 400, cz); }, { cx, cz });
   await page.waitForTimeout(400);
-  tiles.push({ r, c, data: (await page.locator('canvas').first().screenshot({ type: 'png' })).toString('base64') });
+  tiles.push({ r, c, data: (await page.locator('canvas').first().screenshot({ type: 'png', timeout: 240000 })).toString('base64') });
   process.stdout.write(`\rtoma ${tiles.length}/${rows * cols}`);
 }
 console.log('');
