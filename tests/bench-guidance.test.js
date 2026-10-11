@@ -8,7 +8,7 @@ import { getBenchEvidence } from '../src/bench-evidence.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
-  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
+  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|bench-diagnosis|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
 const { PuzzleWorkbench, BENCH_GUIDANCE, observePuzzle } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 
 function bench(id, state = initialPuzzleSnapshot(id)) {
@@ -214,4 +214,65 @@ test('a socket only takes the stones at hand, and the notebook writes which one 
   assert.match(getBenchEvidence('gate', b.state).map(e => e.text).join(' '), /Zócalo del freno: saqué el puente de cobre; puse la piedra de anillos marrón, negro, negro y oro/);
   // The stone brakes what it really is, a little off its rings: the physics uses 10,1 Ω.
   assert.ok(Math.abs(evaluatePuzzle('gate', b.state).network.resistors.find(r => r.id === 'trim').resistance - 10.1) < 1e-9);
+});
+
+// ── Hints that answer the player's own slip (bench-diagnosis.js) ─────────────────────────────
+const click = (b, data) => { const previous = globalThis.document; globalThis.document = { activeElement: null }; try { b.handleClick({ target: { closest: () => ({ dataset: data, tagName: 'BUTTON' }) } }); } finally { globalThis.document = previous; } };
+const touch = (b, a, z) => { click(b, { port: a }); click(b, { port: z }); };
+
+test('a hint first answers the slip the player made, as a question, and keeps the bench hints for later', () => {
+  const b = bench('awaken');
+  touch(b, 'heartOut', 'positive');
+  assert.equal(b.pendingSlip?.kind, 'bypass', 'a cable across the heart is recognised');
+  click(b, { action: 'hint' });
+  const said = instruction(b.html());
+  assert.match(said, /une los dos lados de «Corazón de bronce»/);
+  assert.match(said, /\?/, 'the slip is answered with a question, not with the gesture');
+  assert.equal(b.state.hints, 0, 'answering a slip does not spend one of the four bench hints');
+  assert.equal(b.state.slips?.bypass, 1, 'the slip is counted for the Bitácora and the teacher');
+  click(b, { action: 'hint' });
+  assert.equal(b.state.hints, 1, 'asked again, the bench hints continue in order');
+});
+
+test('what is wrong when a bench opens is its puzzle, never a slip of the player', () => {
+  for (const id of Object.keys(PUZZLES)) {
+    const b = bench(id);
+    b.updateSlip();
+    assert.equal(b.pendingSlip, null, `${id}: the opening montage is the puzzle; the bench hints cover it`);
+  }
+});
+
+test('a short circuit, a reversed part, a lost return and probes on the same copper are each named', () => {
+  const short = bench('beacon_supply'); touch(short, 'positive', 'negative');
+  assert.equal(short.pendingSlip?.kind, 'short');
+  // The gate starts reversed: that is its puzzle. A dome motor turned around by the player is a slip.
+  const turned = bench('beacon_network'); PUZZLES.beacon_network.solve(turned.state);
+  turned.state.wires = turned.state.wires.map(w => w.map(n => ({ bearingIn: 'bearingOut', bearingOut: 'bearingIn' })[n] ?? n)); turned.evaluate(false); turned.updateSlip();
+  assert.equal(turned.pendingSlip?.key, 'reversed:bearing');
+  assert.match(turned.pendingSlip.text, /«Giro \+» o «Giro −»/);
+  const lost = bench('distribution'); PUZZLES.distribution.solve(lost.state); lost.evaluate(false);
+  const hand = lost.state.wires.findIndex(w => w.includes('clinicOut') && w.includes('negative'));
+  click(lost, { wire: String(hand) });
+  assert.equal(lost.pendingSlip?.key, 'open:clinic:vuelta');
+  assert.match(lost.pendingSlip.text, /«Enfermería».*¿Por dónde podría volver\?/);
+  const probe = bench('workshop'); probe.mode = 'voltage';
+  touch(probe, 's1b', 's2a');
+  assert.equal(probe.pendingSlip?.kind, 'probe', 'two probes on one piece of copper can never differ');
+});
+
+test('turning a brake the wrong way is noticed from the last turn, in the words of braking', () => {
+  const b = bench('gate'); PUZZLES.gate.solve(b.state); b.evaluate(false);
+  const key = PUZZLES.gate.knobs[0].key;
+  click(b, { action: 'stone', key, value: '100' });
+  assert.equal(b.pendingSlip?.kind, 'knob');
+  assert.match(b.pendingSlip.text, /frenó más.*¿Qué pasaría si frenaras menos\?/);
+});
+
+test('a slip that stays asks for the hint sooner, and saved slip counts survive a reload', () => {
+  const b = bench('awaken');
+  touch(b, 'heartOut', 'positive');
+  b.progress.changes = 2;
+  assert.ok(b.needsNudge(), 'two changes with the same slip are enough to offer help');
+  const saved = normalizePuzzleSnapshot('awaken', JSON.parse(JSON.stringify({ ...b.state, slips: { bypass: 2, invented: 4 } })));
+  assert.deepEqual(saved.slips, { bypass: 2 });
 });

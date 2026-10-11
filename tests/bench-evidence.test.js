@@ -8,7 +8,7 @@ import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
-  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
+  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|bench-diagnosis|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
 const { PuzzleWorkbench } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 function controller(id) {
   const saves = [], sounds = [], solved = [];

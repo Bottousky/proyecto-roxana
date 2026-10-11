@@ -589,6 +589,14 @@ diez casas habitables están despejadas.
 - **Mundo regenerado** en Linux, con la oclusión horneada por el módulo `bpy` de Blender 5.2
   (`BLENDER_PYTHON`).
 
+## Ciclo 25 · Pistas que miran tu montaje (11 oct 2026)
+
+Al pedir pista, quien habla en el banco mira primero el montaje. Si reconoce un error del jugador
+(cortocircuito, pieza puenteada, al revés, sin ida o sin vuelta, una voz que atraviesa a otra,
+puntas sobre el mismo cobre, freno para el lado equivocado o probar sin pregunta), pregunta sobre
+ese error. Las cuatro pistas fijas quedan para después. Los errores de cada banco quedan contados
+en la partida, para el futuro informe del docente. Detalle en [BANCOS-UX.md](BANCOS-UX.md).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |

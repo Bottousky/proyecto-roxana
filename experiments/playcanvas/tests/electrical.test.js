@@ -9,7 +9,7 @@ import { solveDC, measureVoltage, measureResistance, checkOperatingRange } from 
 // definitions and validators directly without requiring a DOM or bundler in CI.
 const puzzleSource = (await readFile(new URL('../src/game/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
-  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/game/${name}.js`)).href));
+  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|bench-diagnosis|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/game/${name}.js`)).href));
 const { initialPuzzleSnapshot, evaluatePuzzle, normalizePuzzleSnapshot, PuzzleWorkbench, PUZZLES, BENCH_GUIDANCE, observePuzzle } = await import(`data:text/javascript;base64,${Buffer.from(puzzleSource).toString('base64')}`);
 const almost = (actual, expected, tolerance = 1e-7) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} ≈ ${expected}`);
 const source = voltage => ({ id: 'battery', positive: '+', negative: '-', voltage });

@@ -1,6 +1,7 @@
 import { measureVoltage, measureResistance } from './electrical.js';
 import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, wireNodes, wireRole, wireFlow, isSealed, cablesInHand, canJoin, isPolarized, montageSignature, tallyReading, tallyCloses, knobChoices, stoneIn, stoneRings, ringWords, weighedStones, RIDDLE_STONE, RING_HEX, RING_MARKS } from './puzzle-model.js';
 import { appendBenchEvidence, getBenchEvidence } from './bench-evidence.js';
+import { diagnoseBench } from './bench-diagnosis.js';
 import { CONJUROS, ESTIMATES, estimateChoiceText, estimateVerdict, revealFor, WORDS } from './understanding.js';
 export { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, puzzleNetwork, evaluatePuzzle, getBenchEvidence };
 import './puzzles.css';
@@ -176,6 +177,8 @@ export class PuzzleWorkbench {
     this.history = [];
     this.feedback = '';
     this.hintShown = false;
+    // What the player's own montage says, for a hint that answers it (bench-diagnosis.js).
+    this.slipContext = { toggles: {}, lastKnob: null, measured: false }; this.slipsSaid = []; this.pendingSlip = null; this.slipShown = null;
     this.successDismissed = false;
     this.reveal = null;
     this.conjuroFresh = false;
@@ -380,7 +383,7 @@ export class PuzzleWorkbench {
   change(mutate, { history = true, sound = 'click' } = {}) {
     const before = copy(this.state);
     if (history) { this.history.push(copy(this.state)); if (this.history.length > 40) this.history.shift(); }
-    this.hintShown = false; this.estimateNote = ''; this.tallyNote = '';
+    this.hintShown = false; this.slipShown = null; this.estimateNote = ''; this.tallyNote = '';
     if (history) this.conjuroFresh = false;
     const brakeBefore = this.id === 'gate' ? { value: this.state.values.brake, current: Math.abs(this.result?.solution.branches.latch?.current ?? 0) } : null;
     if (history) this.probeMarks = null;
@@ -418,6 +421,27 @@ export class PuzzleWorkbench {
     if (before.sourceOn !== s.sourceOn) note(s.sourceOn ? 'La mesa volvió a encenderse para probar el montaje.' : 'La mesa se apagó para la prueba de camino: el instrumento usa su propia pila.');
     else if (before.tripped && !s.tripped) note('La mesa volvió a encenderse para probar el montaje.');
     if (changed || (!before.tripped && s.tripped)) this.recordObservation();
+    if (changed) this.noteSlips(before);
+  }
+
+  /** Keeps the little history a diagnosis needs (cables laid and taken back, the last knob turned)
+   * and counts each new slip the player makes, for the Bitácora and the teacher. */
+  noteSlips(before) {
+    const s = this.state, ctx = this.slipContext ??= { toggles: {}, lastKnob: null, measured: false }, key = w => [...w].sort().join('~');
+    const had = new Set(before.wires.map(key)), has = new Set(s.wires.map(key));
+    let wiresMoved = false;
+    for (const w of new Set([...had, ...has])) if (had.has(w) !== has.has(w)) { ctx.toggles[w] = (ctx.toggles[w] ?? 0) + 1; wiresMoved = true; }
+    const turned = (this.puzzle.knobs ?? []).find(k => before.values[k.key] !== s.values[k.key]);
+    if (turned) ctx.lastKnob = { key: turned.key, from: before.values[turned.key] };
+    else if (wiresMoved) ctx.lastKnob = null;
+    ctx.measured = false;
+    this.updateSlip();
+  }
+  updateSlip() {
+    this.slipContext ??= { toggles: {}, lastKnob: null, measured: false }; this.slipsSaid ??= [];
+    const slip = this.state.completed && !this.practice ? null : diagnoseBench(this.id, this.state, this.result, this.slipContext, this.slipsSaid);
+    if (slip && slip.key !== this.pendingSlip?.key) { const slips = this.state.slips ??= {}; slips[slip.kind] = (slips[slip.kind] ?? 0) + 1; }
+    this.pendingSlip = slip;
   }
 
   recordMeasurement() {
@@ -430,6 +454,7 @@ export class PuzzleWorkbench {
       ? `Medidor en serie con ${simpleLabel(this.puzzle.components.find(c => c.id === m.branch)?.label ?? '')}; sentido ${this.portLabel(this.puzzle.components.find(c => c.id === m.branch)?.a)} → ${this.portLabel(this.puzzle.components.find(c => c.id === m.branch)?.b)}.`
       : `Punta roja: ${this.portLabel(m.a)}; punta negra: ${this.portLabel(m.b)}.`;
     appendBenchEvidence(this.state, { kind: blocked ? 'observation' : 'measurement', text: blocked ? 'La prueba de continuidad quedó pendiente: la alimentación estaba encendida.' : TOOL_NAMES[this.mode], value: `${reading.value}${reading.unit ? ` ${reading.unit}` : ''}`, reference: `${reference} Alimentación ${this.state.sourceOn && !this.state.tripped ? 'encendida' : 'apagada'}.` });
+    if (!blocked) { (this.slipContext ??= { toggles: {}, lastKnob: null, measured: false }).measured = true; this.updateSlip(); }
     if (!blocked) this.recordProofMeasurement(reading);
     if (!blocked) this.recordWeighing();
     if (!blocked) this.recordTally();
@@ -579,14 +604,21 @@ export class PuzzleWorkbench {
       this.feedback = '';
       return this.change(s => { s.values[knob.key] = Math.max(knob.min, Math.min(knob.max, s.values[knob.key] + Number(el.dataset.delta) * knob.step)); }, { sound: 'dial' });
     }
+    if (action === 'hint' && this.pendingSlip) {
+      // A slip the player made comes first, as a question about it; the bench's own hints wait.
+      const slip = this.pendingSlip; this.feedback = ''; (this.slipsSaid ??= []).push(slip.key); this.pendingSlip = null;
+      this.hintShown = false; this.slipShown = slip;
+      if (this.progress) Object.assign(this.progress, { at: performance.now(), changes: 0 });
+      this.callbacks.onChange?.(this.id, copy(this.state)); this.render(); return;
+    }
     if (action === 'hint') { this.feedback = ''; this.change(s => { s.hints = Math.min(BENCH_GUIDANCE[this.id].hints.length, s.hints + 1); }, { history: false }); this.hintShown = true; if (this.progress) Object.assign(this.progress, { at: performance.now(), changes: 0 }); this.render(); return; }
     if (action === 'undo') {
       if (!this.history.length) return;
       const completed = this.state.completed;
       const before = copy(this.state), evidence = this.state.evidence;
-      const trace = this.state.trace; this.state = this.history.pop(); this.state.completed = completed; this.state.evidence = evidence; this.state.trace = trace;
+      const trace = this.state.trace, slips = this.state.slips; this.state = this.history.pop(); this.state.completed = completed; this.state.evidence = evidence; this.state.trace = trace; if (slips) this.state.slips = slips;
       this.powerForMode();
-      this.feedback = 'Volviste un paso atrás.'; this.selected = null; this.hintShown = false;
+      this.feedback = 'Volviste un paso atrás.'; this.selected = null; this.hintShown = false; this.slipShown = null;
       this.evaluate(false); this.recordChanges(before); this.callbacks.onChange?.(this.id, copy(this.state)); this.render(); return;
     }
     if (action === 'reset') {
@@ -608,7 +640,7 @@ export class PuzzleWorkbench {
       // Taking a cable needs one in hand, and an installation in service only changes in a practice copy.
       if (!this.selected && this.state.completed) { this.feedback = 'La instalación está en servicio: para cambiar cables, practicá con una copia.'; this.render(); return; }
       if (!this.selected && cablesInHand(this.id, this.state) <= 0) { this.feedback = 'No te quedan cables en la mano. Tocá uno de los que tendiste para retirarlo y usarlo en otro lugar.'; this.callbacks.onSound?.('error'); this.render(); return; }
-      if (!this.selected) { this.selected = id; this.feedback = ''; this.hintShown = false; this.callbacks.onSound?.('connect'); this.render(); return; }
+      if (!this.selected) { this.selected = id; this.feedback = ''; this.hintShown = false; this.slipShown = null; this.callbacks.onSound?.('connect'); this.render(); return; }
       if (this.selected === id) { this.selected = null; this.feedback = ''; this.render(); return; }
       const a = this.selected; this.selected = null;
       if (this.state.wires.some(w => w.includes(a) && w.includes(id))) { this.feedback = 'Esos bornes ya están unidos. Tocá su cable para retirarlo.'; this.render(); return; }
@@ -896,7 +928,10 @@ export class PuzzleWorkbench {
   }
   needsNudge() {
     const p = this.progress, guidance = BENCH_GUIDANCE[this.id];
-    return !!p && !this.result?.solved && !this.state.completed && this.state.hints < guidance.hints.length && !this.hintShown && (p.changes >= 6 || performance.now() - p.at > 90000);
+    if (!p || this.result?.solved || this.state.completed || this.hintShown || this.slipShown) return false;
+    // A slip of the player's own that stays two changes asks sooner than a plain wait.
+    if (this.pendingSlip && p.changes >= 2) return true;
+    return this.state.hints < guidance.hints.length && (p.changes >= 6 || performance.now() - p.at > 90000);
   }
 
   /** The bench's single instrument, if any: the one its story asks for. In service, only a
@@ -921,6 +956,7 @@ export class PuzzleWorkbench {
     const book = ESTIMATES[this.id];
     if (this.estimateNote) return { kind: 'estimate', who: book.who, tag: book.book, text: this.estimateNote };
     if (book && !s.estimate && !s.completed && !this.practice && !r.solved && (!book.when || book.when(s))) return { kind: 'estimate', who: book.who, tag: `${book.book} · Marca esperada`, text: book.ask, options: book.options };
+    if (this.slipShown) return { kind: 'hint', who: voice, tag: 'Mirando tu montaje', text: this.slipShown.text };
     if (this.hintShown && s.hints) return { kind: 'hint', who: voice, tag: `Pista ${s.hints} de ${guidance.hints.length}`, text: guidance.hints[s.hints - 1] };
     if (this.feedback) return { kind: s.tripped ? 'warning' : 'note', who: voice, text: this.feedback };
     if (s.tripped) return { kind: 'warning', who: voice, text: observePuzzle(this.id, s, r)[0].text };
@@ -1087,7 +1123,7 @@ export class PuzzleWorkbench {
     };
     const toolButton = (mode, label) => `<button data-action="mode" data-mode="${mode}" class="${this.mode === mode ? 'active' : ''} ${nextTool === mode ? 'wb-next-step' : ''}" aria-pressed="${this.mode === mode}">${label}</button>`;
     const tools = [wiring ? toolButton('wire', `<span aria-hidden="true">⌁</span>Cables <b class="wb-hand" aria-label="${inHand} en la mano">×${inHand}</b>`) : '', tool ? toolButton(tool, `<span aria-hidden="true">⌖</span>${TOOL_NAMES[tool]}`) : ''].join('');
-    const hintButton = !s.completed && !r.solved ? `<button class="wb-hint ${this.needsNudge() ? 'wb-nudge' : ''}" data-action="hint" ${s.hints >= guidance.hints.length ? 'disabled' : ''}>${s.hints >= guidance.hints.length ? 'No hay más pistas' : s.hints === guidance.hints.length - 1 ? 'Mostrame un paso para probar' : s.hints ? 'Otra pista' : 'Pista'}</button>` : '';
+    const hintButton = !s.completed && !r.solved ? `<button class="wb-hint ${this.needsNudge() ? 'wb-nudge' : ''}" data-action="hint" ${s.hints >= guidance.hints.length && !this.pendingSlip ? 'disabled' : ''}>${this.pendingSlip ? (s.hints || this.slipsSaid?.length ? 'Otra pista' : 'Pista') : s.hints >= guidance.hints.length ? 'No hay más pistas' : s.hints === guidance.hints.length - 1 ? 'Mostrame un paso para probar' : s.hints ? 'Otra pista' : 'Pista'}</button>` : '';
     const controls = [...(p.knobs ?? []).map(k => `<div class="wb-compact-control"><span>${escapeHtml(k.label)}</span>${this.knobControl(k)}</div>`), ...(p.switches ?? []).filter(sw => !sw.external).map(sw => `<div class="wb-compact-control"><span>${escapeHtml(p.components.find(c => c.switchKey === sw.key) ? this.pieceName(p.components.find(c => c.switchKey === sw.key)) : sw.label)}</span>${this.switchControl(sw)}</div>`)].join('');
     const revealable = this.id !== 'awaken' && !this.practice;
     const card = this.reveal?.cards[this.reveal.at];

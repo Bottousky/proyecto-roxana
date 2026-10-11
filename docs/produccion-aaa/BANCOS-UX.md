@@ -80,12 +80,41 @@ inferior» tapaba la posición del freno. Ahora, si dos placas se tocan, la que 
 corre de costado lo justo, sin salirse del tablero, y se vuelven a acomodar al girar el teléfono.
 `qa-bench-load.mjs` cuenta 0 placas encimadas en los cuatro tamaños.
 
+## Pistas que miran tu montaje (ciclo 25)
+
+Antes, las cuatro pistas de cada banco salían siempre en el mismo orden, hiciera lo que hiciera el
+jugador. Un buen tutor mira primero lo que hizo el alumno. Ahora, al pedir pista, Ohm (o quien
+hable en ese banco) mira el montaje y, si reconoce un error **del jugador**, pregunta sobre ese
+error. Lo hace con una pregunta, nunca con el gesto. Las cuatro pistas fijas quedan para después y
+no se gastan.
+
+| Error reconocido | Cómo se reconoce | Ejemplo de lo que dice |
+|---|---|---|
+| Cortocircuito | «Fuente +» y «Retorno −» unidos por puro cobre | «Seguí ese camino con el dedo: ¿qué pieza atraviesa la corriente antes de volver?» |
+| Pieza puenteada | un cable une los dos lados de la pieza del encargo | «Si la corriente puede pasar por el cobre, ¿qué le queda para atravesar el corazón?» |
+| Al revés | una pieza con sentido recibe la corriente invertida | «¿Por cuál de sus bornes entra ahora la corriente? ¿Por cuál debería entrar?» |
+| Sin ida o sin vuelta | la pieza no recibe corriente; se sigue el cobre desde cada borne de la fuente | «A la enfermería le llega la corriente, pero desde ahí no tiene cómo volver. ¿Por dónde podría?» |
+| Una voz atraviesa a otra | Castillo y Faro II: sin la otra pieza, ésta se apaga | «Si la cocina se apaga, ¿qué le pasa a la enfermería?» |
+| Puntas sobre el mismo cobre | las dos puntas del instrumento en el mismo tramo de cable | «Entre esos dos bornes hay puro cobre: ¿dónde apoyarías las puntas?» |
+| Freno para el lado equivocado | el último cambio de freno o piedra alejó a la pieza de su punto | «Frenó más y le llega todavía menos fuerza. ¿Qué pasaría si frenaras menos?» |
+| Probar sin pregunta | el mismo cable puesto y sacado cuatro veces | «Antes de tenderlo otra vez: ¿qué esperás que cambie?» |
+
+- **Sólo errores del jugador.** Lo que ya está mal cuando el banco se abre es el puzzle: el corte
+  del Taller, el cerrojo al revés, las luces en serie del Castillo. Esos los cubren las pistas
+  fijas. Una prueba lo comprueba en los diez bancos.
+- **El botón de pista late antes** cuando el mismo error sigue después de dos cambios, en lugar
+  de esperar seis cambios o 90 segundos.
+- **Cada error queda contado** por tipo en el banco (`slips` en la partida guardada), para la
+  Bitácora y para un futuro informe para el docente.
+- Código en `src/bench-diagnosis.js`, puro y probado aparte. Probado en el juego: en el Taller,
+  con las puntas sobre el mismo cobre, Ohm responde a eso en lugar de la primera pista fija.
+
 ## Pendiente o NO VERIFICADO
 
 - **Prueba con personas: NO VERIFICADA.** La investigación recomienda partidas grabadas con
   jugadores nuevos que narren en voz alta. Nada de lo medido acá sustituye eso.
 - **Teléfono real: NO VERIFICADO.** Sólo con emulación táctil: apaisado 844×390 y 740×360, y
   vertical 390×844.
-- No implementado, para discutir: pistas que cambian según el error cometido (hoy son una
-  secuencia fija de cuatro), una pregunta de predicción en los bancos clave (por ejemplo, antes de
-  que Ivara aísle la cocina) y señalar en el tablero dónde se corta un camino abierto.
+- Hecho en el ciclo 25: pistas que responden al error del jugador (arriba). La predicción en los
+  bancos clave quedó hecha en el ciclo 21. Sigue sin hacer: señalar en el tablero dónde se corta un
+  camino abierto.

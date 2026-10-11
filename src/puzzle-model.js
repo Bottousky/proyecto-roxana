@@ -40,6 +40,7 @@ export function stoneIn(k, value) { return k?.stones?.find(st => st.value === va
 // repair, used by tests and to carry old saves across a redesign.
 /** Every bench offers the same four steps of help, the last one a concrete step to try. */
 export const HINT_STEPS = 4;
+export const SLIP_KINDS = ['short', 'bypass', 'reversed', 'open', 'dependent', 'probe', 'knob', 'repeat'];
 const on = (r, s) => s.sourceOn && !s.tripped && !r.overloaded;
 const branchOf = (r, id) => r.solution.branches[id] ?? { voltage: 0, current: 0, power: 0 };
 
@@ -244,7 +245,9 @@ export function normalizePuzzleSnapshot(id, saved) {
   for (const w of p.sealed ?? []) if (!uniqueWires.some(u => samePair(u, w))) uniqueWires.push([...w]);
   let movable = 0;
   for (let i = uniqueWires.length - 1; i >= 0; i--) if (!isSealed(id, uniqueWires[i]) && (!canJoin(id, ...uniqueWires[i]) || ++movable > (p.cables ?? Infinity))) { if (canJoin(id, ...uniqueWires[i])) movable--; uniqueWires.splice(i, 1); }
-  const normalized = { ...initial, evidence: normalizeBenchEvidence(saved.evidence), wires: uniqueWires, sourceOn: typeof saved.sourceOn === 'boolean' ? saved.sourceOn : initial.sourceOn, tripped: !!saved.tripped, completed: !!saved.completed,
+  // Slips the player made at this bench, by kind (bench-diagnosis.js): what a teacher would want to know.
+  const slips = Object.fromEntries(Object.entries(saved.slips && typeof saved.slips === 'object' ? saved.slips : {}).filter(([k, n]) => SLIP_KINDS.includes(k) && Number.isInteger(n) && n > 0).map(([k, n]) => [k, Math.min(n, 999)]));
+  const normalized = { ...initial, ...(Object.keys(slips).length ? { slips } : {}), evidence: normalizeBenchEvidence(saved.evidence), wires: uniqueWires, sourceOn: typeof saved.sourceOn === 'boolean' ? saved.sourceOn : initial.sourceOn, tripped: !!saved.tripped, completed: !!saved.completed,
     switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, typeof saved.switches?.[s.key] === 'boolean' ? saved.switches[s.key] : s.initial])),
     // A value always sits on a notch, or is a stone the socket has (the nearest one, for saves from before sockets).
     values: Object.fromEntries((p.knobs ?? []).map(k => { const v = saved.values?.[k.key]; return [k.key, Number.isFinite(v) ? knobChoices(k).reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a)) : k.initial]; })),
