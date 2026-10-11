@@ -585,7 +585,7 @@ diez casas habitables están despejadas.
   con portón cerrado y su árbol detrás. Su patio queda libre de árboles del lugar, de la arboleda
   del camino y del seto.
 - **El sendero del bosque** (Plaza–Portal y Castillo–Terrazas) era caminable pero se dibujaba como
-  pasto. Ahora el suelo lo pinta de tierra pisada.
+  pasto. Ahora el mapa del suelo le da un tono propio y el sombreador lo pinta de tierra pisada.
 - **Mundo regenerado** en Linux, con la oclusión horneada por el módulo `bpy` de Blender 5.2
   (`BLENDER_PYTHON`).
 

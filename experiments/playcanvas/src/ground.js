@@ -2,8 +2,9 @@ import {SHADERLANGUAGE_GLSL,Texture,PIXELFORMAT_RGBA8,FILTER_LINEAR,ADDRESS_CLAM
 import shore from './data/shore.json';
 
 // The meadow and every paved square or road are one surface. The paving outline comes
-// from the baked map (G: coverage, B: regional tone); the shader breaks its edge with
-// noise, wears a ring of trodden earth around it and varies the grass in broad patches.
+// from the baked map (G: coverage, B: regional tone, 200 for a woodland trail); the shader
+// breaks its edge with noise, wears a ring of trodden earth around it and varies the grass in
+// broad patches.
 const diffusePS=`
 uniform vec3 material_diffuse;
 uniform sampler2D uShoreMap;
@@ -47,6 +48,12 @@ void getAlbedo(){
   float shade=cloudShade(p)*(1.0-0.55*(1.0-texture2D(uGroundAo,uv).r));
   if(cover<0.01){dAlbedo=grass*shade;return;}
   int tone=int(texture2D(uShoreMap,(floor(uv*uShoreSize)+0.5)/uShoreSize).b*255.0+0.5);
+  // A woodland trail (tone 200, scripts/bake-shore.mjs) is beaten earth, not cobbles.
+  if(tone==200){
+    float lum=dot(grass,vec3(0.3,0.59,0.11)),trod=smoothstep(0.12,0.3,cover+(edge-0.5)*0.25);
+    vec3 soil=vec3(lum*1.3,lum*0.98,lum*0.6)*(0.88+0.24*fine);
+    dAlbedo=mix(grass,soil,trod)*shade;return;
+  }
   vec3 tint=uPave[0];
   for(int i=1;i<${shore.paving.length};i++)if(i==tone)tint=uPave[i];
   vec3 stone=texture2D(uCobble,p/5.0).rgb*tint;

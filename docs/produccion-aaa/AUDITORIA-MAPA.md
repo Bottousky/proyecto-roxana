@@ -62,8 +62,10 @@ se veía, y con la cámara del juego el jugador aparecía entre matas sin ningú
 camino difícil de encontrar.
 
 **Arreglo:** el sendero se pinta como tierra pisada. La exportación lo marca como sendero. El
-horneado de la orilla lo escribe en el mapa del suelo con cobertura parcial (0,3), y el sombreador del
-suelo lee esa cobertura como tierra gastada, no como empedrado. Las plantas ya no crecen encima.
+horneado de la orilla lo escribe en el mapa del suelo con cobertura parcial (0,4) y un tono propio
+(200), y el sombreador del suelo pinta ese tono como tierra, no como empedrado. Las plantas ya no
+crecen encima. Con sólo la cobertura parcial, el pasto se oscurecía un 10 % y no se notaba: medido
+en la toma cenital, el verde bajaba de 127 a 112. Por eso lleva su tono.
 
 ## Revisado y sin problema
 
@@ -81,7 +83,11 @@ suelo lee esa cobertura como tierra gastada, no como empedrado. Las plantas ya n
 `npm run export:world` necesita Blender para hornear la oclusión. Sin instalarlo sirve el módulo de
 Python: `pip install bpy==5.2.2` en un entorno con Python 3.13, y
 `BLENDER_PYTHON=ruta/al/python node scripts/bake-ao.mjs`. Esta pasada se horneó así, con las mismas
-muestras (48) que en Windows.
+muestras (48) que en Windows. Con 4 núcleos tarda alrededor de una hora.
+
+El zlib de Node de este contenedor comprime peor que el usado antes: la misma geometría queda en
+9,9 MB en lugar de 8,9 MB. Por eso `geometry.bin.gz` se recomprimió con `gzip -9`: el contenido es
+idéntico y ocupa 9,1 MB. La diferencia con antes son las cercas y portones nuevos.
 
 ## Pendiente (propuestas, no hechas)
 
