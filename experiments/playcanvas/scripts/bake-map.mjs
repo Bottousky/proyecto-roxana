@@ -42,8 +42,8 @@ const page = await browser.newPage({ viewport: { width: TILE_PX, height: TILE_PX
 await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
 // A new journey first asks for the school name (unless this browser already stored one).
-const name = page.locator('#player-name');
-if (await name.isVisible({ timeout: 5000 }).catch(() => false)) { await name.fill('Cartógrafo'); await page.locator('#name-form button').click(); }
+const nameField = page.locator('#player-name');
+if (await nameField.isVisible({ timeout: 5000 }).catch(() => false)) { await nameField.fill('Cartógrafo'); await page.locator('#name-form button').click(); }
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 180000 });
 for (let i = 0; i < 80 && await page.evaluate(() => window.__ohmdal.mode === 'dialogue'); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
 await page.waitForTimeout(1500);
