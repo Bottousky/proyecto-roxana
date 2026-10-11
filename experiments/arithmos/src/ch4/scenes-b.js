@@ -624,7 +624,5 @@ function writeJournal4(g) {
       {id: 'c4.partir', label: 'Desplegar: partir el rectángulo'},
     ],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }

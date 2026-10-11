@@ -1,0 +1,71 @@
+[0.1s] escena → undefined
+[3.3s] escena → c1.puerta
+[8.1s] lee: Tengo las manos de tiza.
+[10.5s] lee: …No hay vuelta. Por ahora.
+[15.0s] lee: Alguien borró todo esto a medias.
+[15.5s] escena → c1.alguien
+[18.6s] elige «Acercarte» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[28.5s] elige «Quedarte quieto y esperar» (Punto espía desde su escondite.)
+[32.0s] lee: —Hola.
+[33.4s] lee: No habla. O no habla como yo.
+[33.9s] lee: —¿Tenés nombre?
+[37.2s] lee: Un punto. Nada más… y nada menos.
+[37.8s] lee: —Te voy a decir Punto. Hasta que me digas cómo te llamás.
+[43.1s] escena → c1.ronda
+[46.9s] lee: ¿Qué es eso?
+[49.2s] lee: Si pasa por acá, los desparrama.
+[50.1s] elige «Contarlos.» (¿Cómo vas a saber si vuelven todos?)
+[65.7s] lee: Doce.
+[66.6s] lee: Pero Punto no sabe qué es "doce". Necesito algo que él también pueda ver.
+[120.6s] no pudo tocar r11: page.click: Timeout 5000ms exceeded.
+[120.7s] escena → c1.marea
+[123.6s] lee: Se llevó todo. Menos las marcas.
+[125.3s] escena → c1.vuelven
+[128.6s] lee: Cada marca era uno de ellos.
+[135.0s] comprueba antes de terminar (error deliberado)
+[142.2s] une un punto a dos marcas (error deliberado)
+[145.7s] deshace la unión doble
+[170.7s] lee: Quedó una marca sola.
+[171.1s] escena → c1.quien
+[176.8s] elige «Que sobra un punto.» (¿Qué quiere decir esa marca sola?)
+[181.1s] lee: Ningún punto quedó sin marca. La que quedó sola es una marca.
+[182.1s] elige «Que hice una marca de más.» (¿Qué quiere decir esa marca sola?)
+[186.9s] lee: Esta mañana pasaron doce y anoté doce: una marca cada vez que tocaba a uno. Ninguna de más.
+[187.7s] lee: Esta noche volvieron once. Alguien no volvió.
+[199.3s] lee: Las marcas saben cuántos. No saben quién. Punto sí.
+[203.3s] lee: —¿El más chico? ¿El que llegaba tarde?
+[205.7s] lee: —Vamos a buscarlo.
+[211.2s] escena → c1.busqueda
+[215.3s] lee: Nadie.
+[225.3s] lee: Alguien anotó acá, hace mucho.
+[235.4s] lee: Ahí. Debajo del polvo.
+[239.6s] escena → c1.todos
+[240.7s] lee: Ahora sí.
+[251.2s] lee: —Están todos.
+[253.4s] escena → c1.gradas
+[255.1s] lee: ¿Y para mí?
+[257.2s] elige «No alcanzan.» (Así, en fila, ¿alcanzan los asientos para la Ronda y Punto?)
+[260.1s] elige «Por cómo se ve.» (¿Cómo lo sabés?)
+[274.5s] elige «Había más en la fila que asientos.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[278.2s] lee: Nadie quedó parado. Lo que sobró es un asiento.
+[279.2s] elige «Eran la misma cantidad.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[283.1s] lee: Si fueran los mismos, no sobraría nada.
+[284.0s] elige «Había más asientos que en la fila.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[286.5s] lee: Punto y yo pensábamos lo mismo. Mirábamos el largo de la fila.
+[288.6s] elige «Ninguno.» (Así apretados, si se vuelven a sentar, ¿cuántos asientos sobran?)
+[292.3s] lee: Sobró uno, como antes. Apretados o separados, son trece.
+[295.2s] lee: ¿El que sobra es para mí?
+[296.7s] escena → c1.nombre
+[297.7s] lee: ¡Le salió!
+[313.2s] lee: —¡Bajen! Cada uno debajo de su marca.
+[314.9s] lee: Catorce marcas. Catorce palabras. Catorce de nosotros.
+[317.2s] elige «Adentro del 14 hay catorce cosas.» (¿Qué le decís a Punto?)
+[321.2s] lee: No hay nada escondido adentro.
+[322.1s] elige «El 14 nombra a dos.» (¿Qué le decís a Punto?)
+[326.1s] lee: Somos catorce, no dos.
+[326.9s] elige «El 14 nombra a catorce.» (¿Qué le decís a Punto?)
+[330.8s] lee: No es una fila más: es el nombre de cuántos hay en cada una.
+[332.6s] lee: Me mira como preguntando qué hace un 1 ahí, si somos catorce.
+[333.2s] lee: —Ni idea. Mañana.
+[335.0s] escena → c2.manana
+[337.5s] {"ended":true,"final":{"mode":"play","seg":"c2.manana"},"journal":["¿Están todos?"],"owner":"Manuel","photos":["c1"],"evidenceKinds":["door","meet","record-method","count-ronda-repeat","count-ronda","record","record-repeat","recorded","pair","check","unpair","interpret","search","predict","seat","seat-taken","interpret-seat","conserve","count","count-repeat","numeral"],"fps":{"min":"20.0","median":"20.0","worst":{"fps":20,"seg":"c1.puerta","mode":"play"}},"errors":[],"seconds":337.466,"size":"1600x900","touch":false,"route":"errores","watch":false}

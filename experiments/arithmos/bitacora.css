@@ -1,0 +1,174 @@
+/* La Bitácora de Arithmos · Tomo 1: un cuaderno de matemática de tapa dura, abierto sobre el pizarrón.
+   Papel cuadriculado con margen rojo. Lápiz (grafito) para lo que pasó, birome azul para lo que eso dice, lápiz rojo para
+   los números, el sello del capítulo en verde Arithmos, y la pizarra del capítulo pegada como foto.
+   Las mismas reglas sirven para la pantalla y para las hojas del PDF (.bt-pdf-*). Fuentes: las del juego (Kalam, Atkinson). */
+
+.bt-root, .bt-pdf {
+  --paper: #fbf9f1; --grid: rgba(70, 135, 165, .2); --grid-strong: rgba(70, 135, 165, .32); --margin: rgba(214, 96, 86, .55);
+  --graphite: #4b4b47; --blue: #1f3c78; --red: #c0392b; --green: #2e7d55; --ink: #22302a;
+  --hand: Kalam, 'Segoe Print', 'Bradley Hand', cursive; --print: 'Atkinson Hyperlegible', system-ui, sans-serif;
+  --cell: 18px;
+}
+
+/* ——— En el menú de pausa: el cuaderno ocupa la hoja entera ——— */
+#pause .sheet.is-book { width: min(1260px, 100%); max-width: none; height: calc(100dvh - 24px); max-height: none; padding: 12px 16px 10px; overflow: hidden; display: flex; flex-direction: column; }
+#pause .sheet.is-book .panel[data-panel=journal] { flex: 1; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+.bt-root { display: flex; flex-direction: column; min-height: 0; flex: 1; color: var(--ink); }
+
+.bt-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 16px; padding: 0 48px 8px 4px; color: #f1f0e6; }
+.bt-heading .bt-eyebrow { width: 100%; order: -1; color: #86e0a8; }
+.bt-heading h2 { margin: 0; font-family: var(--hand); font-weight: 700; font-size: 30px; }
+.bt-heading p { margin: 0; font-family: var(--hand); font-size: 21px; color: rgba(241, 240, 230, .8); }
+.bt-download { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+.bt-download button { font: 600 15px var(--print); color: #14281f; background: #86e0a8; border: 0; border-radius: 6px; padding: 8px 14px; min-height: 40px; cursor: pointer; box-shadow: 0 2px 0 #3d7a59; }
+.bt-download button + button { background: #f1f0e6; box-shadow: 0 2px 0 #9a998f; }
+.bt-download button:disabled { opacity: .55; cursor: progress; }
+.bt-eyebrow { display: block; font: 700 11px var(--print); letter-spacing: .16em; text-transform: uppercase; }
+
+/* El libro: tapas de tela verde, un elástico y la doble página. */
+.bt-desk { position: relative; flex: 1; min-height: 0; display: flex; justify-content: center; }
+.bt-book { position: relative; width: min(1100px, calc(100% - 132px)); margin-right: 132px; padding: 11px; border-radius: 8px 12px 12px 8px;
+  background: radial-gradient(ellipse at 20% 12%, #2f6a4c, transparent 60%), linear-gradient(135deg, #24553d, #1a4330 50%, #12321f);
+  box-shadow: inset 0 2px 0 #3f8a63, inset 0 -2px 0 #0b2015, 0 16px 36px #000b; display: flex; flex-direction: column; }
+.bt-book::before { content: ''; position: absolute; inset: 5px; border: 1px dashed rgba(134, 224, 168, .35); border-radius: 6px 10px 10px 6px; pointer-events: none; }
+.bt-elastic { position: absolute; top: -5px; bottom: -5px; right: 26px; width: 9px; border-radius: 4px; background: linear-gradient(90deg, #0d1712, #2c3b33 45%, #0d1712); box-shadow: 0 0 4px #000a; z-index: 6; pointer-events: none; }
+.bt-spread { position: relative; flex: 1; display: grid; grid-template-columns: 1fr 22px 1fr; min-height: 380px; height: min(calc(100dvh - 170px), 700px); }
+.bt-spine { background: linear-gradient(90deg, #d8d5c6, #a5a294 30%, #7d7a6d 50%, #a5a294 70%, #d8d5c6); box-shadow: inset 0 0 8px #0005; }
+
+/* Papel cuadriculado, con margen rojo del lado de afuera de cada página. */
+.bt-page, .bt-pdf-sheet { position: relative; overflow: hidden; color: var(--ink); background-color: var(--paper);
+  background-image:
+    linear-gradient(90deg, transparent calc(100% - 1px), var(--grid) 0),
+    linear-gradient(transparent calc(100% - 1px), var(--grid) 0);
+  background-size: var(--cell) var(--cell); }
+.bt-left { border-radius: 5px 0 0 5px; box-shadow: inset -20px 0 26px -18px #6d6a5c, inset 4px 0 8px -4px #6d6a5c88; }
+.bt-right { border-radius: 0 5px 5px 0; box-shadow: inset 20px 0 26px -18px #6d6a5c, inset -4px 0 8px -4px #6d6a5c88; }
+.bt-left::after, .bt-right::after, .bt-pdf-sheet::after { content: ''; position: absolute; top: 0; bottom: 0; width: 0; border-left: 2px solid var(--margin); pointer-events: none; }
+.bt-left::after, .bt-pdf-sheet.is-left::after { left: 44px; }
+.bt-right::after, .bt-pdf-sheet.is-right::after { right: 44px; }
+.bt-page-body { position: absolute; inset: 0 0 42px 0; overflow: auto; padding: 22px 30px 14px 60px; scrollbar-width: thin; scrollbar-color: #a5a294 transparent; }
+.bt-right .bt-page-body { padding: 22px 60px 14px 30px; }
+
+/* Encabezados: sello del capítulo, la marca del tomo y el título con un subrayado a mano. */
+.bt-page-head { position: relative; margin-bottom: 8px; }
+.bt-page-head .bt-eyebrow { color: #6b7d73; }
+.bt-stamp { float: right; margin: -4px -6px 6px 10px; padding: 3px 9px; font: 700 13px var(--print); letter-spacing: .1em; text-transform: uppercase; color: var(--green); border: 2px solid rgba(46, 125, 85, .7); border-radius: 4px; transform: rotate(-4deg); opacity: .85; mix-blend-mode: multiply; }
+.bt-page-head h3 { margin: 2px 0 0; font-family: var(--hand); font-weight: 700; font-size: 30px; line-height: 1.1; color: var(--ink); transform: rotate(-.6deg); }
+.bt-underline { display: block; width: 58%; height: 12px; margin: 2px 0 6px; }
+.bt-underline path { fill: none; stroke: var(--red); stroke-width: 2.6; stroke-linecap: round; opacity: .8; }
+.bt-label { display: block; margin: 14px 0 4px; font: 700 12px var(--print); letter-spacing: .12em; text-transform: uppercase; color: var(--green); }
+
+/* Escritura: el renglón es la cuadrícula (dos cuadraditos por línea). */
+.bt-pencil { margin: 0 0 8px; font-family: var(--hand); font-weight: 300; font-size: 20px; line-height: calc(var(--cell) * 1.5); color: var(--graphite); }
+.bt-ink { margin: 0 0 10px; font-family: var(--hand); font-weight: 400; font-size: 20px; line-height: calc(var(--cell) * 1.5); color: var(--blue); }
+.bt-num { color: var(--red); font-weight: 700; }
+.bt-seen { list-style: none; margin: 4px 0 10px; padding: 0; }
+.bt-seen li { position: relative; padding-left: 22px; font-family: var(--hand); font-weight: 300; font-size: 20px; line-height: calc(var(--cell) * 1.5); color: var(--graphite); }
+.bt-seen li::before { content: '✓'; position: absolute; left: 0; font-weight: 700; color: var(--green); }
+
+/* La idea, en un recuadro hecho a mano. */
+.bt-rule { margin: 4px 4px 12px; padding: 8px 14px 6px; border: 2.4px solid var(--blue); border-radius: 12px 4px 14px 5px / 5px 14px 4px 12px; background: rgba(255, 252, 226, .7); transform: rotate(-.4deg); }
+.bt-rule .bt-label { margin-top: 0; color: var(--blue); }
+.bt-rule p { margin: 0; font-family: var(--hand); font-weight: 700; font-size: 22px; line-height: 1.3; color: var(--blue); }
+
+/* La pizarra del capítulo, pegada con cinta. */
+.bt-photo { float: right; width: 46%; max-width: 240px; margin: 2px -4px 10px 14px; padding: 7px 7px 4px; background: #fff; box-shadow: 0 3px 8px #0004, 0 0 0 1px #0001; transform: rotate(var(--tilt, -2.5deg)); position: relative; }
+.bt-photo::before, .bt-photo::after { content: ''; position: absolute; width: 56px; height: 18px; background: rgba(232, 226, 190, .75); box-shadow: 0 1px 1px #0002; }
+.bt-photo::before { top: -9px; left: -12px; transform: rotate(-30deg); }
+.bt-photo::after { top: -8px; right: -14px; transform: rotate(26deg); }
+.bt-photo img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: #14281f; }
+.bt-photo figcaption { margin-top: 2px; text-align: center; font-family: var(--hand); font-size: 15px; color: var(--graphite); }
+
+/* Volver a ver (sólo en pantalla) y la pregunta propia, sobre los renglones. */
+.bt-sticky { margin: 14px 10px 6px auto; max-width: 290px; padding: 10px 14px 12px; background: linear-gradient(#fdf28f, #f6e36a); box-shadow: 0 4px 8px #0004; transform: rotate(1.6deg); font-family: var(--hand); color: #3a3416; }
+.bt-sticky b { display: block; font-size: 17px; margin-bottom: 2px; }
+.bt-sticky button { display: block; border: 0; background: none; padding: 4px 0; min-height: 36px; text-align: left; font: 400 17px var(--hand); color: #3a3416; text-decoration: underline dashed rgba(58, 52, 22, .6); text-underline-offset: 4px; cursor: pointer; }
+.bt-own { margin: 14px 0 6px; padding: 6px 10px 4px; border-left: 3px double var(--margin); background: rgba(255, 255, 255, .55); }
+.bt-own label, .bt-own-label { display: block; font: 700 12px var(--print); letter-spacing: .12em; text-transform: uppercase; color: var(--green); }
+.bt-own textarea { width: 100%; min-height: 108px; resize: vertical; border: 0; outline: 0; padding: 0; background: repeating-linear-gradient(transparent 0 26px, rgba(70, 135, 165, .35) 26px 27px); font: 400 20px/27px var(--hand); color: var(--blue); }
+.bt-own textarea:focus-visible { box-shadow: 0 0 0 2px rgba(31, 60, 120, .4); border-radius: 3px; }
+.bt-own small { display: block; font-family: var(--hand); font-size: 15px; color: var(--graphite); }
+.bt-own-text { margin: 2px 0 6px; font: 400 20px/27px var(--hand); color: var(--blue); white-space: pre-line; }
+.bt-margin { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin: 16px 6px 0 auto; font-family: var(--hand); font-size: 15px; color: var(--graphite); transform: rotate(2deg); }
+.bt-punto { width: 48px; height: 32px; }
+.bt-punto circle { fill: var(--graphite); }
+.bt-punto path { stroke: var(--graphite); stroke-width: 2; stroke-linecap: round; opacity: .6; }
+
+/* Portadilla e índice. */
+.bt-owner { margin: 26px 0 18px; }
+.bt-owner-name { margin: 0 0 6px; font-family: var(--hand); font-weight: 700; font-size: 38px; line-height: 1.15; color: var(--blue); border-bottom: 2px solid var(--grid-strong); }
+.bt-blank { display: inline-block; width: 70%; height: 40px; }
+.bt-tomo { display: inline-flex; flex-direction: column; align-items: center; margin: 8px 0 14px; padding: 10px 22px; border: 3px double var(--green); border-radius: 6px; color: var(--green); transform: rotate(-1.5deg); }
+.bt-tomo span { font: 700 13px var(--print); letter-spacing: .2em; text-transform: uppercase; }
+.bt-tomo b { font-family: var(--hand); font-size: 34px; line-height: 1.1; }
+.bt-tomo small { font: 400 13px var(--print); letter-spacing: .1em; text-transform: uppercase; }
+.bt-motto { font-size: 22px; }
+.bt-index { list-style: none; margin: 6px 0 10px; padding: 0; }
+.bt-index li { display: grid; grid-template-columns: 30px 1fr 24px; align-items: baseline; font-family: var(--hand); font-size: 20px; line-height: calc(var(--cell) * 1.5); }
+.bt-index-n { color: var(--red); font-weight: 700; }
+.bt-index .is-done .bt-index-t { color: var(--blue); }
+.bt-index .is-ahead { color: #9a998f; }
+.bt-index-mark { color: var(--green); font-weight: 700; text-align: right; }
+.bt-more { margin-top: 10px; }
+
+/* Folio, esquinas para pasar la hoja y pestañas de colores. */
+.bt-folio { position: absolute; z-index: 2; bottom: 12px; left: 50%; transform: translateX(-50%); font-family: var(--hand); font-size: 17px; color: var(--graphite); }
+.bt-corner { position: absolute; z-index: 2; bottom: 0; padding: 20px 12px 8px; min-height: 44px; border: 0; background: none; cursor: pointer; font: 700 17px var(--hand); color: var(--ink); }
+.bt-corner-prev { left: 0; background: linear-gradient(45deg, #dedbcc 0 28px, transparent 28px); }
+.bt-corner-next { right: 0; background: linear-gradient(-45deg, #dedbcc 0 28px, transparent 28px); }
+.bt-corner:hover:not(:disabled), .bt-corner:focus-visible { color: var(--red); }
+.bt-corner:disabled { opacity: .25; cursor: default; }
+.bt-tabs { position: absolute; top: 16px; right: -128px; bottom: 16px; width: 132px; display: flex; flex-direction: column; gap: 3px; overflow-y: auto; scrollbar-width: none; }
+.bt-tab { display: flex; gap: 6px; align-items: baseline; min-height: 32px; padding: 4px 8px 4px 12px; border: 0; border-radius: 0 7px 7px 0; text-align: left; font: 400 15px/1.05 var(--hand); color: #22302a; background: var(--tab); box-shadow: 2px 2px 4px #0006; transform: translateX(-10px); transition: transform .18s; cursor: pointer; }
+.bt-tab span { font: 700 12px var(--print); opacity: .8; min-width: 1.2em; }
+.bt-tab:hover, .bt-tab:focus-visible { transform: translateX(-2px); }
+.bt-tab[aria-current=page] { transform: translateX(4px); outline: 2px solid #fff8; outline-offset: -3px; }
+.bt-tab-lima { --tab: #b9e3a0; } .bt-tab-cielo { --tab: #a7cbe8; } .bt-tab-coral { --tab: #f0a58d; } .bt-tab-mostaza { --tab: #ecd07a; } .bt-tab-lila { --tab: #cdb6e0; } .bt-tab-menta { --tab: #93d9c4; }
+#pause .bt-root button:focus-visible, #pause .bt-root textarea:focus-visible { outline: 2px dashed var(--red); outline-offset: 2px; }
+
+/* Pantallas angostas o bajas (teléfono): una página debajo de la otra, pestañas arriba. */
+@media (max-width: 820px), (max-height: 520px) {
+  /* el cuaderno es lo que importa: el título de la pausa se va y el encabezado entra en un renglón */
+  #pause .sheet.is-book { height: calc(100dvh - 12px); padding: 6px 10px; }
+  #pause .sheet.is-book > h2 { display: none; }
+  #pause .sheet.is-book .tabs { margin-bottom: 4px; padding-bottom: 2px; }
+  #pause .sheet.is-book .tabs button { min-height: 32px; }
+  .bt-heading { padding: 0 44px 4px 0; flex-wrap: nowrap; }
+  .bt-heading .bt-eyebrow, .bt-heading p { display: none; }
+  .bt-heading h2 { font-size: 22px; } .bt-heading p { font-size: 17px; }
+  .bt-download button { padding: 6px 10px; font-size: 13px; }
+  .bt-book { width: 100%; margin-right: 0; padding: 7px; }
+  .bt-elastic { display: none; }
+  .bt-spread { display: block; height: auto; min-height: 0; flex: 1; overflow: auto; }
+  .bt-spine { display: none; }
+  .bt-page { min-height: 320px; border-radius: 5px; }
+  .bt-page + .bt-spine + .bt-page { margin-top: 8px; }
+  .bt-page-body { position: relative; inset: auto; overflow: visible; padding: 14px 16px 56px 54px; }
+  .bt-right .bt-page-body { padding: 14px 54px 56px 16px; }
+  .bt-tabs { position: static; flex-direction: row; width: auto; overflow-x: auto; padding: 0 0 6px; order: -1; }
+  .bt-tab { transform: none; border-radius: 7px 7px 0 0; white-space: nowrap; }
+  .bt-tab[aria-current=page] { transform: translateY(2px); }
+  .bt-page-head h3 { font-size: 24px; }
+}
+
+/* Al cortar en hojas (PDF): un bloque no se parte y un rótulo no queda solo al pie. */
+.bt-rule, .bt-photo, .bt-own, .bt-seen li, .bt-index li, .bt-tomo, .bt-owner, .bt-margin { break-inside: avoid; }
+.bt-label, .bt-page-head { break-after: avoid; }
+
+/* ——— Hojas del PDF: A5 (148 × 210 mm a 96 px/pulgada), fuera de la pantalla ——— */
+.bt-pdf { position: fixed; left: -100000px; top: 0; }
+.bt-pdf-sheet { width: 559.37px; height: 793.7px; flex: none; }
+.bt-pdf-window { position: absolute; overflow: hidden; }
+.bt-pdf-flow { position: relative; }
+.bt-pdf-folio { position: absolute; bottom: 20px; font-family: var(--hand); font-size: 15px; color: var(--graphite); }
+.bt-pdf-folio.is-left { left: 60px; } .bt-pdf-folio.is-right { right: 60px; }
+.bt-pdf-plate { display: flex; background: #12321f; }
+.bt-pdf-pliegos { align-items: center; justify-content: center; gap: 0; }
+.bt-pdf-cover { display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 14px; text-align: center; color: #f1f0e6; background: radial-gradient(ellipse at 30% 20%, #2f6a4c, transparent 60%), linear-gradient(135deg, #24553d, #1a4330 50%, #12321f); }
+.bt-pdf-cover::after { display: none; }
+.bt-pdf-cover .bt-eyebrow { color: #86e0a8; }
+.bt-pdf-cover h1 { margin: 0; font-family: var(--hand); font-weight: 700; font-size: 64px; letter-spacing: .02em; }
+.bt-pdf-cover .bt-pdf-tomo { font-family: var(--hand); font-size: 26px; color: #f6d575; }
+.bt-pdf-cover .bt-pdf-owner { margin-top: 30px; font-family: var(--hand); font-size: 28px; }
+.bt-pdf-cover .bt-pdf-motto { font-family: var(--hand); font-size: 19px; opacity: .85; max-width: 80%; }
+.bt-pdf-blank { position: absolute; top: 45%; left: 0; right: 0; text-align: center; font-family: var(--hand); font-size: 19px; color: var(--graphite); }

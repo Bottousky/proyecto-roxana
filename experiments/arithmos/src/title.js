@@ -4,6 +4,7 @@ import {Dot, Custom} from './engine/world.js';
 import {stroke, lineGuide, chalkText, drawStroke, YELLOW} from './engine/chalk.js';
 import {mulberry32} from './engine/rng.js';
 import {ghost, ghostText, ghostParabola, ghostLine, ghostSpiral, ghostHouse, smear} from './art.js';
+import {schoolName, setSchoolName} from './engine/bitacora.js';
 
 export function titleScene(game) {
   const {world, camera} = game;
@@ -88,7 +89,7 @@ export function titleScene(game) {
         fresh.textContent = 'Tocá otra vez: se borra la partida guardada';
         return;
       }
-      game.start(true);
+      askOwner(title, name => game.start(true, name));
     }
     if (act === 'options') game.openOptions();
     if (act.startsWith('chapter-')) game.replayChapter(Number(act.slice(8)));
@@ -96,3 +97,32 @@ export function titleScene(game) {
   (actions.querySelector('button:not([hidden])') || fresh).focus({preventScroll: true});
 }
 
+/**
+ * Antes de empezar: ¿a nombre de quién va la Bitácora? Viene escrito el nombre del registro de Dirección (escuela 3D);
+ * si se cambia acá, cambia también allá (un solo nombre para el alumno). Se puede dejar en blanco.
+ */
+function askOwner(title, done) {
+  const actions = title.querySelector('.actions');
+  const school = schoolName();
+  title.querySelector('.owner-form')?.remove();
+  const form = document.createElement('form');
+  form.className = 'owner-form';
+  form.innerHTML = `<label for="owner-name">¿A nombre de quién va tu Bitácora?</label>
+    <input id="owner-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre">
+    <p class="note">${school ? 'Es el nombre de tu registro en Dirección. Si lo cambiás acá, cambia también allá.' : 'Va en la tapa de tu Bitácora. Lo podés dejar en blanco.'}</p>
+    <button type="submit">Empezar</button>`;
+  const input = form.querySelector('input');
+  input.value = school;
+  actions.hidden = true;
+  title.querySelector(':scope > .note')?.setAttribute('hidden', '');
+  title.append(form);
+  input.focus({preventScroll: true});
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const name = input.value.trim().slice(0, 40);
+    if (school && name !== school) setSchoolName(name);
+    form.remove();
+    actions.hidden = false;
+    done(name);
+  });
+}

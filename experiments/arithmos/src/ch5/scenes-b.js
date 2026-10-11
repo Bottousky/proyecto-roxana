@@ -525,9 +525,7 @@ function writeJournal5(g) {
     seen,
     moments: [{id: 'c5.diagonal', label: 'Desplegar: lo que no entra justo'}],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }
 
 export {Shape, Custom, wordSpot, WHITE, writeBoard, boardText};

@@ -416,7 +416,5 @@ function writeJournal11(g) {
       {id: 'c11.dados', label: 'Desplegar: dos dados'},
     ],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }

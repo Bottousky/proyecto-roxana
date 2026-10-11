@@ -1,6 +1,8 @@
 // Interfaz en el DOM: texto, elecciones, objetos tocables accesibles, pausa y opciones.
 // La escena se dibuja en canvas; todo lo que se lee o se toca también existe aquí.
 
+import {renderBitacora} from './bitacora.js';
+
 const SPEED = {slow: 26, normal: 44, fast: 95, instant: Infinity};
 const $ = (sel, root = document) => root.querySelector(sel);
 
@@ -615,6 +617,8 @@ export class UI {
     }
     for (const p of this.pause$.querySelectorAll('.panel')) p.id = `panel-${p.dataset.panel}`;
     for (const p of this.pause$.querySelectorAll('.panel')) p.hidden = p.dataset.panel !== name;
+    // la Bitácora es un cuaderno abierto: ocupa la hoja de la pausa entera
+    $('.sheet', this.pause$).classList.toggle('is-book', name === 'journal');
   }
 
   renderHistory() {
@@ -637,57 +641,52 @@ export class UI {
     if (!ol.children.length) ol.innerHTML = '<li>Todavía no se dijo nada.</li>';
   }
 
+  /** La Bitácora: el cuaderno «Arithmos · Tomo 1» abierto en una hoja (bitacora.js), con descarga en PDF. */
   renderJournal() {
     const panel = $('[data-panel=journal]', this.pause$);
-    panel.replaceChildren();
-    const entries = this.game.state?.journal || [];
-    if (!entries.length) {
-      const p = document.createElement('p');
-      p.textContent = 'La Bitácora todavía está en blanco. Lo que entiendas acá quedará anotado con tus propias pruebas.';
-      panel.append(p);
-      return;
-    }
-    for (const e of entries) {
-      const div = document.createElement('article');
-      div.className = 'entry';
-      const h = document.createElement('h3');
-      h.textContent = e.title;
-      const abbr = document.createElement('p');
-      abbr.className = 'abbr';
-      abbr.textContent = e.abbr;
-      div.append(h, abbr);
-      // primero lo que pasó en esta partida; después lo que eso dice
-      if (e.seen?.length) {
-        const hs = document.createElement('h4');
-        hs.textContent = 'Lo que pasó';
-        const ul = document.createElement('ul');
-        ul.className = 'seen';
-        for (const s of e.seen) {
-          const li = document.createElement('li');
-          li.textContent = s;
-          ul.append(li);
-        }
-        div.append(hs, ul);
+    const g = this.game, state = g.state || {journal: []};
+    panel.innerHTML = `<div class="bt-root">${renderBitacora(state, {selected: this.btPage, owner: g.owner(), titles: g.chapterTitles(), photos: g.journalPhotos()})}</div>`;
+    // volver a ver un momento sólo se puede durante una partida
+    if (g.mode !== 'play') panel.querySelectorAll('.bt-sticky').forEach(el => el.remove());
+    if (this.btBound) return;
+    this.btBound = true;
+    panel.addEventListener('click', e => {
+      const page = e.target.closest('[data-bt-page]')?.dataset.btPage;
+      if (page) {
+        this.btPage = page;
+        this.renderJournal();
+        $(`[data-bt-page="${CSS.escape(page)}"].bt-tab`, panel)?.focus({preventScroll: true});
       }
-      if (e.body?.length) {
-        const hb = document.createElement('h4');
-        hb.textContent = 'Lo que eso dice';
-        div.append(hb);
-      }
-      for (const line of e.body || []) {
-        const p = document.createElement('p');
-        p.textContent = line;
-        div.append(p);
-      }
-      const moments = this.game.mode !== 'play' ? [] : e.moments || (e.moment ? [{id: e.moment, label: 'Desplegar: volver a ver por qué'}] : []);
-      for (const m of moments) {
-        const b = document.createElement('button');
-        b.type = 'button';
-        b.dataset.moment = m.id;
-        b.textContent = m.label;
-        div.append(b, document.createElement('br'));
-      }
-      panel.append(div);
+      const layout = e.target.closest('[data-bt-download]')?.dataset.btDownload;
+      if (layout) this.#downloadBitacora(layout, e.target.closest('button'));
+    });
+    panel.addEventListener('input', e => {
+      const id = e.target.dataset?.noteFor;
+      if (!id || !this.game.state) return;
+      this.game.state.notes ??= {};
+      this.game.state.notes[id] = e.target.value.slice(0, 1200);
+      this.game.queueSave();
+    });
+  }
+
+  async #downloadBitacora(layout, button) {
+    const g = this.game;
+    if (!g.state || this.btBusy) return;
+    this.btBusy = true;
+    const label = button.textContent;
+    button.disabled = true;
+    try {
+      const {downloadBitacora} = await import('./bitacora-pdf.js');
+      const {filename} = await downloadBitacora(g.state, {layout, owner: g.owner(), titles: g.chapterTitles(), photos: g.journalPhotos(),
+        onProgress: (done, total) => { button.textContent = `Armando… ${done}/${total}`; }});
+      this.toast(`Bitácora descargada: ${filename}`);
+    } catch (err) {
+      console.error(err);
+      this.toast('No se pudo armar el PDF en este navegador.');
+    } finally {
+      button.textContent = label;
+      button.disabled = false;
+      this.btBusy = false;
     }
   }
 

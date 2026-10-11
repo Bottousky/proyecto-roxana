@@ -2057,9 +2057,7 @@ function writeJournal(g) {
       {id: 'c1.nombre', label: 'Desplegar: el número y sus nombres'},
     ],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }
 
 export const SEGMENTS = [puerta, alguien, ronda, marea, vuelven, quien, busqueda, todos, gradas, nombre];

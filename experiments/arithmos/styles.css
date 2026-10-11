@@ -200,3 +200,11 @@ body.clean .spot:focus-visible::after { border-color: #ffd76a; border-style: sol
   #caption.done .next { animation: none; }
 }
 .entry h4 { font-size: 1rem; margin: .9em 0 .25em; opacity: .75; font-weight: 700; }
+
+/* Antes de empezar: el nombre de la Bitácora (el del registro de Dirección, si lo hay). */
+#title .owner-form { display: flex; flex-direction: column; align-items: center; gap: .6em; max-width: 30em; }
+#title .owner-form label { font-size: calc(22px * var(--scale)); }
+#title .owner-form input { width: min(20em, 80vw); padding: .35em .6em; border: 0; border-bottom: 2px dashed rgba(241,240,230,.6); background: rgba(0,0,0,.2); color: var(--chalk); font: inherit; font-size: calc(24px * var(--scale)); text-align: center; }
+#title .owner-form input:focus-visible { outline: 2px dashed var(--yellow); outline-offset: 4px; }
+#title .owner-form .note { margin: 0; }
+#title .owner-form button { border: 0; background: none; color: var(--chalk); font: inherit; font-size: calc(26px * var(--scale)); cursor: pointer; min-height: 44px; text-decoration: underline wavy rgba(246,213,117,.7); text-underline-offset: 8px; }

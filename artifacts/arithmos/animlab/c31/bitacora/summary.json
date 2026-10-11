@@ -1,0 +1,29 @@
+{
+ "errors": [],
+ "savedNote": "El cero guarda el lugar: ¿y si no hubiera cero?",
+ "pdfs": {
+  "pliegos": {
+   "file": "../../artifacts/arithmos/animlab/c31/bitacora/Bitacora-Arithmos-Tomo1-Manuel.pdf",
+   "kb": 7945,
+   "pages": 21,
+   "seconds": 44
+  },
+  "libro": {
+   "file": "../../artifacts/arithmos/animlab/c31/bitacora/Bitacora-Arithmos-Tomo1-Manuel-libro-A5.pdf",
+   "kb": 12504,
+   "pages": 41,
+   "seconds": 84
+  }
+ },
+ "prefilled": "Manuel",
+ "after": {
+  "owner": "Manuel G.",
+  "school": "Manuel G.",
+  "shown": "Manuel G."
+ },
+ "photos": [
+  "c1",
+  "c6",
+  "c12"
+ ]
+}

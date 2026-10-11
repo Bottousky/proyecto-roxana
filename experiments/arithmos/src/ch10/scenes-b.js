@@ -440,9 +440,7 @@ function writeJournal10(g) {
       {id: 'c10.cuarto', label: 'Desplegar: un cuarto de vuelta'},
     ],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }
 
 export {lerp};

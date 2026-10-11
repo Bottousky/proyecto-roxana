@@ -10,6 +10,10 @@ import {loadState, saveState, newState, loadSettings, saveSettings, clearState} 
 import {CHAPTERS} from './chapters.js';
 import {titleScene} from './title.js';
 import {anim as animLevel} from './engine/anim.js';
+import {ownerName, schoolName} from './engine/bitacora.js';
+
+// Fotos de la pizarra al cerrar cada capítulo (la Bitácora las pega en su hoja): aparte de la partida, que es chica.
+const PHOTOS_KEY = 'roxana.arithmos.fotos.v1';
 
 class Game {
   constructor() {
@@ -160,6 +164,70 @@ class Game {
     saveState(this.state);
   }
 
+  // ——— Bitácora ———
+
+  /** Dueño del tomo: el nombre del registro de Dirección (escuela 3D) o el que se dio al empezar. */
+  owner() {
+    return ownerName(this.state, schoolName());
+  }
+
+  chapterTitles() {
+    return Object.fromEntries(Object.entries(CHAPTERS).map(([n, c]) => [n, c.title]));
+  }
+
+  journalPhotos() {
+    try { return JSON.parse(localStorage.getItem(PHOTOS_KEY) || '{}') || {}; } catch { return {}; }
+  }
+
+  /** Anota la entrada del capítulo y pega la foto de la pizarra tal como quedó (con lo que escribió el jugador). */
+  addJournal(entry) {
+    this.state.journal = this.state.journal.filter(e => e.id !== entry.id).concat([entry]);
+    if (!this.director.replay && !this.devNoSave) this.#photograph(entry.id);
+    this.ui.toast('Anotado en la Bitácora (≡)');
+    this.saveNow();
+  }
+
+  #photograph(id) {
+    try {
+      const photos = this.journalPhotos();
+      photos[id] = this.photographBoard();
+      localStorage.setItem(PHOTOS_KEY, JSON.stringify(photos));
+    } catch { /* sin almacenamiento o sin lugar: la hoja queda sin foto */ }
+  }
+
+  /** La pizarra como foto (JPEG, ≤ 720 px), recortada a donde hay tiza, con aire y en 16:9 (lo de la Bitácora). */
+  photographBoard() {
+    this.render();
+    const board = document.getElementById('board'), W = board.width, H = board.height;
+    const probe = document.createElement('canvas');
+    probe.width = 240;
+    probe.height = Math.max(1, Math.round(240 * H / W));
+    const pc = probe.getContext('2d', {willReadFrequently: true});
+    pc.drawImage(board, 0, 0, probe.width, probe.height);
+    pc.drawImage(this.overlay, 0, 0, probe.width, probe.height);
+    const px = pc.getImageData(0, 0, probe.width, probe.height).data;
+    let x0 = Infinity, y0 = Infinity, x1 = -1, y1 = -1;
+    for (let y = 0; y < probe.height; y++) for (let x = 0; x < probe.width; x++) {
+      const i = 4 * (y * probe.width + x);
+      if (0.3 * px[i] + 0.59 * px[i + 1] + 0.11 * px[i + 2] > 110) { x0 = Math.min(x0, x); y0 = Math.min(y0, y); x1 = Math.max(x1, x); y1 = Math.max(y1, y); }
+    }
+    const k = W / probe.width;
+    let r = x1 < 0 ? {x: 0, y: 0, w: W, h: H} : {x: x0 * k, y: y0 * k, w: (x1 - x0 + 1) * k, h: (y1 - y0 + 1) * k};
+    // aire alrededor, proporción 16:9 y nunca más chica que un tercio de la pizarra
+    const pad = 0.08 * Math.max(r.w, r.h * 16 / 9);
+    let w = Math.max(r.w + 2 * pad, (r.h + 2 * pad) * 16 / 9, W / 3), h = w * 9 / 16;
+    if (h > H) { h = H; w = Math.min(W, h * 16 / 9); }
+    const cx = r.x + r.w / 2, cy = r.y + r.h / 2;
+    r = {x: Math.min(Math.max(0, cx - w / 2), W - w), y: Math.min(Math.max(0, cy - h / 2), H - h), w, h};
+    const c = document.createElement('canvas');
+    c.width = Math.min(720, Math.round(r.w));
+    c.height = Math.round(c.width * r.h / r.w);
+    const ctx = c.getContext('2d');
+    ctx.drawImage(board, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+    ctx.drawImage(this.overlay, r.x, r.y, r.w, r.h, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.8);
+  }
+
   addEvidence(kind, data = {}) {
     if (!this.state) return;
     // los datos nunca pisan el tipo, la escena ni la hora
@@ -198,11 +266,13 @@ class Game {
     return `Capítulo ${this.chapter.number} · ${this.chapter.title}${seg ? ` · ${seg.title}` : ''}`;
   }
 
-  async start(fresh) {
+  async start(fresh, owner = '') {
     this.audio.unlock();
     if (fresh) {
       clearState();
       this.state = newState();
+      this.state.owner = owner;
+      try { localStorage.removeItem(PHOTOS_KEY); } catch { /* sin almacenamiento */ }
     }
     document.getElementById('title').hidden = true;
     document.getElementById('corner').hidden = false;

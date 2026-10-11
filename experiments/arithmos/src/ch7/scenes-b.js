@@ -1114,7 +1114,5 @@ function writeJournal7(g) {
       {id: 'c7.cuantas-veces', label: 'Desplegar: ¿cuántas veces?'},
     ],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }

@@ -403,9 +403,7 @@ function writeJournal6(g) {
       {id: 'c6.dos-pasos', label: 'Desplegar: dos pasos'},
     ],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }
 
 export {signed};

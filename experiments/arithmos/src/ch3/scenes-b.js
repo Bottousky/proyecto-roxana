@@ -560,7 +560,5 @@ function writeJournal3(g) {
     seen,
     moments: [{id: 'c3.hacia', label: 'Desplegar: cuánto y hacia dónde'}],
   };
-  g.state.journal = g.state.journal.filter(e => e.id !== entry.id).concat([entry]);
-  g.ui.toast('Anotado en la Bitácora (≡)');
-  g.saveNow();
+  g.addJournal(entry);
 }

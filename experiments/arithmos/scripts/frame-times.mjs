@@ -11,7 +11,7 @@ await p.addInitScript(() => { window.__ft = []; let last = 0; const tick = now =
 await p.goto(`http://127.0.0.1:${server.address().port}/?seg=${seg}${q ? '&' + q : ''}`);
 await p.waitForFunction(() => window.__ready === true);
 // --new: empieza desde el título como el bot (Empezar)
-if (process.argv.includes('--new')) { await p.waitForTimeout(800); await p.click('#title [data-act=new]'); }
+if (process.argv.includes('--new')) { await p.waitForTimeout(800); await p.click('#title [data-act=new]'); if (await p.$('#title .owner-form')) await p.click('#title .owner-form button[type=submit]'); }
 const end = Date.now() + 20000;
 while (Date.now() < end) { await p.evaluate(() => { const g = window.__game; if (g?.ui.waiting && !g.ui.typing) g.ui.advance(); const o = [...document.querySelectorAll('#choices button:not([disabled])')]; if (o.length) o.at(-1).click(); }); await p.waitForTimeout(250); }
 const f = await p.evaluate(() => window.__ft.map(x => x / 1000));

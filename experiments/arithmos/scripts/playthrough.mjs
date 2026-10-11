@@ -476,6 +476,8 @@ for (let iter = 0; iter < 30000; iter++) {
   if (s.mode === 'title') {
     if (s.flags?.chapterDone) { ended = true; break; }
     await page.click('#title [data-act=new]');
+    // ¿a nombre de quién va la Bitácora? (--nombre=…; vacío deja la tapa en blanco)
+    if (await page.$('#title .owner-form')) { await page.fill('#owner-name', val('nombre', '')); await page.click('#title .owner-form button[type=submit]'); }
     continue;
   }
   const sig = JSON.stringify([s.seg, s.caption, s.choices, s.spots.map(x => x.id + x.label + x.selected)]);
@@ -933,6 +935,8 @@ for (let iter = 0; iter < 30000; iter++) {
 const final = await read();
 await shot('final');
 const evidence = await page.evaluate(() => window.__game.state);
+// fotos de la pizarra que la Bitácora pegó al cerrar cada capítulo
+const photos = await page.evaluate(() => { try { return Object.keys(JSON.parse(localStorage.getItem('roxana.arithmos.fotos.v1') || '{}')); } catch { return []; } });
 await writeFile(`${out}/state.json`, JSON.stringify(evidence, null, 2));
 // una Bitácora con «undefined» o «NaN» es un error, aunque la partida termine
 for (const e of evidence.journal) {
@@ -943,7 +947,7 @@ const fps = fpsSamples.filter(Boolean);
 const summary = {
   ended,
   final: {mode: final.mode, seg: final.seg},
-  journal: evidence.journal.map(e => e.title),
+  journal: evidence.journal.map(e => e.title), owner: evidence.owner ?? '', photos,
   evidenceKinds: [...new Set(evidence.evidence.map(e => e.kind))],
   fps: fps.length ? {min: Math.min(...fps).toFixed(1), median: fps.sort((a, b) => a - b)[Math.floor(fps.length / 2)].toFixed(1), worst: fpsWorst} : null,
   errors,
