@@ -19,7 +19,7 @@ const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;
 const px = n => `${n.toFixed(2)}px`;
 const nextFrame = () => new Promise(resolve => requestAnimationFrame(() => resolve()));
 // The photographer copies HTML styles but not the ones SVG strokes get from classes: write them inline.
-const SVG_PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'opacity', 'font-family', 'font-size', 'font-weight', 'font-style', 'text-anchor'];
+const SVG_PROPS = ['fill', 'fill-opacity', 'stroke', 'stroke-width', 'stroke-opacity', 'stroke-linecap', 'stroke-linejoin', 'stroke-dasharray', 'opacity', 'font-family', 'font-size', 'font-weight', 'font-style', 'text-anchor', 'paint-order'];
 function inlineSvgStyles(root) {
   root.querySelectorAll('svg *').forEach(el => {
     const cs = getComputedStyle(el);

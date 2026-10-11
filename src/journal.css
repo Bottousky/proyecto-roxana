@@ -239,12 +239,16 @@
 .sk-cover{fill:#c8a77122;stroke:var(--sienna);stroke-width:2;stroke-dasharray:7 6}
 .sk-dot{fill:var(--ink-black)}.sk-node{fill:var(--ink-black);stroke:var(--paper);stroke-width:2}
 .sk-red-dot{fill:var(--ink-red)}.sk-blue-dot{fill:var(--ink-blue)}.sk-paper{fill:var(--paper);stroke:var(--ink-black);stroke-width:3}
-.dj-schematic text,.dj-word-symbol text{font-family:var(--hand);text-anchor:middle}
+.dj-schematic text,.dj-word-symbol text{font-family:var(--hand)}
+.dj-schematic text:not([text-anchor]),.dj-word-symbol text:not([text-anchor]){text-anchor:middle}
+/* Writing laid over a wire leaves the paper clear around it, as a pen lifted to write. */
+.dj-schematic .sk-label,.dj-schematic .sk-value,.dj-schematic .sk-red-note,.dj-schematic .sk-blue-note{paint-order:stroke;stroke:var(--paper);stroke-width:9px;stroke-linejoin:round}
+.sk-omega{fill:none;stroke:var(--graphite);stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round}
 .sk-label{font-size:42px;font-weight:700;fill:var(--ink-black)}
 .sk-value{font-size:38px;font-weight:700;fill:var(--graphite)}
 .sk-glyph{font-size:34px;font-weight:700;fill:var(--ink-black)}.sk-glyph.sk-big{font-size:40px}
 .sk-sign{font-size:46px;font-weight:700;fill:var(--ink-black)}
-.sk-red-note{font-size:38px;font-weight:700;fill:var(--ink-red)}
+.sk-red-note{font-size:38px;font-weight:700;fill:var(--ink-red)}.sk-red-note.sk-tight{font-size:32px}
 .sk-blue-note{font-size:36px;font-weight:700;fill:var(--ink-blue)}
 
 /* What Ohm saw: numbered notes in ballpoint, the Instituto's words boxed in red. */

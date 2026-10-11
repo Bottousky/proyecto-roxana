@@ -45,10 +45,23 @@ function route(p, [a, b], members) {
   const pa = P(a), pb = P(b), mid = (pa.y + pb.y) / 2;
   // A cable joining both ends of one piece jumps over it, as a bridge drawn above the symbol.
   if (p.components.some(c => (c.a === a && c.b === b) || (c.a === b && c.b === a))) return [pa, { x: pa.x, y: pa.y - 84 }, { x: pb.x, y: pb.y - 84 }, pb];
-  return Math.abs(pa.y - pb.y) < 30 ? [pa, pb] : [pa, { x: pa.x, y: mid }, { x: pb.x, y: mid }, pb];
+  if (Math.abs(pa.y - pb.y) < 30) return [pa, pb];
+  // Down first, then in along the row, when that reaches the piece from its own outer side: the wire
+  // then never climbs through the piece's label.
+  const outer = p.components.some(c => (c.a === b && pa.x < pb.x) || (c.b === b && pa.x > pb.x));
+  return outer ? [pa, { x: pa.x, y: pb.y }, pb] : [pa, { x: pa.x, y: mid }, { x: pb.x, y: mid }, pb];
 }
 
+// Pieces drawn with something above the line (rays, heat, a flame) have their name written a little higher.
+const LIFT = c => (['lens', 'heater', 'forge'].includes(c.kind) ? 6 : 0);
 const zig = (x0, x1, y, rnd, n = 6, h = 11) => { const pts = [{ x: x0, y }], step = (x1 - x0) / n; for (let i = 0; i < n; i++) pts.push({ x: x0 + step * (i + .5), y: y + (i % 2 ? h : -h) }); pts.push({ x: x1, y }); return twice(pts, rnd, 'sk-ink'); };
+
+/** The arrow across a resistance that can be turned: drawn through the zigzag, its head even on both sides. */
+function adjust(x0, x1, y, rnd) {
+  const from = { x: x0 + 4, y: y + 24 }, tip = { x: x1 - 2, y: y - 26 }, len = Math.hypot(tip.x - from.x, tip.y - from.y);
+  const ux = (tip.x - from.x) / len, uy = (tip.y - from.y) / len, wing = s => ({ x: tip.x - 15 * (ux * Math.cos(.45) - s * uy * Math.sin(.45)), y: tip.y - 15 * (uy * Math.cos(.45) + s * ux * Math.sin(.45)) });
+  return twice([from, tip], rnd, 'sk-ink') + `<path class="sk-ink" d="M${f(wing(1).x)} ${f(wing(1).y)} L${f(tip.x)} ${f(tip.y)} L${f(wing(-1).x)} ${f(wing(-1).y)}"/>`;
+}
 
 /** One symbol between two terminals (all bench pieces lie left to right), with its leads. */
 function symbol(c, a, b, state, rnd) {
@@ -59,12 +72,12 @@ function symbol(c, a, b, state, rnd) {
   const circleLeads = r => lead(a.x, cx - r) + lead(cx + r, b.x);
   switch (c.kind) {
     case 'lamp': leads = circleLeads(20); body = ring(20) + twice([{ x: cx - 14, y: y - 14 }, { x: cx + 14, y: y + 14 }], rnd, 'sk-ink') + twice([{ x: cx + 14, y: y - 14 }, { x: cx - 14, y: y + 14 }], rnd, 'sk-ink'); break;
-    case 'lens': leads = circleLeads(20); body = ring(20) + ring(9) + [0, 1, 2, 3, 4].map(i => { const t = -Math.PI / 2 + (i - 2) * .45; return twice([{ x: cx + Math.cos(t) * 26, y: y + Math.sin(t) * 26 }, { x: cx + Math.cos(t) * 38, y: y + Math.sin(t) * 38 }], rnd, 'sk-ink'); }).join(''); break;
+    case 'lens': leads = circleLeads(20); body = ring(20) + ring(9) + [0, 1, 2, 3, 4].map(i => { const t = -Math.PI / 2 + (i - 2) * .45; return twice([{ x: cx + Math.cos(t) * 25, y: y + Math.sin(t) * 25 }, { x: cx + Math.cos(t) * 34, y: y + Math.sin(t) * 34 }], rnd, 'sk-ink'); }).join(''); break;
     case 'orb': leads = circleLeads(22); body = ring(22) + `<text class="sk-glyph" x="${cx}" y="${y + 10}">♥</text>`; break;
     case 'motor': leads = circleLeads(22); body = ring(22) + `<text class="sk-glyph" x="${cx}" y="${y + 10}">M</text>`; break;
     case 'coil': body = twice([{ x: x0, y }, { x: x0 + 4, y }], rnd, 'sk-ink') + `<path class="sk-ink" d="M${x0 + 4} ${y} ${[0, 1, 2, 3].map(i => `a${(w - 8) / 8} ${(w - 8) / 8} 0 0 1 ${(w - 8) / 4} 0`).join(' ')}"/>`; break;
-    case 'heater': body = zig(x0, x1, y, rnd) + [-1, 0, 1].map(i => `<path class="sk-pencil" d="M${cx + i * 22} ${y - 22} q6 -7 0 -14 q-6 -7 0 -14"/>`).join(''); break;
-    case 'forge': body = zig(x0 + 6, x1 - 6, y, rnd, 5) + twice([{ x: x0, y: y - 20 }, { x: x1, y: y - 20 }, { x: x1, y: y + 20 }, { x: x0, y: y + 20 }, { x: x0, y: y - 20 }], rnd, 'sk-ink') + `<path class="sk-red" d="M${cx - 8} ${y - 26} q8 -16 4 -26 q14 12 6 26"/>`; break;
+    case 'heater': body = zig(x0, x1, y, rnd) + [-1, 0, 1].map(i => `<path class="sk-pencil" d="M${cx + i * 24 + 6} ${y - 15} q4 -4 0 -8 q-4 -4 0 -8"/>`).join(''); break;
+    case 'forge': body = zig(x0 + 6, x1 - 6, y, rnd, 5) + twice([{ x: x0, y: y - 20 }, { x: x1, y: y - 20 }, { x: x1, y: y + 20 }, { x: x0, y: y + 20 }, { x: x0, y: y - 20 }], rnd, 'sk-ink') + `<path class="sk-red" d="M${cx - 5} ${y - 22} q4 -7 2 -12 q8 6 4 12"/>`; break;
     case 'switch': {
       const closed = state.switches?.[c.switchKey];
       body = `<circle class="sk-dot" cx="${x0}" cy="${y}" r="4"/><circle class="sk-dot" cx="${x1}" cy="${y}" r="4"/>` + twice([{ x: x0, y }, closed ? { x: x1, y: y - 3 } : { x: x1 - 6, y: y - 30 }], rnd, 'sk-ink');
@@ -83,16 +96,41 @@ function symbol(c, a, b, state, rnd) {
       if (bad) note = `<text class="sk-red-note" x="${cx}" y="${y + 92}">óxido</text>`;
       break;
     }
-    default: body = zig(x0, x1, y, rnd) + (c.valueKey ? `<path class="sk-ink" d="M${x0 + 6} ${y + 22} L${x1 - 6} ${y - 22}"/><path class="sk-ink" d="M${x1 - 6} ${y - 22} l-13 2 M${x1 - 6} ${y - 22} l-2 13"/>` : '');
+    default: body = zig(x0, x1, y, rnd) + (c.valueKey ? adjust(x0, x1, y, rnd) : '');
   }
   return leads + body + note;
 }
 
-/** The value a piece has on this montage, in the Instituto's units. */
-function value(c, state) {
+/** The resistance a piece has on this montage, or null when the notebook doesn't write one. */
+function ohms(c, state) {
   const r = c.valueKey ? state.values?.[c.valueKey] : c.resistance;
-  if (c.kind === 'cloth' || c.kind === 'switch' || (c.kind === 'joint' && c.resistance <= 1)) return '';
-  return Number.isFinite(r) ? `${num(r, 0)} Ω` : '';
+  if (c.kind === 'cloth' || c.kind === 'switch' || (c.kind === 'joint' && c.resistance <= 1)) return null;
+  return Number.isFinite(r) ? r : null;
+}
+
+// Roughly how wide the hand writes: enough to centre a line and keep two labels apart.
+const width = (text, size) => String(text).length * size * .44;
+
+/** «Ω» drawn by the same hand: the notebook's lettering has no Greek, and a borrowed glyph looks typed. */
+export function omega(x, y, k = 1, cls = 'sk-omega') {
+  const d = [[6, 0], [-6, -6, -9, -12, -7, -18], [2, -7, 8, -10, 13, -10], [5, 0, 11, 3, 13, 10], [2, 6, -1, 12, -7, 18], [6, 0]]
+    .map(seg => (seg.length === 2 ? 'l' : 'c') + seg.map(v => f(v * k)).join(' ')).join(' ');
+  return `<path class="${cls}" d="M${f(x)} ${f(y)} ${d}"/>`;
+}
+const OMEGA = 24 * .85;
+
+/** Value and, after a working montage, what reached the piece: under the symbol, or both on one line when the row below is close. */
+function figures(cx, y, r, reading, { room, crossed }) {
+  const n = r == null ? '' : num(r, 0), nw = n ? n.length * 20 + 12 + OMEGA : 0, wide = nw + width(reading, 36) + (n ? 22 : 0);
+  // Two lines when there is room; one line when the row below is close, unless that line would cross
+  // a wire coming down beside the piece: then two tight lines.
+  const tight = reading && room < 18 && crossed(cx - wide / 2, cx + wide / 2), inline = reading && room < 18 && !tight;
+  const rw = inline ? wide - nw : 0, left = cx - (nw + rw) / 2;
+  let out = n ? `<text class="sk-value" x="${f(left + nw - OMEGA - 12)}" y="${y + 50}" text-anchor="end">${n}</text>${omega(left + nw - OMEGA, y + 49, .85)}` : '';
+  if (reading) out += inline
+    ? `<text class="sk-red-note" x="${f(left + nw + (n ? 22 : 0))}" y="${y + 50}" text-anchor="start">${reading}</text>`
+    : `<text class="sk-red-note${tight ? ' sk-tight' : ''}" x="${cx}" y="${y + (n ? (tight ? 80 : 84) : 50)}">${reading}</text>`;
+  return out;
 }
 
 /**
@@ -111,7 +149,9 @@ export function renderSchematic(id, snapshot, { mode = 'after', caption } = {}) 
   const mine = w => mode === 'after' && !isSealed(id, w) && !initial.some(v => same(v, w));
   const result = mode === 'after' ? evaluatePuzzle(id, { ...JSON.parse(JSON.stringify(state)), sourceOn: true, tripped: false }) : null;
 
-  const copper = wires.map(w => twice(route(p, w, members), rnd, mine(w) ? 'sk-blue' : 'sk-ink')).join('');
+  const paths = wires.map(w => route(p, w, members));
+  const copper = paths.map((pts, i) => twice(pts, rnd, mine(wires[i]) ? 'sk-blue' : 'sk-ink')).join('');
+  const uprights = paths.flatMap(pts => pts.slice(1).map((q, i) => [pts[i], q])).filter(([u, v]) => Math.abs(u.x - v.x) < 2 && Math.abs(u.y - v.y) > 2);
   const degree = Object.fromEntries(p.ports.map(n => [n.id, wires.filter(w => w.includes(n.id)).length + p.components.filter(c => c.a === n.id || c.b === n.id).length]));
   const dots = p.ports.filter(n => !['positive', 'negative'].includes(n.id)).map(n => `<circle class="${degree[n.id] >= 3 ? 'sk-node' : 'sk-dot'}" cx="${n.x}" cy="${n.y}" r="${degree[n.id] >= 3 ? 6 : 3.5}"/>`).join('');
 
@@ -119,24 +159,27 @@ export function renderSchematic(id, snapshot, { mode = 'after', caption } = {}) 
   const pos = P.positive, neg = P.negative, mid = (pos.y + neg.y) / 2;
   const cell = twice([{ x: pos.x, y: pos.y }, { x: pos.x, y: mid - 10 }], rnd, 'sk-ink') + twice([{ x: pos.x, y: mid + 10 }, { x: pos.x, y: neg.y }], rnd, 'sk-ink')
     + `<path class="sk-plate" d="M${pos.x - 24} ${mid - 10} H${pos.x + 24}"/><path class="sk-plate sk-thick" d="M${pos.x - 12} ${mid + 10} H${pos.x + 12}"/>`
-    + `<text class="sk-sign" x="${pos.x - 38}" y="${mid - 12}">+</text><text class="sk-sign" x="${pos.x - 38}" y="${mid + 40}">−</text><text class="sk-value" x="${pos.x + 40}" y="${mid + 14}" text-anchor="start">${num(p.voltage, 0)} V</text>`
+    + `<text class="sk-sign" x="${pos.x - 38}" y="${mid - 12}">+</text><text class="sk-sign" x="${pos.x - 38}" y="${mid + 40}">−</text><text class="sk-value" x="${pos.x + 38}" y="${mid + 13}" text-anchor="start">${num(p.voltage, 0)} V</text>`
     + `<circle class="sk-dot" cx="${pos.x}" cy="${pos.y}" r="4"/><circle class="sk-dot" cx="${neg.x}" cy="${neg.y}" r="4"/>`;
 
-  const pieces = p.components.map(c => {
-    const a = P[c.a], b = P[c.b];
-    if (!a || !b) return '';
-    const cx = (a.x + b.x) / 2, y = a.y, val = value(c, state), name = c.label.replace(/ · .*/, '');
-    const branch = result?.solution.branches[c.id];
+  const xs = p.ports.map(n => n.x), ys = p.ports.map(n => n.y), bottom = wires.some(w => w.includes('negative')) ? Math.max(455, ...ys.map(y => y + 70)) : Math.max(...ys);
+  const placed = p.components.filter(c => P[c.a] && P[c.b]).map(c => ({ c, a: P[c.a], b: P[c.b], cx: (P[c.a].x + P[c.b].x) / 2, y: P[c.a].y }));
+  const pieces = placed.map(({ c, a, b, cx, y }) => {
+    const name = c.label.replace(/ · .*/, ''), branch = result?.solution.branches[c.id];
     const reading = result && branch && (c.goal || (p.constraints ?? []).some(k => k.branch === c.id)) && Math.abs(branch.current ?? 0) > .01
-      ? `<text class="sk-red-note" x="${cx}" y="${y + (val ? 92 : 56)}">${num(Math.abs(branch.voltage), 1)} V · ${num(Math.abs(branch.current), 2)} A</text>` : '';
-    return `<g class="sk-piece">${symbol(c, a, b, state, rnd)}<text class="sk-label" x="${cx}" y="${y - 34}">${esc(name)}</text>${val ? `<text class="sk-value" x="${cx}" y="${y + 54}">${val}</text>` : ''}${reading}</g>`;
+      ? `${num(Math.abs(branch.voltage), 1)} V · ${num(Math.abs(branch.current), 2)} A` : '';
+    // Room under the piece: the next row's label, or the return drawn along the bottom.
+    const below = Math.min(bottom - 12, ...placed.filter(o => o.y > y + 30 && Math.abs(o.cx - cx) < 300).map(o => o.y - 34 - LIFT(o.c) - 30));
+    // A label never runs into its neighbour's: the hand writes smaller when the row is tight.
+    const room = Math.min(Infinity, ...placed.filter(o => o !== placed.find(q => q.c === c) && Math.abs(o.y - y) < 30).map(o => Math.abs(o.cx - cx) - 18));
+    const size = Math.max(28, Math.min(42, 42 * room / width(name, 42)));
+    return `<g class="sk-piece">${symbol(c, a, b, state, rnd)}<text class="sk-label" x="${cx}" y="${y - 34 - LIFT(c)}"${size < 42 ? ` style="font-size:${f(size)}px"` : ''}>${esc(name)}</text>${figures(cx, y, ohms(c, state), reading, { room: below - (y + 84), crossed: (x0, x1) => uprights.some(([u, v]) => u.x > x0 && u.x < x1 && Math.min(u.y, v.y) < y + 50 && Math.max(u.y, v.y) > y + 26) })}</g>`;
   }).join('');
 
   // Conventional current leaves «+»: one small arrow on the first lead, when something flows.
   const flowing = result && Math.abs(result.current) > .01;
-  const arrow = flowing ? `<path class="sk-blue" d="M${pos.x + 26} ${pos.y - 12} h22 m-7 -6 l7 6 l-7 6"/><text class="sk-blue-note" x="${pos.x + 37}" y="${pos.y - 24}" text-anchor="start">${num(result.current, 2)} A</text>` : '';
+  const arrow = flowing ? `<path class="sk-blue" d="M${pos.x + 26} ${pos.y - 12} h22 m-7 -6 l7 6 l-7 6"/><text class="sk-blue-note" x="${pos.x + 37}" y="${pos.y - 24}">${num(result.current, 2)} A</text>` : '';
 
-  const xs = p.ports.map(n => n.x), ys = p.ports.map(n => n.y), bottom = wires.some(w => w.includes('negative')) ? Math.max(455, ...ys.map(y => y + 70)) : Math.max(...ys);
   const top = Math.min(...ys) - (wires.some(w => p.components.some(c => w.includes(c.a) && w.includes(c.b))) ? 110 : 80);
   const vb = [Math.min(...xs) - 70, top, Math.max(...xs) + 80 - (Math.min(...xs) - 70), bottom + 40 - top].map(f);
   const title = caption ?? (mode === 'before' ? 'Así estaba' : 'Así lo dejé');
@@ -159,7 +202,7 @@ const SYMBOLS = {
   parallel: '<path class="sk-ink" d="M6 14 V46 M74 14 V46 M6 14 H74 M6 46 H74"/><circle class="sk-paper" cx="40" cy="14" r="9"/><circle class="sk-paper" cx="40" cy="46" r="9"/>',
   power: '<circle class="sk-ink" cx="40" cy="34" r="13"/><path class="sk-red" d="M40 4 v10 M22 10 l6 8 M58 10 l-6 8"/>',
   heat: '<path class="sk-ink" d="M4 40 H76"/><path class="sk-red" d="M24 30 q6 -7 0 -14 q-6 -7 0 -14 M40 30 q6 -7 0 -14 q-6 -7 0 -14 M56 30 q6 -7 0 -14 q-6 -7 0 -14"/>',
-  ohm: '<text class="sk-glyph sk-big" x="40" y="42">Ω</text>',
+  ohm: omega(22, 48, 1.5, 'sk-ink'),
   loopsum: '<rect class="sk-ink" x="8" y="10" width="64" height="40" rx="4"/><path class="sk-blue" d="M30 6 l8 4 l-8 4"/><text class="sk-red-note" x="40" y="38">Σ</text>',
   nodesum: '<path class="sk-ink" d="M4 30 H40 M40 30 L74 8 M40 30 H76 M40 30 L74 52"/><circle class="sk-node" cx="40" cy="30" r="5"/><path class="sk-blue" d="M14 24 h12 m-5 -4 l5 4 l-5 4"/>',
   node: '<path class="sk-ink" d="M4 30 H40 L74 10 M40 30 L74 50"/><circle class="sk-node" cx="40" cy="30" r="5"/>',
