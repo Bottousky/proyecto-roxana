@@ -124,7 +124,7 @@ export class PlayCanvasWorld {
     const owners=new Map(),shore=await loadShore(this.app),groundAo=await loadGroundAo(this.app);this.receivers=[];let count=0;
     const cobble=await surface(this.app,'cobble');
     for(const b of data.meshes){
-      if(b.material.paving)continue; // painted by the ground shader
+      if(b.material.paving||b.material.trail)continue; // painted by the ground shader
       const d=b.material,e=new Entity(b.owner||`${b.area} · ${count}`),m=new StandardMaterial();m.diffuse=color('#'+d.color);m.emissive=color('#'+d.emissive);m.emissiveIntensity=d.emission;m.shininess=10;m.useMetalness=true;m.metalness=0;m.diffuseVertexColor=true;m.alphaTest=d.alpha;m.opacity=d.opacity;m.cull=d.double?CULLFACE_NONE:CULLFACE_BACK;
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}

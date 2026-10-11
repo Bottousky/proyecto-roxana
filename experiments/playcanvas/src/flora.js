@@ -7,6 +7,7 @@ import {makeWind} from './wind.js';
 import {walkableTerrain} from './terrain.js';
 import {reliefHeight,reliefSlope} from './relief.js';
 import {quietMountKeepsClear} from './game/quiet-mount.js';
+import {AREA_LAYOUTS,backdropYards} from './game/world-layout.js';
 import {surface} from './art.ts';
 import {makeLiving,setDry} from './living.js';
 import grid from './data/relief.json';
@@ -72,6 +73,9 @@ export async function sowFlora(world){
   const corridor=(X,Z)=>exteriors.some(a=>inTravelCorridor(a.id,X-a.ox,Z-a.oz,-.6));
   const walkable=(X,Z)=>exteriors.some(a=>{const x=X-a.ox,z=Z-a.oz;return Math.abs(x)<=a.tw/2&&Math.abs(z)<=a.td/2&&walkableTerrain(a.id,x,z);});
   const border=(X,Z)=>!walkable(X,Z)&&[[1.1,0],[-1.1,0],[0,1.1],[0,-1.1],[.8,.8],[-.8,.8],[.8,-.8],[-.8,-.8]].some(([dx,dz])=>walkable(X+dx,Z+dz));
+  // Village houses beyond the square: their garden fence already says where walking ends.
+  const [px,pz]=world.data.areas.plaza.offset,yards=backdropYards(AREA_LAYOUTS.plaza).map(b=>({...b,x:b.x+px,z:b.z+pz}));
+  const yard=(X,Z)=>yards.some(b=>Math.abs(X-b.x)<b.w/2&&Math.abs(Z-b.z)<b.d/2);
   const hedges={positions:[]};
   for(const id of Object.keys(AREAS)){
     if(!isExterior(id)||!FLAT.has(id))continue;
@@ -87,7 +91,7 @@ export async function sowFlora(world){
       if(corridor(X,Z))continue; // los caminos entre lugares quedan libres
       if(Z<seaLine&&!walkable(X,Z)&&!border(X,Z))continue; // al norte del Faro solo hay mar
       if(near(x,z,.05)||quietMountKeepsClear(X,Z,reliefHeight(X,Z)))continue;
-      if(!shoreline&&s.water===0&&border(X,Z)){
+      if(!shoreline&&s.water===0&&border(X,Z)&&!yard(X,Z)){
         // Dos o tres matas altas por celda, apretadas, para que el borde se lea como seto.
         for(let k=0;k<3;k++){const hx=X+(hash(gx,gz,20+k)-.5)*SPACING,hz=Z+(hash(gx,gz,30+k)-.5)*SPACING;if(walkable(hx,hz))continue;hedges.positions.push([hx,hz,pick(HEDGE,hash(gx,gz,40+k)),Math.floor(hash(gx,gz,50+k)*4)]);}
         continue;

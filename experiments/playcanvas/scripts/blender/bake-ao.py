@@ -42,7 +42,7 @@ plain = bpy.data.materials.new('Horneado')
 
 def occluder(mesh):
     d = mesh['material']
-    return not (d.get('paving') or d.get('texture') == 'water' or d.get('alpha', 0) > 0 or d.get('opacity', 1) < 1 or d.get('unlit') or d.get('glass'))
+    return not (d.get('paving') or d.get('trail') or d.get('texture') == 'water' or d.get('alpha', 0) > 0 or d.get('opacity', 1) < 1 or d.get('unlit') or d.get('glass'))
 
 objects = []
 for i, m in enumerate(scene_json['meshes']):

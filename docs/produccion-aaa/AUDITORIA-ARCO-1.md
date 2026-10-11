@@ -72,7 +72,8 @@ palabra del Instituto en la Bitácora.
 4. **Cuenta de Vega después de reparar.** Si se repara primero, la cuenta pierde la historia de los
    7 V. Propuesta: que Vega pida sumar antes del puente, o que la cuenta guarde también el montaje roto.
 5. **Pequeños.**
-   - Caminando con W, el jugador se mete en el seto a la salida del Portal.
+   - Caminando con W, el jugador se mete en el seto a la salida del Portal. *(Revisado en
+     [AUDITORIA-MAPA.md](AUDITORIA-MAPA.md): ya no ocurre, con W sola se sigue la curva.)*
    - La nota de lore del Taller queda tan cerca del cajón que E abre la nota.
    - En vista angosta, la placa de la Cocina tapa el botón × del cable.
    - La lectura del cierre del Taller conserva el título «Ajustar…» después de ajustado.

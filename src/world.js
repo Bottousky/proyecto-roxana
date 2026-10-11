@@ -7,7 +7,7 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { findPath } from './navigation.js';
 import { buildArchitecture } from './architecture.js';
 import { buildFountain, buildCuriosity as buildLandmark } from './landmarks.js';
-import { AREA_LAYOUTS, pointOnPaving, lakeShoreX } from './world-layout.js';
+import { AREA_LAYOUTS, pointOnPaving, lakeShoreX, backdropFrame, backdropYards } from './world-layout.js';
 import { buildPaving, buildPlayableBoundary } from './world-ground.js';
 import { buildSpringWaterworks, buildLighthouseIslet } from './world-waterworks.js';
 import { moveWithCollisions, isPositionClear, isSegmentClear } from './collision.js';
@@ -292,15 +292,33 @@ export class World {
     return group;
   }
   buildAuthoredBuildings(){
-    // Backdrop houses: no interaction, only a yard fence and a tree so each reads as someone's home.
+    // Backdrop houses: no interaction, but a door, a fenced front garden with a closed gate and its
+    // own tree behind, so each reads as someone's home. Their yards stay clear of planted trees.
+    this.backdropYards=backdropYards(this.layout);
     for(const b of this.layout.backdrop||[]){
-      const g=this.building(b.x,b.z,b.w,b.d,b.h,{...b.options,noDoor:true});g.name='village-backdrop-house';delete g.userData.architecture;const r=b.options.rotation||0,fx=Math.sin(r),fz=Math.cos(r),reach=b.d/2+1.6;
-      this.fence(b.x+fx*reach,b.z+fz*reach,b.w*.7,!r);this.tree(b.x-fx*(b.d/2+2)+fz*(b.w/2+1.2),b.z-fz*(b.d/2+2)-fx*(b.w/2+1.2),.9+(Math.abs(b.x)%3)*.12);
+      const g=this.building(b.x,b.z,b.w,b.d,b.h,b.options);g.name='village-backdrop-house';delete g.userData.architecture;
+      this.backdropGarden(b);
     }
     for(const b of this.layout.buildings){
       const group=this.building(b.x,b.z,b.w,b.d,b.height,b.options);
       Object.assign(group.userData.architecture,{id:b.id,label:b.label});
     }
+  }
+  backdropGarden(b){
+    const {at,front,garden}=backdropFrame(b),r=b.options.rotation||0,half=b.w/2+.45,line=front+garden;
+    // A low picket fence: the front run leaves room for the gate, the sides return to the walls.
+    const run=(p,q)=>{const [x0,z0]=at(...p),[x1,z1]=at(...q),steps=Math.max(1,Math.round(Math.hypot(x1-x0,z1-z0)/1.2));
+      for(let i=0;i<=steps;i++){const x=x0+(x1-x0)*i/steps,z=z0+(z1-z0)*i/steps;this.box(x,.45,z,.13,.9,.13,this.m.darkwood);this.solid(x,z,.2,.2);}
+      for(const y of [.32,.7])this.beam([x0,y,z0],[x1,y,z1],.07,this.m.wood);};
+    run([-half,line],[-.7,line]);run([.7,line],[half,line]);run([-half,front+.35],[-half,line]);run([half,front+.35],[half,line]);
+    // The gate stays shut: boards between two taller posts, on the path to the door.
+    const [gx,gz]=at(0,line),gate=this.group(gx,0,gz);gate.rotation.y=r;gate.name='village-garden-gate';
+    for(const side of [-1,1]){this.box(side*.66,.55,0,.17,1.1,.17,this.m.darkwood,gate);const [px,pz]=at(side*.66,line);this.solid(px,pz,.24,.24);}
+    for(let k=-.45;k<.5;k+=.15)this.box(k,.43,0,.11,.68,.05,this.m.wood,gate);this.box(0,.63,.03,1.12,.08,.05,this.m.darkwood,gate);
+    // Beaten earth from the doorstep to the gate.
+    const [wx,wz]=at(0,front+.35+(garden-.35)/2),walk=this.box(wx,.05,wz,.95,.04,garden-.35,this.mat('#a1906c'));walk.rotation.y=r;walk.name='village-garden-walk';
+    // Its own tree grows behind, beside the back wall: it frames the roof instead of hiding the door.
+    const [tx,tz]=at(b.w/2-.8,-(b.d/2+3));this.tree(tx,tz,.95+(Math.abs(b.x)%3)*.1,false,!inKingdomWater(this.area.id,tx,tz,1));
   }
   door(x,y,z,g){this.box(x,y+1.23,z+.02,1.28,2.4,.15,this.m.darkwood,g);this.box(x,y+1.15,z+.12,.92,2.18,.12,this.m.wood,g);for(let k=-.4;k<.5;k+=.18)this.box(x+k,y+1.15,z+.19,.018,2.13,.012,this.m.darkwood,g);this.torus(x+.3,y+1.1,z+.23,.065,.022,this.m.brass,null,g);this.box(x,y+.07,z+.35,1.7,.14,.75,this.m.stone,g);this.box(x,y+2.45,z+.1,1.5,.2,.25,this.m.darkwood,g);}
   window(x,y,z,g,small=false){const w=small?.8:1.05,h=small?1.15:1.25;this.box(x,y,z,w+.22,h+.22,.12,this.m.darkwood,g);this.box(x,y,z+.08,w,h,.06,this.m.glass,g).name='window-pane';this.box(x,y,z+.13,.07,h,.05,this.m.darkwood,g);this.box(x,y,z+.13,w,.07,.05,this.m.darkwood,g);for(const side of [-1,1]){this.box(x+side*(w/2+.24),y,z+.02,.28,h+.08,.12,this.m.wood,g);this.box(x+side*(w/2+.24),y-h*.3,z+.09,.32,.07,.08,this.m.darkwood,g);}this.box(x,y-h/2-.15,z+.2,w+.6,.16,.5,this.m.stone,g);}
@@ -310,6 +328,7 @@ export class World {
   crate(x,z,scale=.75){this.solid(x,z,scale,scale+.12);this.box(x,scale/2,z,scale,scale,scale,this.m.wood);for(const side of [-1,1])this.box(x+side*scale*.4,scale/2,z+scale*.51,.1,scale,.06,this.m.darkwood);this.beam([x-scale*.36,.1,z+scale*.53],[x+scale*.36,scale-.1,z+scale*.53],.09,this.m.darkwood);}
   lamp(x,z,h=3.4){this.solid(x,z,.7,.7);const g=this.group(x,0,z);this.cylinder(0,.16,0,.35,.3,this.m.stone,g);this.cylinder(0,h*.46,0,.09,h*.9,this.m.metal,g);this.beam([0,h-.3,0],[.6,h-.15,0],.075,this.m.metal,g);this.box(.6,h-.42,0,.4,.6,.36,this.m.brass,g);const bulb=this.box(.6,h-.4,0,.29,.4,.26,this.m.glass,g);this.mesh('cone',this.m.metal,.6,h-.04,0,.38,.35,.38,g);const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:this.textures.glow,color:'#ffca75',transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}));glow.position.set(.6,h-.4,0);glow.scale.set(2.5,2.5,1);g.add(glow);this.sharedMaterials.add(glow.material);this.lamps.push({bulb,glow,phase:this.rand()*6});if(this.lamps.length<5){const light=new THREE.PointLight('#ffc079',3.0,6,2);light.position.set(x+.6,h-.45,z);this.root.add(light);this.lamps.at(-1).light=light;}return g;}
   fence(x,z,length,alongX=true){this.solid(x,z,alongX?length+.16:.16,alongX?.16:length+.16);const steps=Math.ceil(length/1.5);for(let i=0;i<=steps;i++){const t=(i/steps-.5)*length;this.box(x+(alongX?t:0),.6,z+(alongX?0:t),.16,1.2,.16,this.m.darkwood);}for(const h of [.45,.95])this.box(x,h,z,alongX?length:.1,.13,alongX?.1:length,this.m.wood);}
+  inBackdropYard(x,z,margin=.4){return (this.backdropYards||[]).some(b=>Math.abs(x-b.x)<b.w/2+margin&&Math.abs(z-b.z)<b.d/2+margin);}
   sceneryBlocksFacade(x,z,size=1){
     // The straight gameplay camera projects height against depth at 13.5 / 25.
     // Reserve the facade and its immediate approach, not merely the tree trunk.
@@ -320,15 +339,15 @@ export class World {
       return z>front&&Math.abs(x-b.x)<halfWidth+b.w*.45+.35&&top>facadeBottom-.8&&bottom<facadeBottom+b.height;
     });
   }
-  tree(x,z,size=1,autumn=false){
-    if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size))return this.group();
+  tree(x,z,size=1,autumn=false,beyond=false){
+    if(!(beyond||this.onLand(x,z))||this.sceneryBlocksFacade(x,z,size)||this.inBackdropYard(x,z))return this.group();
     const g=this.group(x,0,z);const entry={g,size:size*.86,type:Math.floor(this.rand()*6)};this.treeModels.push(entry);if(this.treeTextures){this.applyTreeArt(entry);this.solid(x,z,.7,.7);return g;}const bend=(this.rand()-.5)*.4;this.cylinder(0,1.35*size,0,.18*size,2.7*size,this.m.darkwood,g);for(let k=0;k<3;k++){const a=k*2.15;this.beam([0,size,0],[Math.cos(a)*size,2.65*size,Math.sin(a)*size],.15*size,this.m.wood,g);}
     const foliage=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,38),dummy=new THREE.Object3D();
     for(let i=0;i<38;i++){const a=i*2.4,r=Math.sqrt(this.rand())*1.25*size,y=(2.5+this.rand()*1.8)*size;dummy.position.set(Math.cos(a)*r+bend,y,Math.sin(a)*r);dummy.rotation.set((this.rand()-.5)*1.6,this.rand()*Math.PI,0);dummy.scale.set((1.65+this.rand()*.65)*size,(1.25+this.rand()*.4)*size,1);dummy.updateMatrix();foliage.setMatrixAt(i,dummy.matrix);foliage.setColorAt(i,new THREE.Color().setHSL(autumn?.16:.22+this.rand()*.06,.25+this.rand()*.15,.58+this.rand()*.18));}foliage.castShadow=true;foliage.receiveShadow=true;g.add(foliage);
     for(let k=0;k<4;k++){const a=k*1.57;this.beam([0,.17,0],[Math.cos(a)*.5*size,.03,Math.sin(a)*.5*size],.15*size,this.m.darkwood,g);}
     this.animations.push({kind:'tree',obj:g,phase:this.rand()*6,speed:.4});this.solid(x,z,.7,.7);return g;
   }
-  pine(x,z,size=1){const g=this.group(x,0,z);if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size))return g;this.solid(x,z,.35*size,.35*size);this.cylinder(0,2.4*size,0,.13*size,4.8*size,this.m.darkwood,g);const leaves=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,32),dummy=new THREE.Object3D();for(let i=0;i<32;i++){const tier=Math.floor(i/8),angle=i*2.4,r=(1.2-tier*.24)*size;dummy.position.set(Math.cos(angle)*r*.35,(1.35+tier*.9)*size,Math.sin(angle)*r*.35);dummy.rotation.set(-.35,angle,0);dummy.scale.set(r*2.3,r*1.35,1);dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);leaves.setColorAt(i,new THREE.Color('#79a097'));}leaves.castShadow=true;leaves.receiveShadow=true;g.add(leaves);return g;}
+  pine(x,z,size=1){const g=this.group(x,0,z);if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size)||this.inBackdropYard(x,z))return g;this.solid(x,z,.35*size,.35*size);this.cylinder(0,2.4*size,0,.13*size,4.8*size,this.m.darkwood,g);const leaves=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,32),dummy=new THREE.Object3D();for(let i=0;i<32;i++){const tier=Math.floor(i/8),angle=i*2.4,r=(1.2-tier*.24)*size;dummy.position.set(Math.cos(angle)*r*.35,(1.35+tier*.9)*size,Math.sin(angle)*r*.35);dummy.rotation.set(-.35,angle,0);dummy.scale.set(r*2.3,r*1.35,1);dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);leaves.setColorAt(i,new THREE.Color('#79a097'));}leaves.castShadow=true;leaves.receiveShadow=true;g.add(leaves);return g;}
   rock(x,z,size=1){
     this.solid(x,z,size*1.7,size*1.7);
     // Each boulder gets its own faceted shape: shared vertices pushed in and out.
@@ -549,7 +568,7 @@ export class World {
   }
   buildNature(w,d){
     const footprints=[];this.root.traverse(o=>{if(o.userData.architecture)footprints.push(o.userData.architecture.footprint)});
-    const clearScenery=(x,z,r)=>(!this.continuous||Math.abs(z)<d/2-1&&!inTravelCorridor(this.area.id,x,z,-r))&&!inKingdomWater(this.area.id,x,z,Math.min(r,1))&&!pointOnPaving(this.layout,x,z,r)&&!this.nearObject(x,z,Math.max(1.4,r))&&!footprints.some(b=>Math.abs(x-b.x)<b.w/2+r&&Math.abs(z-b.z)<b.d/2+r);
+    const clearScenery=(x,z,r)=>(!this.continuous||Math.abs(z)<d/2-1&&!inTravelCorridor(this.area.id,x,z,-r))&&!inKingdomWater(this.area.id,x,z,Math.min(r,1))&&!pointOnPaving(this.layout,x,z,r)&&!this.nearObject(x,z,Math.max(1.4,r))&&!footprints.some(b=>Math.abs(x-b.x)<b.w/2+r&&Math.abs(z-b.z)<b.d/2+r)&&!this.inBackdropYard(x,z,Math.min(r,1.2));
     const positions=[];
     buildGardenArt(this,clearScenery);
     for(let i=0;i<24;i++){const side=i%2?-1:1,x=side*(w*.4+this.rand()*5),z=(this.rand()-.5)*(d+7);if((this.area.id==='portal'&&side>0)||!clearScenery(x,z,3.4))continue;positions.push([x,z]);if(i%4===0)this.pine(x,z,.85+this.rand()*.45);else this.tree(x,z,.72+this.rand()*.5,this.area.id==='terraces');}

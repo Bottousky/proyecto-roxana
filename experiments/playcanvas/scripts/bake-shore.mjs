@@ -12,7 +12,7 @@ const root = new URL('../', import.meta.url);
 const scene = JSON.parse(readFileSync(new URL('src/data/scene.json', root)));
 const raw = gunzipSync(readFileSync(new URL('src/data/geometry.bin.gz', root)));
 const buffer = raw.buffer.slice(raw.byteOffset, raw.byteOffset + raw.byteLength);
-const PX = 4, MAX = 6; // píxeles por metro, metros representados
+const PX = 4, MAX = 6, TRAIL = .3; // píxeles por metro, metros representados
 const view = (m, key) => channel(buffer, m, key);
 
 const waters = scene.meshes.filter(m => m.material.texture === 'water' && !m.dynamic); // fountains are pivoted, local meshes
@@ -52,8 +52,10 @@ for (const m of scene.meshes.filter(m => m.material.paving)) {
   const before = paving.slice(); raster(m, paving, { flatOnly: true });
   const index = palette.indexOf(m.material.color); for (let i = 0; i < paving.length; i++) if (paving[i] !== before[i]) tone[i] = index;
 }
+const trail = new Float32Array(W * H).fill(-Infinity);
+for (const m of scene.meshes.filter(m => m.material.trail)) raster(m, trail, { flatOnly: true });
 for (const m of scene.meshes) {
-  if (m.material.paving || m.material.texture === 'water' || m.dynamic || m.material.alpha || m.material.opacity < 1) continue;
+  if (m.material.paving || m.material.trail || m.material.texture === 'water' || m.dynamic || m.material.alpha || m.material.opacity < 1) continue;
   raster(m, land, { flatOnly: true });
 }
 
@@ -73,7 +75,8 @@ for (let z = 0; z < H; z++) { const d = edt1d(f.subarray(z * W, z * W + W), W); 
 // breaks it up with noise.
 const SIGMA = .45 * PX, R = Math.ceil(SIGMA * 3), kernel = Array.from({ length: 2 * R + 1 }, (_, i) => Math.exp(-((i - R) ** 2) / (2 * SIGMA * SIGMA)));
 const norm = kernel.reduce((a, b) => a + b, 0); kernel.forEach((v, i) => kernel[i] = v / norm);
-let cover = Float32Array.from(paving, v => v === -Infinity ? 0 : 1), tmp = new Float32Array(W * H);
+// A trail is partial cover: the shader reads 0,06–0,42 as trodden earth, not as cobbles.
+let cover = Float32Array.from(paving, (v, i) => v !== -Infinity ? 1 : trail[i] !== -Infinity ? TRAIL : 0), tmp = new Float32Array(W * H);
 for (let z = 0; z < H; z++) for (let x = 0; x < W; x++) { let sum = 0; for (let k = -R; k <= R; k++) { const xx = Math.min(W - 1, Math.max(0, x + k)); sum += cover[z * W + xx] * kernel[k + R]; } tmp[z * W + x] = sum; }
 for (let z = 0; z < H; z++) for (let x = 0; x < W; x++) { let sum = 0; for (let k = -R; k <= R; k++) { const zz = Math.min(H - 1, Math.max(0, z + k)); sum += tmp[zz * W + x] * kernel[k + R]; } cover[z * W + x] = sum; }
 // Spread each region's tone outward so blurred edges never read index 0 by accident.

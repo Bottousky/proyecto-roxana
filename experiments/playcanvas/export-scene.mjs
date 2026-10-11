@@ -67,6 +67,8 @@ function capture(world,id,offset=[0,0],landscape=false){
     // Seen from above, a cone range 50 m behind the Faro reads as rocks floating over the islet.
     if(object.name==='kingdom-distant-mountain')return;
     if(PAVING.has(object.name))descriptor.paving=true;
+    // The woodland loop is beaten earth: the ground shader wears it into the meadow (bake-shore).
+    if(object.name==='woodland-loop')descriptor.trail=true;
     if(object.name==='terrace-crop')descriptor.crop=true;
     if(['field-rock','upland-outcrop','quiet-mount-rock'].includes(object.name))descriptor.rock=true;
     if(['window-pane','workshop-window-glass'].includes(object.name))descriptor.pane=true;

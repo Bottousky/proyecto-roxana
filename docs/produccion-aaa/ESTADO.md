@@ -575,6 +575,20 @@ escritura deja el papel limpio alrededor de los cables.
 - **Las marcas de Lumen** (opción): cada anillo lleva la inicial de su color. Lumen no distingue el
   rojo del verde; sirve para jugadores daltónicos y para la Bitácora impresa en blanco y negro.
 
+## Ciclo 24 · Auditoría del mapa: el pueblo sale del bosque y el sendero se ve (11 oct 2026)
+
+Detalle en [AUDITORIA-MAPA.md](AUDITORIA-MAPA.md). Se llega al 100 % del suelo de cada lugar. Las
+diez casas habitables están despejadas.
+- **Las seis casas del pueblo**, más allá de la cerca de la Plaza, tenían árboles creciendo dentro y
+  delante, sin puerta y lejos de todo camino. Ahora tres miran a la Plaza desde detrás de su cerca
+  oeste y tres bordean el camino a la Calzada, giradas hacia él. Cada una tiene puerta, un jardín
+  con portón cerrado y su árbol detrás. Su patio queda libre de árboles del lugar, de la arboleda
+  del camino y del seto.
+- **El sendero del bosque** (Plaza–Portal y Castillo–Terrazas) era caminable pero se dibujaba como
+  pasto. Ahora el suelo lo pinta de tierra pisada.
+- **Mundo regenerado** en Linux, con la oclusión horneada por el módulo `bpy` de Blender 5.2
+  (`BLENDER_PYTHON`).
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |

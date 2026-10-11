@@ -4,6 +4,8 @@ import * as THREE from 'three';
 import { AREAS } from '../src/content.js';
 import { buildArchitecture } from '../src/architecture.js';
 import { buildCollisionWorld } from './helpers/world-fixture.js';
+import { backdropFrame, backdropYards } from '../src/world-layout.js';
+import { buildKingdomLandscape } from '../src/kingdom-landscape.js';
 import { auditComposition, compositionFailures, GAME_CAMERA_OFFSET } from './helpers/composition-audit.js';
 
 function replaceBuildings(world, specifications) {
@@ -119,4 +121,25 @@ test('every authored house keeps its entrance and facade readable from the gamep
     } finally { world.dispose(); }
   }
   assert.deepEqual(failures, [], failures.join('\n'));
+});
+
+test('village houses beyond the square keep a door, a shut garden gate and yards free of trees', () => {
+  const world = buildCollisionWorld('plaza', { continuous: true });
+  try {
+    const houses = [], gates = [];
+    world.root.traverse(o => { if (o.name === 'village-backdrop-house') houses.push(o); if (o.name === 'village-garden-gate') gates.push(o); });
+    assert.equal(houses.length, world.layout.backdrop.length);
+    assert.equal(gates.length, houses.length, 'Each house opens onto its garden gate');
+    const yards = backdropYards(world.layout), inYard = (x, z) => yards.some(b => Math.abs(x - b.x) < b.w / 2 && Math.abs(z - b.z) < b.d / 2);
+    for (const { g } of world.treeModels) assert.ok(!inYard(g.position.x, g.position.z), `tree at ${g.position.x.toFixed(1)}, ${g.position.z.toFixed(1)} grows in a house yard`);
+    for (const house of world.layout.backdrop) {
+      const [x, z] = backdropFrame(house).at(0, house.d / 2 + 1);
+      assert.equal(world.tree(x, z).children.length, 0, 'No tree may be planted in a front garden');
+    }
+    // The shared landscape copse along the roads respects the same gardens.
+    const original = world.root; world.root = new THREE.Group(); world.localGeometries = []; world.waterMaterials = [];
+    buildKingdomLandscape(world);
+    world.root.traverse(o => { if (o.name === 'shared-copse') assert.ok(!inYard(o.position.x, o.position.z), `landscape tree at ${o.position.x.toFixed(1)}, ${o.position.z.toFixed(1)} grows in a house yard`); });
+    world.root = original;
+  } finally { world.dispose(); }
 });
