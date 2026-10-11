@@ -587,3 +587,40 @@ El jalón, las marcas en cada marco y las notas vienen después.
 **El arranque de evaluación** `?avenida` (declarado, no es parte del juego): borra lo guardado, abre el arco y la reja y deja al explorador en el andén.
 
 **Después:** la transferencia, con vectores en dos dimensiones, para cerrar la familia. El paquete de evaluación con personas está en `EVALUACION-INTRODUCCION.md`.
+
+## D25 · Género y dirección: aventura de descubrimiento físico en dioramas (2026-10-11, pedido del usuario)
+
+**El pedido.** El usuario dudó de que «un plataformero 2D que evoluciona a 3D» fuera el género idóneo y propuso, en su lugar, una aventura de exploración y experimentación física en dioramas, donde el jugador aprende las propiedades del universo en lugar de adquirir habilidades. Pidió avanzar con cuatro ideas y en este orden: volver a lugares viejos con lo aprendido, condiciones modificables, el objeto delicado en la cascada y momentos que no sean puzzles.
+
+**Lo que ya coincidía (no cambia).** Lo construido no es un plataformero:
+- el explorador no salta (D4);
+- el desafío es entender y transformar el entorno (contrato §2);
+- la cascada ascendente es la escena insignia (Hito A);
+- el 3D se descubre por el arco tapiado (D18–D20).
+
+**El género, con su nombre:** aventura de descubrimiento físico en dioramas, con un plano de medición 2.5D y exploración 3D donde aporta.
+- **El plano 2.5D no es herencia de un plataformero:** es donde se mide. La caída, el tiro vertical y el tiro oblicuo ocurren en un plano. Ahí no hay cámara libre.
+- **El explorador no gana poderes:** termina con los mismos verbos con que empieza. Cambia lo que el jugador entiende del lugar.
+
+**Lo que se adopta, en orden:**
+1. **Volver con lo aprendido** (una «metroidvania de conocimiento»).
+   - Un lugar viejo guarda algo que no se puede hacer con lo que se sabe en ese momento. Más tarde, la misma acción, entendida, lo resuelve.
+   - La vuelta es la prueba de transferencia que el contrato exige a cada familia.
+   - **Riesgo:** un bloqueo por conocimiento no se ve, porque no hay un ítem que avise «ahora sí podés».
+   - **La Bitácora lo hace visible** con una sección de **preguntas abiertas**. Una pregunta:
+     - se abre cuando el jugador vio el lugar;
+     - recibe una pista cuando aprende algo que tiene que ver;
+     - se cierra con lo medido cuando la resuelve.
+   - La pista se escribe como pregunta y nunca dice la solución.
+2. **Modificar condiciones, no leyes** (A17). El jugador cambia la intensidad de un campo, el rozamiento de una superficie, el ángulo y la rapidez de un lanzamiento, un medio óptico o una carga. Las leyes no se tocan: son las del mundo real.
+3. **El objeto delicado** (A26): llevar a la Terraza algo que no aguanta un golpe fuerte. Obliga a pensar en la velocidad con que se sale de la región.
+4. **Momentos que no sean puzzles** (B6): vehículos, carreras, persecuciones. Sin exigir precisión motora para demostrar comprensión.
+
+**Lo que no se adopta:**
+- **Tres prototipos para comparar** (plataformero, diorama y sandbox). El contrato prohíbe hacer «dos juegos incompatibles para unirlos después». La pregunta de fondo, si el jugador predice bien ante situaciones nuevas, se responde con los paquetes de evaluación y con personas.
+- **Cámara giratoria en el plano de medición.** Dificulta leer marcas y trayectorias.
+- **Varias soluciones en todas partes.** Valen sólo si cada una es física legítima y si predecir sigue rindiendo más que tantear.
+
+**Resuelve el conflicto 5 de `CANON.md`.** La pecera de la landing promete «leyes regulables a gusto»; el diseño anterior decía que no hay edición libre. Se regulan las **condiciones** dentro de los experimentos de los profesores; las leyes no.
+
+**Lo invalidaría:** que la evaluación con personas muestre que las vueltas no se entienden ni con la Bitácora, o que el plano 2.5D no ayuda a leer las mediciones.

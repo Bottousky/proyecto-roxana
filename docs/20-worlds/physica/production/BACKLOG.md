@@ -26,7 +26,8 @@ primero.
 | A20 | **Objetivo con dos límites + amortiguación declarada** | El objetivo con dos límites está en el Pozo (iter 3). Falta decidir la amortiguación: hoy la oscilación ideal es eterna, con salidas (cadena en el aire, R, dirección). | parcial |
 | A21 | Segunda surgencia que se quede corta, con fuente visible | Dos chorros a distinta profundidad: uno cresta sobre la Terraza y el otro no. La fuente (reja y caño) es visible. | pendiente |
 | A22 | Legibilidad del lado de la Orilla | El mástil de plomadas no parece escalera. El aviso de cada soporte apunta a su esfera. La cadena explica por qué no se ofrece con una esfera en la mano. | hecho (iter 9, `evidence/iter-09`: revisión independiente en dos pasadas; el collar del borde en el mástil se lee débil) |
-| A17 | **Modificar**: la energía del campo viene de un aparato que el jugador puede afectar | La caída familiar de la izquierda mueve una rueda visible que alimenta las anclas. Desviar el agua baja `power`, el arco cambia y la región se debilita gradualmente. Las anclas responden a la carga. Prueba: el arco recalculado con `power` < 1 no cruza. | pendiente |
+| A17 | **Modificar condiciones, no leyes** (D25): la energía del campo viene de un aparato que el jugador puede afectar | La caída familiar de la izquierda mueve una rueda visible que alimenta las anclas. Desviar el agua baja `power`, el arco cambia y la región se debilita gradualmente. Las anclas responden a la carga. Prueba: el arco recalculado con `power` < 1 no cruza. | pendiente |
+| A26 | **El objeto delicado** (D25): llevar a la Terraza algo que se rompe si llega rápido | Un objeto frágil que, si sale de la región con demasiada velocidad, se rompe al chocar afuera, con aviso y reinicio local. Hay una forma de entregarlo sano que se puede predecir con los instrumentos de la Orilla. Prueba: la misma entrega, con dos alturas de partida, una lo rompe y la otra no. | pendiente |
 | A18 | Plano de establecimiento que reúna las dos caídas familiares y el arco | Al entrar, una toma que deja ver la composición completa | hecho (iter 4; se salta con cualquier entrada) |
 | A19 | La columna se rompe en la cresta (gotas, sección variable) y salpica con volumen al llegar | Secuencia antes/después comparable | hecho (iter 5, `evidence/iter-05`; revisión independiente aplicada; la corona de la cresta se ve poco y las pozas son rectángulos) |
 | A24 | Modelo 3D del explorador fiel al retrato (lentes de las antiparras, mechones, colas de bufanda, proporción) | Vista de giro del modelo junto al retrato | hecho (iter 6, `evidence/iter-06`; revisión independiente en dos pasadas; quedan la silueta del pelo más redonda que en la hoja y la pista del campo poco visible en la cámara de juego) |
@@ -64,7 +65,20 @@ primero.
     - el jalón y el encargo de la vecina (iter 18): un cero que se elige, y una tarea que recompensa predecir.
     - dos observadores, la tabla y el pedido a la vista; el paquete de evaluación (iter 19).
   - **Falta:**
-    - la transferencia, con vectores en el mundo;
+    - la transferencia, con vectores en el mundo. Desde D25 es **la primera vuelta a un lugar viejo** (B3t, abajo);
     - después, la prueba con personas (`EVALUACION-INTRODUCCION.md`).
+- **B3t:** la primera vuelta: la transferencia de «Introducción» en la Orilla (D25, D26).
+  - **Qué:** en la pared de la Terraza, detrás del agua, hay un buzón al que ninguna esfera llega:
+    - las de los soportes suben derechas;
+    - con una esfera en la mano no se baja por la cadena.
+  - **La respuesta:** lo que va con algo que se mueve sale con su velocidad (el carro). Soltada caminando, la esfera sale con la velocidad del explorador.
+  - **La Bitácora** abre la pregunta, le da una pista después del carro y la cierra con lo medido.
+  - **Vectores en el mundo:** la traza de la esfera soltada caminando muestra su velocidad partida en dos flechas: la horizontal no cambia y la vertical sí.
+  - **Criterio:**
+    - con teclado: soltada parada no llega; soltada caminando en el borde, sí;
+    - pruebas de la simulación y de la Bitácora;
+    - una revisión independiente;
+    - el paquete de evaluación al día.
 - **B4:** familia MRU (ver `FAMILIAS.md`).
 - **B5:** primer sector jugable de la metrópolis. Empezado con la avenida del carro (iter 16). La deuda de dibujo del barrio quedó pagada en la iter 16 (unión por material).
+- **B6:** momentos que no sean puzzles (D25): vehículos, carreras, persecuciones. La física se usa porque es divertida, no para un examen. Sin exigir precisión motora para demostrar comprensión. Pendiente de diseño.
