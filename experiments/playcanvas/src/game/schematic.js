@@ -218,3 +218,30 @@ const SYMBOLS = {
   divider: '<path class="sk-ink" d="M20 2 V10 L12 13 L28 19 L12 25 L20 28 V32 L12 35 L28 41 L12 47 L20 50 V58 M20 30 H60"/><circle class="sk-node" cx="20" cy="30" r="4"/><text class="sk-red-note" x="66" y="34">V</text>',
 };
 export function wordSymbol(key) { return SYMBOLS[key] ? `<svg class="dj-word-symbol" viewBox="0 0 80 60" aria-hidden="true">${SYMBOLS[key]}</svg>` : ''; }
+
+// ── Piedras de freno, in the notebook ────────────────────────────────────────────────────
+const RING_ORDER = ['negro', 'marron', 'rojo', 'naranja', 'amarillo', 'verde', 'azul', 'violeta', 'gris', 'blanco'];
+const RING_LETTER = { negro: 'N', marron: 'M', rojo: 'R', naranja: 'Na', amarillo: 'A', verde: 'V', azul: 'Az', violeta: 'Vi', gris: 'G', blanco: 'B' };
+
+/** A stone as it is sketched beside its weight: a capsule, its leads, its four rings. */
+export function stoneSketch(nominal) {
+  const rings = stoneRings(nominal);
+  return `<svg class="dj-stone-sketch" viewBox="0 0 132 44" aria-hidden="true"><path class="sk-ink" d="M2 22 H22 M110 22 H130"/><rect class="sk-stone" x="22" y="8" width="88" height="28" rx="14"/>${rings.map((c, i) => `<rect x="${[36, 49, 62, 88][i]}" y="9" width="8" height="26" fill="${RING_HEX[c]}"/>`).join('')}<rect class="sk-ink" x="22" y="8" width="88" height="28" rx="14" fill="none"/></svg>`;
+}
+
+/**
+ * «La rueda de colores»: the ten ring colours round a hub. A colour gets its number only once a weighed
+ * stone used it; the others keep a question mark, and an initial so they can be told apart in grey.
+ */
+export function renderColorWheel(known) {
+  const cx = 210, cy = 205, R = 150, r = 64, rnd = hand('rueda');
+  const at = (a, rr) => `${f(cx + Math.cos(a) * rr)} ${f(cy + Math.sin(a) * rr)}`;
+  const slices = RING_ORDER.map((c, i) => {
+    const a0 = i / 10 * Math.PI * 2 - Math.PI / 2 + .012, a1 = (i + 1) / 10 * Math.PI * 2 - Math.PI / 2 - .012, am = (a0 + a1) / 2, ink = ['negro', 'marron', 'azul', 'violeta', 'rojo', 'verde'].includes(c) ? '#f3e8cb' : '#2b2620';
+    const slice = `<path class="sk-wheel" d="M${at(a0, r)} L${at(a0, R)} A${R} ${R} 0 0 1 ${at(a1, R)} L${at(a1, r)} A${r} ${r} 0 0 0 ${at(a0, r)}Z" fill="${RING_HEX[c]}"/>`;
+    const letter = `<text class="sk-wheel-letter" x="${f(cx + Math.cos(am) * (r + R) / 2)}" y="${f(cy + Math.sin(am) * (r + R) / 2 + 9)}" fill="${ink}">${RING_LETTER[c]}</text>`;
+    const label = known.has(i) ? `<text class="sk-red-note" x="${f(cx + Math.cos(am) * (R + 30))}" y="${f(cy + Math.sin(am) * (R + 30) + 13 + rnd())}">${i}</text>` : `<text class="sk-wheel-unknown" x="${f(cx + Math.cos(am) * (R + 30))}" y="${f(cy + Math.sin(am) * (R + 30) + 11)}">¿?</text>`;
+    return slice + letter + label;
+  }).join('');
+  return `<figure class="dj-schematic dj-wheel"><figcaption>Cada color, una cifra</figcaption><svg viewBox="0 0 420 410" role="img" aria-label="Rueda de los diez colores de los anillos; ${known.size} con su número"><g class="sk-sheet">${slices}<circle class="sk-ink" cx="${cx}" cy="${cy}" r="${R}" fill="none"/><circle class="sk-ink" cx="${cx}" cy="${cy}" r="${r}" fill="none"/>${omega(cx - 19, cy + 22, 1.6, 'sk-ink')}</g></svg></figure>`;
+}

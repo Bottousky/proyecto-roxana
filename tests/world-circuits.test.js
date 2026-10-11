@@ -247,7 +247,8 @@ test('the optical shutter and brake never create voltage; final loaded-divider c
 test('every world electrical/mechanical lever and panel after the Portal has a measurement anchor', () => {
   const supported = ['workshop','road','spring','castle','terraces','lake','lighthouse'];
   for (const id of supported) {
-    for (const object of AREAS[id].objects.filter(o => ['lever','panel','beacon'].includes(o.kind))) {
+    // An optional bench is a table in a room, not part of the installation: nothing to probe from outside.
+    for (const object of AREAS[id].objects.filter(o => ['lever','panel','beacon'].includes(o.kind) && !o.optional)) {
       const result = measureWorld(id, state({}), object.id);
       assert.ok(result, `${id}/${object.id} needs a probe anchor`);
       assert.ok(result.reference.length > 40);

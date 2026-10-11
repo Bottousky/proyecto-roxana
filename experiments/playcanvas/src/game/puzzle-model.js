@@ -22,7 +22,11 @@ export const RING_NAMES = { negro: 'negro', marron: 'marrón', rojo: 'rojo', nar
 export const RING_MARKS = { negro: 'N', marron: 'M', rojo: 'R', naranja: 'Na', amarillo: 'A', verde: 'V', azul: 'Az', violeta: 'Vi', gris: 'G', blanco: 'B', oro: 'O' };
 /** A stone said by its rings, as someone who can't read them yet would: «marrón, negro, negro y oro». */
 export function ringWords(nominal) { const r = stoneRings(nominal).map(c => RING_NAMES[c]); return `${r.slice(0, 3).join(', ')} y ${r[3]}`; }
-const stone = (value, actual) => ({ value, actual });
+const stone = (value, actual, extra = {}) => ({ value, actual, ...extra });
+/** The stones a player weighed on Lumen's tray, in the order they were weighed (their nominal values). */
+export const weighedStones = state => (Array.isArray(state?.weighed) ? state.weighed : []);
+/** The riddle stone (red, red, brown) comes out of Lumen's fist once three stones were weighed. */
+export const RIDDLE_STONE = 220;
 /** An empty socket keeps a copper strap across it: no brake at all. */
 const STRAP = { value: 0, actual: 0, strap: true };
 /** The positions a control can take: the stones in its socket, or the notches of a dial. */
@@ -183,6 +187,26 @@ export const PUZZLES = {
   },
 };
 
+// ── Optional benches: their own reward, never on the main road ──────────────────────────────
+PUZZLES.drawer = {
+  title: 'El cajón de Lumen', place: 'TALLER DE LUMEN · EL CAJÓN DE LAS PIEDRAS', subtitle: 'Seis piedras de freno en una bandeja. Lumen guarda una séptima en el puño.', voltage: 6, protection: 1.2, optional: true,
+  brief: 'Lumen elige las piedras «por temperamento». Poné cada una en el zócalo y pesala con la mesa apagada: el instrumento dice cuánto frena. Después, Lumen tiene un acertijo.',
+  ports: [...sourcePorts, port('trayA', 'Zócalo · A', 330, 125), port('trayB', 'Zócalo · B', 600, 125), port('lampIn', 'Lámpara +', 640, 345), port('lampOut', 'Lámpara −', 860, 345)],
+  components: [component('tray', 'Piedra del cajón', 'trayA', 'trayB', 10, { valueKey: 'tray', kind: 'resistor' }), component('lamp', 'Lámpara de prueba', 'lampIn', 'lampOut', 12, { kind: 'lamp' })],
+  initialWires: [['positive', 'trayA'], ['trayB', 'lampIn'], ['lampOut', 'negative']],
+  sealed: [['positive', 'trayA'], ['trayB', 'lampIn'], ['lampOut', 'negative']], cables: 0,
+  knobs: [{ key: 'tray', label: 'Zócalo de prueba', socket: 'El cajón de Lumen', stones: [stone(10, 9.9), stone(12, 11.8), stone(22, 22.3), stone(47, 46.4), stone(100, 101), stone(120, 118), stone(RIDDLE_STONE, 217, { riddle: true })], min: 10, max: RIDDLE_STONE, initial: 10, unit: 'Ω', description: 'La piedra que se pesa.' }],
+  criteria: [
+    { text: 'Pesaste tres piedras del cajón', met: (r, s) => weighedStones(s).filter(v => v !== RIDDLE_STONE).length >= 3 },
+    { text: 'Le dijiste a Lumen cuánto frena la piedra roja, roja, marrón, y la pesaste', met: (r, s) => weighedStones(s).includes(RIDDLE_STONE) },
+  ],
+  // Done is what was weighed, not a working montage: the stones are weighed with the bench off.
+  done: s => weighedStones(s).filter(v => v !== RIDDLE_STONE).length >= 3 && weighedStones(s).includes(RIDDLE_STONE),
+  solve: s => { s.weighed = [10, 12, 100, RIDDLE_STONE]; s.values.tray = RIDDLE_STONE; s.estimate = { choice: 'doscientos', settled: true, measured: 217 }; },
+  lesson: 'Los anillos escriben un número: dos cifras y cuántos ceros. El anillo dorado dice que el valor real puede correrse un 5 %: el instrumento lo confirma.',
+  observation: 'Lumen tiene un cajón de piedras de freno, cada una con anillos pintados. Las elige «por temperamento».',
+};
+
 const samePair = (a, b) => (a[0] === b[0] && a[1] === b[1]) || (a[0] === b[1] && a[1] === b[0]);
 /** A wire soldered into the installation: it cannot be removed and does not use a cable in hand. */
 /** Declared simplification: only parts with a reason to care about direction are polarized. */
@@ -204,7 +228,7 @@ export function terracesAgreement(state) {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, tally: null, completed: false };
+  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, tally: null, ...(p.done ? { weighed: [] } : {}), completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -222,7 +246,7 @@ export function normalizePuzzleSnapshot(id, saved) {
     // A value always sits on a notch, or is a stone the socket has (the nearest one, for saves from before sockets).
     values: Object.fromEntries((p.knobs ?? []).map(k => { const v = saved.values?.[k.key]; return [k.key, Number.isFinite(v) ? knobChoices(k).reduce((a, b) => (Math.abs(b - v) < Math.abs(a - v) ? b : a)) : k.initial]; })),
     hints: Number.isFinite(saved.hints) ? Math.max(0, Math.min(HINT_STEPS, Math.floor(saved.hints))) : 0,
-    meter: { mode: ['voltage', 'continuity', 'current'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) || (saved.meter?.branch === 'source' && p.tally?.parts.includes('source')) ? saved.meter.branch : null },
+    meter: { mode: ['voltage', 'continuity', 'current', 'weigh'].includes(saved.meter?.mode) ? saved.meter.mode : 'voltage', a: ids.has(saved.meter?.a) ? saved.meter.a : null, b: ids.has(saved.meter?.b) ? saved.meter.b : null, branch: p.components.some(c => c.id === saved.meter?.branch) || (saved.meter?.branch === 'source' && p.tally?.parts.includes('source')) ? saved.meter.branch : null },
   };
   // Whether the copper already put the keeper's inherited conjuro to the test on this bench.
   // A repaired installation already answered it, also in saves from before conjuros existed.
@@ -233,6 +257,8 @@ export function normalizePuzzleSnapshot(id, saved) {
     const readings = Object.fromEntries(p.tally.parts.filter(k => Number.isFinite(saved.tally?.readings?.[k])).map(k => [k, saved.tally.readings[k]]));
     normalized.tally = { closed: saved.tally?.closed === true || saved.completed === true, readings, ...(typeof saved.tally?.signature === 'string' ? { signature: saved.tally.signature.slice(0, 2000) } : {}) };
   }
+  // The stones weighed on an optional tray: only stones the tray has, each once.
+  if (p.done) { const tray = p.knobs.flatMap(k => knobChoices(k)); normalized.weighed = weighedStones(saved).filter((v, i, all) => tray.includes(v) && all.indexOf(v) === i); }
   // The mark written in the keepers' book before measuring («skip» if measured without one), and what was read.
   normalized.estimate = saved.estimate && typeof saved.estimate.choice === 'string' && /^[a-z]{1,12}$/.test(saved.estimate.choice)
     ? { choice: saved.estimate.choice, settled: saved.estimate.settled === true, ...(Number.isFinite(saved.estimate.measured) ? { measured: saved.estimate.measured } : {}) } : null;
@@ -287,7 +313,7 @@ export function evaluatePuzzle(id, state) {
   }));
   // maxPower limits losses on a line; minCurrent keeps a part in service (the lens divider needs both arms).
   const constraintsMet = (p.constraints ?? []).every(c => { if (c.source) return !powered || requestedCurrent <= c.maxCurrent; const b = solution.branches[c.branch]; return (c.maxPower === undefined || (b?.power ?? Infinity) <= c.maxPower) && Math.abs(b?.current ?? 0) >= (c.minCurrent ?? 0); });
-  const solved = powered && solution.valid && Object.values(operating).every(Boolean) && constraintsMet;
+  const solved = p.done ? p.done(state) : powered && solution.valid && Object.values(operating).every(Boolean) && constraintsMet;
   // «solved» is physics. Commissioning may also need a proof the community asked to see.
   const proofMet = !!p.proof?.when && powered && solution.valid && constraintsMet && p.proof.when(state) && operating[p.proof.component];
   const proven = !p.proof || state.proofs?.[p.proof.id] === true || proofMet;

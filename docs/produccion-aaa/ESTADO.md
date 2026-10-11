@@ -550,6 +550,31 @@ vez. Reemplaza el camino anterior por el diálogo de imprimir. Para una tirada c
 PDF vectorial generado en servidor (texto nítido a 300 dpi, sangrado y lomo): ver la conversación
 del ciclo sobre el producto físico.
 
+## Ciclo 23 · Las piedras de freno y una Bitácora sin errores en los esquemas (11 oct 2026)
+
+**Esquemas.** El resistor variable lleva una flecha pareja; el Ω se dibuja a mano (la letra del
+cuaderno no tiene griego); las lecturas en rojo pasan a la línea del valor cuando la fila de abajo
+está cerca; los nombres se achican antes de chocar; los cables entran a la pieza por su lado; la
+escritura deja el papel limpio alrededor de los cables.
+
+**Piedras de freno** (diseño en [PIEDRAS-DE-FRENO.md](PIEDRAS-DE-FRENO.md), aprobado con «sí a todo»):
+- Las resistencias de zócalo son piedras con cuatro anillos: dos cifras, cuántos ceros y el dorado
+  del 5 %. Cada piedra tiene su valor real dentro de ese margen, y la física usa ese valor.
+- **Calzada:** zócalo con puente de cobre y la bolsa de Edda (10, 22, 47 y 100 Ω). Bobina de 14 Ω;
+  sólo la de 10 Ω da fuerza firme. Las partidas viejas pasan del dial a la piedra más cercana.
+- **Faro III:** zócalo con la piedra vieja (24 Ω) y los repuestos de Nereo (10, 12 y 15 Ω). La de
+  12 Ω da la luz dorada aunque se corra su 5 %.
+- **El cajón de Lumen** (Taller, opcional, fuera de la cuenta de luces): seis piedras, el
+  instrumento «Pesar el freno» (con la mesa apagada, lee 11,8 Ω en la de 12), la nota de Ohm después
+  de la tercera y el acertijo de la piedra roja, roja, marrón (22, 220 o 2200 Ω), que Lumen tapa
+  hasta que se responde. Conjuro: «Rojo con rojo, freno de buey; la dorada miente, pero no traiciona».
+- **Bitácora:** página «La rueda de colores» junto al capítulo del Taller. Cada color recibe su cifra
+  sólo cuando una piedra pesada lo usó; los que faltan quedan con «¿?». Al lado, cada piedra con sus
+  anillos, su lectura y cuánto se corrió. Palabra nueva: «Los anillos de las piedras» → «Código de
+  colores · tolerancia». En los esquemas, la piedra se dibuja con sus anillos.
+- **Las marcas de Lumen** (opción): cada anillo lleva la inicial de su color. Lumen no distingue el
+  rojo del verde; sirve para jugadores daltónicos y para la Bitácora impresa en blanco y negro.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |

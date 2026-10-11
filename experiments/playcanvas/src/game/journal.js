@@ -2,7 +2,8 @@ import {AREAS, CHARACTERS, JOURNAL, journalText, knowsCharacter, playerName, cha
 import {hasRequirements} from './state.js';
 import {JOURNEY_PHASES, inferredTime} from './story-time.js';
 import {revealFor, CONJUROS, ESTIMATES, estimateChoiceText, estimateVerdict, WORDS, WORD_ORDER, wordsKnown} from './understanding.js';
-import {renderSchematic, wordSymbol} from './schematic.js';
+import {renderSchematic, wordSymbol, renderColorWheel, stoneSketch} from './schematic.js';
+import {weighedStones, stoneRings, stoneIn, ringWords, RING_COLORS} from './puzzle-model.js';
 
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const RECORDS = {
@@ -133,9 +134,29 @@ function wordsPages(state) {
     `<section class="dj-page dj-right dj-words-page"><div class="dj-page-body"><ul class="dj-words">${known.slice(half).map(entry).join('')}</ul>${known.length < WORD_ORDER.length ? '<p class="dj-pencil dj-more">Quedan renglones para las palabras que todavía no usé.</p>' : ''}<div class="dj-marginalia">Ohmio viene de Ohm.<br>Ohm dice que es casualidad.<span>— no le creo</span></div></div>`];
 }
 
+// ── La rueda de colores: Lumen's stones, weighed one by one ─────────────────────────────────
+const zerosSaid = z => z === 0 ? 'ningún cero' : z === 1 ? 'un cero' : `${z} ceros`;
+/** The digits the weighed stones taught: each ring colour that appeared on one of them. */
+export function knownRingDigits(snapshot) {
+  return new Set(weighedStones(snapshot).flatMap(v => stoneRings(v).slice(0, 3).map(c => RING_COLORS.indexOf(c))));
+}
+function stoneList(snapshot, puzzles) {
+  const tray = puzzles.drawer?.knobs?.[0], weighed = weighedStones(snapshot);
+  if (!weighed.length) return '';
+  const item = v => { const [a, b, z] = stoneRings(v).map(c => RING_COLORS.indexOf(c)), actual = stoneIn(tray, v)?.actual;
+    return `<li class="dj-stone">${stoneSketch(v)}<div><strong>${esc(ringWords(v))}</strong><span>${a} · ${b} · ${zerosSaid(z)} = ${v} Ω</span>${Number.isFinite(actual) ? `<em>Pesó ${actual.toLocaleString('es-AR', {maximumFractionDigits: 1})} Ω${Math.abs(actual - v) > .01 ? `: se corrió un ${(Math.abs(actual - v) / v * 100).toLocaleString('es-AR', {maximumFractionDigits: 1})} %` : ''}</em>` : ''}</div></li>`; };
+  return `<header class="dj-evidence-head"><span class="eyebrow">PIEDRAS QUE PESÉ</span><h3>Lo que dicen los anillos</h3></header><ul class="dj-stones">${weighed.map(item).join('')}</ul>`;
+}
+
 /** Every page of the book, in order: chapters, open experiments, field notes, people and words. */
 function bookPages(state,puzzles={}){
   const pages=journalPages(state);
+  // Lumen's drawer is its own page, beside the workshop's chapter: the colour wheel fills stone by stone.
+  if(puzzles.drawer&&weighedStones(state.puzzles?.drawer).length){
+    const at=pages.findIndex(page=>page.puzzle==='workshop');
+    pages.splice(at<0?pages.length:at+1,0,{id:'stones',title:'La rueda de colores',area:'workshop',puzzle:'drawer',wheel:true,requires:['workshop'],
+      text:'Lumen elige sus piedras de freno «por temperamento». Las pesé una por una con el instrumento de Ohm. Los anillos no hablan de temperamento: escriben un número.'});
+  }
   // Open experiments remain a record even before their explanatory chapter exists.
   for(const [id,snapshot] of Object.entries(state.puzzles || {})) {
     if(!puzzles[id]||pages.some(page=>page.puzzle===id))continue;
@@ -153,7 +174,8 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
   const pages=bookPages(state,puzzles);
   const page=pages.find(page=>page.id===selected)||pages.filter(page=>!page.people&&!page.words).at(-1)||{id:'arrival',title:'La primera pregunta',area:'portal',text:'Todavía no escribí nada. Primero voy a mirar.'};
   const index=pages.indexOf(page),snapshot=state.puzzles?.[page.puzzle],evidence=page.puzzle?evidenceFor(page.puzzle,snapshot):[];
-  const field=(state.fieldNotes||[]).filter(note=>note.area===page.area);
+  // Field readings belong to the chapter of their place, not to a side page that shares it.
+  const field=page.wheel?[]:(state.fieldNotes||[]).filter(note=>note.area===page.area);
   const names={observation:'Lo que observé',measurement:'Una medición',intervention:'Lo que cambié',prediction:'Mi hipótesis',result:'Lo que ocurrió'};
   const notes=[...evidence.map(note=>({kind:note.kind,title:note.label||names[note.kind]||'Una prueba',text:note.text,reading:note.value,reference:note.reference})),...field.map(note=>({...note,kind:'measurement'}))];
   const previous=pages[index-1],next=pages[index+1];
@@ -172,10 +194,10 @@ export function renderJournal(state, {selected, puzzles={}, evidenceFor=()=>[], 
   }else{
     const stamp=page.experiment?'En estudio':journalStamp(page);
     left=`<section class="dj-page dj-left"><div class="dj-page-body">${stain}<header class="dj-page-head"><span class="dj-stamp ${page.experiment?'dj-stamp-open':''}">${esc(stamp)}</span><span class="eyebrow dj-place">${esc(AREAS[page.area]?.name || 'Ohmdal')} · ${page.experiment?'UNA PRUEBA ABIERTA':'MEMORIA DEL ENCUENTRO'}</span><h3>${esc(page.title)}</h3>${squiggle}</header>
-      ${photo(page.area, AREAS[page.area]?.name || 'Ohmdal', index%2?3:-3)}<p class="dj-ink">${esc(page.text)}</p>${schematics(page.puzzle,snapshot,puzzles)}
+      ${photo(page.area, AREAS[page.area]?.name || 'Ohmdal', index%2?3:-3)}<p class="dj-ink">${esc(page.text)}</p>${page.wheel?`${renderColorWheel(knownRingDigits(snapshot))}${knownRingDigits(snapshot).size<10?'<p class="dj-pencil dj-more">Quedan colores sin número: otra piedra, otro día.</p>':''}`:schematics(page.puzzle,snapshot,puzzles)}
       ${page.question?`<blockquote class="dj-sticky" style="--tilt:-2deg">${esc(page.question)}</blockquote>`:''}
       </div><span class="dj-folio">${index+1}</span>${corner(previous,'← Hoja anterior','prev')}</section>`;
-    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${keepersBook(page.puzzle,snapshot)}${tallyBlock(page.puzzle,snapshot,puzzles)}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
+    right=`<section class="dj-page dj-right"><div class="dj-page-body">${conjuro(page.puzzle,snapshot)}${keepersBook(page.puzzle,snapshot)}${tallyBlock(page.puzzle,snapshot,puzzles)}${page.wheel?stoneList(snapshot,puzzles):''}${behind(page.puzzle,snapshot)}<header class="dj-evidence-head"><span class="eyebrow">PRUEBAS QUE CONSERVÉ</span><h3>El rastro de mis intentos</h3></header>
       ${trials(notes)}
       ${page.explanation?`<details class="dj-card"><summary>La idea que pudimos explicar</summary><p>${esc(page.explanation)}</p></details>`:''}
       <div class="dj-own-note"><label for="personal-journal-note">Mi pregunta o hipótesis</label><textarea id="personal-journal-note" data-note-for="${esc(page.id)}" maxlength="1200" rows="4" placeholder="Creo que… / Me pregunto qué pasaría si…">${esc(state.personalNotes?.[page.id]||'')}</textarea><small>Una idea puede cambiar. No hace falta tener la respuesta.</small></div>

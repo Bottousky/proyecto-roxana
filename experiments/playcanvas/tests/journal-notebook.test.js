@@ -69,3 +69,20 @@ test("the keeper's sum is written in the Bitácora as an addition, only with rea
   assert.match(page, /La cuenta de la vuelta/); assert.match(page, /anotada por Vega/);
   assert.match(page, /11,93 V/, 'the total is the sum of the numbers as written'); assert.match(page, /La fuente empuja 12 V/);
 });
+
+test("Lumen's drawer fills the colour wheel stone by stone, beside the workshop chapter", () => {
+  const drawer = {...initialPuzzleSnapshot('drawer'), weighed: [10, 47]};
+  const state = {...freshState(), flags: {awaken: true, workshop: true}, puzzles: {workshop: repaired('workshop'), drawer}};
+  const html = renderJournal(state, {selected: 'stones', puzzles: PUZZLES});
+  assert.match(html, /La rueda de colores/);
+  assert.match(html, /amarillo, violeta, negro y oro/);
+  assert.match(html, /4 · 7 · ningún cero = 47 Ω/);
+  assert.match(html, /Pesó 46,4 Ω: se corrió un 1,3 %/);
+  // Weighed: brown, black, yellow, violet → 0, 1, 4, 7. Red never appeared: it keeps its question mark.
+  const digits = [...html.matchAll(/class="sk-red-note"[^>]*>(\d)</g)].map(m => +m[1]).sort();
+  assert.deepEqual(digits, [0, 1, 4, 7]);
+  assert.match(html, /Quedan colores sin número/);
+  const pages = [...html.matchAll(/data-journal-page="([^"]+)" title/g)].map(m => m[1]);
+  assert.equal(pages[pages.indexOf('diagnosis') + 1], 'stones', 'right after the workshop chapter');
+  assert.doesNotMatch(renderJournal({...state, puzzles: {workshop: state.puzzles.workshop, drawer: initialPuzzleSnapshot('drawer')}}, {puzzles: PUZZLES}), /data-journal-page="stones"/, 'no wheel before a stone is weighed');
+});

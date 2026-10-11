@@ -1,6 +1,6 @@
 # Las piedras de freno · diseño para revisar
 
-Propuesta del Ciclo 23 (10 oct 2026), para aprobar antes de construir.
+Propuesta del Ciclo 23 (10 oct 2026). **Aprobada y construida** (11 oct 2026): las tres decisiones de abajo salieron «sí». Diferencias con la propuesta: el zócalo vacío de la Calzada tiene un puente de cobre; la piedra vieja del Faro III es de 24 Ω; las marcas de Lumen muestran la inicial del color (sin muescas numéricas, que darían la cifra); el acertijo no ofrece «medir sin anotar».
 
 ![Lámina de muestra: piedras con sus anillos y la rueda de colores a medio completar](piedras-de-freno-lamina.png)
 

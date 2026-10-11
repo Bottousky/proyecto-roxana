@@ -18,7 +18,7 @@ import './journal.css';
 import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -78,7 +78,7 @@ function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,
 function show(node,value=true){(typeof node==='string'?$(node):node).classList.toggle('hidden',!value);if(node==='#dialogue')$('#hud').classList.toggle('conversing',value);}
 function toast(text,duration=3600){$('#toast').textContent=text;show('#toast');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>show('#toast',false),duration);}
 function sound(name){try{audio.play(name);}catch{}}
-function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);}
+function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);document.documentElement.classList.toggle('lumen-marks',!!settings.lumenMarks);}
 storeSettings();
 
 function refreshTitle(){
@@ -155,7 +155,7 @@ function initWorld(){
     onClose:()=>{
       show('#workbench',false);world.setInspection(false);mode='world';show('#hud');held.clear();persist();$('#world').focus({preventScroll:true});
       const solved=pendingPuzzleResult;pendingPuzzleResult=null;
-      if(solved){if(solved==='beacon_lens')runFinale();else if(state.activeCinematic?.id===solved)playPendingCinematic();else{world.playRestoration?.(solved);audio.playRestoration?.(solved);queueDialogue(PUZZLE_STORY[solved]?.complete,500);}}
+      if(solved){if(solved==='beacon_lens')runFinale();else if(state.activeCinematic?.id===solved)playPendingCinematic();else{world.playRestoration?.(solved);audio.playRestoration?.(solved);queueDialogue(PUZZLE_STORY[solved]?.complete??SIDE_BENCHES[solved]?.complete,500);}}
     },
     onSolve:(id,result)=>{
       state.flags[id]=true;
@@ -374,10 +374,11 @@ function openMap(){
 
 function openOptions(){
   const titleMode=mode==='title';
-  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic en el suelo para caminar. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Las marcas de Lumen<span class="setting-note">Cada anillo de las piedras lleva la inicial de su color</span></span><input id="lumen-marks" aria-label="Las marcas de Lumen" type="checkbox" ${settings.lumenMarks?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic en el suelo para caminar. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
   $('#volume').oninput=e=>{settings.volume=Number(e.target.value);storeSettings();};
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
+  $('#lumen-marks').onchange=e=>{settings.lumenMarks=e.target.checked;storeSettings();};
   $('#quality').onchange=e=>{settings.quality=e.target.value;storeSettings();world?.resize();};
   $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:36;storeSettings();};
   $('#resume-option').onclick=closeModal;

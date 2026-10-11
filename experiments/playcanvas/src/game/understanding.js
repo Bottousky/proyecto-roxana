@@ -1,4 +1,4 @@
-import { PUZZLES, evaluatePuzzle, initialPuzzleSnapshot, terracesAgreement } from './puzzle-model.js';
+import { PUZZLES, evaluatePuzzle, initialPuzzleSnapshot, terracesAgreement, weighedStones, ringWords, stoneIn, RIDDLE_STONE } from './puzzle-model.js';
 
 // What a repair was really about. Three layers, in this order (PEDAGOGIA.md, «concreteness fading»):
 // what the player did and saw on the bench; what was happening that nobody can see (charges that are
@@ -173,6 +173,21 @@ const REVEALS = {
     ],
     question: 'Si sumaras una cuarta voz de 18 Ω, ¿cuánta corriente le pedirías a la fuente?',
   }),
+  drawer: ({ id, state }) => {
+    const k = PUZZLES[id].knobs[0], weighed = weighedStones(state).filter(v => v !== RIDDLE_STONE), off = v => (stoneIn(k, v).actual - v) / v * 100;
+    const worst = weighed.reduce((a, v) => (Math.abs(off(v)) > Math.abs(off(a)) ? v : a), weighed[0] ?? 10);
+    return {
+      cards: [
+        { spot: ['tray'], title: 'Un número escrito en colores', words: ['anillos'],
+          text: 'Los dos primeros anillos son cifras; el tercero, cuántos ceros siguen. Rojo, rojo, marrón: 2, 2 y un cero. 220. Igual que escribimos los números todos los días, sólo que con pintura.' },
+        { spot: ['tray'], title: 'La dorada miente un poco',
+          text: `La piedra ${ringWords(worst)} dice ${worst} Ω y pesó ${num(stoneIn(k, worst).actual, 1)}: se corrió un ${num(Math.abs(off(worst)), 1)} %. El anillo dorado promete que nunca se corre más de un 5 %. No traiciona: avisa.` },
+        { spot: ['lamp'], title: 'Por qué Lumen las elegía por temperamento',
+          text: 'Con más freno, la lámpara de prueba brilla menos. El temperamento que Lumen leía en cada piedra era ese número. Sus muescas también sirven: él no distingue el rojo del verde, y las reconoce igual.' },
+      ],
+      question: 'Una piedra amarilla, violeta, rojo. ¿Cuánto frena?',
+    };
+  },
   beacon_lens: ({ id, now, state }) => {
     const first = PUZZLES[id].knobs[0].initial;
     const unloaded = variant(id, state, s => { s.values.upper = first; s.wires = s.wires.filter(w => !touches(w, 'lensIn')); });
@@ -235,6 +250,10 @@ export const CONJUROS = {
     words: 'Las voces del Faro cantan en fila: la primera da el tono y las demás la siguen.',
     settled: r => ['optic', 'bearing', 'signal'].every(k => r.operating[k]),
     copper: 'En fila, ninguna voz recibía lo que necesitaba. Con su propio camino, cada una toma lo que su freno le deja: la óptica, cuatro veces lo de la señal.' },
+  drawer: { who: 'LUMEN', heir: 'del cajón de Lumen',
+    words: 'Rojo con rojo, freno de buey; la dorada miente, pero no traiciona.',
+    settled: (r, s) => weighedStones(s).some(v => v === 22 || v === RIDDLE_STONE),
+    copper: 'El freno de buey era un número: rojo es 2, y rojo con rojo, 22. Y la dorada mintió, poquito: ninguna piedra se corrió más de un 5 %.' },
   beacon_lens: { who: 'NEREO', heir: 'de los fareros',
     words: 'La lente se templa una sola vez, a oscuras, antes de abrirle el ojo al lago.',
     settled: (r, s) => !!s.proofs?.tapUnloaded && !!s.proofs?.tapLoaded,
@@ -257,6 +276,17 @@ export const ESTIMATES = {
     close: (value, x) => Math.abs(x - value) / value < .15,
     reading: x => `la óptica tomó ${num(x, 1)} veces lo de la señal`,
     why: 'Un cuarto del freno, cuatro veces la corriente.' },
+  drawer: { who: 'LUMEN', book: 'El acertijo de Lumen',
+    ask: 'Esta no se pesa hasta que me digas cuánto frena. Rojo, rojo, marrón. ¿Cuánto?',
+    noted: 'La piedra roja, roja, marrón: ¿cuánto frena?',
+    options: [{ id: 'veintidos', text: '22 Ω', value: 22 }, { id: 'doscientos', text: '220 Ω', value: 220 }, { id: 'dosmil', text: '2200 Ω', value: 2200 }],
+    // Lumen asks only once the riddle stone is in the socket, and does not let it be weighed without an answer.
+    when: s => s.values?.tray === RIDDLE_STONE && !weighedStones(s).includes(RIDDLE_STONE), required: true,
+    measured: (r, s) => (weighedStones(s).includes(RIDDLE_STONE) ? stoneIn(PUZZLES.drawer.knobs[0], RIDDLE_STONE).actual : null),
+    close: (value, x) => Math.abs(x - value) / value < .06,
+    reading: x => `pesó ${num(x, 0)} Ω`,
+    why: 'Rojo, rojo: 2 y 2. Marrón: un cero.',
+    right: 'Lumen se ríe: «Y yo que la elegía por el peso en la mano».', wrong: 'Lumen la guarda igual: «Me pasó lo mismo con mi padre».' },
   beacon_lens: { who: 'NEREO', book: 'Libro del farero',
     ask: 'Para el libro del farero, antes de medir: los dos brazos del divisor frenan lo mismo. Sin la lente, ¿qué parte de los 18 V debería marcar la toma?',
     noted: 'Los dos brazos del divisor frenan lo mismo. Sin la lente, ¿qué parte de los 18 V marca la toma?',
@@ -272,7 +302,8 @@ export function estimateChoiceText(id, choice) { return ESTIMATES[id]?.options.f
 export function estimateVerdict(id, choice, measured) {
   const e = ESTIMATES[id], option = e?.options.find(o => o.id === choice);
   if (!option || !Number.isFinite(measured)) return '';
+  const said = option.text[0].toLowerCase() + option.text.slice(1);
   return e.close(option.value, measured)
-    ? `Anotado: esperábamos «${option.text.toLowerCase()}» y ${e.reading(measured)}. ${e.why} El próximo farero va a poder confiar en esa marca.`
-    : `Esperábamos «${option.text.toLowerCase()}»; ${e.reading(measured)}. ${e.why} Lo anoto igual: que el próximo farero sepa que también nos equivocamos.`;
+    ? `Anotado: esperábamos «${said}» y ${e.reading(measured)}. ${e.why} ${e.right ?? 'El próximo farero va a poder confiar en esa marca.'}`
+    : `Esperábamos «${said}»; ${e.reading(measured)}. ${e.why} ${e.wrong ?? 'Lo anoto igual: que el próximo farero sepa que también nos equivocamos.'}`;
 }

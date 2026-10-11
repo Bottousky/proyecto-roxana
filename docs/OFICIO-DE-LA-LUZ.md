@@ -31,7 +31,7 @@ donde la experiencia engaña, y ahí está cada falla del arco. Tiene tres rasgo
 | El empuje, la fuerza | Las ganas de la Luz | Tensión: diferencia entre dos puntos (V) | Manantial |
 | Cuántas pasan | (No tiene palabra propia: es el agujero del Oficio) | Corriente (A) | Portal, Castillo, Faro II |
 | El freno | Lo que calma a la Luz | Resistencia (Ω) | Calzada |
-| Las piedras de freno | Piedras con temperamento, leídas por sus anillos | Resistores con código de colores | Taller y Calzada (diseño en curso) |
+| Las piedras de freno | Piedras con temperamento, leídas por sus anillos | Resistores con código de colores y tolerancia | Calzada, Faro III y el cajón de Lumen |
 | El cobre, los hilos | El cuerpo de la Luz | Conductores | Taller |
 | La tela | La piel que la protege | Aislante | Taller |
 | La vuelta | El camino de ida y regreso | Circuito cerrado | Portal |
@@ -56,7 +56,7 @@ donde la experiencia engaña, y ahí está cada falla del arco. Tiene tres rasgo
 | «Las voces cantan en fila» | Fareros | Una cadena se entiende fácil | En fila nadie recibe lo que necesita | Razonamiento en serie |
 | «La lente se templa a oscuras» | Fareros | Calibrar es necesario | La carga cambia el divisor | Razonamiento local |
 | «La Luz se ofende si la cuentan» | Todos, en distinta medida | Los números sin comprensión fallaron | Contar no la ofende: Nereo escribe y el Faro lo reconoce | Desconfianza de lo predecible |
-| «Los anillos dicen el temperamento de la piedra» | Lumen y los reparadores | Los colores sí codifican algo | No es temperamento: es un número | (Diseño: piedras de freno) |
+| «Rojo con rojo, freno de buey; la dorada miente, pero no traiciona» | Lumen y los reparadores | Los colores sí codifican algo, y el dorado avisa | No es temperamento: es un número; la dorada se corre a lo sumo un 5 % | Memorizar en vez de entender (el código como tabla) |
 
 ## Ritos
 

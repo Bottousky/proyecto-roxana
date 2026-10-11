@@ -239,7 +239,22 @@ export const DIALOGUES = {
   lumen_after: d(
     ['lumen', 'La receta sigue acá. Le agregué: «Si no enciende, no gastes otra lámpara antes de mirar el camino».'],
     ['player', 'Ocupa más papel.'],
-    ['lumen', 'Y menos estante. En la Calzada tienen el cerrojo atrancado. Le engrasé hasta lo que no se mueve; ahora les toca mirar.']),
+    ['lumen', 'Y menos estante. En la Calzada tienen el cerrojo atrancado. Le engrasé hasta lo que no se mueve; ahora les toca mirar.'],
+    ['lumen', 'Si un día te sobra la tarde, el cajón del mostrador tiene mis piedras de freno. Las elijo por temperamento. Tu instrumento capaz que las elige por otra cosa.']),
+  drawer_locked: d(['lumen', 'Ese cajón es para después. Primero la lámpara del banco.']),
+  drawer_arrival: d(
+    ['narrator', 'Lumen abre el cajón del mostrador. Piedras de cerámica, cada una con anillos pintados y unas muescas talladas en la punta.'],
+    ['lumen', 'Mis piedras de freno. Las elijo por temperamento: las de rojo con rojo frenan como un buey. Mi padre decía «la dorada miente, pero no traiciona».'],
+    ['player', '¿Y las muescas?'],
+    ['lumen', 'Son mías. Yo el rojo y el verde no los distingo: para mí son el mismo color, más claro o más oscuro. Las conozco por el peso y por las muescas.'],
+    ['ohm', 'Puedo pesar el freno: cuánto le cuesta a la corriente atravesar cada piedra. Con la mesa apagada y mi propia pila.'],
+    ['lumen', 'Pesá las que quieras. Y guardo una en el puño: esa no se pesa hasta que me digas cuánto frena.']),
+  drawer_complete: d(
+    ['lumen', '¿Así que los anillos son un número? Dos cifras y cuántos ceros. Toda la vida leyendo temperamento.'],
+    ['player', 'El temperamento era el número. Tus manos lo sabían antes que los ojos.'],
+    ['lumen', 'Y la dorada mintió poquito, como decía mi padre. Esto lo anoto con números. Que no se entere el Consejo.'],
+    ['ohm', 'Dejé los pesos en la Bitácora, junto a una rueda de colores. Se completa sola, piedra por piedra.']),
+  drawer_after: d(['lumen', 'Les pinté la cifra al lado de las muescas. Las muescas las dejé: me gustan.']),
   workshop_note: d(
     ['narrator', 'Una hoja está manchada de aceite y corregida por cuatro manos. La última corrección no borra las otras: dibuja la pieza gastada.'],
     ['lumen', 'Edda me dijo que repetir una reparación cien veces no explica por qué anda. Le dije que me alcanzara el paño.'],
@@ -691,6 +706,7 @@ export const AREAS = {
       lever('workshop_feed', -.9, -.5, 'Ajustar el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo encaja con un clic.', 'El cierre izquierdo queda separado.'),
       lever('workshop_return', 6.9, -.5, 'Ajustar el cierre derecho', 'workshop_return', 'El cierre derecho encaja con un clic.', 'El cierre derecho queda separado.'),
       panel('workbench', 3, -3, 'La lámpara del banco', 'workshop', ['bench_ready'], 'workshop_locked', 'workshop_bench_after'),
+      { ...panel('stone_drawer', -8.2, -7.1, 'El cajón de las piedras', 'drawer', ['workshop'], 'drawer_locked', 'drawer_after'), dialogue: 'drawer_arrival', optional: true },
       lore('workshop_note', -7, -4.5, 'Cuatro manos sobre un esquema', 'workshop_note'),
       secret('workshop_cup', 8, -6, 'La taza que espera', 'workshop_cup'),
     ],
@@ -806,6 +822,8 @@ export function evaluateWorld(state) {
   });
 }
 
+// Optional benches: their own arrival and closing, outside the count of lights on the main road.
+export const SIDE_BENCHES = { drawer: { arrival: 'drawer_arrival', complete: 'drawer_complete' } };
 export const PUZZLE_STORY = Object.fromEntries([
   ['awaken', 'awaken_arrival', 'awaken_complete'],
   ['workshop', 'workshop_arrival_puzzle', 'workshop_complete'],
@@ -862,7 +880,7 @@ export const JOURNAL = [
   { id: 'arrival', title: 'Al otro lado del Portal', text: 'Crucé el Portal. Del otro lado estaba Edda, de la familia que lo cuida; hacía años que nadie llegaba. Junto al arco hay un pequeño de bronce que no responde. Empiezo por mirar.', requires: [] },
   { id: 'circuit', title: 'El retorno también es camino', text: 'Ohm necesitaba las dos conexiones. Dibujé el camino entero, incluido el que vuelve. Edda quiere guardar también el dibujo de cuando no funcionaba.', explanation: 'El cristal es una fuente: aporta energía. El cobre permite el paso y Ohm la utiliza. Para que haya corriente eléctrica hace falta una trayectoria completa entre los dos extremos de la fuente, pasando por Ohm. A esa trayectoria la llamamos circuito cerrado. Un corte en cualquier parte puede interrumpirla.', requires: ['awaken'] },
   { id: 'diagnosis', title: 'La lámpara era la misma', text: 'Lumen había cambiado la lámpara tres veces. Al reparar el camino de cobre, encendió la que ya estaba. Conservamos el tramo viejo para compararlo con el nuevo.', explanation: 'La tela era una cubierta aislante. Debajo, el conductor de cobre estaba cortado. Con el banco apagado, la prueba de continuidad permite comprobar si hay paso entre los extremos de ese tramo. Una cubierta entera no demuestra que el conductor también lo esté. Esta prueba se hace sin alimentación; no sirve para afirmar que toda la máquina funcionará.', requires: ['workshop'] },
-  { id: 'operating_window', title: 'Lo suficiente para levantar una puerta', text: 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Ajustar la rueda permitió que levantara; llevarla al extremo no fue la solución.', explanation: 'La polaridad describe el sentido de una tensión entre dos puntos. El pestillo del cerrojo es un imán: la bobina lo empuja o lo atrae según el sentido de la corriente; una bobina que mueve hierro sin imán atrae igual en los dos sentidos. La tensión se mide en voltios (V); la corriente que pasa por un tramo, en amperios (A). La resistencia del regulador se mide en ohmios (Ω). En un resistor óhmico se relacionan mediante V = I × R. El cerrojo tiene un intervalo de trabajo: más corriente no equivale siempre a mejor funcionamiento.', requires: ['gate'] },
+  { id: 'operating_window', title: 'Lo suficiente para levantar una puerta', text: 'El cerrojo empujaba hacia abajo. Al cambiar sus conexiones invirtió el sentido. Con la piedra de freno justa en el zócalo levantó; con el puente de cobre, golpeaba.', explanation: 'La polaridad describe el sentido de una tensión entre dos puntos. El pestillo del cerrojo es un imán: la bobina lo empuja o lo atrae según el sentido de la corriente; una bobina que mueve hierro sin imán atrae igual en los dos sentidos. La tensión se mide en voltios (V); la corriente que pasa por un tramo, en amperios (A). La resistencia de la piedra de freno se mide en ohmios (Ω), y sus anillos la escriben en colores. En un resistor óhmico se relacionan mediante V = I × R. El cerrojo tiene un intervalo de trabajo: más corriente no equivale siempre a mejor funcionamiento.', requires: ['gate'] },
   { id: 'source_load', title: 'Una unión puede pasar… y perder', text: 'La unión del Manantial parecía unida, pero se calentaba al trabajar la bomba. Cambiarla devolvió el agua a la Plaza. No todas las fallas se parecen al corte del taller.', explanation: 'El empalme oxidado tenía continuidad, pero también demasiada resistencia. Cuando circulaba corriente, parte de la tensión caía en él y allí se producía calor. Comparar ambos lados mientras la bomba trabaja permite observar esa pérdida. Una prueba de continuidad sola no cuenta qué ocurre bajo carga. La rueda y el generador convierten el movimiento del agua en energía eléctrica.', requires: ['pump'] },
   { id: 'parallel', title: 'Cerrar una rama sin cerrar el reino', text: 'El archivo quedó separado. La enfermería y la cocina recuperaron sus propios caminos. La Consejera dejó el plano en la puerta: ahora cualquiera puede señalar qué se está cerrando.', explanation: 'Los servicios conectados en paralelo comparten los mismos dos puntos de conexión, llamados nodos, y por eso tienen la misma tensión. Cada rama lleva su propia corriente; la fuente entrega la suma. En serie hay un único camino: circula la misma corriente y la tensión se reparte. Separar una rama dañada puede preservar las demás, según cómo esté conectada y protegida la red.', requires: ['distribution'] },
   { id: 'power', title: 'Azadas y tomates', text: 'Yesca trabaja a un ritmo que puede sostener. Vega mira las alturas con el riego funcionando. Dejar las perillas al máximo no ayudaba ni a las raíces ni a quien tenía que fabricar sus herramientas.', explanation: 'La potencia expresa cuánta energía se transforma por segundo; se mide en watts (W). En corriente continua, P = V × I. En un resistor, la potencia convertida en calor también puede calcularse como I² × R. El calor útil en el lecho de raíces y el calor perdido en un cable tienen consecuencias distintas. Cada servicio y la fuente compartida tienen límites.', requires: ['irrigation'] },

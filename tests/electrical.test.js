@@ -74,7 +74,18 @@ test('a source short trips protection and removes supply current before operatin
 });
 
 // Each bench's canonical repair lives with the puzzle itself.
-const solutions = Object.fromEntries(Object.keys(PUZZLES).map(id => [id, s => PUZZLES[id].solve(s)]));
+// Installations to repair; an optional tray of stones is weighed, not repaired (its own test below).
+const solutions = Object.fromEntries(Object.keys(PUZZLES).filter(id => !PUZZLES[id].optional).map(id => [id, s => PUZZLES[id].solve(s)]));
+
+test("Lumen's drawer is done by weighing three stones and the riddle one, with the bench off", () => {
+  const s = initialPuzzleSnapshot('drawer');
+  assert.equal(evaluatePuzzle('drawer', s).solved, false);
+  assert.equal(evaluatePuzzle('drawer', { ...s, weighed: [10, 12, 22] }).solved, false, 'three stones are not the riddle');
+  assert.equal(evaluatePuzzle('drawer', { ...s, weighed: [10, 220] }).solved, false, 'the riddle alone is not three stones');
+  PUZZLES.drawer.solve(s);
+  assert.equal(evaluatePuzzle('drawer', { ...s, sourceOn: false }).solved, true, 'stones are weighed with the bench off');
+  assert.deepEqual(normalizePuzzleSnapshot('drawer', { ...s, weighed: [10, 10, 33, 'x', 220] }).weighed, [10, 220], 'only stones the tray has, once each');
+});
 
 for (const [id, solve] of Object.entries(solutions)) {
   test(`${id}: initial fault is meaningful and a physical repair reaches operating ranges`, () => {

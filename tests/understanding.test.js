@@ -66,7 +66,7 @@ test("Nereo's expected marks are answered by the same model: half the push at an
   assert.ok(ESTIMATES.beacon_lens.close(.5, share));
   assert.match(estimateVerdict('beacon_lens', 'half', share), /^Anotado: esperábamos «la mitad» y marcó 9 V de 18 V/);
   assert.match(estimateVerdict('beacon_network', 'double', ratio), /Lo anoto igual/);
-  for (const [id, book] of Object.entries(ESTIMATES)) assert.equal(book.who, 'NEREO', `${id}: asked by the keeper who needs the mark`);
+  for (const [id, book] of Object.entries(ESTIMATES)) assert.equal(book.who, id === 'drawer' ? 'LUMEN' : 'NEREO', `${id}: asked by the keeper who needs the mark`);
 });
 
 test('a written mark survives a reload with what was read', () => {

@@ -240,6 +240,8 @@ export class AudioDirector {
       case 'beacon_supply': tone(55, 0, 2, .07);tone(110, .25, 1.7, .035);noise(0, 1.6, .05, 260);break;
       case 'awaken': tone(520, 0, .3, .03);tone(780, .22, 1.1, .045);tone(68, 1.2, .2, .09);tone(68, 1.55, .18, .07);break;
       case 'beacon_lens': this.finale();break;
+      // Lumen's drawer: ceramic stones knocking on wood, then a small bright note.
+      case 'drawer': for (let i = 0; i < 4; i++) { noise(i * .14, .05, .07, 2400);tone(880 + i * 110, i * .14, .12, .02); } tone(1320, .7, .9, .03);break;
       default: return false;
     }
     return true;
