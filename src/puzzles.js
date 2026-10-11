@@ -802,7 +802,7 @@ export class PuzzleWorkbench {
   /** A hand cable follows the board's grid: straight runs and square corners, around the pieces. */
   wirePath(a, b, index) {
     const pts = this.routes()[index];
-    if (pts?.length) return roundedPath(pts, 14);
+    if (pts?.length) return roundedPath(pts, 4);
     const pa = this.puzzle.ports.find(p => p.id === a), pb = this.puzzle.ports.find(p => p.id === b);
     return `M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`;
   }
@@ -988,7 +988,7 @@ export class PuzzleWorkbench {
 
   // Soldered wires are the installation's own copper: drawn as fixed traces along the edges of the
   // board, sharing a trunk from each source terminal. Hand cables hang loose, so they read as movable.
-  tracePath(w) { return roundedPath(this.tracePoints(w)); }
+  tracePath(w) { return roundedPath(miter(this.tracePoints(w)), 4); }
   tracePoints([a, b]) {
     const p = this.puzzle, P = id => p.ports.find(n => n.id === id), sealed = p.sealed ?? [];
     const others = end => sealed.filter(w => w.includes(end)).map(w => P(w[0] === end ? w[1] : w[0]));
@@ -1021,7 +1021,7 @@ export class PuzzleWorkbench {
     const key = `${this.id}:${JSON.stringify(this.state.wires)}`;
     if (this.routeCache?.key !== key) {
       const { nodeOf } = wireNodes(this.id, this.state);
-      const sealedTraces = this.state.wires.filter(w => isSealed(this.id, w)).map(w => ({ node: nodeOf[w[0]], pts: this.tracePoints(w) }));
+      const sealedTraces = this.state.wires.filter(w => isSealed(this.id, w)).map(w => ({ node: nodeOf[w[0]], pts: miter(this.tracePoints(w)) }));
       this.routeCache = { key, routes: routeWires(this.puzzle, this.state.wires.map(w => (isSealed(this.id, w) ? null : w)), sealedTraces, this.plateBoxes(), nodeOf) };
     }
     return this.routeCache.routes;
@@ -1213,41 +1213,59 @@ function routeWires(p, wires, sealedTraces, plates, nodeOf = {}) {
   const lay = (pts, node) => { const n0 = own(node); for (let k = 1; k < pts.length; k++) { const a = cell(pts[k - 1]), b = cell(pts[k]); for (let t = 0, n = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)); t <= n; t++) { const x = Math.round(a.x + (b.x - a.x) * t / (n || 1)), y = Math.round(a.y + (b.y - a.y) * t / (n || 1)); used[idx(x, y)] += 1; n0[idx(x, y)] += 1; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (x + dx >= 0 && x + dx < GW && y + dy >= 0 && y + dy < GH) { used[idx(x + dx, y + dy)] += .35; n0[idx(x + dx, y + dy)] += .35; } } } };
   sealedTraces.forEach(t => lay(t.pts, t.node));
   const portCell = Object.fromEntries(p.ports.map(n => [n.id, cell(n)]));
-  const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  // Eight directions, as on a printed circuit board: a trace runs straight or at 45°, and every change of
+  // direction is a 45° bend. A square corner is two bends with a diagonal between them.
+  const DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]];
   const route = (a, b) => {
-    const same = own(nodeOf[a]), s = portCell[a], t = portCell[b], near = (q, id) => p.ports.some(n => n.id !== a && n.id !== b && Math.abs(portCell[n.id].x - q.x) <= 1 && Math.abs(portCell[n.id].y - q.y) <= 1);
+    const same = own(nodeOf[a]), s = portCell[a], t = portCell[b];
+    const near = q => p.ports.some(n => n.id !== a && n.id !== b && Math.abs(portCell[n.id].x - q.x) <= 1 && Math.abs(portCell[n.id].y - q.y) <= 1);
     const open = (x, y) => x >= 0 && y >= 0 && x < GW && y < GH && (!hard[idx(x, y)] || (Math.abs(x - s.x) + Math.abs(y - s.y) <= 1) || (Math.abs(x - t.x) + Math.abs(y - t.y) <= 1)) && !near({ x, y });
-    const key = (x, y, d) => (idx(x, y) << 3) | d, g = new Map(), from = new Map(), heap = [];
+    const key = (x, y, d) => idx(x, y) * 9 + d, g = new Map(), from = new Map(), heap = [];
     const push = (f, k) => { heap.push([f, k]); let i = heap.length - 1; while (i > 0) { const j = (i - 1) >> 1; if (heap[j][0] <= heap[i][0]) break; [heap[i], heap[j]] = [heap[j], heap[i]]; i = j; } };
     const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[i], heap[m]] = [heap[m], heap[i]]; i = m; } } return top; };
-    const start = key(s.x, s.y, 4); g.set(start, 0); push(Math.abs(t.x - s.x) + Math.abs(t.y - s.y), start);
+    const octile = (x, y) => { const dx = Math.abs(t.x - x), dy = Math.abs(t.y - y); return Math.max(dx, dy) + .414 * Math.min(dx, dy); };
+    const start = key(s.x, s.y, 8); g.set(start, 0); push(octile(s.x, s.y), start);
     let goal = null;
     while (heap.length) {
-      const [, k] = pop(), d = k & 7, i = k >> 3, x = i % GW, y = (i - x) / GW, base = g.get(k);
+      const [, k] = pop(), d = k % 9, i = (k - d) / 9, x = i % GW, y = (i - x) / GW, base = g.get(k);
       if (x === t.x && y === t.y) { goal = k; break; }
-      for (let nd = 0; nd < 4; nd++) {
-        if (d < 4 && nd === (d + 2) % 4) continue;
-        const nx = x + DIRS[nd][0], ny = y + DIRS[nd][1];
-        if (!open(nx, ny)) continue;
-        const ni = idx(nx, ny), nk = key(nx, ny, nd), cost = base + 1 + soft[ni] + Math.max(0, used[ni] - same[ni]) * 6 - Math.min(same[ni], 1) * .4 + (d < 4 && d !== nd ? 6 : 0);
-        if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); from.set(nk, k); push(cost + Math.abs(t.x - nx) + Math.abs(t.y - ny), nk); }
+      for (let nd = 0; nd < 8; nd++) {
+        const turn = d === 8 ? 0 : Math.min((nd - d + 8) % 8, (d - nd + 8) % 8);
+        if (turn > 1) continue;
+        const [dx, dy] = DIRS[nd], nx = x + dx, ny = y + dy;
+        if (!open(nx, ny) || (dx && dy && (!open(x + dx, y) || !open(x, y + dy)))) continue;
+        const ni = idx(nx, ny), nk = key(nx, ny, nd);
+        const cost = base + (dx && dy ? 1.414 : 1) + soft[ni] + Math.max(0, used[ni] - same[ni]) * 6 - Math.min(same[ni], 1) * .4 + turn * 2.5;
+        if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); from.set(nk, k); push(cost + octile(nx, ny), nk); }
       }
     }
     if (goal === null) return null;
-    const cells = []; for (let k = goal; k !== undefined; k = from.get(k)) { const i = k >> 3; cells.push({ x: (i % GW) * CELL, y: Math.floor(i / GW) * CELL }); }
+    const cells = []; for (let k = goal; k !== undefined; k = from.get(k)) { const i = Math.floor(k / 9); cells.push({ x: (i % GW) * CELL, y: Math.floor(i / GW) * CELL }); }
     cells.reverse();
-    // Corners only, then the first and last runs straightened onto the terminals themselves.
-    const pts = cells.filter((q, k) => k === 0 || k === cells.length - 1 || (cells[k - 1].x === q.x) !== (q.x === cells[k + 1].x));
-    const A = P(a), B = P(b);
-    if (pts.length >= 2) {
-      if (pts[0].y === pts[1].y && pts.length > 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { ...pts[1], y: A.y }; } else if (pts.length > 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { ...pts[1], x: A.x }; }
-      const n = pts.length - 1;
-      if (pts[n].y === pts[n - 1].y && n > 1) { pts[n] = { x: B.x, y: B.y }; pts[n - 1] = { ...pts[n - 1], y: B.y }; } else if (n > 1) { pts[n] = { x: B.x, y: B.y }; pts[n - 1] = { ...pts[n - 1], x: B.x }; }
-      if (pts.length === 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { x: B.x, y: B.y }; if (A.x !== B.x && A.y !== B.y) pts.splice(1, 0, { x: B.x, y: A.y }); }
-    }
+    // Keep the bends only, then lay the first and last straight runs onto the terminals themselves.
+    const dir = (u, v) => `${Math.sign(v.x - u.x)},${Math.sign(v.y - u.y)}`;
+    const pts = cells.filter((q, k) => k === 0 || k === cells.length - 1 || dir(cells[k - 1], q) !== dir(q, cells[k + 1]));
+    const A = P(a), B = P(b), ends = (q, port, next) => (q.y === next.y ? { ...next, y: port.y } : q.x === next.x ? { ...next, x: port.x } : next);
+    if (pts.length > 2) { pts[1] = ends(pts[0], A, pts[1]); pts[0] = { x: A.x, y: A.y }; const n = pts.length - 1; pts[n - 1] = ends(pts[n], B, pts[n - 1]); pts[n] = { x: B.x, y: B.y }; }
+    else if (pts.length === 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { x: B.x, y: B.y }; }
     return pts;
   };
   return wires.map(w => { if (!w) return null; const pts = route(w[0], w[1]); if (pts) lay(pts, nodeOf[w[0]]); return pts; });
+}
+
+/** Square corners cut at 45°, the way a board's copper traces turn. */
+function miter(points, cut = 22) {
+  if (points.length < 3) return points;
+  const out = [points[0]];
+  for (let i = 1; i < points.length - 1; i++) {
+    const [prev, at, next] = [points[i - 1], points[i], points[i + 1]];
+    const lin = Math.hypot(at.x - prev.x, at.y - prev.y), lout = Math.hypot(next.x - at.x, next.y - at.y), r = Math.min(cut, lin / 2, lout / 2);
+    if (r < 1) { out.push(at); continue; }
+    out.push({ x: at.x - (at.x - prev.x) / lin * r, y: at.y - (at.y - prev.y) / lin * r }, { x: at.x + (next.x - at.x) / lout * r, y: at.y + (next.y - at.y) / lout * r });
+  }
+  out.push(points.at(-1));
+  // Two cuts that meet in the middle of a short run leave one point, not two.
+  return out.filter((q, i) => i === 0 || Math.hypot(q.x - out[i - 1].x, q.y - out[i - 1].y) > .5);
 }
 
 /** A polyline with softened corners, as copper bent around a pin. */
@@ -1257,6 +1275,7 @@ function roundedPath(points, radius = 16) {
   for (let i = 1; i < points.length - 1; i++) {
     const [prev, at, next] = [points[i - 1], points[i], points[i + 1]];
     const lin = Math.hypot(at.x - prev.x, at.y - prev.y), lout = Math.hypot(next.x - at.x, next.y - at.y), r = Math.min(radius, lin / 2, lout / 2);
+    if (!(r > .1)) { d += ` L ${at.x} ${at.y}`; continue; }
     const from = { x: at.x - (at.x - prev.x) / lin * r, y: at.y - (at.y - prev.y) / lin * r }, to = { x: at.x + (next.x - at.x) / lout * r, y: at.y + (next.y - at.y) / lout * r };
     d += ` L ${from.x.toFixed(1)} ${from.y.toFixed(1)} Q ${at.x} ${at.y} ${to.x.toFixed(1)} ${to.y.toFixed(1)}`;
   }
