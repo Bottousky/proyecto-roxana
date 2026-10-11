@@ -24,6 +24,11 @@
 .wb-checks li{display:flex;align-items:center;gap:7px;font-size:13px;line-height:1.3;color:var(--wb-muted)}
 .wb-check-mark{flex:none;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;border:1.5px solid #8d9a85;font-size:11px;font-weight:700;color:#aab5a2}
 .wb-checks li.current{color:#f6ead0}
+/* One thing at a time: the item being worked on says its words; done and coming items are a dot (words on hover). */
+.wb-checks li:not(.current) .wb-check-text{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.wb-checks{align-items:center}
+.wb-icon-button{min-width:40px;justify-content:center;font-size:18px}
+.wb-icon-button span{margin:0}
 .wb-checks li.current .wb-check-mark{border-color:var(--wb-gold);color:#1b2a22;background:var(--wb-gold);box-shadow:0 0 0 4px #e0c27f2e}
 .wb-checks li.met{color:#bfe3c4}
 .wb-checks li.met .wb-check-mark{background:var(--wb-ok);border-color:var(--wb-ok);color:#10261c}
@@ -76,7 +81,8 @@
 .wb-rubber{fill:none;stroke:#f3dca0;stroke-width:4;stroke-dasharray:7 7;stroke-linecap:round;pointer-events:none;opacity:.9}
 .wb-board.tracing .wb-wire:not(.traced){opacity:.3}
 .wb-wire.traced .wb-wire-casing{stroke-width:9;filter:drop-shadow(0 0 4px #f5d18a)}
-.wb-wire-chip{position:absolute;z-index:6;transform:translate(-50%,-50%);width:24px;height:24px;padding:0;border-radius:50%;border:1px solid #d9b98a88;background:#2a2219e6;color:#f2d3b0;font-size:16px;line-height:1;display:grid;place-items:center;opacity:.72;box-shadow:0 2px 6px #0008}
+.wb-wire-chip{position:absolute;z-index:6;transform:translate(-50%,-50%);width:24px;height:24px;padding:0;border-radius:50%;border:1px solid #d9b98a88;background:#2a2219e6;color:#f2d3b0;font-size:16px;line-height:1;display:grid;place-items:center;opacity:.5;box-shadow:0 2px 6px #0008;transition:opacity .15s}
+.wb-wire-chip:hover,.wb-wire-chip:focus-visible,.wb-board:has(.wb-wire:hover) .wb-wire-chip{opacity:1}
 .wb-wire-chip:hover,.wb-wire-chip:focus-visible{opacity:1;background:#6b3626;border-color:#f0b58f}
 
 /* Bornes */

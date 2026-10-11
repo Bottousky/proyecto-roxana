@@ -753,7 +753,7 @@ export class PuzzleWorkbench {
     const bars = share === null ? 0 : Math.max(share > .01 ? 1 : 0, Math.min(8, Math.round(share * 8)));
     const gauge = share === null ? '' : ` ${'▮'.repeat(bars)}${'▯'.repeat(8 - bars)}`;
     const amount = share === null ? 'Hay diferencia' : `${share < .04 ? 'Casi iguales' : ['Casi iguales', 'Un poco de diferencia', 'Algo de diferencia', 'Bastante diferencia', 'La mitad de la fuerza', 'Mucha diferencia', 'Mucha diferencia', 'Casi toda la fuerza', 'Casi toda la fuerza'][bars]}${gauge}`;
-    return { value: voltage === null ? 'Sin referencia' : Math.abs(voltage) < .01 ? 'Iguales' : voltage < 0 ? `Al revés · ${amount.replace(/ ▮.*/, '').toLocaleLowerCase('es')}` : amount, unit: '', caption: voltage === null ? 'Una punta quedó aislada. No hay una comparación fiable.' : `Comparación entre ${this.portLabel(m.a)} y ${this.portLabel(m.b)}. Al intercambiar las puntas, cambia el sentido de la lectura.` };
+    return { value: voltage === null ? 'Sin referencia' : Math.abs(voltage) < .01 ? 'Iguales' : voltage < 0 ? `Al revés · ${amount.replace(/ ▮.*/, '').toLocaleLowerCase('es')}` : amount, unit: '', caption: voltage === null ? 'Una punta quedó aislada: no hay con qué comparar.' : `${this.portLabel(m.a)} ↔ ${this.portLabel(m.b)}` };
   }
 
   knobValue(knob) {
@@ -799,10 +799,12 @@ export class PuzzleWorkbench {
     if (caption) caption.textContent = '';
   }
 
+  /** A hand cable follows the board's grid: straight runs and square corners, around the pieces. */
   wirePath(a, b, index) {
+    const pts = this.routes()[index];
+    if (pts?.length) return roundedPath(pts, 14);
     const pa = this.puzzle.ports.find(p => p.id === a), pb = this.puzzle.ports.find(p => p.id === b);
-    const sag = 30 + (index % 4) * 17;
-    return `M ${pa.x} ${pa.y} C ${pa.x + (pb.x - pa.x) * .2} ${pa.y + sag}, ${pb.x - (pb.x - pa.x) * .2} ${pb.y + sag}, ${pb.x} ${pb.y}`;
+    return `M ${pa.x} ${pa.y} L ${pb.x} ${pb.y}`;
   }
 
   ohmSvg(x, y, awake) {
@@ -986,7 +988,8 @@ export class PuzzleWorkbench {
 
   // Soldered wires are the installation's own copper: drawn as fixed traces along the edges of the
   // board, sharing a trunk from each source terminal. Hand cables hang loose, so they read as movable.
-  tracePath([a, b]) {
+  tracePath(w) { return roundedPath(this.tracePoints(w)); }
+  tracePoints([a, b]) {
     const p = this.puzzle, P = id => p.ports.find(n => n.id === id), sealed = p.sealed ?? [];
     const others = end => sealed.filter(w => w.includes(end)).map(w => P(w[0] === end ? w[1] : w[0]));
     let points;
@@ -1003,19 +1006,37 @@ export class PuzzleWorkbench {
       const pa = P(a), pb = P(b), mid = (pa.y + pb.y) / 2;
       points = Math.abs(pa.y - pb.y) < 30 ? [pa, pb] : [pa, { x: pa.x, y: mid }, { x: pb.x, y: mid }, pb];
     }
-    return roundedPath(points.filter((q, i, all) => i === 0 || Math.hypot(q.x - all[i - 1].x, q.y - all[i - 1].y) > .5));
+    return points.filter((q, i, all) => i === 0 || Math.hypot(q.x - all[i - 1].x, q.y - all[i - 1].y) > .5);
   }
 
-  // The remove button sits on the cable itself, at the first point along it that is clear of
-  // plates, pieces and terminals.
+  /** The plates floating over the pieces, as half-extent boxes in board units: cables avoid running under them. */
+  plateBoxes() {
+    const p = this.puzzle, port = id => p.ports.find(n => n.id === id);
+    return p.components.map(c => { const a = port(c.a), b = port(c.b), x = (a.x + b.x) / 2, y = (a.y + b.y) / 2, knob = p.knobs?.find(k => k.key === c.valueKey);
+      return { x, y: y - this.plateOffset(c), w: 20 + 4.5 * (this.pieceName(c).length + (c.goal ? 14 : 0)), h: knob ? (knob.stones ? 64 : 48) / 2 + 6 : 16 }; });
+  }
+
+  /** Every movable cable laid on the board's grid, computed once per montage. */
+  routes() {
+    const key = `${this.id}:${JSON.stringify(this.state.wires)}`;
+    if (this.routeCache?.key !== key) {
+      const { nodeOf } = wireNodes(this.id, this.state);
+      const sealedTraces = this.state.wires.filter(w => isSealed(this.id, w)).map(w => ({ node: nodeOf[w[0]], pts: this.tracePoints(w) }));
+      this.routeCache = { key, routes: routeWires(this.puzzle, this.state.wires.map(w => (isSealed(this.id, w) ? null : w)), sealedTraces, this.plateBoxes(), nodeOf) };
+    }
+    return this.routeCache.routes;
+  }
+
+  // The remove button sits on the cable itself: in the middle of its longest straight run that is
+  // clear of terminals.
   wireChip(w, i) {
-    const p = this.puzzle, port = id => p.ports.find(n => n.id === id), pa = port(w[0]), pb = port(w[1]), sag = 30 + (i % 4) * 17;
-    const c1 = { x: pa.x + (pb.x - pa.x) * .2, y: pa.y + sag }, c2 = { x: pb.x - (pb.x - pa.x) * .2, y: pb.y + sag };
-    const at = t => { const u = 1 - t; return { x: u ** 3 * pa.x + 3 * u * u * t * c1.x + 3 * u * t * t * c2.x + t ** 3 * pb.x, y: u ** 3 * pa.y + 3 * u * u * t * c1.y + 3 * u * t * t * c2.y + t ** 3 * pb.y }; };
-    const boxes = p.components.flatMap(c => { const a = port(c.a), b = port(c.b), x = (a.x + b.x) / 2, y = (a.y + b.y) / 2, knob = p.knobs?.some(k => k.key === c.valueKey);
-      return [{ x, y: y - this.plateOffset(c), w: 20 + 4.5 * (this.pieceName(c).length + (c.goal ? 14 : 0)), h: knob ? (p.knobs.find(k => k.key === c.valueKey).stones ? 64 : 48) : 22 }, { x, y, w: 80, h: 45 }]; });
-    const clear = q => boxes.every(r => Math.abs(q.x - r.x) > r.w || Math.abs(q.y - r.y) > r.h) && p.ports.every(n => Math.hypot(n.x - q.x, n.y - q.y) > 42);
-    const { x, y } = [.5, .4, .6, .3, .7, .22, .78, .15, .85].map(at).find(clear) ?? at(.5);
+    const p = this.puzzle, pts = this.routes()[i] ?? [];
+    const runs = pts.slice(1).map((q, k) => ({ a: pts[k], b: q, len: Math.hypot(q.x - pts[k].x, q.y - pts[k].y) })).sort((u, v) => v.len - u.len);
+    const mid = r => ({ x: (r.a.x + r.b.x) / 2, y: (r.a.y + r.b.y) / 2 });
+    const plates = this.plateBoxes(), along = (r, t) => ({ x: r.a.x + (r.b.x - r.a.x) * t, y: r.a.y + (r.b.y - r.a.y) * t });
+    const clear = q => p.ports.every(n => Math.hypot(n.x - q.x, n.y - q.y) > 42) && plates.every(b => Math.abs(q.x - b.x) > b.w + 14 || Math.abs(q.y - b.y) > b.h + 14);
+    const spots = runs.flatMap(r => [.5, .3, .7, .15, .85].map(t => along(r, t)));
+    const { x, y } = spots.find(clear) ?? (runs[0] ? mid(runs[0]) : { x: 500, y: 250 });
     return `<button class="wb-wire-chip" data-wire="${i}" style="left:${x / 10}%;top:${y / 5}%" aria-label="Retirar el cable entre ${escapeHtml(this.portLabel(w[0]))} y ${escapeHtml(this.portLabel(w[1]))}" title="Retirar este cable">×</button>`;
   }
 
@@ -1073,7 +1094,7 @@ export class PuzzleWorkbench {
     const successWhat = [...new Set(observePuzzle(this.id, s, r).filter(o => p.components.some(c => c.goal && simpleLabel(c.label) === o.label)).map(o => o.text))].slice(0, 2).join(' ');
     this.shell.innerHTML = `<div class="wb-case ${this.id === 'awaken' ? 'wb-first' : ''} ${this.showNumbers ? 'wb-with-numbers' : ''} ${s.completed ? 'completed' : ''} ${success ? 'is-solved' : ''}">
       <header class="wb-header"><div class="wb-heading"><p class="wb-eyebrow">${p.place}${this.practice ? ' · PRÁCTICA CON UNA COPIA' : ''}</p><h1>${p.title}</h1></div>
-        <section class="wb-goal" aria-label="Objetivo"><p class="wb-goal-line"><span aria-hidden="true">◎</span>${escapeHtml(guidance.goal)}</p><ol class="wb-checks">${steps.map((c, i) => `<li class="${c.met ? 'met' : ''} ${i === current ? 'current' : ''}"><span class="wb-check-mark" aria-hidden="true">${c.met ? '✓' : i + 1}</span>${escapeHtml(c.text)}<small class="screen-reader-only">${c.met ? ' (logrado)' : ' (pendiente)'}</small></li>`).join('')}</ol></section>
+        <section class="wb-goal" aria-label="Objetivo"><p class="wb-goal-line"><span aria-hidden="true">◎</span>${escapeHtml(guidance.goal)}</p><ol class="wb-checks">${steps.map((c, i) => `<li class="${c.met ? 'met' : ''} ${i === current ? 'current' : ''}" title="${escapeHtml(c.text)}"><span class="wb-check-mark" aria-hidden="true">${c.met ? '✓' : i + 1}</span><span class="wb-check-text">${escapeHtml(c.text)}</span><small class="screen-reader-only">${c.met ? ' (logrado)' : ' (pendiente)'}</small></li>`).join('')}</ol></section>
         ${inService ? '<span class="wb-in-service">✓ En servicio</span>' : success && this.successDismissed ? `<button class="wb-commission-top" data-action="commission">${leaveLabel}</button>` : ''}
         <button class="wb-close" data-action="close" aria-label="${success ? 'Volver al mundo: la instalación queda en servicio' : 'Volver al mundo'}">✕ <span>Volver</span></button></header>
       <main class="wb-stage"><div class="wb-board ${powered ? 'powered' : ''} ${this.selected ? 'holding' : ''} ${card ? 'wb-eye' : ''}"><span class="wb-corner tl"></span><span class="wb-corner tr"></span><span class="wb-corner bl"></span><span class="wb-corner br"></span><svg class="wb-schematic" viewBox="0 0 1000 500" preserveAspectRatio="none" aria-label="Mesa con piezas y cables. Las piezas redondas se pueden tocar."><defs>${this.materialDefs()}<radialGradient id="wb-glass" cx=".35" cy=".25"><stop stop-color="#98b5ab" stop-opacity=".65"/><stop offset=".42" stop-color="#283e3b"/><stop offset="1" stop-color="#0c1919"/></radialGradient><radialGradient id="wb-steel"><stop stop-color="#697c70"/><stop offset="1" stop-color="#24362e"/></radialGradient><pattern id="wb-cloth" width="8" height="8" patternUnits="userSpaceOnUse"><rect width="8" height="8" fill="#5a4933"/><path d="M0 2H8 M2 0V8" stroke="#756044" stroke-width="1"/></pattern></defs><rect width="1000" height="500" filter="url(#wb-grain)" opacity=".05" pointer-events="none"/><path d="M85 125 V180 M85 320 V375" stroke="#b89b66" stroke-width="6"/><rect x="43" y="185" width="84" height="128" rx="13" fill="#242f2b" stroke="#ac8a53" stroke-width="4"/><rect x="57" y="210" width="56" height="65" rx="4" fill="#111e1b" stroke="#6d714e"/>${this.showNumbers ? `<text x="85" y="238" class="wb-source-value">${p.voltage}</text><text x="85" y="260" class="wb-spec">VOLTIOS</text>` : `<path d="M68 243 h34 M85 226 v34" stroke="#d2b57b" stroke-width="4"/>`}<text x="85" y="299" class="wb-source-mark" aria-hidden="true">Ω</text><circle cx="85" cy="198" r="4" fill="${powered ? '#cfedab' : '#786845'}"/>${this.zoneSvg()}${s.wires.map((w, i) => [w, i]).filter(([w]) => isSealed(this.id, w)).map(([w, i]) => this.wireSvg(w, i, true)).join('')}${p.components.map(c => this.componentSvg(c)).join('')}${s.wires.map((w, i) => [w, i]).filter(([w]) => !isSealed(this.id, w)).map(([w, i]) => this.wireSvg(w, i, false)).join('')}${this.mode === 'wire' ? '<path class="wb-rubber" d=""/>' : ''}</svg>
@@ -1105,7 +1126,7 @@ export class PuzzleWorkbench {
   dockMarkup({ say, hintButton, controls, inService, tools, portMarkup, p, s }) {
     return `${this.conjuroStrip()}${this.tallyStrip()}<div class="wb-say is-${say.kind} ${say.kind === 'proof' ? 'wb-proof' : ''}" aria-live="polite"><span class="wb-say-face ${SAY_FACES[say.who ?? 'OHM'] ? `wb-face wb-face-${SAY_FACES[say.who ?? 'OHM']}` : ''}" aria-hidden="true">${SAY_FACES[say.who ?? 'OHM'] ? '' : 'Ω'}</span><p><b>${escapeHtml(say.who ?? 'OHM')}${say.tag ? ` · ${say.tag}` : ''}</b>${escapeHtml(say.text)}</p>${say.options ? '' : hintButton}${say.options ? `<div class="wb-marks" role="group" aria-label="Marca esperada">${say.options.map(o => `<button data-action="estimate" data-choice="${o.id}">${escapeHtml(o.text)}</button>`).join('')}${ESTIMATES[this.id]?.required ? '' : '<button class="wb-marks-skip" data-action="estimate" data-choice="skip">Medir sin anotar</button>'}</div>` : ''}</div>
         ${controls && !inService ? `<div class="wb-compact-controls">${controls}</div>` : ''}
-        <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService && revealFor(this.id, s) ? '<button data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Lo que vio Ohm</button>' : ''}${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio"><span aria-hidden="true">↶</span>Deshacer</button><button data-action="reset" title="Volver a la disposición inicial de la mesa"><span aria-hidden="true">↺</span>Empezar de nuevo</button>` : ''}</div></div>
+        <div class="wb-toolbar">${tools ? `<div class="wb-tools">${tools}</div>` : ''}${this.renderProbe()}<div class="wb-history">${inService && revealFor(this.id, s) ? '<button data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Lo que vio Ohm</button>' : ''}${inService ? '<button data-action="practice">Practicar con una copia</button>' : this.practice ? '<button data-action="end-practice">Terminar la práctica</button>' : ''}${!inService ? `<button data-action="undo" class="wb-icon-button" ${!this.history.length ? 'disabled' : ''} title="Deshacer el último cambio" aria-label="Deshacer el último cambio"><span aria-hidden="true">↶</span></button><button data-action="reset" class="wb-icon-button" title="Empezar de nuevo: la mesa como estaba" aria-label="Empezar de nuevo: la mesa como estaba"><span aria-hidden="true">↺</span></button>` : ''}</div></div>
         <details class="wb-terminal-drawer" data-drawer="terminals" ${p.cables ? 'open' : ''}><summary>Tocar las conexiones <span>Las mismas piezas, más cerca</span></summary><div class="wb-terminal-rail">${p.ports.map(n => portMarkup(n, true)).join('')}</div></details>`;
   }
 
@@ -1161,6 +1182,72 @@ export class PuzzleWorkbench {
     const path = sealed ? this.tracePath(w) : this.wirePath(...w, i), flow = wireFlow(r, i, powered);
     return `<g class="wb-wire ${sealed ? 'wb-wire-sealed' : ''}" data-wire="${i}" data-node="${topo.nodeOf[w[0]]}"><title>${sealed ? 'Soldado a la instalación' : 'Retirar cable'}: ${escapeHtml(this.portLabel(w[0]))} → ${escapeHtml(this.portLabel(w[1]))}</title>${sealed ? '' : `<path d="${path}" class="wb-wire-shadow"/>`}<path d="${path}" class="wb-wire-casing ${wireTone(w, i)}"/>${sealed ? '' : `<path d="${path}" class="wb-wire-highlight"/>`}${flow ? `<path d="${path}" class="wb-wire-flow${flow.forward ? '' : ' reverse'}" style="--flow-seconds:${flow.seconds}s"/>` : ''}${sealed ? w.map(n => { const q = p.ports.find(o => o.id === n); return `<circle cx="${q.x}" cy="${q.y}" r="15" class="wb-solder"/>`; }).join('') : ''}</g>`;
   }
+}
+
+// ── Cables on a grid ─────────────────────────────────────────────────────────────────────
+// The board (1000 × 500 units) is a grid of 10-unit cells. Each hand cable is found with A*: square
+// corners cost extra, piece bodies and other terminals are walls, plates and the other cables are
+// costly to run under or alongside, so cables keep their own lanes and cross only when they must.
+const CELL = 10, GW = 100, GH = 50;
+// How far each kind of piece reaches above and below its terminals' line.
+const BODY = { orb: [122, 142], lens: [84, 74], lamp: [52, 48], motor: [42, 44], coil: [36, 42], forge: [56, 40], heater: [40, 40], switch: [32, 36], cloth: [24, 30], joint: [28, 30] };
+function routeWires(p, wires, sealedTraces, plates, nodeOf = {}) {
+  // Copper of one node may share a lane, as a bus does; copper of another node keeps its distance.
+  const hard = new Uint8Array(GW * GH), soft = new Float32Array(GW * GH), used = new Float32Array(GW * GH), mine = new Map();
+  const own = node => { if (!mine.has(node)) mine.set(node, new Float32Array(GW * GH)); return mine.get(node); };
+  const idx = (x, y) => y * GW + x, cell = q => ({ x: Math.max(0, Math.min(GW - 1, Math.round(q.x / CELL))), y: Math.max(0, Math.min(GH - 1, Math.round(q.y / CELL))) });
+  const box = (x0, y0, x1, y1, fn) => { for (let gy = Math.max(0, Math.ceil(y0 / CELL)); gy <= Math.min(GH - 1, Math.floor(y1 / CELL)); gy++) for (let gx = Math.max(0, Math.ceil(x0 / CELL)); gx <= Math.min(GW - 1, Math.floor(x1 / CELL)); gx++) fn(idx(gx, gy)); };
+  const P = id => p.ports.find(n => n.id === id);
+  for (let gx = 0; gx < GW; gx++) for (const gy of [0, 1, GH - 2, GH - 1]) hard[idx(gx, gy)] = 1;
+  for (let gy = 0; gy < GH; gy++) for (const gx of [0, 1, GW - 2, GW - 1]) hard[idx(gx, gy)] = 1;
+  for (const c of p.components) {
+    const a = P(c.a), b = P(c.b), [up, down] = BODY[c.kind] ?? [30, 30], y = (a.y + b.y) / 2;
+    // One cell of clearance all round: a cable never brushes a piece.
+    box(Math.min(a.x, b.x) + 8, y - up - 10, Math.max(a.x, b.x) - 8, y + down + 10, i => { hard[i] = 1; });
+  }
+  const pos = P('positive'), neg = P('negative');
+  if (pos && neg) box(pos.x - 36, Math.min(pos.y, neg.y) + 20, pos.x + 36, Math.max(pos.y, neg.y) - 20, i => { hard[i] = 1; });
+  for (const r of plates) box(r.x - r.w, r.y - r.h, r.x + r.w, r.y + r.h, i => { soft[i] += 5; });
+  // Each terminal's name hangs just under it: cables keep off the words.
+  for (const n of p.ports) box(n.x - 40, n.y + 14, n.x + 40, n.y + 42, i => { soft[i] += 9; });
+  const lay = (pts, node) => { const n0 = own(node); for (let k = 1; k < pts.length; k++) { const a = cell(pts[k - 1]), b = cell(pts[k]); for (let t = 0, n = Math.max(Math.abs(b.x - a.x), Math.abs(b.y - a.y)); t <= n; t++) { const x = Math.round(a.x + (b.x - a.x) * t / (n || 1)), y = Math.round(a.y + (b.y - a.y) * t / (n || 1)); used[idx(x, y)] += 1; n0[idx(x, y)] += 1; for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) if (x + dx >= 0 && x + dx < GW && y + dy >= 0 && y + dy < GH) { used[idx(x + dx, y + dy)] += .35; n0[idx(x + dx, y + dy)] += .35; } } } };
+  sealedTraces.forEach(t => lay(t.pts, t.node));
+  const portCell = Object.fromEntries(p.ports.map(n => [n.id, cell(n)]));
+  const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  const route = (a, b) => {
+    const same = own(nodeOf[a]), s = portCell[a], t = portCell[b], near = (q, id) => p.ports.some(n => n.id !== a && n.id !== b && Math.abs(portCell[n.id].x - q.x) <= 1 && Math.abs(portCell[n.id].y - q.y) <= 1);
+    const open = (x, y) => x >= 0 && y >= 0 && x < GW && y < GH && (!hard[idx(x, y)] || (Math.abs(x - s.x) + Math.abs(y - s.y) <= 1) || (Math.abs(x - t.x) + Math.abs(y - t.y) <= 1)) && !near({ x, y });
+    const key = (x, y, d) => (idx(x, y) << 3) | d, g = new Map(), from = new Map(), heap = [];
+    const push = (f, k) => { heap.push([f, k]); let i = heap.length - 1; while (i > 0) { const j = (i - 1) >> 1; if (heap[j][0] <= heap[i][0]) break; [heap[i], heap[j]] = [heap[j], heap[i]]; i = j; } };
+    const pop = () => { const top = heap[0], last = heap.pop(); if (heap.length) { heap[0] = last; let i = 0; for (;;) { const l = 2 * i + 1, r = l + 1; let m = i; if (l < heap.length && heap[l][0] < heap[m][0]) m = l; if (r < heap.length && heap[r][0] < heap[m][0]) m = r; if (m === i) break; [heap[i], heap[m]] = [heap[m], heap[i]]; i = m; } } return top; };
+    const start = key(s.x, s.y, 4); g.set(start, 0); push(Math.abs(t.x - s.x) + Math.abs(t.y - s.y), start);
+    let goal = null;
+    while (heap.length) {
+      const [, k] = pop(), d = k & 7, i = k >> 3, x = i % GW, y = (i - x) / GW, base = g.get(k);
+      if (x === t.x && y === t.y) { goal = k; break; }
+      for (let nd = 0; nd < 4; nd++) {
+        if (d < 4 && nd === (d + 2) % 4) continue;
+        const nx = x + DIRS[nd][0], ny = y + DIRS[nd][1];
+        if (!open(nx, ny)) continue;
+        const ni = idx(nx, ny), nk = key(nx, ny, nd), cost = base + 1 + soft[ni] + Math.max(0, used[ni] - same[ni]) * 6 - Math.min(same[ni], 1) * .4 + (d < 4 && d !== nd ? 6 : 0);
+        if (cost < (g.get(nk) ?? Infinity)) { g.set(nk, cost); from.set(nk, k); push(cost + Math.abs(t.x - nx) + Math.abs(t.y - ny), nk); }
+      }
+    }
+    if (goal === null) return null;
+    const cells = []; for (let k = goal; k !== undefined; k = from.get(k)) { const i = k >> 3; cells.push({ x: (i % GW) * CELL, y: Math.floor(i / GW) * CELL }); }
+    cells.reverse();
+    // Corners only, then the first and last runs straightened onto the terminals themselves.
+    const pts = cells.filter((q, k) => k === 0 || k === cells.length - 1 || (cells[k - 1].x === q.x) !== (q.x === cells[k + 1].x));
+    const A = P(a), B = P(b);
+    if (pts.length >= 2) {
+      if (pts[0].y === pts[1].y && pts.length > 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { ...pts[1], y: A.y }; } else if (pts.length > 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { ...pts[1], x: A.x }; }
+      const n = pts.length - 1;
+      if (pts[n].y === pts[n - 1].y && n > 1) { pts[n] = { x: B.x, y: B.y }; pts[n - 1] = { ...pts[n - 1], y: B.y }; } else if (n > 1) { pts[n] = { x: B.x, y: B.y }; pts[n - 1] = { ...pts[n - 1], x: B.x }; }
+      if (pts.length === 2) { pts[0] = { x: A.x, y: A.y }; pts[1] = { x: B.x, y: B.y }; if (A.x !== B.x && A.y !== B.y) pts.splice(1, 0, { x: B.x, y: A.y }); }
+    }
+    return pts;
+  };
+  return wires.map(w => { if (!w) return null; const pts = route(w[0], w[1]); if (pts) lay(pts, nodeOf[w[0]]); return pts; });
 }
 
 /** A polyline with softened corners, as copper bent around a pin. */

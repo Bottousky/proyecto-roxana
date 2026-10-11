@@ -67,7 +67,7 @@ test('every bench names one goal, one step for each item of the brief and at mos
     for (const step of g.steps) if (step.tool && step.tool !== 'wire') assert.equal(step.tool, g.tools[0], `${id}: a step only asks for the bench's own instrument`);
     const html = b.html();
     assert.match(html, new RegExp(g.goal.replace(/[.*+?^${}()|[\]\\→]/g, '.')), `${id}: the goal is on screen`);
-    assert.equal((html.match(/<li class="[^"]*"><span class="wb-check-mark"/g) ?? []).length, p.criteria.length);
+    assert.equal((html.match(/<li class="[^"]*"[^>]*><span class="wb-check-mark"/g) ?? []).length, p.criteria.length);
   }
 });
 
