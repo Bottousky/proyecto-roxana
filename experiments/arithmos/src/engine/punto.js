@@ -28,7 +28,10 @@ export async function hop2(d, o, x, y, {dur = 0.4, h = 40, g, sound = 'tap', bra
   const x0 = o.x, y0 = o.y;
   o.setMode?.('still');
   o.settle = null;
-  if (g && sound) sound === 'tap' ? g.audio.tap(0.2, 1.7, Math.min(CROUCH, dur * 0.3)) : g.audio.punto(sound);
+  // el sonido es del contacto: suena al aterrizar (como en la slice, score.js: la nota de cada salto cae en `land`), no al
+  // empezar la agachada — medido con scripts/scene-audit.mjs (c30): la voz llegaba 97 ms antes del despegue y el
+  // aterrizaje quedaba mudo. Saltando la escena, nada.
+  if (g && sound && !d.skipping) sound === 'tap' ? g.audio.tap(0.2, 1.7, dur) : g.audio.punto(sound, dur);
   await d.tween(dur, k => {
     const s = hopShape(k * dur, dur, h, {brake});
     o.x = lerp(x0, x, s.u); o.y = lerp(y0, y, s.u); o.lift = s.lift;

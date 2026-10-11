@@ -1,0 +1,44 @@
+{
+ "seg": "c1.ronda",
+ "extra": "",
+ "T": 20.02,
+ "errors": [],
+ "sound": {
+  "lufs": -30.1,
+  "lufsPhone": -31.3,
+  "truePeakDb": -17.5,
+  "dc": 0.000017,
+  "under60Hz": 0.006,
+  "renderErrors": [],
+  "calls": 9,
+  "hits": 7,
+  "matched": 1,
+  "syncFrames": {
+   "min": -5.81,
+   "max": -5.81
+  },
+  "early": 1,
+  "late": 0,
+  "noticeable": 1,
+  "uiHits": 4,
+  "unmatchedHits": 2,
+  "overBedDb": null,
+  "silentContacts": "aterrizaje 1",
+  "silentArrivals": 15
+ },
+ "teleports": [
+  {
+   "id": "punto",
+   "t": 1.9667,
+   "px": 30,
+   "from": [
+    2390,
+    400
+   ],
+   "to": [
+    2360.08,
+    397.6
+   ]
+  }
+ ]
+}

@@ -64,6 +64,34 @@ Motor propio sin dependencias: Canvas 2D + un compuesto WebGL. Archivos: `experi
 - **Long Animation Frames API** [fuente] https://www.w3.org/TR/long-animation-frames/ — jank en Chrome.
 - En esta máquina no hay PIL, OpenCV ni ffmpeg: las métricas se calculan **en el navegador** sobre el lienzo de presión (antes del compuesto), que es más informativo que los píxeles finales [probado E01].
 
+## 6. Motion design con Opus 5.5 (posts de X, 9 y 10 de octubre de 2026)
+
+Tres posts que pasó el usuario. X no se puede abrir desde el entorno de trabajo: el contenido de los dos primeros lo pegó el usuario; **el tercero (rossaxbt, https://x.com/rossaxbt/status/2108933141406638456, 10/10) no se leyó**.
+
+- **0xMovez** [fuente] https://x.com/0xMovez/status/2108555750843064477 — prompt de una película de interfaz de 10 s en la que **una bola blanca recorre todos los componentes** (interruptor → deslizador → notificaciones → respuesta → teclado → vuelta). Es el problema de Punto: un punto blanco que lleva el ojo de un lugar a otro. Reglas que trae: todo se calcula desde `seek(t)` (sin transiciones CSS, temporizadores ni estado entre cuadros); un solo mundo y una sola cámara con posición y zoom logarítmico; la bola hace **un recorrido continuo** con resortes de forma cerrada al aterrizar y un aplastamiento breve en cada impacto; lo que depende de la bola se calcula desde su posición (el relleno del deslizador sale de la x de la bola); cada tecla tiene un tiempo fijo y el texto es lo tecleado hasta ese instante; **un sonido sutil en cada contacto**; un cuadro fijo por tiempo fuerte antes de exportar. Trampas: «**nunca dejes que la bola se teletransporte entre componentes: mostrá el camino de cada traspaso**»; las teclas que golpea tienen que coincidir con el texto que aparece.
+- **Florence (@flxrnc)**, *Opus 5.5 Motion Lab: Make Claude Animate Like a Studio* [fuente] (artículo del 30/9; post https://x.com/flxrnc/status/2108899503092740561) — cada pieza con su prompt y **todas** sus correcciones («no fake one-shots»). Lo aplicable:
+  - **Contrato de render**: cada cuadro es función pura de t; nada de `Date.now`, temporizadores ni azar sin semilla; `?t=` congela un cuadro.
+  - **El sonido se certifica midiendo, no escuchando** («Opus 5.5 can't hear»): cada golpe sintetizado con Web Audio cae **1 cuadro después** de su imagen; golpes **3–6 dB sobre el fondo** (ponderación K, primeros 60 ms); −14 LUFS y pico −1 dBTP para video web; energía en la **banda de un parlante de teléfono (200 Hz–6 kHz)** (su primera mezcla tenía el 80 % bajo 60 Hz); fase coseno para que el primer pico caiga en el cuadro. Todas las correcciones de sonido salieron de medir el audio decodificado.
+  - **Auditoría numérica**: 71 comprobaciones leídas de la escena en vivo en los 480 cuadros contra los números del prompt (cada etiqueta en su cuadro, cada aterrizaje en su marca).
+  - **Bucle del laboratorio**: cuadros fijos → notas con número de cuadro → corregir → volver a renderizar sólo lo que cambió; hoja de contactos; **papel cebolla** (espaciado parejo = robótico; espaciado que se cierra cerca de las claves = la curva funciona); gráfico de velocidad; ante un arreglo que no se sostiene, comparar los cuadros a ambos lados.
+  - **Números**: razón de amortiguamiento 0.7–0.85 «premium», 0.4–0.6 juguetón; **posición y tamaño pueden rebotar, opacidad y color nunca** (Material 3); salidas 40–50 % más cortas que entradas; un héroe por plano: lo secundario recorre 50–70 % de lo que recorre el héroe y empieza 100–200 ms después, lo ambiental < 5 %; texto quieto ≥ 0,3 s por palabra + 0,5 s antes de moverse; contraste 4,5:1 y ≤ 3 destellos por segundo (WCAG); en teléfono, exagerar las poses clave 10–30 %.
+  - **Lista de prohibidos viva**: después de cada primer render, nombrar lo que el modelo usó por defecto y prohibirlo («Every adjective you replace with a number is a decision you take back from the model»).
+
+| Idea | En Arithmos |
+|---|---|
+| Cuadro = función de t | **[probado]** en el laboratorio (`__lab.seek`). El juego es incremental (dt): para medirlo, `scripts/scene-audit.mjs` lo corre con un **reloj fijo de 60 Hz** (cada cuadro avanza 1/60 s, tarde lo que tarde en dibujarse). |
+| Un mundo, una cámara, zoom log | **[probado]** E08 / M1. |
+| Resortes de forma cerrada, aplastamiento en el impacto | **[probado]** `SecondOrder`, `settleShape` (M4). |
+| Nunca teletransportar; mostrar cada traspaso | **[probado c30]** la auditoría encontró un salto de 30 px de Punto en `c1.ronda` (el `zip` terminaba en el radio y la vuelta empezaba en radio + 30); corregido. |
+| Sonido en cada contacto, 1 cuadro después | **[probado c30]** la voz del salto llegaba 97 ms **antes** del despegue (M4 agregó la agachada) y el aterrizaje quedaba mudo; ahora suena al aterrizar, como en la slice (`score.js`). |
+| Golpes 3–6 dB sobre el fondo | **[probado c30]** los golpes de inicio de trazo quedaban debajo del rasgueo (−5,3…+1,7 dB); ahora siguen al rasgueo con que empieza su trazo (mediana +4,5 dB en `c1.puerta`; las letras quedan en +6/+7, abierto [H]). |
+| Sonoridad, pico, banda de teléfono | **[medido c30]** sin objetivo propio todavía (el juego no es un video de X: lo que importa es que las escenas sean parejas entre sí). |
+| Papel cebolla | [pendiente] no existe en el laboratorio (hay hoja de contactos, apilado y gráfico de velocidad). |
+| Texto quieto 0,3 s/palabra + 0,5 s; ≤ 3 destellos/s | [pendiente] agregados al quality bar; sin medir en el juego. |
+| Jerarquía héroe / secundario / ambiental | [hipótesis] compatible con la superposición de N4 (50–120 ms); sin medir. |
+| Exagerar poses 10–30 % en teléfono | [hipótesis] para la figura (M5). |
+| Bucles sin costura, grilla de tempo | no aplica (las escenas no son bucles; la música no va sobre una grilla). |
+
 ## Pendiente de investigar (con experimento)
 - Plantado de pies e IK de dos huesos para la figura (E09).
 - Borrador con forma y residuo dependiente del depósito (E07).

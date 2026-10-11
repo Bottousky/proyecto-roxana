@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {hopShape, settleShape} from '../src/engine/punto.js';
+import {hopShape, settleShape, hop2} from '../src/engine/punto.js';
 
 test('salto: se agacha sin avanzar, después avanza sin retroceder y termina en el destino', () => {
   const dur = 0.4, h = 40;
@@ -37,4 +37,26 @@ test('aterrizaje: sigue de largo ≤ 8 % del salto, se aplasta y termina exacto 
   assert.equal(settleShape(st, 0.3, 10), null);
   const [ox0, oy0, sl0] = settleShape(st, 0, 10);
   assert.ok(Math.abs(ox0) < 1e-9 && Math.abs(oy0) < 1e-9 && Math.abs(sl0 - 1) < 1e-9, 'empieza continuo');
+});
+
+// el sonido del salto es del contacto: suena al aterrizar, programado con la duración del salto (scene-audit, c30)
+const fakeHop = async (sound, skipping = false) => {
+  const calls = [];
+  const audio = {tap: (...a) => calls.push(['tap', ...a]), punto: (...a) => calls.push(['punto', ...a])};
+  const d = {skipping, tween: async (dur, fn) => { fn(0.5); fn(1); }};
+  const o = {x: 0, y: 0, setMode() {}};
+  await hop2(d, o, 100, 0, {dur: 0.36, h: 20, g: {audio}, sound});
+  return {calls, o};
+};
+
+test('salto: el golpe y la voz suenan al aterrizar, no al empezar la agachada', async () => {
+  assert.deepEqual((await fakeHop('tap')).calls, [['tap', 0.2, 1.7, 0.36]]);
+  assert.deepEqual((await fakeHop('yes')).calls, [['punto', 'yes', 0.36]]);
+});
+
+test('salto: saltando la escena no suena y termina en el destino', async () => {
+  const {calls, o} = await fakeHop('hop', true);
+  assert.deepEqual(calls, []);
+  assert.equal(o.x, 100);
+  assert.equal(o.lift, 0);
 });

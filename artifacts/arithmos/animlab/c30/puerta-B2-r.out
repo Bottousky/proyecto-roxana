@@ -1,0 +1,36 @@
+{
+ "seg": "c1.puerta",
+ "extra": "",
+ "T": 20.02,
+ "errors": [],
+ "sound": {
+  "lufs": -23.9,
+  "lufsPhone": -27,
+  "truePeakDb": -5.6,
+  "dc": 0.000077,
+  "under60Hz": 0.005,
+  "renderErrors": [],
+  "calls": 5,
+  "hits": 17,
+  "matched": 17,
+  "syncFrames": {
+   "min": -0.37,
+   "max": 0.7
+  },
+  "early": 6,
+  "late": 0,
+  "noticeable": 0,
+  "uiHits": 0,
+  "unmatchedHits": 0,
+  "overBedDb": {
+   "min": 2.7,
+   "median": 4.5,
+   "max": 6.4,
+   "below3": 1,
+   "above6": 3
+  },
+  "silentContacts": "ninguno",
+  "silentArrivals": 0
+ },
+ "teleports": []
+}

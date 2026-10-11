@@ -1,6 +1,6 @@
 # ARITHMOS ANIMATION LAB · Estado
 
-**Última actualización**: 2026-10-08, ciclo 25.
+**Última actualización**: 2026-10-11, ciclo 26.
 **Loop**: `/loop 1m` (cron de sesión). Rama `claude/arithmos-graphic-adventure-065e68`, worktree `arithmos-graphic-adventure-065e68`. Sólo commits locales.
 
 ## Ver la vertical slice
@@ -11,6 +11,7 @@
 2. Laboratorio: `cd experiments/arithmos && npm start` → `http://127.0.0.1:4195/animlab/?test=01&play=1`.
 3. Captura: `node scripts/animlab-capture.mjs <test> ../../artifacts/arithmos/animlab/cNN/<nombre> --frames=9 '--crop=x,y,w,h;…'` (siempre carpeta nueva).
 4. Curvas: `node scripts/animlab-plot.mjs <probes.json> <png> A.v,B.v`.
+5. Auditoría de una escena del juego (sonido contra la imagen, teletransportes): `node scripts/scene-audit.mjs ../../artifacts/arithmos/animlab/cNN/<nombre> c1.ronda 20 --q=anim=2` (`--replay=<carpeta>` re-mide el sonido en segundos; `--wav` guarda la mezcla). En un contenedor sin Chrome: `ARITHMOS_CHROMIUM=/opt/pw-browsers/chromium`.
 
 ## Documentos
 `docs/arithmos/animation/`: RESEARCH (incluye la auditoría del motor actual), TECHNIQUE_MATRIX, QUALITY_BAR, VISUAL_LANGUAGE, PIPELINE, EXPERIMENTS, STATE. Enlaces simbólicos en `docs/arithmos/ARITHMOS_ANIMATION_*.md` para los cinco que lee el loop.
@@ -47,6 +48,7 @@
 - R14: N3 en todo, **N4 en Timing y Matemática**; Actuación N3 por la mirada. **VS14** (`c25/vs14`): ojos que se leen (hasta 5·k, dentro de la cabeza), pausa del atado de cinco y salto al primer grupo en la tabla, zoom escalonado tras el paso atrás.
 - R15: **N4 en Timing, Matemática y Legibilidad**; Actuación N3 (anticipaciones), Textura sin toque medido. **VS15** (`c26/vs15b`): contramovimiento del brazo, Punto posado con inercia, toque/levantada corregidos en el depósito y medidos (1.14 / 0.42).
 - **R16: aprobada** (N3 en todo; N4 en Timing, Actuación y Matemática). Benchmark congelado `c26/vs15b`.
+- **M4 Punto** detrás de `?anim=2` y **A01 auditoría numérica de escenas** (`scripts/scene-audit.mjs`, a partir de los posts de RESEARCH §6): reloj fijo de 60 Hz, sonido regenerado sin parlantes y medido contra los contactos de la imagen, teletransportes de puntos. Encontró y corrigió: un teletransporte de Punto en `c1.ronda` (30 px, también sin bandera), la voz del salto 97 ms antes del despegue (ahora al aterrizar, como en la slice) y los golpes de inicio de trazo tapados por el rasgueo (−3.3 → +4.5 dB de mediana). EXPERIMENTS «M4 — Punto…».
 - R10: No (salto de Punto, hilo que cruzaba el «2»). **VS10** (`c20/t10a`) corrige ambos; tiempos de marcas verificados con sondas (≤ 0.1 s tras cada aterrizaje).
 
 ## Decisión (con evidencia de E01–E10): **B. Reconstrucción parcial**
@@ -64,7 +66,7 @@
 - **Condición para migrar al juego**: que la vertical slice (basada en E10) pase una revisión independiente en nivel ≥ 4 en Timing, Actuación y Matemática; recién entonces se adapta `src/engine` (adaptadores para no reescribir escenas) y se migra un capítulo piloto.
 
 ## Siguiente (en orden)
-1. **Migración (empieza)**: la slice pasó la revisión independiente R16 (N3 en todo, N4 en Timing/Actuación/Matemática). **Benchmark congelado: `artifacts/arithmos/animlab/c26/vs15b`** (etiqueta local `arithmos-animlab-benchmark-vs15`). **M1 cámara, M2 trazos (+ rasgueo desde el plan) y M3 Label → glifos: hechos detrás de `?anim=2`** (pruebas, A/B, bot y capítulo 1 en tiempo real sin errores). Siguiente: **M4 Punto** (`Dot`, `zip`/`hop` de `acting.js` y las copias locales de `ch1/scenes.js`) con el salto de cuatro fases y `SecondOrder`.
+1. **Migración (empieza)**: la slice pasó la revisión independiente R16 (N3 en todo, N4 en Timing/Actuación/Matemática). **Benchmark congelado: `artifacts/arithmos/animlab/c26/vs15b`** (etiqueta local `arithmos-animlab-benchmark-vs15`). **M1 cámara, M2 trazos (+ rasgueo desde el plan) y M3 Label → glifos: hechos detrás de `?anim=2`** (pruebas, A/B, bot y capítulo 1 en tiempo real sin errores). **M4 Punto: hecho** (auditoría de sonido y traspasos en `c30/`). Siguiente: **M5 figura** (actor incremental + `drawFigureDeposit`), con `scene-audit` antes y después (los pasos de la figura son contactos: en la slice suenan, `score.js` `step`).
 2. Pulido de la slice (no bloqueante, con revisión propia): pendientes D1, D3, D4, E1–E4 de R16 (EXPERIMENTS).
 2. ~~Poses nuevas~~ (hecho en E11; pendiente: hombros para encogerse).
 3. **Vertical slice** = E10 + poses nuevas + correcciones de R2 + una transformación con deslizamiento y un borrado (E03/E07) + composición final legible. Nivel objetivo 4 en todo.
@@ -72,5 +74,7 @@
 5. Después: adaptadores en `src/engine` y capítulo piloto (sólo con la slice aprobada).
 
 ## Abierto / humano
-- Audio: nada certificado (nadie escuchó).
+- Audio: lo medible está medido (sincronía, golpes sobre el fondo, sonoridad, pico; QUALITY_BAR §Sonido); que suene bien, nadie lo escuchó [H]. `scene-audit.mjs --wav` guarda la mezcla de una escena. Decidir de oído si las letras (+6/+7 dB sobre el rasgueo) suenan bien.
+- A 20 fps (contenedor sin GPU) el bot avisa `[spot fuera de cuadro] r10` durante el conteo de la Ronda, con y sin bandera y desde antes de este ciclo; en la Mac no. ¿Pasa en un teléfono lento?
+- El tercer post de X (rossaxbt) no se leyó: X está bloqueado en el entorno; pegarlo para incorporarlo.
 - Teléfono real: rendimiento de B sin medir.

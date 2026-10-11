@@ -1,0 +1,280 @@
+{
+ "seg": "c1.ronda",
+ "extra": "",
+ "T": 20.02,
+ "errors": [],
+ "sound": {
+  "lufs": -30.2,
+  "lufsPhone": -31.4,
+  "truePeakDb": -17.2,
+  "dc": 0.000029,
+  "under60Hz": 0.006,
+  "renderErrors": [],
+  "calls": 9,
+  "hits": 7,
+  "matched": 1,
+  "syncFrames": {
+   "min": 0.19,
+   "max": 0.19
+  },
+  "early": 0,
+  "late": 0,
+  "noticeable": 0,
+  "uiHits": 4,
+  "unmatchedHits": 2,
+  "overBedDb": null,
+  "silentContacts": "aterrizaje 1",
+  "silentArrivals": 15
+ },
+ "teleports": [],
+ "replay": "../../artifacts/arithmos/animlab/c30/ronda-A",
+ "vol": {
+  "master": 0.8,
+  "music": 0.7,
+  "sfx": 0.8
+ },
+ "hitsDetail": [
+  {
+   "t": 5.0347,
+   "fn": "golpe",
+   "call": 5.033333333333333,
+   "src": "ui",
+   "peakT": 5.0531,
+   "overBedDb": null,
+   "contact": null,
+   "offsetFrames": null
+  },
+  {
+   "t": 5.0347,
+   "fn": "punto yes",
+   "call": 5.033333333333333,
+   "src": "escena",
+   "peakT": 5.0531,
+   "overBedDb": null,
+   "contact": {
+    "t": 5.05,
+    "kind": "despegue",
+    "id": "punto"
+   },
+   "offsetFrames": 0.19
+  },
+  {
+   "t": 9.416,
+   "fn": "golpe",
+   "call": 9.416666666666666,
+   "src": "escena",
+   "peakT": 9.4266,
+   "overBedDb": null,
+   "contact": null,
+   "offsetFrames": null
+  },
+  {
+   "t": 11.0507,
+   "fn": "punto scared",
+   "call": 11.05,
+   "src": "escena",
+   "peakT": 11.0689,
+   "overBedDb": 8,
+   "contact": null,
+   "offsetFrames": null
+  },
+  {
+   "t": 14.5493,
+   "fn": "golpe",
+   "call": 14.55,
+   "src": "ui",
+   "peakT": 14.5607,
+   "overBedDb": null,
+   "contact": null,
+   "offsetFrames": null
+  },
+  {
+   "t": 16.6827,
+   "fn": "golpe",
+   "call": 16.683333333333334,
+   "src": "ui",
+   "peakT": 16.6939,
+   "overBedDb": null,
+   "contact": null,
+   "offsetFrames": null
+  },
+  {
+   "t": 17.1333,
+   "fn": "golpe",
+   "call": 17.133333333333333,
+   "src": "ui",
+   "peakT": 17.1443,
+   "overBedDb": null,
+   "contact": null,
+   "offsetFrames": null
+  }
+ ],
+ "contacts": [
+  {
+   "t": 0.4833,
+   "kind": "llega",
+   "id": "r1"
+  },
+  {
+   "t": 0.5667,
+   "kind": "llega",
+   "id": "r6"
+  },
+  {
+   "t": 0.65,
+   "kind": "llega",
+   "id": "r0"
+  },
+  {
+   "t": 0.8333,
+   "kind": "llega",
+   "id": "r5"
+  },
+  {
+   "t": 1.2667,
+   "kind": "llega",
+   "id": "r11"
+  },
+  {
+   "t": 1.8667,
+   "kind": "llega",
+   "id": "r10"
+  },
+  {
+   "t": 1.9333,
+   "kind": "llega",
+   "id": "punto"
+  },
+  {
+   "t": 2.4833,
+   "kind": "llega",
+   "id": "r4"
+  },
+  {
+   "t": 3.1333,
+   "kind": "llega",
+   "id": "r3"
+  },
+  {
+   "t": 3.9667,
+   "kind": "llega",
+   "id": "r9"
+  },
+  {
+   "t": 4.1667,
+   "kind": "llega",
+   "id": "punto"
+  },
+  {
+   "t": 4.5,
+   "kind": "llega",
+   "id": "r8"
+  },
+  {
+   "t": 4.6667,
+   "kind": "llega",
+   "id": "punto"
+  },
+  {
+   "t": 5.05,
+   "kind": "despegue",
+   "id": "punto"
+  },
+  {
+   "t": 5.2667,
+   "kind": "llega",
+   "id": "r2"
+  },
+  {
+   "t": 5.4,
+   "kind": "aterrizaje",
+   "id": "punto"
+  },
+  {
+   "t": 6.75,
+   "kind": "llega",
+   "id": "r7"
+  }
+ ],
+ "calls": [
+  {
+   "t": 0,
+   "fn": "cue",
+   "args": [
+    "ronda"
+   ],
+   "src": "escena"
+  },
+  {
+   "t": 5.033333333333333,
+   "fn": "tap",
+   "args": [
+    0.12,
+    1.6
+   ],
+   "src": "ui"
+  },
+  {
+   "t": 5.033333333333333,
+   "fn": "punto",
+   "args": [
+    "yes"
+   ],
+   "src": "escena"
+  },
+  {
+   "t": 9.416666666666666,
+   "fn": "tap",
+   "args": [
+    0.15,
+    2.4
+   ],
+   "src": "escena"
+  },
+  {
+   "t": 11.05,
+   "fn": "erase",
+   "args": [
+    2.4,
+    0.5
+   ],
+   "src": "escena",
+   "h": 1
+  },
+  {
+   "t": 11.05,
+   "fn": "punto",
+   "args": [
+    "scared"
+   ],
+   "src": "escena"
+  },
+  {
+   "t": 14.55,
+   "fn": "tap",
+   "args": [
+    0.12,
+    1.6
+   ],
+   "src": "ui"
+  },
+  {
+   "t": 16.683333333333334,
+   "fn": "tap",
+   "args": [
+    0.12,
+    1.6
+   ],
+   "src": "ui"
+  },
+  {
+   "t": 17.133333333333333,
+   "fn": "tap",
+   "args": [
+    0.3,
+    1.2
+   ],
+   "src": "ui"
+  }
+ ]
+}

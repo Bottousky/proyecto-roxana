@@ -1,6 +1,14 @@
 // Sonido procedural: tiza, borrador, golpecitos, la voz de Punto y poca música.
 // Todo se genera en el navegador (sin archivos ni servicios). El silencio es parte del diseño.
 
+// golpe de cada apoyo de tiza con ?anim=2: sigue al rasgueo con que empieza su trazo (media de la envolvente en los primeros
+// 60 ms), para quedar 3–6 dB por encima de él con trazos lentos y rápidos (medido con scripts/scene-audit.mjs, c30)
+const ENV_TAP = 1.05;
+const tapLevel = (env, t) => {
+  const v = env.filter(e => !e.tap && e.t >= t && e.t <= t + 0.06).map(e => e.v);
+  return v.length ? Math.max(0.35, v.reduce((a, b) => a + b, 0) / v.length) : 1; // 0.35: el rasgueo mínimo con la tiza apoyada
+};
+
 export class Sound {
   constructor() {
     this.ctx = null;
@@ -141,7 +149,7 @@ export class Sound {
     g.gain.setValueAtTime(0, t);
     if (env?.length) {
       for (const e of env) {
-        if (e.tap) { this.tap(0.35 * strength, 1, e.t); continue; }
+        if (e.tap) { this.tap(ENV_TAP * strength * tapLevel(env, e.t), 1, e.t); continue; }
         g.gain.linearRampToValueAtTime(level * e.v, t + e.t);
       }
       g.gain.linearRampToValueAtTime(0, t + sec + 0.04);
@@ -328,27 +336,27 @@ export class Sound {
     }
   }
 
-  /** La voz de Punto: no son palabras; son contornos. */
-  punto(kind = 'hello') {
+  /** La voz de Punto: no son palabras; son contornos. `delay` (s): programada (el aterrizaje de un salto con ?anim=2). */
+  punto(kind = 'hello', delay = 0) {
     if (!this.ready) return;
     const base = 880;
-    const n = (st, at, d = 0.18, g = 0.07) => this.note(base * Math.pow(2, st / 12), at, d, {gain: g, bus: 'sfx', rev: 0.35, bright: 0.12});
+    const n = (st, at, d = 0.18, g = 0.07) => this.note(base * Math.pow(2, st / 12), at + delay, d, {gain: g, bus: 'sfx', rev: 0.35, bright: 0.12});
     switch (kind) {
       case 'hello': n(0, 0); n(4, 0.12); n(7, 0.24, 0.3); break; // su firma: tres notas ascendentes
       case 'happy': n(7, 0, 0.12); n(12, 0.09, 0.22); break;
       case 'hop': n(5 + Math.random() * 2, 0, 0.11, 0.09); break;
-      case 'question': this.#glide(base, base * 1.33, 0.32, 0.06); break;
+      case 'question': this.#glide(base, base * 1.33, 0.32, 0.06, delay); break;
       case 'scared': for (let i = 0; i < 5; i++) n(3 - i * 1.5, i * 0.06, 0.08, 0.05); break;
       case 'sad': n(3, 0, 0.35, 0.05); n(-2, 0.3, 0.6, 0.045); break;
       case 'no': n(2, 0, 0.1, 0.05); n(-1, 0.12, 0.16, 0.05); break;
       case 'yes': n(4, 0, 0.1, 0.05); n(9, 0.1, 0.16, 0.05); break;
-      case 'surprise': this.#glide(base * 0.9, base * 1.6, 0.18, 0.07); break;
+      case 'surprise': this.#glide(base * 0.9, base * 1.6, 0.18, 0.07, delay); break;
       default: n(0, 0);
     }
   }
 
-  #glide(f0, f1, dur, gain) {
-    const ctx = this.ctx, t = ctx.currentTime;
+  #glide(f0, f1, dur, gain, delay = 0) {
+    const ctx = this.ctx, t = ctx.currentTime + delay;
     const o = ctx.createOscillator();
     o.frequency.setValueAtTime(f0, t);
     o.frequency.exponentialRampToValueAtTime(f1, t + dur);

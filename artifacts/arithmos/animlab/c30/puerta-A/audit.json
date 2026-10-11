@@ -1,0 +1,96 @@
+{
+ "seg": "c1.puerta",
+ "extra": "",
+ "T": 20.02,
+ "errors": [],
+ "sound": {
+  "lufs": -26.7,
+  "lufsPhone": -27.5,
+  "truePeakDb": -13.8,
+  "dc": 0.000002,
+  "under60Hz": 0,
+  "renderErrors": [],
+  "calls": 5,
+  "hits": 2,
+  "matched": 0,
+  "syncFrames": null,
+  "early": 0,
+  "late": 0,
+  "noticeable": 0,
+  "uiHits": 0,
+  "unmatchedHits": 2,
+  "overBedDb": null,
+  "silentContacts": "ninguno"
+ },
+ "teleports": [],
+ "vol": {
+  "master": 0.8,
+  "music": 0.7,
+  "sfx": 0.8
+ },
+ "hitsDetail": [
+  {
+   "t": 0.7173,
+   "fn": "tiza",
+   "call": 0.7166666666666667,
+   "src": "escena",
+   "peakT": 0.7274,
+   "overBedDb": -2.6,
+   "contact": null,
+   "offsetFrames": null
+  },
+  {
+   "t": 3.3173,
+   "fn": "tiza",
+   "call": 3.316666666666667,
+   "src": "escena",
+   "peakT": 3.3297,
+   "overBedDb": -4.7,
+   "contact": null,
+   "offsetFrames": null
+  }
+ ],
+ "contacts": [],
+ "calls": [
+  {
+   "t": 0.7166666666666667,
+   "fn": "cue",
+   "args": [
+    "door"
+   ],
+   "src": "escena"
+  },
+  {
+   "t": 0.7166666666666667,
+   "fn": "chalkStart",
+   "args": [
+    2.6,
+    1,
+    null
+   ],
+   "src": "escena",
+   "h": 1
+  },
+  {
+   "t": 3.316666666666667,
+   "fn": "stop",
+   "h": 1
+  },
+  {
+   "t": 3.316666666666667,
+   "fn": "chalkStart",
+   "args": [
+    1.4,
+    1,
+    null
+   ],
+   "src": "escena",
+   "h": 2
+  },
+  {
+   "t": 4.716666666666667,
+   "fn": "stop",
+   "h": 2
+  }
+ ]
+}

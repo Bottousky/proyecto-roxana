@@ -1,0 +1,27 @@
+{
+ "seg": "c1.puerta",
+ "extra": "",
+ "T": 20.02,
+ "errors": [],
+ "sound": {
+  "lufs": -26.5,
+  "lufsPhone": -27.4,
+  "truePeakDb": -12.3,
+  "dc": 0.0000062,
+  "under60Hz": 0,
+  "renderErrors": [],
+  "calls": 5,
+  "hits": 2,
+  "matched": 0,
+  "syncFrames": null,
+  "early": 0,
+  "late": 0,
+  "noticeable": 0,
+  "uiHits": 0,
+  "unmatchedHits": 2,
+  "overBedDb": null,
+  "silentContacts": "ninguno",
+  "silentArrivals": 0
+ },
+ "teleports": []
+}

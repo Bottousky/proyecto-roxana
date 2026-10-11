@@ -7,7 +7,7 @@ Estado: **en curso**. La condición de inicio se cumplió el 2026-10-08 (R16 apr
 | 1. Cámara (`Camera.go` → van Wijk–Nuij + mínimo jerk, `dur` como tope) | **hecho detrás de `?anim=2`** | `tests/camera.test.mjs` (5 pruebas), `c27/cam2-*.json` (A/B en c1.ronda, c1.vuelven, c1.marea), bot del capítulo 1 con y sin bandera (`c27/bot-c1-{A,B}.out`) |
 | 2. `Drawing` + `d.draw` → depósito con plan de mano | **hecho detrás de `?anim=2`**, con rasgueo que suena sólo mientras la tiza toca (nivel por velocidad de la punta, golpe al empezar cada trazo; `tests/drawing-anim2.test.mjs`) | `c28/puerta-{A,B}` (hojas), `c28/puerta-door-AB2.png` (recorte dpr 2), bot del capítulo 1 sin errores (`c28/bot-c1-B.out`); capítulo 1 en tiempo real con y sin bandera (`c28/watch-c1-{A,B}.out`: 362 / 376 s, fps mín. 46.7 / 45.0, mediana 60, 0 errores) |
 | 3. `Label` → glifos de un trazo | **hecho detrás de `?anim=2`** (si algún signo del texto no tiene glifo, queda la fuente; faltan W, ≠ y comillas) | `c29/vuelven-{A,B}` (hojas), `c29/title-AB2.png` (recorte dpr 2), bot del capítulo 1 (`c29/bot-c1-B2.out`, fps mín. 46.7) |
-| 4. Punto (`Dot`, `zip`/`hop`) | — | — |
+| 4. Punto (`Dot`, `zip`/`hop`) | **hecho detrás de `?anim=2`** (salto de cuatro fases y aterrizaje en el dibujo, `zip` de mínimo jerk; el sonido del salto suena al aterrizar, como en la slice) | `tests/punto-anim2.test.mjs` (6 pruebas); auditoría `c30/` (`scripts/scene-audit.mjs`): sonido del salto +0.79 cuadros del aterrizaje (antes −5.8), 0 teletransportes en `c1.ronda`, `c1.puerta`, `c1.vuelven`; bot del capítulo 1 con la bandera hasta `c2.manana`, mismas 21 evidencias (`c30/bot-c1-B.out`; en el contenedor, 20 fps por WebGL por software: un aviso `[spot fuera de cuadro] r10` que también da el commit anterior con la bandera y este sin ella, `c30/bot-c1-{B-base,A}.out`) |
 | 5. Figura → actor incremental | — | — |
 
 ## Escala (conteo en `experiments/arithmos/src`, 2026-10-07)
@@ -30,6 +30,7 @@ Estado: **en curso**. La condición de inicio se cumplió el 2026-10-08 (R16 apr
 3. Si el piloto pasa: activar por defecto capítulo por capítulo, con corrida del bot por capítulo.
 
 ## Riesgos
+- **Sonido**: cada adaptador cambia cuándo ocurre lo que se ve (agachada, plan de mano) y los sonidos que dispara la escena no se mueven solos. Después de cada paso, `scripts/scene-audit.mjs` con y sin bandera en las escenas del A/B (sincronía, golpes sobre el fondo, teletransportes).
 - **Rendimiento en teléfono**: depósito = ~10× llamadas de dibujo mientras se dibuja; mitigado con caché (E12), sin medir en dispositivo [H].
 - **Palabras**: resuelto en el laboratorio (E13b/c); falta revisión independiente de la hoja del alfabeto.
 - **Tiempos de escena**: si los trazos duran distinto, cambian los tiempos de las escenas que esperan a `d.draw`; el bot de partida completa lo detecta (timeouts) — usar `sec` como tope evita la mayoría.

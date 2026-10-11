@@ -46,12 +46,12 @@ Cómo se verifica cada nivel: **[S]** sonda numérica (`__lab.probe`, gráficos 
 - **N5**: polvo residual coherente: borrar deja el fantasma de lo que había [C].
 
 ### Legibilidad y composición
-- **N2**: todo texto ≥ 12 px CSS en teléfono acostado (844×390); nada se superpone [C en dos tamaños].
-- **N3**: un solo foco por momento: lo que no importa baja de presión o queda fuera de cuadro [C]; el ojo se lleva con movimiento o con la mano, no con flechas de interfaz.
+- **N2**: todo texto ≥ 12 px CSS en teléfono acostado (844×390); nada se superpone [C en dos tamaños]; ningún destello más de 3 veces por segundo (WCAG 2.3.1).
+- **N3**: un solo foco por momento: lo que no importa baja de presión o queda fuera de cuadro [C]; el ojo se lleva con movimiento o con la mano, no con flechas de interfaz. Un texto queda quieto ≥ 0,3 s por palabra + 0,5 s antes de moverse o borrarse [S, sin medir todavía] (RESEARCH §6).
 - **N4**: las distancias significan (lo que se relaciona está cerca; lo que se opone, enfrentado); márgenes del plano consistentes [R].
 
 ### Continuidad
-- **N2**: ningún objeto aparece o desaparece sin causa visible (mano, borrador, Punto, Marea) [C hoja de contactos].
+- **N2**: ningún objeto aparece o desaparece sin causa visible (mano, borrador, Punto, Marea) [C hoja de contactos]. Ningún punto se teletransporta: un punto visible no se corre más de 24 px en un cuadro de 60 Hz si en los cuadros vecinos se corre 4 veces menos [S `scene-audit.mjs`, traspasos] (RESEARCH §6: «mostrá el camino de cada traspaso»).
 - **N3**: lo que se transforma conserva identidad (el mismo «3» se mueve; no se apaga uno y se prende otro) [C].
 - **N4**: la cámara nunca corta durante una transformación que el jugador necesita seguir [C].
 
@@ -62,9 +62,10 @@ Cómo se verifica cada nivel: **[S]** sonda numérica (`__lab.probe`, gráficos 
 - **N5**: el jugador puede predecir el siguiente cuadro antes de verlo [H].
 
 ### Sonido
-- **N2**: el rasgueo de tiza suena sólo mientras la punta toca. [S] (evento de audio ↔ estado de la punta).
-- **N3**: volumen y brillo del rasgueo siguen la velocidad de la punta; silencio en levantadas [S].
-- **N4**: el sonido anticipa o puntúa (golpe de tiza al terminar un «=») [R]. **Nunca se certifica audio no escuchado** [H].
+Lo medible se certifica midiendo (`scripts/scene-audit.mjs`: el sonido de la escena se vuelve a generar sin parlantes y se compara con los contactos de la imagen); **que suene bien sigue siendo [H]** (RESEARCH §6).
+- **N2**: el rasgueo de tiza suena sólo mientras la punta toca. [S] (evento de audio ↔ estado de la punta). Ningún sonido de contacto se adelanta a su imagen más de 45 ms ni se atrasa más de 125 ms (umbrales de detección, ITU-R BT.1359) [S].
+- **N3**: volumen y brillo del rasgueo siguen la velocidad de la punta; silencio en levantadas [S]. Cada contacto que suena (aterrizaje de Punto, apoyo de tiza) suena en el cuadro del contacto o en el siguiente (−1 < Δ ≤ +1 cuadro de 60 Hz) y 3–6 dB sobre el fondo (ponderación K, primeros 60 ms) [S].
+- **N4**: el sonido anticipa o puntúa (golpe de tiza al terminar un «=») [R]; sonoridad pareja entre escenas del mismo capítulo (±3 LU) y pico verdadero ≤ −1 dBTP [S]. Gusto: [H].
 
 ### Rendimiento
 - **N2**: escena estable a 60 fps en escritorio; ≤ 8 ms de tiza por cuadro (HUD del lab) [S].
@@ -79,4 +80,6 @@ Se rechaza en revisión, aunque "se vea bien":
 - rebote (`easeOutBack`) en objetos que no son elásticos en la ficción;
 - partículas, brillo o desenfoque sin causa en la ficción (el polvo de borrado sí tiene causa);
 - texto que "se revela" con barrido rectangular en lugar de escribirse;
+- texto que se mueve mientras se lee;
+- opacidad o color que rebotan o sobrepasan (sólo posición y tamaño pueden: Material 3, RESEARCH §6);
 - cámara que se mueve sin que algo en cuadro lo motive.

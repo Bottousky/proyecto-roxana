@@ -6,7 +6,7 @@
 // --watch: no salta animaciones (para video y ritmo). --reload: recarga la página en varias
 // escenas y continúa desde el título. --route=errores provoca errores del jugador a propósito.
 
-import {chromium} from 'playwright';
+import {launch} from './browser.mjs';
 import {mkdir, writeFile} from 'node:fs/promises';
 import {startServer} from './serve.mjs';
 
@@ -26,7 +26,7 @@ for (let k = 0; k < 8 && !server; k++) {
   server = await startServer(port).catch(() => null);
 }
 if (!server) throw new Error('no hay puerto libre para el servidor de la partida');
-const browser = await chromium.launch({channel: 'chrome'});
+const browser = await launch();
 const context = await browser.newContext({
   viewport: {width: W, height: H}, deviceScaleFactor: 1, hasTouch: opt('touch'), isMobile: opt('touch') && W < 900,
 });

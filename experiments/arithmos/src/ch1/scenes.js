@@ -359,7 +359,8 @@ export const ronda = {
     s.look(1, -0.2);
     await d.wait(1.4);
     // Punto se suma a la ronda un momento
-    await zip(d, p, RING.x - RING.r, RING.y, 0.55);
+    // llega justo donde empieza su vuelta (radio + 30): antes saltaba 30 px en un cuadro (scene-audit, c30)
+    await zip(d, p, RING.x - RING.r - 30, RING.y, 0.55);
     await d.tween(2.2, k => {
       const a = Math.PI + k * Math.PI * 1.2;
       p.x = RING.x + Math.cos(a) * (RING.r + 30);

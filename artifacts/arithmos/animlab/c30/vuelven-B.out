@@ -1,0 +1,35 @@
+{
+ "seg": "c1.vuelven",
+ "extra": "anim=2",
+ "T": 20.03,
+ "errors": [],
+ "sound": {
+  "lufs": -23.5,
+  "lufsPhone": -28.9,
+  "truePeakDb": -5.3,
+  "dc": 0.000089,
+  "under60Hz": 0.008,
+  "renderErrors": [],
+  "calls": 20,
+  "hits": 36,
+  "matched": 19,
+  "syncFrames": {
+   "min": -0.29,
+   "max": 0.55
+  },
+  "early": 9,
+  "late": 0,
+  "noticeable": 0,
+  "uiHits": 2,
+  "unmatchedHits": 15,
+  "overBedDb": {
+   "min": 2.7,
+   "median": 6.6,
+   "max": 13.3,
+   "below3": 1,
+   "above6": 12
+  },
+  "silentContacts": "ninguno"
+ },
+ "teleports": []
+}

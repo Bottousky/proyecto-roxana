@@ -1,0 +1,74 @@
+[0.1s] escena → undefined
+[1.9s] escena → c1.puerta
+[7.3s] lee: Tengo las manos de tiza.
+[10.3s] lee: …No hay vuelta. Por ahora.
+[15.9s] lee: Alguien borró todo esto a medias.
+[16.6s] escena → c1.alguien
+[20.1s] elige «Acercarte» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[31.0s] elige «Quedarte quieto y esperar» (Punto espía desde su escondite.)
+[34.6s] lee: —Hola.
+[36.1s] lee: No habla. O no habla como yo.
+[36.8s] lee: —¿Tenés nombre?
+[40.6s] lee: Un punto. Nada más… y nada menos.
+[41.2s] lee: —Te voy a decir Punto. Hasta que me digas cómo te llamás.
+[46.7s] escena → c1.ronda
+[48.1s] lee: —¿Son tu familia?
+[50.7s] lee: ¿Qué es eso?
+[52.9s] lee: Si pasa por acá, los desparrama.
+[53.8s] elige «Contarlos.» (¿Cómo vas a saber si vuelven todos?)
+[70.3s] lee: Doce.
+[71.3s] lee: Pero Punto no sabe qué es "doce". Necesito algo que él también pueda ver.
+[121.1s] no pudo tocar r11: page.click: Timeout 5000ms exceeded.
+[121.3s] escena → c1.marea
+[124.8s] lee: Se llevó todo. Menos las marcas.
+[126.8s] escena → c1.vuelven
+[130.4s] lee: Cada marca era uno de ellos.
+[137.1s] comprueba antes de terminar (error deliberado)
+[144.9s] une un punto a dos marcas (error deliberado)
+[148.8s] deshace la unión doble
+[151.1s] deshace la unión doble
+[153.2s] deshace la unión doble
+[155.5s] deshace la unión doble
+[157.8s] deshace la unión doble
+[183.3s] lee: Quedó una marca sola.
+[183.7s] escena → c1.quien
+[189.3s] elige «Que sobra un punto.» (¿Qué quiere decir esa marca sola?)
+[194.1s] lee: Ningún punto quedó sin marca. La que quedó sola es una marca.
+[195.1s] elige «Que hice una marca de más.» (¿Qué quiere decir esa marca sola?)
+[199.9s] lee: Esta mañana pasaron doce y anoté doce: una marca cada vez que tocaba a uno. Ninguna de más.
+[200.7s] lee: Esta noche volvieron once. Alguien no volvió.
+[213.0s] lee: Las marcas saben cuántos. No saben quién. Punto sí.
+[217.5s] lee: —¿El más chico? ¿El que llegaba tarde?
+[220.2s] lee: —Vamos a buscarlo.
+[226.0s] escena → c1.busqueda
+[240.3s] lee: Alguien anotó acá, hace mucho.
+[251.5s] lee: Ahí. Debajo del polvo.
+[256.0s] escena → c1.todos
+[257.2s] lee: Ahora sí.
+[268.8s] lee: —Están todos.
+[271.3s] escena → c1.gradas
+[275.3s] elige «No alcanzan.» (Así, en fila, ¿alcanzan los asientos para la Ronda y Punto?)
+[278.6s] elige «Por cómo se ve.» (¿Cómo lo sabés?)
+[293.4s] elige «Había más en la fila que asientos.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[297.5s] lee: Nadie quedó parado. Lo que sobró es un asiento.
+[298.5s] elige «Eran la misma cantidad.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[302.8s] lee: Si fueran los mismos, no sobraría nada.
+[303.7s] elige «Había más asientos que en la fila.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[306.6s] lee: Punto y yo pensábamos lo mismo. Mirábamos el largo de la fila.
+[308.8s] elige «Ninguno.» (Así apretados, si se vuelven a sentar, ¿cuántos asientos sobran?)
+[312.9s] lee: Sobró uno, como antes. Apretados o separados, son trece.
+[316.1s] lee: ¿El que sobra es para mí?
+[317.8s] escena → c1.nombre
+[318.7s] lee: ¡Le salió!
+[335.7s] lee: —¡Bajen! Cada uno debajo de su marca.
+[337.9s] lee: Catorce marcas. Catorce palabras. Catorce de nosotros.
+[340.5s] elige «Adentro del 14 hay catorce cosas.» (¿Qué le decís a Punto?)
+[345.3s] lee: No hay nada escondido adentro.
+[346.2s] elige «El 14 nombra a dos.» (¿Qué le decís a Punto?)
+[350.7s] lee: Somos catorce, no dos.
+[351.6s] elige «El 14 nombra a catorce.» (¿Qué le decís a Punto?)
+[356.3s] lee: No es una fila más: es el nombre de cuántos hay en cada una.
+[358.5s] lee: Me mira como preguntando qué hace un 1 ahí, si somos catorce.
+[359.2s] lee: —Ni idea. Mañana.
+[361.2s] escena → c2.manana
+[363.8s] {"ended":true,"final":{"mode":"play","seg":"c2.manana"},"journal":["¿Están todos?"],"evidenceKinds":["door","meet","record-method","count-ronda-repeat","count-ronda","record","record-repeat","recorded","pair","check","unpair","interpret","search","predict","seat","seat-taken","interpret-seat","conserve","count","count-repeat","numeral"],"fps":{"min":"20.0","median":"20.0","worst":{"fps":20,"seg":"c1.puerta","mode":"play"}},"errors":["[spot fuera de cuadro] r10 (1276, 55)"],"seconds":363.812,"size":"1600x900","touch":false,"route":"errores","watch":false}

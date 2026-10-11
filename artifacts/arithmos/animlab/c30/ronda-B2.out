@@ -1,0 +1,29 @@
+{
+ "seg": "c1.ronda",
+ "extra": "anim=2",
+ "T": 20.02,
+ "errors": [],
+ "sound": {
+  "lufs": -30,
+  "lufsPhone": -31.2,
+  "truePeakDb": -16.3,
+  "dc": 0.000014,
+  "under60Hz": 0.007,
+  "renderErrors": [],
+  "calls": 9,
+  "hits": 7,
+  "matched": 1,
+  "syncFrames": {
+   "min": 0.79,
+   "max": 0.79
+  },
+  "early": 0,
+  "late": 0,
+  "noticeable": 0,
+  "uiHits": 4,
+  "unmatchedHits": 2,
+  "overBedDb": null,
+  "silentContacts": "despegue 1"
+ },
+ "teleports": []
+}

@@ -5,7 +5,7 @@
   "description": "Arithmos — aventura de tiza del Instituto Roxana. Sin dependencias de ejecución.",
   "scripts": {
     "start": "node scripts/serve.mjs 4195",
-    "test": "node --test tests/",
+    "test": "node --test \"tests/*.test.mjs\"",
     "check": "for f in src/*.js src/*/*.js scripts/*.mjs; do node --check \"$f\" || exit 1; done",
     "play:auto": "node scripts/playthrough.mjs ../../artifacts/arithmos/tmp/auto",
     "play:film": "node scripts/playthrough.mjs ../../artifacts/arithmos/tmp/film --watch --film --route=directa",
