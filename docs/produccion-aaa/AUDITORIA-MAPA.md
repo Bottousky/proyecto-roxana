@@ -94,4 +94,9 @@ idéntico y ocupa 9,1 MB. La diferencia con antes son las cercas y portones nuev
 - **Que las casas del pueblo tengan vida:** humo en alguna chimenea, una ventana encendida al atardecer
   o un vecino en el jardín. Hoy están quietas.
 - **El mapa dibujado (`public/assets/map/`)** se horneó con las casas en su lugar anterior. Hay que
-  volver a hornearlo (`scripts/bake-map.mjs`) cuando haya un Chrome con GPU.
+  volver a hornearlo (`scripts/bake-map.mjs`) en una máquina con GPU. Se probó en este contenedor,
+  que sólo tiene renderizado por software (SwiftShader), y el resultado no sirve: los techos de
+  pizarra oscura salen con otro color y el pintor los toma por agua. El Taller y la Casa de la Plaza
+  aparecen como estanques y se pierden otras casas, así que se dejó el mapa anterior. De esa prueba
+  quedaron dos arreglos al script: completa el nombre que pide la partida nueva y da más tiempo a
+  cada toma.
