@@ -38,7 +38,7 @@ export const BENCH_GUIDANCE = {
   drawer: { goal: 'Pesá las piedras de Lumen y resolvé su acertijo.', learned: 'Los anillos no dicen el temperamento: escriben un número, con dos cifras y cuántos ceros. Y la piedra dorada miente un poco, nunca más de un 5 %.',
     steps: [{ how: 'Elegí una piedra de la bandeja para el zócalo. Después tomá “Pesar el freno” y apoyá las puntas en «Zócalo · A» y «Zócalo · B».', tool: 'weigh' }, { how: 'Lumen te da la séptima piedra, roja, roja, marrón. Decile cuánto frena antes de pesarla.', tool: 'weigh' }],
     tools: ['weigh'], voice: 'OHM', hints: ['La lámpara de prueba ya dice algo: con unas piedras brilla más que con otras. El instrumento lo dice en números.', 'El instrumento usa su propia pila: con la mesa apagada, mide cuánto frena lo que está entre las dos puntas.', 'Compará los anillos de dos piedras cuyo número se parezca. ¿Qué anillo cambia cuando el número suma un cero?', 'Un paso para probar: poné la piedra marrón, negro, negro, pesala apoyando las puntas en «Zócalo · A» y «Zócalo · B», y después probá con la marrón, negro, marrón.'] },
-  beacon_lens: { goal: 'Alimentá la lente desde la toma del divisor y calibrala.', learned: 'Al conectar una carga, la toma del divisor baja: por eso se calibra con la lente puesta.',
+  beacon_lens: { goal: 'Alimentá la lente desde la toma del divisor y calibrala.', learned: 'Al conectar una carga, la toma del divisor baja: por eso la piedra se elige con la lente puesta. Y con el anillo dorado alcanza: la luz queda dorada aunque la piedra se corra un poco.',
     steps: [{ how: 'Elegí “Comparar dos puntos” y compará «Toma intermedia» con «Retorno −»: una vez así y otra con la lente conectada a la toma.', tool: 'voltage' }, { how: 'Con el cable de la lente en la «Toma intermedia», probá las piedras de repuesto de Nereo en el brazo superior hasta que la luz sea dorada.', tool: 'wire' }],
     tools: ['voltage'], voice: 'OHM', hints: ['La lente está unida directo a «Fuente +». El divisor está listo, pero nadie toma de su toma intermedia.', 'Nereo quiere dos lecturas de la toma: una sin la lente y otra con la lente conectada.', 'Con la lente conectada, la toma baja. Por eso la piedra del brazo superior se elige con la lente puesta, no antes.', 'Un paso para probar: compará «Toma intermedia» con «Retorno −». Mové el cable de la lente de «Fuente +» a la «Toma intermedia» y volvé a comparar. Después cambiá la piedra del brazo superior hasta que la luz sea dorada: la de anillos marrón, rojo, negro.'] },
 };
@@ -57,16 +57,21 @@ function stoneIcon(st) {
   return `<svg viewBox="0 0 80 34" aria-hidden="true"><defs><linearGradient id="wb-ceramic-icon" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f1e3c2"/><stop offset=".6" stop-color="#d9c398"/><stop offset="1" stop-color="#b59a6a"/></linearGradient></defs><path d="M0 17 H8 M72 17 H80" stroke="#9a8656" stroke-width="3"/>${stoneArt(40, 15, 64, st.value).replace('url(#wb-ceramic)', 'url(#wb-ceramic-icon)').replace(/<text class="wb-ring-mark"[^>]*>[^<]*<\/text>/g, '')}</svg>`;
 }
 /** «saqué la piedra rojo, rojo, negro y oro», «puse el puente de cobre»: what a hand did at a socket. */
-const stoneSaid = (k, value, verb) => { const st = stoneIn(k, value); return st?.strap ? `${verb} el puente de cobre` : `${verb} la piedra ${ringWords(value)}`; };
+const stoneSaid = (k, value, verb) => { const st = stoneIn(k, value); return st?.strap ? `${verb} el puente de cobre` : `${verb} la piedra de anillos ${ringWords(value)}`; };
 const TOOL_NAMES = { wire: 'Mover cables', continuity: 'Comprobar el camino', voltage: 'Comparar dos puntos', current: 'Medir un camino', weigh: 'Pesar el freno' };
 // Instruments that run on their own battery: the bench switches off while they are in hand.
 const OWN_BATTERY = ['continuity', 'weigh'];
-/** After the third stone, Ohm points at what the player can already see: two stones that differ only in the third ring. */
+/**
+ * After the third stone, Ohm points at what the player can already see: two stones that differ only in
+ * the third ring. If none was weighed yet, he proposes the one that makes the pair, and asks for a guess.
+ */
+const TWINS = [[10, 100], [12, 120]];
 function ringPattern(weighed) {
-  const pairs = [[10, 100], [12, 120]].filter(([a, b]) => weighed.includes(a) && weighed.includes(b));
-  if (pairs.length) { const [a, b] = pairs[0]; return `Mirá estas dos: ${ringWords(a)} pesa ${a}; ${ringWords(b)}, ${b}. Las dos primeras cifras son iguales. El tercer anillo parece decir cuántos ceros siguen.`; }
-  const [a, b] = weighed.slice(-2);
-  return `Mirá los dos primeros anillos de cada una y su número: ${ringWords(a)}, ${a}; ${ringWords(b)}, ${b}. ¿Ves qué dice cada color?`;
+  const pair = TWINS.find(([a, b]) => weighed.includes(a) && weighed.includes(b));
+  if (pair) { const [a, b] = pair; return `Mirá estas dos: la de anillos ${ringWords(a)} pesó casi ${a}; la de ${ringWords(b)}, casi ${b}. Los dos primeros anillos son iguales. El tercero parece decir cuántos ceros siguen.`; }
+  const half = TWINS.find(([a, b]) => weighed.includes(a) !== weighed.includes(b));
+  if (half) { const [had, next] = weighed.includes(half[0]) ? half : [half[1], half[0]]; return `La de anillos ${ringWords(had)} pesó casi ${had}. Probá la de ${ringWords(next)}: los mismos dos primeros anillos, otro tercero. Antes de pesarla, ¿cuánto pensás que va a dar?`; }
+  return `Mirá la de anillos ${ringWords(10)}, y después la de ${ringWords(100)}: los mismos dos primeros anillos, otro tercero. Antes de pesarlas, ¿qué pensás que cambia?`;
 }
 
 // These observations describe the solved physical state, not proximity to a
@@ -352,7 +357,10 @@ export class PuzzleWorkbench {
     const flow = current / before.current, amps = n => `${n.toFixed(2).replace('.', ',')} A`;
     const stone = (v, from) => (v ? `${from ? 'De' : 'a'} la piedra de ${v} Ω` : `${from ? 'Del' : 'al'} puente de cobre`), times = before.value ? value / before.value : null;
     const words = times && times > 1.8 ? `más del doble de freno` : times && times < .55 ? `menos de la mitad de freno` : null;
-    this.feedback = `${stone(before.value, true)} ${stone(value)}${words ? `: ${words}` : ''}. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'más freno, menos corriente' : 'menos freno, más corriente'}${words ? `, pero no en la misma proporción: la bobina también frena, y ese freno no cambió` : ''}.`;
+    // The reason is said once; after that Ohm only reads the two currents.
+    const why = words && !this.proportionExplained ? ', pero no en la misma proporción: la bobina también frena, y ese freno no cambió' : words ? ', otra vez no en la misma proporción' : '';
+    if (words) this.proportionExplained = true;
+    this.feedback = `${stone(before.value, true)} ${stone(value)}${words ? `: ${words}` : ''}. Corriente de ${amps(before.current)} a ${amps(current)}: ${flow < 1 ? 'más freno, menos corriente' : 'menos freno, más corriente'}${why}.`;
   }
 
   // The mark Nereo wrote in the keepers' book meets the instrument.
@@ -548,6 +556,10 @@ export class PuzzleWorkbench {
     if (action === 'numbers') { this.showNumbers = !this.showNumbers; this.recordMeasurement(); this.callbacks.onChange?.(this.id, copy(this.state)); this.render(); return; }
     if (action === 'mode') {
       // An instrument button toggles: pressing the active one puts it down and frees the hands.
+      // The instrument in hand stays in hand when its button is touched again: the way back is «Cables».
+      // Only a bench with nothing to wire puts it down that way, to switch the table back on.
+      const wiring = this.puzzle.cables !== 0 && !(this.state.completed && !this.practice);
+      if (el.dataset.mode === this.mode && this.mode !== 'wire' && wiring) { this.feedback = ''; this.render(); return; }
       const mode = el.dataset.mode === this.mode && this.mode !== 'wire' ? 'wire' : el.dataset.mode;
       this.mode = mode; this.selected = null; this.feedback = '';
       return this.change(s => { if (mode !== 'wire') s.meter.mode = mode; s.meter.a = null; s.meter.b = null; s.meter.branch = null; }, { history: false });
@@ -704,11 +716,11 @@ export class PuzzleWorkbench {
     if (weighed.includes(value)) return;
     weighed.push(value);
     const st = stoneIn(k, value), read = fmt(measureResistance(puzzleNetwork(this.id, s, false), c.a, c.b), 1);
-    appendBenchEvidence(s, { kind: 'result', text: `Pesé la piedra ${ringWords(value)}: ${read} Ω.` });
+    appendBenchEvidence(s, { kind: 'result', text: `Pesé la piedra de anillos ${ringWords(value)}: ${read} Ω.` });
     this.result = evaluatePuzzle(this.id, s);
     if (st?.riddle) { this.settleEstimate(); return; }
     const plain = weighed.filter(v => v !== RIDDLE_STONE);
-    this.feedback = plain.length === 3 ? `${ringPattern(plain)} Lumen abre el puño: tiene una piedra más.` : `La piedra ${ringWords(value)} pesa ${read} Ω.`;
+    this.feedback = plain.length === 3 ? `${ringPattern(plain)} Lumen abre el puño: tiene una piedra más.` : `La piedra de anillos ${ringWords(value)} pesa ${read} Ω.`;
     this.settleConjuro();
   }
 
@@ -718,8 +730,11 @@ export class PuzzleWorkbench {
     if (this.mode === 'current') {
       if (!m.branch) return { value: 'Elegí una pieza', unit: '', caption: 'Apagá y elegí la pieza: el medidor irá dentro de su camino.' };
       if (m.branch === 'source') return { value: this.result.current > .001 ? 'Sale corriente' : 'No sale nada', unit: '', caption: 'El medidor va en serie con la fuente: todo lo que sale de ella lo atraviesa. Para la cuenta, Nereo escribe el número.' };
-      const amount = this.result.solution.branches[m.branch]?.current ?? 0;
-      return { value: Math.abs(amount) < .001 ? 'No pasa' : amount < 0 ? 'Al revés' : 'Hay paso', unit: '', caption: `Medidor en serie con ${simpleLabel(this.puzzle.components.find(c => c.id === m.branch)?.label ?? '')}. ${this.state.sourceOn && !this.state.tripped ? 'La misma corriente atraviesa ambos.' : 'Encendé para probar este camino.'}` };
+      const amount = this.result.solution.branches[m.branch]?.current ?? 0, total = Math.abs(this.result.current ?? 0);
+      // Without numbers the meter still compares: what share of what leaves the source goes through this piece.
+      const share = total > .001 ? Math.min(1, Math.abs(amount) / total) : null, bars = share === null ? 0 : Math.max(1, Math.min(8, Math.round(share * 8)));
+      const much = share === null ? 'Hay paso' : `${share > .92 ? 'Casi todo lo que sale' : share > .6 ? 'Mucho de lo que sale' : share > .35 ? 'Una buena parte' : share > .15 ? 'Una parte chica' : 'Muy poco'} ${'▮'.repeat(bars)}${'▯'.repeat(8 - bars)}`;
+      return { value: Math.abs(amount) < .001 ? 'No pasa' : amount < 0 ? 'Al revés' : much, unit: '', caption: `Medidor en serie con ${simpleLabel(this.puzzle.components.find(c => c.id === m.branch)?.label ?? '')}. ${this.state.sourceOn && !this.state.tripped ? 'La barra compara con todo lo que sale de la fuente.' : 'Encendé para probar este camino.'}` };
     }
     if (!m.a || !m.b) return { value: m.a ? 'Una punta más' : 'Apoyá las puntas', unit: '', caption: m.a ? 'Elegí otra pieza redonda para apoyar la punta negra.' : 'Tocá dos piezas redondas: primero una, después otra.' };
     if (this.mode === 'weigh') return this.state.sourceOn && !this.state.tripped ? { value: 'Primero, apagá', unit: '', caption: 'Este instrumento usa su propia pila. Apagá la mesa y volvé a mirar.' } : this.weighReading();
@@ -732,8 +747,10 @@ export class PuzzleWorkbench {
     // Without numbers the instrument still says how much: a share of what the source gives, in words
     // and a small gauge, so two comparisons can be told apart.
     const source = Math.abs(measureVoltage(this.result.solution, 'positive', 'negative') ?? 0), share = source > .01 && voltage !== null ? Math.abs(voltage) / source : null;
-    const gauge = share === null ? '' : ` ${'▮'.repeat(Math.max(share > .01 ? 1 : 0, Math.min(8, Math.round(share * 8))))}${'▯'.repeat(8 - Math.max(share > .01 ? 1 : 0, Math.min(8, Math.round(share * 8))))}`;
-    const amount = share === null ? 'Hay diferencia' : `${share < .08 ? 'Casi iguales' : share < .25 ? 'Algo de diferencia' : share < .5 ? 'Bastante diferencia' : share < .75 ? 'Mucha diferencia' : 'Casi toda la fuerza'}${gauge}`;
+    // The words follow the bars, so the same gauge always reads the same; four of eight is said as half.
+    const bars = share === null ? 0 : Math.max(share > .01 ? 1 : 0, Math.min(8, Math.round(share * 8)));
+    const gauge = share === null ? '' : ` ${'▮'.repeat(bars)}${'▯'.repeat(8 - bars)}`;
+    const amount = share === null ? 'Hay diferencia' : `${share < .04 ? 'Casi iguales' : ['Casi iguales', 'Un poco de diferencia', 'Algo de diferencia', 'Bastante diferencia', 'La mitad de la fuerza', 'Mucha diferencia', 'Mucha diferencia', 'Casi toda la fuerza', 'Casi toda la fuerza'][bars]}${gauge}`;
     return { value: voltage === null ? 'Sin referencia' : Math.abs(voltage) < .01 ? 'Iguales' : voltage < 0 ? `Al revés · ${amount.replace(/ ▮.*/, '').toLocaleLowerCase('es')}` : amount, unit: '', caption: voltage === null ? 'Una punta quedó aislada. No hay una comparación fiable.' : `Comparación entre ${this.portLabel(m.a)} y ${this.portLabel(m.b)}. Al intercambiar las puntas, cambia el sentido de la lectura.` };
   }
 
@@ -930,7 +947,7 @@ export class PuzzleWorkbench {
     const now = this.state.values[k.key];
     const plain = weighedStones(this.state).filter(v => v !== RIDDLE_STONE).length;
     return `<div class="wb-socket" data-knob-key="${k.key}" role="radiogroup" aria-label="${escapeHtml(`${k.label} · ${k.socket}`)}">${k.stones.filter(st => !st.riddle || plain >= 3).map(st => {
-      const on = st.value === now, name = st.strap ? 'Puente de cobre, sin piedra' : `Piedra ${ringWords(st.value)}${this.showNumbers ? ` · ${st.value} Ω` : ''}`;
+      const on = st.value === now, name = st.strap ? 'Puente de cobre, sin piedra' : `Piedra de anillos ${ringWords(st.value)}${this.showNumbers ? ` · ${st.value} Ω` : ''}`;
       return `<button class="wb-stone ${on ? 'is-in' : ''}" role="radio" aria-checked="${on}" data-action="stone" data-key="${k.key}" data-value="${st.value}" aria-label="${escapeHtml(name)}" title="${escapeHtml(name)}">${stoneIcon(st)}${st.strap ? '' : `<span class="wb-stone-marks" aria-hidden="true">${stoneRings(st.value).map(c => `<i>${RING_MARKS[c]}</i>`).join('')}</span>`}${this.showNumbers ? `<small>${st.strap ? '0' : st.value} Ω</small>` : ''}</button>`;
     }).join('')}</div>`;
   }
@@ -1061,7 +1078,7 @@ export class PuzzleWorkbench {
         ${this.linePlate()}${p.components.map(c => this.plate(c)).join('')}${p.ports.map(n => portMarkup(n)).join('')}${this.mode === 'wire' && !inService ? s.wires.map((w, i) => isSealed(this.id, w) ? '' : this.wireChip(w, i)).join('') : ''}
         <p class="wb-node-caption" aria-live="polite"></p>
       </div>
-        ${success && !this.successDismissed && !this.reveal ? `<div class="wb-success" role="status"><div class="wb-success-seal" aria-hidden="true">✓</div><h2>${p.done ? '¡Resuelto!' : '¡Funciona!'}</h2>${successWhat ? `<p class="wb-success-what">${escapeHtml(successWhat)}</p>` : ''}<p class="wb-learned"><b>Lo que aprendiste</b>${escapeHtml(guidance.learned)}</p><div class="wb-success-actions">${revealable ? `<button class="wb-primary" data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Mirá lo que vi →</button><button class="wb-quiet" data-action="commission">${leaveLabel}</button>` : `<button class="wb-primary" data-action="commission">${leaveLabel}</button><button class="wb-quiet" data-action="stay">Seguir mirando la mesa</button>`}</div></div>` : ''}
+        ${success && !this.successDismissed && !this.reveal ? `<div class="wb-success" role="status"><div class="wb-success-seal" aria-hidden="true">✓</div><h2>${p.done ? '¡Resuelto!' : '¡Funciona!'}</h2>${successWhat ? `<p class="wb-success-what">${escapeHtml(successWhat)}</p>` : ''}<p class="wb-learned"><b>Lo que vimos</b>${escapeHtml(guidance.learned)}</p><div class="wb-success-actions">${revealable ? `<button class="wb-primary" data-action="reveal"><span class="wb-eye-icon" aria-hidden="true"></span>Mirá lo que vi →</button><button class="wb-quiet" data-action="commission">${leaveLabel}</button>` : `<button class="wb-primary" data-action="commission">${leaveLabel}</button><button class="wb-quiet" data-action="stay">Seguir mirando la mesa</button>`}</div></div>` : ''}
       <p class="wb-rotate-hint"><span aria-hidden="true">⟳</span>Con el teléfono apaisado, el tablero se ve más grande.</p>
       <ul class="wb-piece-list">${[...p.components.filter(c => c.goal || this.probeMarks?.[c.id] || (p.constraints ?? []).some(k => k.branch === c.id)).map(c => `<li><span>${escapeHtml(this.pieceName(c))}</span>${this.stateMarkup(c)}</li>`), (p.constraints ?? []).some(k => k.source) ? `<li>${this.linePlate().replace(/^<div[^>]*>|<\/div>$/g, '')}</li>` : ''].join('')}</ul>
 </main>

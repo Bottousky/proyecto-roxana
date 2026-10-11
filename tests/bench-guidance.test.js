@@ -78,7 +78,7 @@ test('a working, proven bench shows one way forward and what was learned', () =>
     const html = bench(id, s).html();
     assert.match(html, /class="wb-success"/, `${id}: the success card is on the board`);
     assert.equal((html.match(/data-action="commission"/g) ?? []).length, 1, `${id}: one button carries the story on`);
-    assert.match(html, /Lo que aprendiste/);
+    assert.match(html, /Lo que vimos/);
     assert.doesNotMatch(html, /data-action="hint"/, `${id}: no hints once it works`);
   }
 });
@@ -211,7 +211,7 @@ test('a socket only takes the stones at hand, and the notebook writes which one 
   const previous = globalThis.document;
   globalThis.document = { activeElement: null };
   try { b.change(state => { state.values.brake = 10; }); } finally { globalThis.document = previous; }
-  assert.match(getBenchEvidence('gate', b.state).map(e => e.text).join(' '), /Zócalo del freno: saqué el puente de cobre; puse la piedra marrón, negro, negro y oro/);
+  assert.match(getBenchEvidence('gate', b.state).map(e => e.text).join(' '), /Zócalo del freno: saqué el puente de cobre; puse la piedra de anillos marrón, negro, negro y oro/);
   // The stone brakes what it really is, a little off its rings: the physics uses 10,1 Ω.
   assert.ok(Math.abs(evaluatePuzzle('gate', b.state).network.resistors.find(r => r.id === 'trim').resistance - 10.1) < 1e-9);
 });

@@ -162,3 +162,16 @@ test('a newcomer receives observations before optional electrical formalization'
   }
   assert.equal(JOURNAL.find(entry => entry.id === 'arrival').explanation, undefined, 'The blank journal does not front-load a lesson');
 });
+
+test("Vega's song is put to the test: coupling the axle before the water gets its own start", async () => {
+  const { toggleMemory, resolveDialogue } = await import('../src/content.js');
+  const flags = {};
+  Object.assign(flags, toggleMemory('spring_coupling', flags)); flags.spring_coupling = true;
+  assert.equal(flags.spring_backwards, true, 'the axle went first');
+  Object.assign(flags, toggleMemory('spring_sluice', flags)); flags.spring_sluice = true;
+  assert.match(resolveDialogue('spring_ready', { flags }).map(l => l.text).join(' '), /Para eso era el canto/);
+  const inOrder = {};
+  Object.assign(inOrder, toggleMemory('spring_sluice', inOrder)); inOrder.spring_sluice = true;
+  Object.assign(inOrder, toggleMemory('spring_coupling', inOrder)); inOrder.spring_coupling = true;
+  assert.doesNotMatch(resolveDialogue('spring_ready', { flags: inOrder }).map(l => l.text).join(' '), /canto/);
+});

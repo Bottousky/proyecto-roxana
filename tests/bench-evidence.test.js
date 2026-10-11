@@ -71,7 +71,9 @@ test('only an actual probe reading becomes a measurement, its result stays on th
   click({ action: 'numbers' });
   assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').at(-1).value, 'ABIERTO');
   click({ action: 'mode', mode: 'continuity' });
-  assert.equal(bench.mode, 'wire', 'pressing the active instrument puts it down');
+  assert.equal(bench.mode, 'continuity', 'touching the instrument in hand again keeps it: a novice taps it to be sure');
+  click({ action: 'mode', mode: 'wire' });
+  assert.equal(bench.mode, 'wire', '«Cables» puts the instrument down');
   assert.equal(bench.state.sourceOn, true, 'and the bench is live again');
 });
 
@@ -151,7 +153,7 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
     assert.equal(bench.state.weighed.includes(220), false, 'Lumen covers the riddle stone until it is answered');
     click({ action: 'estimate', choice: 'doscientos' }); probe('weigh', 'trayA', 'trayB');
     assert.deepEqual(bench.state.weighed, [10, 12, 100, 220]);
-    assert.match(getBenchEvidence(id, bench.state).map(e => e.text).join(' '), /Pesé la piedra marrón, rojo, negro y oro: 11,8 Ω/);
+    assert.match(getBenchEvidence(id, bench.state).map(e => e.text).join(' '), /Pesé la piedra de anillos marrón, rojo, negro y oro: 11,8 Ω/);
   }
   for (const [key, value] of Object.entries(target.values)) {
     // A socket takes a stone in one gesture; a dial turns one notch at a time.

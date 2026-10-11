@@ -292,7 +292,7 @@ export const DIALOGUES = {
     ['narrator', 'El cerrojo asciende. Por primera vez en años, la Calzada no termina en una pared.'],
     ['player', 'Cambió el sentido. Y con la piedra justa en el zócalo, levantó sin atascarse.'],
     ['edda', 'Con toda la Luz golpeaba. Le voy a decir a mi abuela que la Puerta prefería que le hablaran más despacio.'],
-    ['edda', 'Lo voy a dibujar con las dos posiciones. Si dibujo sólo la buena, después parece que adiviné.'],
+    ['edda', 'Lo voy a dibujar con el puente y con la piedra. Si dibujo sólo la buena, después parece que adiviné.'],
     ['edda', 'Del otro lado hay agua. La escuché detrás de la puerta cada vez que vine. No sabés cuánto quería comprobarlo.'],
     ['ohm', 'Distancia hasta la próxima pregunta: aproximadamente un camino.']),
   road_after: d(['edda', 'Voy a adelantarme al Castillo. Si la Consejera pregunta quién abrió la puerta, voy a decir la verdad. Con una pausa teatral.']),
@@ -320,6 +320,12 @@ export const DIALOGUES = {
     ['narrator', 'La corriente de agua alcanza los álabes. El acople vibra, toma el movimiento y un indicador eléctrico cobra vida.'],
     ['player', 'La rueda se mueve y el indicador encendió. Pero la bomba sigue quieta.'],
     ['vega', 'Como aquella mañana. Acerquémonos antes de pedirle más agua.']),
+  // The operators' song, put to the test: the axle coupled before the water reached the wheel.
+  spring_ready_backwards: d(
+    ['narrator', 'El agua alcanza los álabes. La rueda, ya enganchada al generador, arranca a tirones: el acople cruje antes de tomar el movimiento. Un indicador eléctrico cobra vida.'],
+    ['vega', 'Al revés. Y no se ofendió: arrancó pesada, nada más. Quieta y enganchada, la rueda tiene que mover la máquina entera de golpe. Para eso era el canto.'],
+    ['player', 'Se mueve y el indicador encendió. Pero la bomba sigue quieta.'],
+    ['vega', 'Como aquella mañana. Acerquémonos antes de pedirle más agua.']),
   pump_locked: d(['vega', 'Todavía falta transmitir el movimiento. Abrí el canal hacia la rueda y conectá el acople del generador. Son las dos manivelas.']),
   pump_arrival: d(
     ['vega', 'Esa unión junto al agua se entibia cuando la bomba intenta arrancar. Antes no lo hacía.'],
@@ -333,7 +339,7 @@ export const DIALOGUES = {
     ['vega', 'Ese sonido. Pensé que lo había olvidado. Era el comienzo de mis mañanas.'],
     ['vega', 'Y mirá el canal viejo, el que baja del Monte Quieto: volvió a traer agua. La Casa de Compuertas está callada desde antes de que yo naciera.'],
     ['player', 'No alcanzaba con que el camino estuviera unido. Esa unión vieja estaba haciendo otra cosa cuando la bomba trabajaba.'],
-    ['ohm', 'El instrumento puede guardar ambas lecturas. Una sola habría contado menos.'],
+    ['ohm', 'Guardé las dos lecturas: con la bomba quieta y trabajando. Una sola habría contado menos.'],
     ['vega', 'El Castillo decide el reparto. Voy a las Terrazas a preparar los canales. Cuando llegues, no vas a encontrarme esperando.']),
   spring_after: d(['vega', 'La marca de agua sube despacio. Es buena señal: una instalación estable no necesita demostrar su fuerza todo el tiempo.']),
   spring_levels: d(
@@ -450,8 +456,8 @@ export const DIALOGUES = {
     ['nereo', 'Lo que tiene que durar.'],
     ['ohm', 'Unidad no reconocida.'],
     ['nereo', 'Cuarenta años y recién ahora viene alguien a quejarse. Las uniones del muelle las hago yo: las hice más veces que ustedes años.'],
-    ['narrator', 'Nereo fija la bornera junto a las bobinas y, entre las cañas, une el retorno sin mirar. En el agua, una baliza tarda un momento y contesta.'],
-    ['nereo', 'Miren las balizas, no a mí. Si una se apaga, ahí está la pregunta.']),
+    ['narrator', 'Nereo fija la bornera junto a las bobinas, sin mirar. Entre las cañas, el retorno sigue suelto. Las balizas no contestan.'],
+    ['nereo', 'El retorno lo cerrás vos, entre las cañas. Y miren las balizas, no a mí: si una no contesta, ahí está la pregunta.']),
   lake_link_complete: d(
     ['narrator', 'La línea sumergida vibra bajo el muelle. Tres balizas marcan el camino hacia el Faro.'],
     ['nereo', 'Ahora sí. Yo llevo la llave. Ustedes, esa costumbre nueva de mirar dos veces.']),
@@ -867,9 +873,14 @@ export function journalText(entry, state = {}) {
 }
 
 // Routine preparations the inhabitants do themselves once a conversation ends.
+/** What a hand on a lever remembers beyond the lever itself: the order Vega's song asks for. */
+export function toggleMemory(flag, flags) {
+  return flag === 'spring_coupling' && !flags.spring_coupling && !flags.spring_sluice ? { spring_backwards: true } : flag === 'spring_sluice' && !flags.spring_sluice && !flags.spring_coupling ? { spring_backwards: false } : {};
+}
+
 export const DIALOGUE_EFFECTS = {
   lumen_before: { flags: ['workshop_feed'] },
-  nereo_lake: { flags: ['lake_cable', 'lake_return'] },
+  nereo_lake: { flags: ['lake_cable'] },
   // In the Faro Nereo does the routine joins and the mechanical preparation; the player keeps
   // the decisions (isolating the worn bridge, coupling the motor) and the three benches.
   nereo_tower: { flags: ['tower_feed', 'tower_return'] },
@@ -894,11 +905,13 @@ export const JOURNAL = [
 const objectives = [
   ['awaken', { title: 'Una pequeña luz', detail: 'Mirá con Edda al pequeño de bronce sobre el pedestal.', area: 'portal', object: 'ohm_pedestal' }],
   ['workshop', { title: 'El oficio de preguntar', detail: 'Visitá a Lumen en su taller y mirá la lámpara que no enciende.', area: 'workshop', object: 'workbench' }],
-  ['gate', { title: 'El otro lado de la puerta', detail: 'Encontrá a Edda en la Calzada. ¿Por qué la puerta sigue cerrada?', area: 'road', object: 'gate_panel' }],
+  ['bridge_ready', { title: 'El otro lado de la puerta', detail: 'Encontrá a Edda en la Calzada. Las balizas no responden: hay cierres en los dos postes y un puente de cobre que no figura en el dibujo.', area: 'road', object: 'road_bypass' }, 'gate'],
+  ['gate', { title: 'El otro lado de la puerta', detail: 'Las balizas responden. Falta el cerrojo: su regulador está junto a la puerta.', area: 'road', object: 'gate_panel' }],
   ['pump', { title: 'Donde empieza el agua', detail: 'Hablá con Vega en el Manantial y ayudala a mirar la bomba.', area: 'spring', object: 'pump_panel' }],
   ['distribution', { title: 'Una red que se puede comprender', detail: 'En el Castillo, buscá con la Consejera una forma de recuperar servicios sin poner en riesgo a sus vecinos.', area: 'castle', object: 'distribution_panel' }],
   ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],
-  ['beacon_link', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }],
+  ['lake_cable', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }, 'beacon_link'],
+  ['beacon_link', { title: 'La orilla de la señal', detail: 'Nereo fijó la bornera. El retorno, entre las cañas, es tuyo: cerralo y mirá las balizas.', area: 'lake', object: 'lake_return' }],
   ['beacon_supply', { title: 'El Faro · I / III', detail: 'Hablá con Nereo junto a la base y verificá la fuente en el primer panel.', area: 'lighthouse', object: 'beacon_supply_panel' }],
   ['beacon_network', { title: 'El Faro · II / III', detail: 'Con Nereo, buscá el giro y las luces que faltan en la galería del medio.', area: 'lighthouse', object: 'beacon_network_panel' }],
   ['beacon_lens', { title: 'El Faro · III / III', detail: 'Con el obturador abierto, ajustá la linterna hasta sostener la señal.', area: 'lighthouse', object: 'beacon_lens_panel' }],
@@ -906,7 +919,8 @@ const objectives = [
 
 export function getObjective(state) {
   const flags = state.flags || {};
-  const objective = objectives.find(([flag]) => !flags[flag])?.[1];
+  // A step inside a chapter (the third element names its chapter) no longer counts once the chapter is done.
+  const objective = objectives.find(([flag, , chapter]) => !flags[flag] && !(chapter && flags[chapter]))?.[1];
   return objective || (flags.epilogue_shared
     ? { title: 'Un reino que vuelve a preguntar', detail: 'Los habitantes siguen con sus tareas. Podés volver a visitarlos y conservar las preguntas que quedan abiertas.', area: state.area || 'plaza', object: null }
     : { title: 'La primera clase', detail: 'Edda, Lumen y Tala se reúnen junto a la linterna. Acercate a compartir lo que viene después de la reparación.', area: 'lighthouse', object: 'edda_tower' });
@@ -930,6 +944,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'lake_edda' && f.beacon_link) context = 'edda_lake_linked';
   if (id === 'edda_tower_before') context = f.beacon_network ? 'edda_tower_network' : f.beacon_supply ? 'edda_tower_source' : id;
   if (id === 'vega_spring' && f.spring_drive) context = 'vega_spring_ready';
+  if (id === 'spring_ready' && f.spring_backwards) context = 'spring_ready_backwards';
   if (id === 'consejera_before' && f.castle_ready) context = 'castle_ready';
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
   if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';

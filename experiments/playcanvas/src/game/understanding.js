@@ -104,7 +104,7 @@ const REVEALS = {
         { spot: ['trim', 'latch'], title: 'El freno', words: ['resistencia'], tags: { latch: amps(I(now, 'latch')) },
           text: `Una piedra de freno es una resistencia: un tramo que cuesta atravesar. Con el puente de cobre pasaban ${amps(I(hard, 'latch'))} y el cerrojo golpeaba. Con la piedra de ${brake} Ω pasan ${amps(I(now, 'latch'))}: firme. En el Instituto se mide en ohmios, Ω. Sí, como yo. No lo elegí.` },
         { spot: ['trim'], title: 'Lo que dicen los anillos', words: ['anillos'],
-          text: brake === 10 ? 'Marrón, negro, negro: 1, 0 y ningún cero. Diez ohmios. La abuela de Edda leía «temperamento»; los anillos escriben un número, con dos cifras y cuántos ceros le siguen. El dorado avisa que la piedra puede correrse un poco.' : `Los anillos de esta piedra escriben ${brake} Ω: dos cifras y cuántos ceros les siguen. El dorado avisa que la piedra puede correrse un poco.` },
+          text: brake === 10 ? 'Marrón, negro, negro: 1, 0 y ningún cero. Diez ohmios. La abuela de Edda leía «temperamento»; los anillos escriben un número, con dos cifras y cuántos ceros les siguen. El dorado avisa que la piedra puede correrse un poco.' : `Los anillos de esta piedra escriben ${brake} Ω: dos cifras y cuántos ceros les siguen. El dorado avisa que la piedra puede correrse un poco.` },
       ],
       question: 'La piedra roja, roja, negra frena 22 Ω. ¿Cuánto frenaría una roja, roja, marrón?',
     };
@@ -181,7 +181,7 @@ const REVEALS = {
         { spot: ['tray'], title: 'Un número escrito en colores', words: ['anillos'],
           text: 'Los dos primeros anillos son cifras; el tercero, cuántos ceros siguen. Rojo, rojo, marrón: 2, 2 y un cero. 220. Igual que escribimos los números todos los días, sólo que con pintura.' },
         { spot: ['tray'], title: 'La dorada miente un poco',
-          text: `La piedra ${ringWords(worst)} dice ${worst} Ω y pesó ${num(stoneIn(k, worst).actual, 1)}: se corrió un ${num(Math.abs(off(worst)), 1)} %. El anillo dorado promete que nunca se corre más de un 5 %. No traiciona: avisa.` },
+          text: `La piedra de anillos ${ringWords(worst)} dice ${worst} Ω y pesó ${num(stoneIn(k, worst).actual, 1)}: se corrió un ${num(Math.abs(off(worst)), 1)} %. El anillo dorado promete que nunca se corre más de un 5 %. No traiciona: avisa.` },
         { spot: ['lamp'], title: 'Por qué Lumen las elegía por temperamento',
           text: 'Con más freno, la lámpara de prueba brilla menos. El temperamento que Lumen leía en cada piedra era ese número. Sus muescas también sirven: él no distingue el rojo del verde, y las reconoce igual.' },
       ],
@@ -286,7 +286,7 @@ export const ESTIMATES = {
     close: (value, x) => Math.abs(x - value) / value < .06,
     reading: x => `pesó ${num(x, 0)} Ω`,
     why: 'Rojo, rojo: 2 y 2. Marrón: un cero.',
-    right: 'Lumen se ríe: «Y yo que la elegía por el peso en la mano».', wrong: 'Lumen la guarda igual: «Me pasó lo mismo con mi padre».' },
+    yours: true, right: 'Lumen se ríe: «Y yo que la elegía por el peso en la mano».', wrong: 'Lumen la guarda igual: «Me pasó lo mismo con mi padre».' },
   beacon_lens: { who: 'NEREO', book: 'Libro del farero',
     ask: 'Para el libro del farero, antes de medir: los dos brazos del divisor frenan lo mismo. Sin la lente, ¿qué parte de los 18 V debería marcar la toma?',
     noted: 'Los dos brazos del divisor frenan lo mismo. Sin la lente, ¿qué parte de los 18 V marca la toma?',
@@ -303,7 +303,8 @@ export function estimateVerdict(id, choice, measured) {
   const e = ESTIMATES[id], option = e?.options.find(o => o.id === choice);
   if (!option || !Number.isFinite(measured)) return '';
   const said = option.text[0].toLowerCase() + option.text.slice(1);
+  const [hit, miss] = e.yours ? ['Acertaste: dijiste', 'Dijiste'] : ['Anotado: esperábamos', 'Esperábamos'];
   return e.close(option.value, measured)
-    ? `Anotado: esperábamos «${said}» y ${e.reading(measured)}. ${e.why} ${e.right ?? 'El próximo farero va a poder confiar en esa marca.'}`
-    : `Esperábamos «${said}»; ${e.reading(measured)}. ${e.why} ${e.wrong ?? 'Lo anoto igual: que el próximo farero sepa que también nos equivocamos.'}`;
+    ? `${hit} «${said}» y ${e.reading(measured)}. ${e.why} ${e.right ?? 'El próximo farero va a poder confiar en esa marca.'}`
+    : `${miss} «${said}»; ${e.reading(measured)}. ${e.why} ${e.wrong ?? 'Lo anoto igual: que el próximo farero sepa que también nos equivocamos.'}`;
 }

@@ -18,7 +18,7 @@ import './journal.css';
 import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -295,7 +295,7 @@ function interact(obj=nearby){
     if(action.type==='toggle'){
       const latched=WORLD_SYSTEMS.find(system=>(system.requires?.includes(action.flag)||system.off?.includes(action.flag))&&state.flags[system.latch]);
       if(latched){bubble('Los mandos quedaron asegurados al poner esta instalación en servicio.');return;}
-      state.flags[action.flag]=!state.flags[action.flag];sound('switch');
+      Object.assign(state.flags,toggleMemory(action.flag,state.flags));state.flags[action.flag]=!state.flags[action.flag];sound('switch');
       toast(state.flags[action.flag]?(action.onText||'Contacto cerrado'):(action.offText||'Contacto abierto'));
       refreshWorldSystems();persist();return;
     }
