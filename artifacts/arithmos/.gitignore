@@ -6,3 +6,6 @@ it*/review-*/**/*.png
 it*/review-*/**/*.jpg
 it*/review-*/**/*.jpeg
 it*/review-*/**/*.webm
+# Laboratorio: capturas de los bots y recorridos cuadro a cuadro de scene-audit (se regeneran; audit.json y *.out quedan).
+animlab/**/bot-*/
+animlab/**/tracks.json

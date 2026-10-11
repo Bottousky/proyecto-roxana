@@ -44,7 +44,9 @@ page.on('pageerror', e => errors.push(String(e.stack || e)));
 let rec;
 if (replay) {
   const old = JSON.parse(await readFile(join(replay, 'audit.json'), 'utf8'));
-  rec = {calls: old.calls, contacts: old.contacts, vol: old.vol ?? {master: 0.8, music: 0.7, sfx: 0.8}, T: old.T, tracks: JSON.parse(await readFile(join(replay, 'tracks.json'), 'utf8'))};
+  // sin tracks.json (no se versiona: es pesado) quedan los contactos guardados y no se buscan teletransportes
+  const tracks = await readFile(join(replay, 'tracks.json'), 'utf8').then(JSON.parse, () => null);
+  rec = {calls: old.calls, contacts: old.contacts, vol: old.vol ?? {master: 0.8, music: 0.7, sfx: 0.8}, T: old.T, tracks: tracks ?? {}, keepContacts: !tracks};
   await page.goto(`http://127.0.0.1:${server.address().port}/README.md`);
 } else {
   await page.addInitScript(() => {
@@ -138,7 +140,7 @@ if (replay) {
 
 // contactos de los puntos, desde sus recorridos (también con --replay: se recalculan con las reglas de ahora)
 const DOT_KINDS = new Set(['despegue', 'aterrizaje', 'aparece', 'llega']);
-rec.contacts = rec.contacts.filter(c => !DOT_KINDS.has(c.kind));
+if (!rec.keepContacts) rec.contacts = rec.contacts.filter(c => !DOT_KINDS.has(c.kind));
 for (const [id, tr] of Object.entries(rec.tracks)) {
   const step = k => Math.hypot(tr[k][1] - tr[k - 1][1], tr[k][2] - tr[k - 1][2]);
   let moving = false;
