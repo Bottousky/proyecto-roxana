@@ -3,7 +3,7 @@
 // Uso: GAME_URL=http://127.0.0.1:4190/ node scripts/qa-dialogue-input.mjs
 import { chromium } from 'playwright';
 import assert from 'node:assert/strict';
-import { chromePath } from './chrome.mjs';
+import { chromePath, nameTraveller } from './chrome.mjs';
 
 const browser = await chromium.launch({ headless: true, executablePath: chromePath });
 const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
@@ -11,6 +11,7 @@ const errors = [];
 page.on('pageerror', error => errors.push(error.message));
 await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
+await nameTraveller(page);
 const mode = () => page.evaluate(() => window.__ohmdal?.mode);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
 while (await mode() === 'dialogue') { await page.keyboard.press('Enter'); await page.waitForTimeout(90); }

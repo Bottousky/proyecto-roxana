@@ -9,7 +9,7 @@
  * observe positions and state; every game change is a keyboard or DOM click.
  */
 import { chromium } from 'playwright';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -529,6 +529,8 @@ try {
   await page.locator('#resume-option').click();
   await screenshot('title');
   await page.locator('#new-game').click();
+  // A fresh browser has no name in the Instituto's register: the Portal asks for one.
+  if (!await nameTraveller(page)) throw new Error('Una partida nueva sin registro debería preguntar el nombre del viajero.');
   await settle({ stable: 1600 });
   await screenshot('portal-arrival');
   if (adversarial) { await lockedExit('portal_to_plaza'); await wrongWireThenAbandon(); await reloadAndContinue('portal-after-abandoned-bench'); }

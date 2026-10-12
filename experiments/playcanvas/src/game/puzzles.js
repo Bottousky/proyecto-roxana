@@ -1154,7 +1154,12 @@ export class PuzzleWorkbench {
       }
     }
     // A fresh success takes the focus, so Enter carries the story on.
-    if (success && !this.successDismissed && !this.successAnnounced) { this.successAnnounced = true; this.shell.querySelector('.wb-success [data-action="commission"]')?.focus?.({ preventScroll: true }); }
+    // The card waits until the receptor has answered (puzzles.css, 1.6 s hidden): it takes the focus
+    // once it is really on screen, on its main button, so Enter does what the card offers first.
+    if (success && !this.successDismissed && !this.successAnnounced) {
+      const card = this.shell.querySelector('.wb-success'), go = card?.querySelector?.('.wb-primary');
+      if (go) card.addEventListener?.('animationend', () => { if (!go.isConnected) return; this.successAnnounced = true; go.focus?.({ preventScroll: true }); }, { once: true });
+    }
     if (!success) this.successAnnounced = false;
     this.separatePlates();
   }

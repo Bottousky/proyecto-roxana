@@ -5,7 +5,7 @@
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4190/';
 const [width, height] = (process.env.SIZE || '1440x900').split('x').map(Number);
@@ -15,6 +15,7 @@ const page = await browser.newPage({ viewport: { width, height } });
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
+await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
 const shot = async name => { if (shots) await page.screenshot({ path: `${shots}/${width}x${height}-${name}.png` }); };
 const open = id => page.evaluate(id => { document.querySelector('#dialogue')?.classList.add('hidden'); document.querySelector('#workbench').classList.remove('hidden'); window.__ohmdal.workbench.open(id, undefined); }, id);
@@ -30,10 +31,11 @@ const drag = async (a, b) => {
 };
 const log = (...a) => console.log(...a);
 
-// Taller: el paso 1 pide el probador; cada tramo probado queda marcado sobre el tablero.
+// Taller: el paso 1 pide el probador, que ya está en la mano al abrir (ciclo 20); cada tramo probado
+// queda marcado sobre el tablero.
 await open('workshop');
 log('workshop', '·', await say());
-assert.match(await page.locator('[data-mode="continuity"]').getAttribute('class'), /wb-next-step/, 'the instrument the step asks for is highlighted');
+assert.match(await page.locator('[data-mode="continuity"]').getAttribute('class'), /\bactive\b/, 'the instrument the first step asks for is already in hand');
 await page.locator('[data-mode="continuity"]').click();
 assert.equal((await bench()).state.sourceOn, false, 'the continuity probe switches the bench off by itself');
 for (const [a, b] of [['s1a', 's1b'], ['s2a', 's2b'], ['s3a', 's3b']]) { await page.locator(`.wb-terminal[data-port="${a}"]`).click(); await page.locator(`.wb-terminal[data-port="${b}"]`).click(); }
@@ -51,10 +53,16 @@ assert.equal(b.solved, true, 'a dragged cable bridges the cut');
 assert.equal(b.state.sourceOn, true);
 await page.locator('.wb-success').waitFor({ state: 'visible' });
 assert.equal(await page.locator('[data-action="commission"]').count(), 1, 'one button carries the story on');
-assert.equal(await page.evaluate(() => document.activeElement?.dataset.action), 'commission', 'the success card takes focus');
+// The card waits for the receptor's answer, then takes the focus on its main button (Enter does it).
+assert.ok(await page.waitForFunction(() => !!document.activeElement?.closest('.wb-success') && document.activeElement.classList.contains('wb-primary'), {}, { timeout: 6000 }).then(() => true, () => false), 'the success card takes focus once it appears');
 await shot('workshop-success');
 log('  éxito ·', (await page.locator('.wb-success').innerText()).replace(/\s+/g, ' '));
-await page.locator('[data-action="stay"]').click();
+// «Mirá lo que vi» walks through Ohm's cards (ciclo 21); staying at the table afterwards keeps the
+// way forward in the header.
+await page.locator('.wb-success [data-action="reveal"]').click();
+const nextCard = page.locator('.wb-reveal [data-action="reveal-step"][data-delta="1"]');
+for (let i = 0; i < 10 && await nextCard.count(); i++) await nextCard.click();
+await page.locator('.wb-reveal [data-action="reveal-end"]').click();
 assert.equal(await page.locator('.wb-commission-top').count(), 1, 'after looking around, the way forward stays in the header');
 await closeBench();
 

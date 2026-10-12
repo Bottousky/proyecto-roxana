@@ -5,7 +5,7 @@
 import { chromium } from 'playwright';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4190/';
 const save = readFileSync(resolve(process.env.SAVE || 'output/playcanvas-playthrough/verified-save.json'), 'utf8');
@@ -18,6 +18,7 @@ page.on('pageerror', e => errors.push(e.message));
 await page.addInitScript(text => { if (!sessionStorage.getItem('visit')) { localStorage.setItem('ohmdal.playcanvas.arc1.v1', text); sessionStorage.setItem('visit', '1'); } }, save);
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.locator('#continue').click();
+await nameTraveller(page);
 const game = () => page.evaluate(() => ({ mode: window.__ohmdal?.mode, area: window.__ohmdal?.state.area, p: window.__ohmdal?.world.getPlayerPosition() }));
 const settle = async () => { for (let i = 0; i < 400; i++) { const g = await game(); if (g.mode === 'world') return g; if (g.mode === 'dialogue') await page.keyboard.press('Enter'); else if (g.mode === 'modal') await page.keyboard.press('Escape'); await page.waitForTimeout(80); } };
 await page.waitForFunction(() => window.__ohmdal?.mode && window.__ohmdal.mode !== 'title', {}, { timeout: 60000 });

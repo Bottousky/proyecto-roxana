@@ -3,7 +3,7 @@
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const out = resolve(process.env.OUT || 'output/awaken-scene');
 await mkdir(out, { recursive: true });
@@ -12,6 +12,7 @@ const page = await browser.newPage({ viewport: { width: 1280, height: 720 } });
 const errors = []; page.on('pageerror', e => errors.push(e.message));
 await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
+await nameTraveller(page);
 const mode = () => page.evaluate(() => window.__ohmdal?.mode);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
 while (await mode() === 'dialogue') { await page.keyboard.press('Enter'); await page.waitForTimeout(90); }

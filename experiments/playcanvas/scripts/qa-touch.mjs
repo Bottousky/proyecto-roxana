@@ -7,7 +7,7 @@ import { chromium } from 'playwright';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const out = resolve(process.env.OUT || 'output/qa-touch');
 await mkdir(out, { recursive: true });
@@ -57,6 +57,7 @@ async function reach(id, { until = g => g.near === id || g.mode !== 'world', tri
 await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
 await capture('titulo');
 await tapEl('#new-game');
+await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
 await capture('llegada');
 await read(); note('llegada-leida');

@@ -4,7 +4,7 @@
 // Uso: GAME_URL=http://127.0.0.1:4190/ SIZE=1280x720 [SHOTS=carpeta] node scripts/qa-type-sizes.mjs
 // Sale con código 1 si encuentra algo por debajo del piso (STRICT=0 sólo informa).
 import { chromium } from 'playwright';
-import { chromePath } from './chrome.mjs';
+import { chromePath, nameTraveller } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4190/';
 const [width, height] = (process.env.SIZE || '1280x720').split('x').map(Number);
@@ -38,6 +38,7 @@ const findings = [];
 const mode = () => page.evaluate(() => window.__ohmdal?.mode);
 findings.push(...await scan('título'));
 await page.locator('#new-game').click();
+await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
 await page.waitForTimeout(900);
 findings.push(...await scan('diálogo'));

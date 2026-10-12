@@ -11,7 +11,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { execSync } from 'node:child_process';
 import os from 'node:os';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4191/';
 const [width, height] = (process.env.SIZE || '1440x900').split('x').map(Number);
@@ -32,6 +32,7 @@ await page.goto(url, { waitUntil: 'networkidle' });
 const titleMs = Date.now() - t0;
 const t1 = Date.now();
 await page.locator('#continue').click();
+await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode && !['title', 'transition'].includes(window.__ohmdal.mode), {}, { timeout: 120000 });
 const worldMs = Date.now() - t1;
 const transfer = await page.evaluate(() => performance.getEntriesByType('resource').concat(performance.getEntriesByType('navigation')).reduce((a, e) => ({ wire: a.wire + (e.transferSize || 0), body: a.body + (e.decodedBodySize || 0) }), { wire: 0, body: 0 }));

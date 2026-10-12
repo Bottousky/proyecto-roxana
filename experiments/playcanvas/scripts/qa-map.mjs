@@ -4,7 +4,7 @@
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4190/', out = process.env.OUT || 'output/qa-map';
 await mkdir(out, { recursive: true });
@@ -19,7 +19,7 @@ for (const size of sizes) {
   await page.goto(url, { waitUntil: 'networkidle' });
   // A late journey comes in through the title screen's own import, as a player would bring it.
   if (save) { await page.locator('#title-settings').click(); await page.locator('#import-save').setInputFiles(save); await page.locator('#transition').waitFor({ state: 'hidden', timeout: 120000 }); }
-  else await page.locator('#new-game').click();
+  else { await page.locator('#new-game').click(); await nameTraveller(page); }
   await page.waitForFunction(() => ['dialogue', 'world'].includes(window.__ohmdal?.mode), {}, { timeout: 180000 });
   for (let i = 0; i < 100 && await page.evaluate(() => window.__ohmdal.mode !== 'world'); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(140); }
   await page.keyboard.press('m');

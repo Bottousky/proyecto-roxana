@@ -4,7 +4,7 @@
 // no recorrido). Uso: GAME_URL=… SIZE=1440x900 [SHOTS=carpeta] node scripts/qa-bench-load.mjs
 import { chromium } from 'playwright';
 import { mkdir } from 'node:fs/promises';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const url = process.env.GAME_URL || 'http://127.0.0.1:4190/';
 const [width, height] = (process.env.SIZE || '1440x900').split('x').map(Number);
@@ -13,6 +13,7 @@ const browser = await chromium.launch({ headless: true, executablePath: chromePa
 const page = await browser.newPage({ viewport: { width, height } });
 await page.goto(url, { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
+await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
 const ids = ['awaken', 'workshop', 'gate', 'pump', 'distribution', 'irrigation', 'beacon_supply', 'beacon_network', 'beacon_lens'];
 const rows = [];

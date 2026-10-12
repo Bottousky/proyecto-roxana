@@ -1,7 +1,7 @@
 // Captura el banco de cada puzzle recién abierto, sin tocar partidas.
 // Uso: node scripts/puzzle-review.mjs [id,id…]
 import { chromium } from 'playwright';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -15,6 +15,7 @@ page.on('console', m => { if (m.type() === 'error') console.log('console:', m.te
 page.on('pageerror', e => console.log('pageerror:', e.message));
 await page.goto(base);
 await page.locator('#new-game').click();
+await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', null, { timeout: 180000 });
 while (await page.evaluate(() => window.__ohmdal.mode) === 'dialogue') { await page.keyboard.press('Enter'); await page.waitForTimeout(80); }
 for (const id of ids) {

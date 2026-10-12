@@ -597,6 +597,28 @@ puntas sobre el mismo cobre, freno para el lado equivocado o probar sin pregunta
 ese error. Las cuatro pistas fijas quedan para después. Los errores de cada banco quedan contados
 en la partida, para el futuro informe del docente. Detalle en [BANCOS-UX.md](BANCOS-UX.md).
 
+## Ciclo 26 · El mapa horneado con GPU y las pruebas de navegador al día con el nombre (12 oct 2026)
+
+- **Mapa.** Se volvió a hornear en la Mac con GPU, como pedía la auditoría del mapa. Las seis casas
+  del pueblo aparecen en su lugar nuevo, con su teja o su pizarra y giradas como en el juego. Con
+  GPU seguía un error: la pizarra gris verdosa del Taller de Lumen y de las torres del Castillo y
+  de la Calzada se pintaba como estanques. El horneado ahora fotografía también sólo los techos
+  y bajo un techo nunca pinta agua ([MAPA.md](MAPA.md)). La fidelidad cuenta además los techos:
+  río 100 % de 35, tierra 100 % de 107.
+- **Pruebas de navegador.** Desde el ciclo 20, una partida nueva pregunta el nombre del viajero
+  si el registro del Instituto no tiene uno, y ningún guion contestaba. Ahora todos contestan
+  igual que un jugador, con `nameTraveller` (`scripts/chrome.mjs`), y el recorrido completo
+  además comprueba que la pregunta aparezca. Verificado sobre el código vivo: humo, diálogos y
+  mapa en tres tamaños, correctos.
+- **Banco: foco del cartel de éxito.** Desde que «¡Funciona!» espera la reacción (1,6 s oculto), el
+  foco no llegaba al cartel: Enter no seguía. Ahora el foco llega cuando el cartel aparece, en su
+  botón principal. Lo encontró `qa-bench-flow.mjs`.
+- **Lo que queda: las pruebas de navegador no siguen a los bancos rediseñados** (ciclos 21–25:
+  piedras de freno, piezas limitadas, «Mirá lo que vi»). `qa-bench-flow.mjs` ya pasa el Taller y
+  falla en el Cerrojo, que no tiene perilla. El recorrido completo (`playthrough.mjs`) resuelve
+  cada banco con la interfaz anterior. Hasta actualizarlos, la cadena de aceptación no puede
+  correr sobre la punta de la rama. La última aceptación completa sigue siendo la de `6a71019`.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -637,21 +659,22 @@ Los scripts de navegador eligen Chrome por plataforma (`scripts/chrome.mjs`, `CH
 
 ## Siguiente acción
 
-**Entrega parcial, candidata `6a71019` (6 oct 2026).** Aceptación completa en verde, que ahora
-incluye el mapa de juego y el Monte Quieto ([ACEPTACION.md](ACEPTACION.md)). Después de ella, sólo
-el acomodo de placas del banco y el guion de capturas apaisadas, verificados aparte. Siguen
-pendientes, fuera del alcance de este equipo:
+**Última aceptación completa: `6a71019` (6 oct 2026)** ([ACEPTACION.md](ACEPTACION.md)). Los
+ciclos 20 a 26 se verificaron por partes: pruebas unitarias, partida jugada a mano y guiones de
+navegador sueltos. El próximo paso del equipo es poner al día con los bancos rediseñados
+`qa-bench-flow.mjs` y `playthrough.mjs` (ciclo 26), y después correr la aceptación completa sobre
+la punta de la rama.
+
+Pendientes fuera del alcance de este equipo:
 - teléfono real (tacto y 30 FPS);
 - escucha del audio;
-- prueba con personas, en especial de los bancos rediseñados;
-- medir el rendimiento de esta candidata con el equipo tranquilo.
+- prueba con alguien que no sepa electricidad, en especial de las pistas que miran el montaje;
+- medir el rendimiento con el equipo tranquilo.
 
-Siguen abiertos y para decidir con el usuario:
-- **Bancos:** pistas que cambien según el error cometido ([BANCOS-UX.md](BANCOS-UX.md)). La
-  predicción en los bancos clave quedó hecha en el ciclo 21.
+Para decidir con el usuario:
+- **Arco II:** las 6 preguntas abiertas de [ARCO-2-LA-MAREA.md](ARCO-2-LA-MAREA.md#para-decidir).
 - **Escenas oscuras:** la llegada al Faro de noche, el Lago al crepúsculo y el taller a oscuras.
   El canon las pide así.
-- **Arco II:** la Casa de Compuertas ya está en el mundo y espera su arco.
 
 Para mirar el juego en el navegador integrado, cerrá la pestaña al terminar: compite por la GPU
 con las partidas automatizadas.

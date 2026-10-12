@@ -1,7 +1,7 @@
 // Captura el HUD al comenzar un viaje nuevo, en escritorio y en teléfono, con un guardado aparte.
 // Uso: node scripts/hud-review.mjs
 import { chromium } from 'playwright';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 import { mkdirSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 
@@ -14,6 +14,7 @@ for (const [name, viewport, touch] of [['desktop', { width: 1440, height: 900 },
   page.on('console', m => { if (m.type() === 'error') console.log('console:', m.text()); });
   await page.goto(base);
   await page.locator('#new-game').click();
+  await nameTraveller(page);
   await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', null, { timeout: 180000 });
   await page.screenshot({ path: `${out}${name}-dialogue.png` });
   while (await page.evaluate(() => window.__ohmdal.mode) === 'dialogue') { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
