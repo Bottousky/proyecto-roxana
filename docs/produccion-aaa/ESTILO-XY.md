@@ -46,3 +46,45 @@ piernas y brazos con la fase de la caminata, respiración en reposo y giro hacia
 - **Interiores, agua, cielo y noche:** se ajustaron por la paleta, sin trabajo propio.
 - **Peso:** 7,9 MB de PNG. Para entregar hay que pasarlos a WebP.
 - **Interfaz:** sigue con su tono actual (verde petróleo y dorado). Se podría acercar a la de X e Y.
+
+## El viajero en 3D (ciclo 28)
+
+El usuario pidió más calidad que el primer muñeco hecho con piezas geométricas. Ahora se arma así:
+
+1. **Referencias** (`art-src/xy/viajero/generate.sh`, image_gen de Codex con la hoja HD-2D adjunta):
+   el viajero de frente en pose A y una hoja de giro con frente, perfil y espalda.
+2. **Forma** (`scripts/ia3d/forma.py`): Hunyuan3D-2mv, de Tencent, a partir de las tres vistas, en la
+   GPU de la Mac (MPS). Tarda unos 17 minutos y da 305 mil caras. El entorno vive fuera del
+   repositorio, en `~/code/ohmdal-3d`, con Python 3.11, PyTorch, `transformers` 4.46.3 y `diffusers`
+   0.31.0 (las versiones nuevas rompen la carga). **Licencia:** Tencent Hunyuan Community; no vale en
+   la Unión Europea, el Reino Unido ni Corea del Sur.
+3. **Textura y esqueleto** (`scripts/blender/viajero-3d.py`):
+   - normaliza la malla a 2 m y la simplifica a 16 mil caras;
+   - le arma las UV;
+   - hornea la textura proyectando las tres vistas, cada punto desde la que lo ve de frente y sin
+     tapar (un rayo por vértice);
+   - le pone un esqueleto de 12 huesos con pesos automáticos.
+4. **En el juego** (`src/style.js`, `attachFigure` y `skinnedPose`): se mueve hueso por hueso con la
+   fase de la caminata. Las piernas dan zancadas con flexión de rodilla, los brazos se balancean y la
+   cabeza mira apenas hacia arriba. La cabeza va un 22 % más grande, que es la proporción de X e Y y
+   además deja ver la cara desde la cámara alta. La luz ambiente y la base de color van atenuadas,
+   porque la textura ya trae su luz pintada.
+
+Para comparar (`scripts/qa-style.mjs` saca las cuatro):
+- `?estilo=xy`: el sprite de siempre sobre el mundo nuevo;
+- `?estilo=xy&gente=dibujo`: la hoja de sprites redibujada (opción 2);
+- `?estilo=xy&gente=3d`: el viajero 3D (opción 1);
+- `?estilo=xy&gente=3d&figura=bloques`: el muñeco anterior.
+
+Pendientes del 3D:
+- las puntas de los dedos salen con color de abrigo;
+- una mancha marrón donde la correa cruza el pecho;
+- falta una caminata más rica: la bufanda no flamea.
+
+## Pelo y piel editables (para más adelante)
+
+Conviene prepararlo ahora y construirlo más adelante. Al hornear la textura del 3D se saca también
+una máscara de pelo y de piel, y un shader cambia el tono dentro de la máscara y conserva la luz
+pintada. Solo para el viajero, con 6 u 8 colores elegidos a mano en la pantalla donde se pide el
+nombre, y guardado en el registro del Instituto. Con sprites también se puede, pero hay que hacer
+una máscara para cada uno de los 20 cuadros.

@@ -1,0 +1,16 @@
+Saved `frente-apose.png` using the built-in image_gen tool.
+
+- Size: 1024 × 1536 pixels; 1,342,581 bytes
+- Alpha: No
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image. Use the attached sprite sheet only as the character identity and clothing reference, not as a style, pose, layout, or background reference.
+
+A single full-body character model sheet view: front view, standing straight in a relaxed A-pose (arms slightly away from the body, palms toward the legs, feet slightly apart), neutral friendly expression, facing the viewer exactly, centred, full body from hair to boots with margin. Plain pure white background, no shadow on the floor, no text.
+
+The SAME character as in the attached sprite sheet: a young traveller of about 14, curly messy brown hair, blue-grey eyes, a long mustard-yellow scarf, a teal knee-length coat with brass buttons and cuffs, a cream shirt, a brown leather belt, a brown satchel on a strap across the chest worn at the character's right hip (viewer’s left), dark grey trousers tucked into brown leather boots.
+
+Rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4 heads tall (big head, compact body, not super-deformed), large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, thin dark outline, clean saturated colours, no pixel art, no texture noise. One character, one straight-on front view, no additional views or panels.
+```

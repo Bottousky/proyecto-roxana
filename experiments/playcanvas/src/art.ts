@@ -1,5 +1,5 @@
 import {Asset,Application,Texture,TextureAtlas,Sprite,Vec2,Vec4,FILTER_LINEAR,FILTER_LINEAR_MIPMAP_LINEAR,FILTER_NEAREST,ADDRESS_REPEAT,ADDRESS_CLAMP_TO_EDGE,PIXELFORMAT_RGBA8} from 'playcanvas';
-import {XY,XY_SURFACES} from './style.js';
+import {XY,XY_SURFACES,DRAWN_PLAYER} from './style.js';
 import {opaqueBounds,actorFrameLayout,isolateFigure} from './game/actor-animation.js';
 export const textures=new Map<string,Texture>();
 const images=new Map<string,Promise<HTMLImageElement>>();
@@ -61,7 +61,7 @@ function outlineFigures(ctx:CanvasRenderingContext2D,w:number,h:number,radius:nu
   ctx.putImageData(d,0,0);
 }
 export async function actorArt(app:Application,name:string){
-  const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
+  const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':name==='player'&&DRAWN_PLAYER?'/assets/xy/player-dibujo.png':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const tile=ohm?crop(img,c,r,cols,rows,true):cropFigure(img,c,r,cols,rows);tiles.push(tile);bounds.push(opaqueBounds(tile.getContext('2d')!.getImageData(0,0,tile.width,tile.height).data,tile.width,tile.height));}
   const sheet=canvas(cols*256,rows*256),ctx=sheet.getContext('2d')!,layout=actorFrameLayout(bounds);
   tiles.forEach((tile,i)=>{const b=bounds[i],p=ohm?{x:128-b.width/2,y:244-b.height,width:b.width,height:b.height}:layout.placements[i];ctx.drawImage(tile,b.x,b.y,b.width,b.height,(i%cols)*256+p.x,Math.floor(i/cols)*256+p.y,p.width,p.height);});

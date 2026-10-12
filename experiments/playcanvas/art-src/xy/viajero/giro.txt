@@ -1,0 +1,13 @@
+Saved `giro.png` — 1536×1024 pixels, 1,410,893 bytes, no alpha. Generated with the built-in image_gen tool.
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Create exactly ONE character turnaround sheet in one wide image, 1536x1024 pixels.
+Use the attached sprite sheet (Image #1) ONLY as the character identity and clothing reference; do not copy its sprite layout, poses, rendering style, or background.
+Show the SAME character exactly three times side by side at exactly the same scale and height: left, straight front view; middle, exact right side profile facing right; right, straight back view. All three are full body, standing straight in the same relaxed A-pose, with arms slightly away from the body, feet planted, and a neutral expression. Align the tops of their heads and the soles of their boots. Use an orthographic character-sheet presentation with equal spacing and sufficient white margins, no cropping.
+Character: a young traveller of about 14, curly messy brown hair, blue-grey eyes, a long mustard-yellow scarf, a teal knee-length coat with brass buttons and cuffs, a cream shirt, a brown leather belt, a brown satchel on a strap across the chest worn at the character's anatomical right hip, dark grey trousers tucked into brown leather boots. Keep the character, clothing, accessories, and proportions consistent across all three views.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4 heads tall (big head, compact body, not super-deformed), large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, thin dark outline, clean saturated colours, no pixel art, no texture noise.
+Background: plain pure white, opaque. No cast shadows, no ground shadows, no text, no labels, no watermark, no additional characters or panels.
+```

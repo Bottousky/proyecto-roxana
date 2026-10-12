@@ -7,8 +7,14 @@ import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 
 const area = process.env.AREA || 'plaza', at = (process.env.AT || '2,6').split(',').map(Number), out = process.env.OUT || 'output/qa-style';
 await mkdir(out, { recursive: true });
-const looks = process.argv.slice(2).length ? process.argv.slice(2) : ['hd2d', 'xy', 'xy3d'];
-const query = { hd2d: '?estilo=hd2d', xy: '?estilo=xy', xy3d: '?estilo=xy&gente=3d' };
+const looks = process.argv.slice(2).length ? process.argv.slice(2) : ['hd2d', 'xy', 'dibujo', 'xy3d'];
+const query = { hd2d: '?estilo=hd2d', xy: '?estilo=xy', xy3d: '?estilo=xy&gente=3d', dibujo: '?estilo=xy&gente=dibujo' };
+
+// A crop around the traveller, from the camera's own projection.
+const crop = async (page, file, size = 320) => {
+  const [x, y] = await page.evaluate(() => { const w = window.__ohmdal.world, p = w.player.position, [ox, oz] = w.data.areas[w.area.id].offset, v = w.camera.getPosition().clone().set(p.x + ox, 1.1, p.z + oz), s = w.camera.camera.worldToScreen(v); return [s.x, s.y]; });
+  await page.screenshot({ path: file, clip: { x: Math.max(0, x - size / 2), y: Math.max(0, y - size / 2), width: size, height: size } });
+};
 const browser = await chromium.launch({ headless: true, executablePath: chromePath, args: gpuArgs });
 for (const look of looks) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
@@ -34,6 +40,12 @@ for (const look of looks) {
   await page.evaluate(() => { const w = window.__ohmdal.world; w.closeUp = w.restPose; w.restPose = p => { const r = w.closeUp(p); return { ...r, zoom: 3.2, focus: [p[0], r.focus[1], p[2] - .6] }; }; });
   await page.waitForTimeout(2500);
   await page.screenshot({ path: `${out}/${area}-${look}-cerca.png` });
+  await crop(page, `${out}/${area}-${look}-retrato.png`);
+  // Walking sideways, mid-stride.
+  await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(700);
+  await crop(page, `${out}/${area}-${look}-camina.png`);
+  await page.waitForTimeout(260); await crop(page, `${out}/${area}-${look}-camina2.png`);
+  await page.keyboard.up('ArrowLeft');
   console.log(look, errors.length ? errors.slice(0, 2) : 'sin errores');
   await page.close();
 }

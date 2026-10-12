@@ -1,0 +1,20 @@
+Saved `hoja-sprites.png` using the built-in image generator.
+
+- Size: **1402 × 1122 px**, **1,612,940 bytes**
+- Alpha: **Yes**, RGBA with transparency values from 0–255.
+
+Exact prompt used:
+
+```text
+Create exactly ONE sprite sheet image with a real transparent alpha background, containing exactly 20 full-body sprites in a precise 5-column by 4-row grid of equal cells.
+
+REFERENCE ROLES: The FIRST attached image, referencia-hd2d.png, is ONLY the grid/layout and per-cell pose reference. Copy its grid and the pose in each corresponding cell. Do NOT copy its pixel-art rendering, dark palette, purple background, or horizontal stripes. The SECOND attached image, frente-apose.png, is the definitive CHARACTER and STYLE reference. Every sprite must be the exact same character as image 2, rendered in its clean, bright, toon-shaded Pokemon X and Y style: smooth shapes, flat anime eyes, two-tone cel shading, thin dark outlines, clean saturated colours, no pixels and no texture noise.
+
+CHARACTER: Preserve image 2's tousled brown hair, youthful face, blue-gray anime eyes, golden yellow scarf with trailing ends, teal long coat with brass buttons and cuffs, cream shirt, brown cross-body strap and leather satchel, belt with brass buckle, dark olive trousers and brown boots. Keep the outfit, facial design and colours consistent in all 20 cells. Use image 2's proportions but a little chunkier, about 4.5 heads tall. Preserve the anatomical side of the satchel and strap when rotating the character.
+
+GRID AND POSES: Row 1 faces the viewer. Row 2 faces right in profile. Row 3 faces directly away, showing the back of the head and outfit. Row 4 faces left in profile. In EVERY row, column 1 is standing idle and columns 2, 3, 4 and 5 form a four-frame walk cycle: first stride, passing pose, opposite stride, opposite passing pose, with alternating legs and naturally opposite swinging arms. Match the corresponding poses of image 1 while keeping the character design and clean rendering of image 2.
+
+COMPOSITION: Equal-sized cells, evenly spaced columns and rows, identical character scale throughout, consistent framing, full hair/scarf/arms/boots inside each cell with no overlap or cropping. Feet align to the bottom baseline of each cell, with only a tiny safe transparent margin. Orthographic game-sprite presentation, no perspective grid. No visible cell borders.
+
+BACKGROUND AND EXCLUSIONS: Fully transparent background with a REAL alpha channel. Empty space between sprites must be transparent, not white, purple, black or a painted checkerboard. Characters only: no ground, no cast shadows, no scenery, no extra objects, no text, no labels, no watermark, no pixel art, no dithering, no texture noise. Generate one finished image only.
+```

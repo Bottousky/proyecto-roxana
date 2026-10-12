@@ -1,0 +1,15 @@
+Saved `hoja-sprites.png` — **1402 × 1122 px**, **1,585,720 bytes**, **alpha: yes**. Generated exactly one image using the built-in tool.
+
+Exact prompt used:
+
+```text
+Create exactly ONE PNG sprite sheet with a real transparent alpha background. Use the attached image ONLY as the character identity reference; do not copy its rendering style or striped background.
+
+Layout: exactly 5 columns by 4 rows, 20 equal cells, on a 1536x1229 canvas or a similar 5:4 canvas. No visible grid. Row 1 faces the viewer; row 2 faces right; row 3 faces away; row 4 faces left. In EVERY row, column 1 is standing idle and columns 2, 3, 4, 5 are four sequential walk-cycle frames: first leg forward contact, passing pose, opposite leg forward contact, opposite passing pose. Opposite arms swing naturally. Keep the same character scale and proportions in every cell, centered horizontally, with the supporting boot soles aligned at the bottom of each cell with a small consistent transparent margin. Entire hair, scarf, limbs and boots must remain inside their own cell, with no cropping or overlap.
+
+Character: the SAME young traveller of about 14 as the reference, with curly messy brown hair, blue-grey eyes, a long mustard-yellow scarf, a teal knee-length coat with brass buttons and cuffs, a cream shirt, a brown leather belt, a brown satchel on a strap across the chest worn at the character's anatomical right hip, dark grey trousers tucked into brown leather boots. Maintain identical clothing and anatomical satchel placement through all directions.
+
+Rendering: like a character of Pokemon X and Y on Nintendo 3DS upscaled in an emulator: a clean 3D toon-shaded figure, about 4 heads tall, big head and compact body but not super-deformed, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, thin dark outline, clean saturated colours. No pixel art, no painterly rendering, no texture noise.
+
+Only the twenty character sprites on genuine transparency. Nothing else: no background colour, no stripes, no checkerboard baked into pixels, no scenery, no floor, no cast shadows, no text, no labels, no borders, no watermark.
+```
