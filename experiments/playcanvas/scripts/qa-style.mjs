@@ -46,6 +46,13 @@ for (const look of looks) {
   await crop(page, `${out}/${area}-${look}-camina.png`);
   await page.waitForTimeout(260); await crop(page, `${out}/${area}-${look}-camina2.png`);
   await page.keyboard.up('ArrowLeft');
+  if (process.env.GESTOS) {
+    // Talking and cheering, on the traveller (the world's own signals).
+    await page.evaluate(([x, z]) => { const w = window.__ohmdal.world; w.player.position.set(x, 0, z); w.speaking = { actor: w.playerActor, t: 1 }; if (w.playerActor.figure) w.playerActor.figure.heading = 0; }, at);
+    for (const k of [0, 1, 2]) { await page.waitForTimeout(330); await crop(page, `${out}/${area}-${look}-habla${k}.png`); }
+    await page.evaluate(() => { const w = window.__ohmdal.world; w.speaking = null; const p = w.player.position; w.celebration = { t: 0, x: p.x, z: p.z, actors: [w.playerActor, w.ohmActor] }; });
+    for (const k of [0, 1, 2]) { await page.waitForTimeout(k ? 300 : 900); await crop(page, `${out}/${area}-${look}-festeja${k}.png`); }
+  }
   console.log(look, errors.length ? errors.slice(0, 2) : 'sin errores');
   await page.close();
 }

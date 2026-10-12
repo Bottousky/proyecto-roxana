@@ -1,0 +1,10 @@
+Saved `giro.png` using the built-in image_gen tool.
+
+- Size: **1536 × 1024**, **1,549,481 bytes**
+- Alpha: **No**
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image: a character turnaround sheet in one wide 1536x1024 image. Use the attached sprite sheet only as the character reference, not as a style, pose, layout, or background reference. Show the same character three times side by side at exactly the same size and height: left, front view; middle, right side profile view facing right; right, back view. All three are full body, standing straight in the same relaxed A-pose with arms slightly away from the body, feet aligned on the same baseline and tops of heads aligned, neutral friendly expression. Use consistent orthographic views and equal scale, with comfortable white margins and separation. Loose cloth, including the long scarf, hangs naturally and close to the body, with no wind. Plain pure white background, no cast shadows, no ground shadows, no text, no labels. The character is Nereo, the old lighthouse keeper: a navy-blue knitted beanie with a small brass button, a white beard, a long mustard-yellow scarf, a cream heavy wool pea coat with brass buttons, a brown leather satchel on a strap, navy trousers, brown boots. Keep the exact same outfit, colours and hairstyle as the attached sprite sheet, with consistent garment details and satchel strap placement across all three views. Rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise.
+```

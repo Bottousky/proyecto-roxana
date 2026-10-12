@@ -100,22 +100,24 @@ const PARTS=['cadera','cuerpo','cabeza','pierna-izq','pierna-der','brazo-izq','b
 // A skinned figure (scripts/blender/viajero-3d.py) swings its bones about the model's own axes:
 // each bone keeps its rest rotation and turns by a delta around the model's X (forward swing) or Z
 // (arms toward the body), expressed in the bone's rest frame.
-const SKIN_BONES=['cadera','cuerpo','cuello','cabeza','brazo-izq','brazo-der','antebrazo-izq','antebrazo-der','pierna-izq','pierna-der','canilla-izq','canilla-der'];
+const SKIN_BONES=['cadera','cuerpo','cuello','cabeza','brazo-izq','brazo-der','antebrazo-izq','antebrazo-der','pierna-izq','pierna-der','canilla-izq','canilla-der','pie-izq','pie-der'];
 export const FIGURE_URL=new URLSearchParams(globalThis.location?.search||'').get('figura')==='bloques'?'./assets/xy/viajero.glb':'./assets/xy/viajero-hy.glb';
 /** The people that already have a 3D figure (public/assets/xy), by sprite name. */
-export const FIGURES={edda:'./assets/xy/edda-3d.glb'};
-export async function attachFigure(app,actor,url,pitch,{chosen}={}){
+// size: the figure's height relative to a person (Ohm is a small robot).
+export const FIGURES={edda:{url:'./assets/xy/edda-3d.glb'},lumen:{url:'./assets/xy/lumen-3d.glb',size:.92},marin:{url:'./assets/xy/marin-3d.glb'},vega:{url:'./assets/xy/vega-3d.glb'},nereo:{url:'./assets/xy/nereo-3d.glb',size:.95},tala:{url:'./assets/xy/tala-3d.glb',size:.9},yesca:{url:'./assets/xy/yesca-3d.glb'},consejera:{url:'./assets/xy/consejera-3d.glb'},ohm:{url:'./assets/xy/ohm-3d.glb',size:.42}};
+export async function attachFigure(app,actor,url,pitch,{chosen,size=1}={}){
   const asset=await new Promise((resolve,reject)=>app.assets.loadFromUrl(url,'container',(error,a)=>error?reject(error):resolve(a)));
   const model=asset.resource.instantiateRenderEntity();model.name='figura 3D';
   actor.entity.addChild(model);actor.entity.sprite.enabled=false;
-  actor.figure={model,pitch,parts:Object.fromEntries(PARTS.map(n=>[n,model.findByName(n)])),heading:0,time:0,tilt:new Quat(),turn:new Quat(),q:new Quat()};
+  actor.figure={seed:Math.random(),cheer:-1,talking:false,model,pitch,parts:Object.fromEntries(PARTS.map(n=>[n,model.findByName(n)])),heading:0,time:0,tilt:new Quat(),turn:new Quat(),q:new Quat()};
   actor.figure.tilt.setFromEulerAngles(pitch,0,0);
   // Skinned: remember each bone's rest rotation and the model's X and Z axes in its rest frame.
   const skinned=SKIN_BONES.map(n=>model.findByName(n)).filter(Boolean);
-  if(skinned.length>4){
-    model.setLocalScale(1.36,1.36,1.36);
+  if(skinned.length>2){
+    model.setLocalScale(1.36*size,1.36*size,1.36*size);
     // X and Y heads are big: a fifth larger than the model's, which also shows the face to a camera above.
     model.findByName('cabeza')?.setLocalScale(1.22,1.22,1.22);
+    actor.figure.size=size;
     const inv=new Quat(),root=model.getRotation().clone().invert();
     actor.figure.bones=Object.fromEntries(skinned.map(b=>{const rest=b.getLocalRotation().clone(),world=new Quat().mul2(root,b.getRotation());inv.copy(world).invert();
       return [b.name,{entity:b,rest,x:inv.transformVector(new Vec3(1,0,0)),z:inv.transformVector(new Vec3(0,0,1)),rotation:new Quat(),delta:new Quat(),delta2:new Quat(),restPos:b.getLocalPosition().clone()}];}));
@@ -129,7 +131,7 @@ export function updateFigure(actor,dx,dz,dt){
   const f=actor.figure;if(!f)return;const a=actor.animation;f.time+=dt;
   if(Math.hypot(dx,dz)>1e-4){const want=Math.atan2(dx,dz)*180/Math.PI;let d=want-f.heading;d-=360*Math.round(d/360);f.heading+=d*Math.min(1,dt*12);}
   f.turn.setFromEulerAngles(0,f.heading,0);f.q.mul2(f.tilt,f.turn);f.model.setLocalRotation(f.q);
-  if(f.bones){skinnedPose(f,a);return;}
+  if(f.bones){(f.bones['pie-izq']?robotPose:skinnedPose)(f,a);return;}
   // Walk: a stride per two phase units; idle: a slow breath.
   const walk=a.moving?Math.sin(a.phase*Math.PI):0,breath=a.moving?0:Math.sin(f.time*2.2)*.012,P=f.parts;
   P['pierna-izq']?.setLocalEulerAngles(walk*32,0,0);P['pierna-der']?.setLocalEulerAngles(-walk*32,0,0);
@@ -143,16 +145,30 @@ function turn(f,name,swing,lower=0){
   b.delta.setFromAxisAngle(b.x,swing*57.2958);b.delta2.setFromAxisAngle(b.z,lower*57.2958); // PlayCanvas takes degrees
   b.rotation.mul2(b.rest,b.delta).mul(b.delta2);b.entity.setLocalRotation(b.rotation);
 }
+// Shared animations for every skinned figure (the same twelve bones): walking, an idle that breathes
+// and now and then looks around, talking with a hand and the head, and a cheer with both arms up.
 function skinnedPose(f,a){
-  const s=a.moving?Math.sin(a.phase*Math.PI):0,c=a.moving?Math.cos(a.phase*Math.PI):0,idle=a.moving?0:Math.sin(f.time*2.2);
-  // Legs swing opposite, the knee bends on the way forward; arms swing against the legs and hang
-  // closer to the body than the A-pose they were modelled in.
+  const t=f.time,walking=a.moving,s=walking?Math.sin(a.phase*Math.PI):0,c=walking?Math.cos(a.phase*Math.PI):0;
+  const calm=f.reduced?0:1,breath=Math.sin(t*2.2)*calm;
+  // A slow glance left or right every few seconds while standing.
+  const glanceCycle=(t*.11+f.seed)%1,glance=walking||f.talking?0:Math.sin(Math.min(1,Math.max(0,(glanceCycle-.7)/.3))*Math.PI)*(f.seed>.5?1:-1)*calm;
+  const cheer=f.cheer>=0&&f.cheer<1.4?Math.sin(Math.min(1,f.cheer/1.4)*Math.PI):0;
+  const talk=f.talking&&!walking?1:0,beat=Math.sin(t*5.2),beat2=Math.sin(t*2.7+1);
   turn(f,'pierna-izq',-s*.5);turn(f,'pierna-der',s*.5);
   turn(f,'canilla-izq',Math.max(0,s)*.7);turn(f,'canilla-der',Math.max(0,-s)*.7);
-  turn(f,'brazo-izq',s*.45,-.3);turn(f,'brazo-der',-s*.45,.3);
-  turn(f,'antebrazo-izq',-.25-Math.max(0,-s)*.3);turn(f,'antebrazo-der',-.25-Math.max(0,s)*.3);
-  turn(f,'cuerpo',a.moving?0:-.05+idle*.012);turn(f,'cabeza',a.moving?-.3:-.34+Math.sin(f.time*.9)*.03);
-  const hips=f.bones.cadera;if(hips){const p=hips.restPos;hips.entity.setLocalPosition(p.x,p.y+(a.moving?Math.abs(c)*.035:idle*.006),p.z);}
+  // Arms: swing when walking; the right one gestures while talking; both go up in a cheer.
+  const gesture=talk*(.55+.25*beat2)*calm;
+  turn(f,'brazo-izq',s*.45-cheer*2.1,-.3+cheer*.6);
+  turn(f,'brazo-der',-s*.45-gesture-cheer*2.1,.3-cheer*.6-talk*.15);
+  turn(f,'antebrazo-izq',-.25-Math.max(0,-s)*.3-cheer*.3);
+  turn(f,'antebrazo-der',-.25-Math.max(0,s)*.3-talk*(.9+.25*beat)*calm-cheer*.3);
+  turn(f,'cuerpo',walking?0:-.05+breath*.012+talk*beat2*.03*calm);
+  // The head looks up a little (the camera is above), nods while talking, glances when idle.
+  const head=f.bones.cabeza;
+  if(head){head.delta.setFromAxisAngle(head.x,(walking?-.3:-.34+talk*beat*.08*calm-cheer*.2)*57.2958);head.delta2.setFromAxisAngle(head.z,0);
+    f.q2??=new Quat();f.yaw??=new Quat();f.yaw.setFromAxisAngle(head.up??=(()=>{const v=new Vec3();v.cross(head.x,head.z);return v;})(),glance*28);
+    head.rotation.mul2(head.rest,head.delta).mul(f.yaw);head.entity.setLocalRotation(head.rotation);}
+  const hips=f.bones.cadera;if(hips){const p=hips.restPos,hop=cheer*.12;hips.entity.setLocalPosition(p.x,p.y+(walking?Math.abs(c)*.035:breath*.006*calm)+hop,p.z);}
 }
 
 // ── Appearance: hair, skin and clothes tinted by region ─────────────────────────────────────
@@ -201,3 +217,15 @@ export async function applyAppearance(app,figureModel,regionsUrl,mapUrl,chosen=c
     m.shaderChunksVersion='2.22';m.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',tintPS);
     m.setParameter('uRegionMap',map);m.setParameter('uRegionBase[0]',base);m.setParameter('uRegionTint[0]',tint);m.update();}
 }
+
+// Ohm: a round body on two feet. It waddles (the body rocks side to side over the stepping foot),
+// bounces when it talks and hops in a celebration.
+function robotPose(f,a){
+  const t=f.time,walking=a.moving,s=walking?Math.sin(a.phase*Math.PI):0,calm=f.reduced?0:1;
+  const cheer=f.cheer>=0&&f.cheer<1.4?Math.abs(Math.sin(f.cheer/.7*Math.PI)):0,talk=f.talking&&!walking?Math.abs(Math.sin(t*6)):0;
+  const lift=k=>Math.max(0,k)*.12;
+  for(const [n,k] of [['pie-izq',s],['pie-der',-s]]){const b=f.bones[n];if(!b)continue;b.entity.setLocalPosition(b.restPos.x,b.restPos.y+lift(k),b.restPos.z);turn(f,n,-k*.25);}
+  const body=f.bones.cuerpo;if(body){b2(body,f,s*.12*calm,Math.sin(t*1.7)*.03*calm-talk*.08);}
+  const hips=f.bones.cadera;if(hips){const p=hips.restPos;hips.entity.setLocalPosition(p.x,p.y+(walking?Math.abs(Math.cos(a.phase*Math.PI))*.05:Math.sin(t*2.4)*.01*calm)+talk*.05+cheer*.35,p.z);}
+}
+function b2(b,f,roll,pitch){b.delta.setFromAxisAngle(b.z,roll*57.2958);b.delta2.setFromAxisAngle(b.x,pitch*57.2958);b.rotation.mul2(b.rest,b.delta).mul(b.delta2);b.entity.setLocalRotation(b.rotation);}

@@ -8,7 +8,7 @@
 #    la malla y le da pesos automáticos. El juego anima los huesos por nombre.
 # 4. Hornea también una máscara: pelo (rojo) y piel (verde), para poder teñirlos en el juego más adelante.
 # Uso: blender -b -P scripts/blender/viajero-3d.py -- forma.glb carpeta-de-vistas salida.glb [caras]
-import bpy, bmesh, sys, math, os
+import bpy, bmesh, sys, math, os, json
 from mathutils import Vector
 
 args = sys.argv[sys.argv.index('--') + 1:]
@@ -188,26 +188,64 @@ body.data.materials.clear(); body.data.materials.append(game)
 vs = [v.co.copy() for v in body.data.vertices]
 def slab(z, dz=.03): return [v for v in vs if abs(v.z - z) < dz]
 H = 2.0
-# Proportions of the reference (≈ 5 heads): head from 1.62, neck 1.56, shoulders 1.46, hips 0.98, knees 0.52.
-def widest_x(z):
-    s = slab(z); return (min(v.x for v in s), max(v.x for v in s)) if s else (-.3, .3)
-sx0, sx1 = widest_x(1.38)
+# Joints. ESQUELETO (JSON) overrides any of them: {"axila": z, "entrepierna": z, "rodilla": z}.
+override = json.loads(os.environ.get('ESQUELETO') or '{}')
+def pieces(z, band=.025, gap=.035, ylim=None):
+    xs = sorted(v.x for v in vs if abs(v.z - z) < band and (ylim is None or abs(v.y) < ylim))
+    if not xs: return []
+    out = [[xs[0], xs[0]]]
+    for x in xs[1:]:
+        if x - out[-1][1] > gap: out.append([x, x])
+        else: out[-1][1] = x
+    return out
+# The traveller's proportions (≈ 5 heads, checked by eye); stout or tall people override them from
+# their personajes/<name>.json ("esqueleto"). Hands and legs are measured on the mesh.
+armpit = override.get('axila', 1.37)
+crotch = override.get('entrepierna', .92)
+hands = [v for v in vs if abs(v.x) > max(abs(w.x) for w in vs) - .08]
+hand_z = sum(v.z for v in hands) / len(hands)
+shoulder = armpit + .07; neck = shoulder + .06; head = neck + .08; hip = crotch + .06
+knee = override.get('rodilla', crotch * .55)
+sx0, sx1 = min(v.x for v in vs), max(v.x for v in vs)
+print(f'articulaciones: axila {armpit:.2f} hombro {shoulder:.2f} cuello {neck:.2f} entrepierna {crotch:.2f} rodilla {knee:.2f} manos {hand_z:.2f}')
 arm = bpy.data.armatures.new('esqueleto'); rig = bpy.data.objects.new('esqueleto', arm); scene.collection.objects.link(rig)
 bpy.context.view_layer.objects.active = rig; bpy.ops.object.mode_set(mode='EDIT')
 def bone(name, head, tail, parent=None):
     b = arm.edit_bones.new(name); b.head = head; b.tail = tail
     if parent: b.parent = arm.edit_bones[parent]; b.use_connect = False
     return b
-bone('cadera', (0, 0, .98), (0, 0, 1.12))
-bone('cuerpo', (0, 0, 1.12), (0, 0, 1.5), 'cadera')
-bone('cuello', (0, 0, 1.5), (0, 0, 1.6), 'cuerpo')
-bone('cabeza', (0, 0, 1.6), (0, 0, 2.0), 'cuello')
+bone('cadera', (0, 0, hip), (0, 0, hip + .14))
+bone('cuerpo', (0, 0, hip + .14), (0, 0, neck), 'cadera')
+bone('cuello', (0, 0, neck), (0, 0, head), 'cuerpo')
+bone('cabeza', (0, 0, head), (0, 0, 2.0), 'cuello')
+torso = pieces(armpit + .02)
+half = (torso[0][1] - torso[0][0]) / 2 if len(torso) == 1 else .2
 for side, sgn in (('izq', 1), ('der', -1)):
     # The character's left is +X when it faces −Y.
-    sh = Vector((sgn * .2, 0, 1.44)); hand = Vector((sgn * (abs(sx1 if sgn > 0 else sx0) - .04), 0, 1.0))
+    sh = Vector((sgn * min(half * .85, .3), 0, shoulder)); hand = Vector((sgn * ((sx1 if sgn > 0 else -sx0) - .05), 0, hand_z))
     elbow = sh.lerp(hand, .5)
     bone(f'brazo-{side}', sh, elbow, 'cuerpo'); bone(f'antebrazo-{side}', elbow, hand, f'brazo-{side}')
-    bone(f'pierna-{side}', (sgn * .11, 0, .96), (sgn * .11, 0, .52), 'cadera'); bone(f'canilla-{side}', (sgn * .11, 0, .52), (sgn * .11, -.02, .08), f'pierna-{side}')
+    legs = pieces(max(.3, knee), ylim=.25); lx = sum(p[0] + p[1] for p in legs if (p[0] + p[1]) * sgn > 0) / 2 / max(1, len([p for p in legs if (p[0] + p[1]) * sgn > 0])) if len(legs) >= 2 else sgn * .11
+    bone(f'pierna-{side}', (lx, 0, crotch - .02), (lx, 0, knee), 'cadera'); bone(f'canilla-{side}', (lx, 0, knee), (lx, -.02, .08), f'pierna-{side}')
+if os.environ.get('ROBOT'):
+    # Ohm: a body and two feet. The feet are what lies below FEET (metres), split left and right.
+    for b in list(arm.edit_bones): arm.edit_bones.remove(b)
+    feet_top = float(os.environ.get('PIES', .32))
+    bone('cadera', (0, 0, feet_top), (0, 0, feet_top + .3))
+    bone('cuerpo', (0, 0, feet_top + .3), (0, 0, 2.0), 'cadera')
+    for side, sgn in (('izq', 1), ('der', -1)): bone(f'pie-{side}', (sgn * .35, 0, feet_top), (sgn * .35, -.05, 0), 'cadera')
+    bpy.ops.object.mode_set(mode='OBJECT')
+    groups = {n: body.vertex_groups.new(name=n) for n in ('cuerpo', 'pie-izq', 'pie-der')}
+    for v in body.data.vertices:
+        if v.co.z < feet_top - .02: groups['pie-izq' if v.co.x > 0 else 'pie-der'].add([v.index], 1.0, 'REPLACE')
+        elif v.co.z < feet_top + .06:
+            k = (v.co.z - feet_top + .02) / .08; groups['cuerpo'].add([v.index], k, 'REPLACE'); groups['pie-izq' if v.co.x > 0 else 'pie-der'].add([v.index], 1 - k, 'REPLACE')
+        else: groups['cuerpo'].add([v.index], 1.0, 'REPLACE')
+    mod = body.modifiers.new('esqueleto', 'ARMATURE'); mod.object = rig; body.parent = rig
+    print('esqueleto de robot, pies hasta', feet_top)
+    bpy.ops.object.select_all(action='SELECT')
+    bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_yup=True, export_skins=True, export_animations=False, use_selection=True)
+    print('exportado', out); sys.exit(0)
 bpy.ops.object.mode_set(mode='OBJECT')
 bpy.ops.object.select_all(action='DESELECT'); body.select_set(True); rig.select_set(True); bpy.context.view_layer.objects.active = rig
 try:

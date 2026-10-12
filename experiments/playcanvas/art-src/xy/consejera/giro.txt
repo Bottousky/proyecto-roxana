@@ -1,0 +1,15 @@
+Saved `giro.png` using the built-in image_gen tool.
+
+- Size: 1536 × 1024 pixels; 1,658,361 bytes
+- Alpha: No
+
+Exact prompt used:
+
+```text
+Create exactly ONE character turnaround sheet in one wide image, 1536x1024 pixels.
+Input image: use the attached sprite sheet ONLY as the character reference for Ivara's identity, outfit, colours and hairstyle. Do not copy its sprite-sheet layout, pixel rendering, walking poses or striped background.
+Composition: show the same character exactly three times side by side, all at exactly the same size and height, with aligned tops of heads and soles of boots. Left: straight front view. Middle: exact right side profile view, facing right. Right: straight back view. Full bodies entirely visible, comfortably spaced, using a consistent orthographic camera and scale. All three stand straight in a relaxed A-pose, arms slightly away from the body, feet planted, with a neutral friendly expression. The brown leather book is held at her side consistently across views. Loose cloth, especially the cape, hangs naturally and close to the body.
+Character: Ivara, the councillor of the castle, a dignified young woman with warm brown skin, black hair in an elaborate braided bun, small gold earrings, a deep purple cape with gold embroidered borders fastened at the neck, a cream blouse, a long navy-blue robe with gold trim, a brown leather book held at her side, and brown boots. Keep the exact same outfit, colours and hairstyle as the reference sprite sheet, consistently in all three views.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise.
+Background: plain pure white (#FFFFFF), fully opaque. No cast shadows, no ground shadows, no text, no labels, no watermark, no additional characters or panels.
+```

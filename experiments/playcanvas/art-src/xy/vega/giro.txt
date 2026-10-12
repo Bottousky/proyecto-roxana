@@ -1,0 +1,16 @@
+Saved `giro.png` using the built-in image_gen tool.
+
+- Size: **1536 × 1024 px**, **1,649,386 bytes**
+- Alpha channel: **No**
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Create exactly ONE character turnaround sheet in one wide image, 1536x1024 pixels.
+Input image: use the attached sprite sheet ONLY as the character reference for Vega's identity, exact outfit, colours, and hairstyle. Do not reproduce its sprite-sheet layout, poses, rendering style, or background.
+Composition: the same character three times side by side, full body, at exactly the same size and height, with the tops of the heads and soles of the boots aligned. Left: straight front view. Middle: exact right side profile view, facing right. Right: straight back view. All three stand straight in the same relaxed A-pose, arms slightly away from the body, feet planted, neutral friendly expression. Keep all figures fully visible, with comfortable white margins and clear space between them. Use consistent orthographic framing.
+Character: Vega, a calm woman who keeps the spring's waterworks. Long silver-grey hair in one thick braid over the shoulder, warm brown eyes, a sage-green long-sleeved dress with cream cuffs, a teal-blue apron skirt over it, a brown leather belt with two small brass canisters, and brown boots. Keep the exact same outfit, colours and hairstyle as the attached sprite sheet, consistently across all three views. Loose cloth hangs naturally and close to the body.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours. No pixel art, no texture noise.
+Background: plain pure white. No cast shadows, no ground shadows, no text, no labels, no extra figures or props.
+```

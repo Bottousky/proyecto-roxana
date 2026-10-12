@@ -1,0 +1,10 @@
+Saved `frente-apose.png` using built-in image_gen.
+
+- Size: 1145 × 1374 pixels; 1,392,733 bytes.
+- Alpha: No.
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image: a single full-body character model sheet view of Marin, the plump friendly village baker. Use the attached sprite sheet ONLY as the character reference, preserving the exact same outfit, colours and hairstyle; do not reproduce its sheet layout, poses, background or rendering style. Front view, facing the viewer exactly, standing straight in a relaxed A-pose with both arms angled gently down and outward, hands relaxed, feet planted evenly, neutral friendly expression with a warm slight smile. Centred, full body visible with comfortable margin around hair, hands and boots. Plain pure white background, no shadow, no text. Marin has curly brown shoulder-length hair, a short beard and moustache, large expressive anime eyes painted flat, a cream shirt with rolled sleeves, a mustard-ochre vest with buttons, a long cream baker's apron with a few flour stains, a small leather pouch at the belt, olive trousers, and brown boots. Rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise. Only one character and one front view; no extra views, no props, no labels, no watermark.
+```

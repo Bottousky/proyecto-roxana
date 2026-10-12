@@ -1,0 +1,14 @@
+Saved `giro.png` using built-in image_gen.
+
+- Size: **1536 × 1024**, **1,581,760 bytes**
+- Alpha: **No**
+
+Exact prompt:
+
+```text
+Generate exactly ONE character turnaround sheet in one wide image, 1536x1024 pixels. Use the attached sprite sheet only as the character reference, not as a reference for background, rendering style, layout, or walking poses. Show the same character three times side by side at exactly the same size and height: left, front view; middle, exact right side profile facing right; right, back view. Full bodies entirely visible, evenly spaced, with tops of heads and soles aligned. All three stand straight in the same relaxed A-pose with arms slightly away from the body, feet planted, and a neutral friendly expression. Loose cloth hangs naturally and close to the body. Plain pure white background, no cast shadows, no ground shadows, no text, no labels.
+
+The character is Yesca, the young blacksmith of the terraces, sturdy and cheerful: a big bright copper-orange ponytail, freckles, brass goggles with teal lenses on her forehead, an orange shirt with rolled sleeves, a dark leather work apron with crossed straps over a khaki skirt-apron, dark trousers, brown boots. Keep the exact same outfit, colours, hairstyle, and recognizable character identity as the attached sprite sheet, consistently across all three views. Show the crossed apron straps and tied apron at the back as in the reference.
+
+Render like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours. No pixel art, no texture noise. The figure should read as a simple stylized 3D game model. Do not reproduce the sprite sheet's painterly shading or striped background.
+```

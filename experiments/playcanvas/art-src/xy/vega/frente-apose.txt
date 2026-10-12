@@ -1,0 +1,10 @@
+Saved `frente-apose.png` using built-in image_gen.
+
+- Size: 1070 × 1470 pixels; 1,362,909 bytes.
+- Alpha: No.
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image. Use the attached sprite sheet only as the character reference, not as a composition or rendering-style reference. A single full-body character model sheet view: front view, standing straight in a relaxed A-pose with both arms angled slightly outward and down, neutral friendly expression, facing the viewer exactly, centred, full body with margin. Plain pure white background, no shadow, no text. The character: Vega, a calm woman who keeps the spring's waterworks: long silver-grey hair in one thick braid over the shoulder, warm brown eyes, a sage-green long-sleeved dress with cream cuffs, a teal-blue apron skirt over it, a brown leather belt with two small brass canisters, brown boots. Rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise. Keep the exact same outfit, colours and hairstyle as the attached sprite sheet. One character only, one front view only, no panels or additional views.
+```

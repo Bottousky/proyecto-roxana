@@ -158,9 +158,11 @@ export class PlayCanvasWorld {
     await placeDressing(this);await raiseRelief(this);await sowFlora(this);await buildHomes(this,this.kit);
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
-      if(PEOPLE_3D&&FIGURES[object.character])await attachFigure(this.app,a,FIGURES[object.character],LENS.pitch||28.37).catch(e=>console.warn('figura',object.character,e));
+      if(PEOPLE_3D&&FIGURES[object.character])await attachFigure(this.app,a,FIGURES[object.character].url,LENS.pitch||28.37,{size:FIGURES[object.character].size}).catch(e=>console.warn('figura',object.character,e));
     }
     this.playerActor=await this.makeActor('player',0,0,'player');if(PEOPLE_3D)await attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37,{chosen:chosenAppearance()});this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
+    // Ohm in 3D, awake and asleep on its pedestal, once its model exists (a missing file keeps the sprite).
+    if(PEOPLE_3D)for(const a of [this.ohmActor])await attachFigure(this.app,a,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{});
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
     this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();
@@ -172,7 +174,12 @@ export class PlayCanvasWorld {
   }
   animateActor(a,dx,dz,dt,{paused=false,reducedMotion=false}={}){
     a.animation=advanceActor(a.animation,paused?0:dx,paused?0:dz,dt,{reducedMotion});a.script.showFrame(a.animation,a.name==='ohm',this.clock);
-    if(a.figure)updateFigure(a,paused?0:dx,paused?0:dz,dt);
+    if(a.figure){
+      // What a 3D figure is doing beyond walking: talking while its line is on screen, cheering in a celebration.
+      const c=this.celebration;a.figure.talking=this.speaking?.actor===a;
+      a.figure.cheer=c&&c.actors.includes(a)?Math.max(0,c.t-.35-c.actors.indexOf(a)*.14):-1;
+      a.figure.reduced=reducedMotion;updateFigure(a,paused?0:dx,paused?0:dz,dt);
+    }
   }
   context(id){
     const context=Object.create(this);context.area=AREAS[id];context.coreBounds=context.area.bounds;context.bounds=travelBounds(id);context.obstacles=this.localObstacles(id);context.actors=this.regions.get(id).actors;return context;

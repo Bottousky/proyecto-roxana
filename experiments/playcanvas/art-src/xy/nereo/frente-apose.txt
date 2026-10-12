@@ -1,0 +1,16 @@
+Saved `frente-apose.png` using built-in image_gen.
+
+- Size: **1122 × 1402 px**, **1,383,416 bytes**
+- Alpha: **No**
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Generate exactly ONE image: a single full-body character model sheet view of Nereo, the old lighthouse keeper.
+Input image: use the attached sprite sheet ONLY as the character reference for identity, outfit, colours and hairstyle; do not reproduce the sheet layout, sprite rendering or background.
+Composition: exact front view, facing the viewer squarely, standing straight in a relaxed A-pose, arms angled slightly outward and downward with hands clear of the coat, neutral friendly expression, centred, full body visible with generous margin around the hat, hands and boots. Proportions about 4.5 to 5 heads tall.
+Character: keep the exact same outfit, colours and hairstyle as the reference: navy-blue knitted beanie with a small brass button, white beard and moustache, long mustard-yellow scarf, cream heavy wool pea coat with brass buttons, brown leather satchel on a diagonal strap, navy trousers and brown boots. Preserve the recognizable face and clothing details while simplifying them into clean 3D forms.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours. No pixel art, no texture noise.
+Background: plain pure white (#FFFFFF), fully opaque. No ground shadow or cast shadow, no scenery, no text, no labels, no watermark, no additional characters, no extra views.
+```
