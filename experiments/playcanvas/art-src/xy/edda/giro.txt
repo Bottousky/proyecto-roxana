@@ -1,0 +1,12 @@
+Saved `giro.png` using the built-in image tool. **1536 × 1024 pixels**, **1,594,135 bytes**, **no alpha channel**.
+
+Exact prompt used:
+
+```text
+Create exactly ONE character turnaround sheet in one wide image, 1536x1024 pixels.
+Use the attached sprite sheet ONLY as the character reference, preserving the exact same outfit, colours and hairstyle. Do not reproduce its background, sprite layout, pixel rendering, or walking poses.
+Show the same character three times side by side at exactly the same size and height: left, straight front view; middle, true right side profile facing right; right, straight back view. Full bodies visible, crowns and soles aligned, consistent orthographic camera and scale, evenly spaced with white margins. All three stand straight in a relaxed A-pose, arms slightly away from the body, with a neutral friendly expression. Loose cloth, especially the cape, hangs naturally and close to the body.
+The character is Edda, a girl of about 14 from the family that keeps the Portal: copper-red wavy shoulder-length hair with a single braid falling on one side, green eyes, freckles, a short olive-green hooded cape fastened with a round brass clasp, a cream long-sleeved shirt, brown leather bracers on the forearms, two brown leather belts with small pouches, puffy rust-red terracotta trousers gathered below the knee, sturdy brown leather boots. Maintain the same character design consistently across all three views.
+Render like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise.
+Plain pure white opaque background. No cast shadows, no ground shadows, no text, no labels, no watermark, no additional figures or objects.
+```

@@ -102,7 +102,9 @@ const PARTS=['cadera','cuerpo','cabeza','pierna-izq','pierna-der','brazo-izq','b
 // (arms toward the body), expressed in the bone's rest frame.
 const SKIN_BONES=['cadera','cuerpo','cuello','cabeza','brazo-izq','brazo-der','antebrazo-izq','antebrazo-der','pierna-izq','pierna-der','canilla-izq','canilla-der'];
 export const FIGURE_URL=new URLSearchParams(globalThis.location?.search||'').get('figura')==='bloques'?'./assets/xy/viajero.glb':'./assets/xy/viajero-hy.glb';
-export async function attachFigure(app,actor,url,pitch){
+/** The people that already have a 3D figure (public/assets/xy), by sprite name. */
+export const FIGURES={edda:'./assets/xy/edda-3d.glb'};
+export async function attachFigure(app,actor,url,pitch,{chosen}={}){
   const asset=await new Promise((resolve,reject)=>app.assets.loadFromUrl(url,'container',(error,a)=>error?reject(error):resolve(a)));
   const model=asset.resource.instantiateRenderEntity();model.name='figura 3D';
   actor.entity.addChild(model);actor.entity.sprite.enabled=false;
@@ -120,7 +122,7 @@ export async function attachFigure(app,actor,url,pitch){
   }
   // Matte painted materials, like the world's: no glossy highlight washing the colours out.
   for(const r of model.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial))continue;m.useMetalness=true;m.metalness=0;m.metalnessMap=null;m.glossInvert=false;m.glossMap=null;m.gloss=.1;m.specularityFactor=0;m.ambient.set(.42,.42,.46);m.diffuse.set(.74,.72,.72);m.update();} // its texture already carries painted light: the sky's fill and full sun would wash it
-  if(actor.figure.bones)await applyAppearance(app,model,url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.json',url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.png');
+  if(actor.figure.bones)await applyAppearance(app,model,url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.json',url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.png',chosen??{});
   celShade(app);updateFigure(actor,0,0,0);
 }
 export function updateFigure(actor,dx,dz,dt){

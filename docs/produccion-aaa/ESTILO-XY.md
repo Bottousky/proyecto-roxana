@@ -138,3 +138,17 @@ Defectos del viajero a pulir:
 - manchas de cuero en el borde de bolsillos y puños;
 - pelo invadiendo las mejillas;
 - puntitos en los bordes entre regiones del juego.
+
+## Edda, el segundo personaje (ciclo 28)
+
+Corre todo el proceso con un guion: `scripts/ia3d/personaje.sh edda forma modelo explorar` y, después
+de escribir `personajes/edda.json`, `… regiones`. Las referencias salen con
+`art-src/xy/referencias.sh edda "<descripción>"`. La forma tardó 15 minutos y dio 384 mil caras. En
+el juego reemplaza a su sprite con `?gente=3d` (`FIGURES` en `src/style.js`).
+
+Lo nuevo con Edda:
+- **Colores compartidos.** Pelo y bombachos comparten el rojizo, y piel y camisa, el crema. Se
+  separan con franjas de altura, que ahora admiten varias (la camisa y las medias).
+- **La capa.** Es lo más difícil: debajo, la camisa y las mangas quedan mezcladas en las regiones
+  del kit. En el juego no se nota, porque se ve la textura pintada. Para imprimir, la capa va a
+  necesitar retoque a mano o una pieza aparte.

@@ -1,5 +1,5 @@
 import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
-import {XY,XY_LENS,XY_GRADES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,FIGURE_URL} from './style.js';
+import {XY,XY_LENS,XY_GRADES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,FIGURE_URL,FIGURES,chosenAppearance} from './style.js';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -158,8 +158,9 @@ export class PlayCanvasWorld {
     await placeDressing(this);await raiseRelief(this);await sowFlora(this);await buildHomes(this,this.kit);
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
+      if(PEOPLE_3D&&FIGURES[object.character])await attachFigure(this.app,a,FIGURES[object.character],LENS.pitch||28.37).catch(e=>console.warn('figura',object.character,e));
     }
-    this.playerActor=await this.makeActor('player',0,0,'player');if(PEOPLE_3D)await attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37);this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
+    this.playerActor=await this.makeActor('player',0,0,'player');if(PEOPLE_3D)await attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37,{chosen:chosenAppearance()});this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
     this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();

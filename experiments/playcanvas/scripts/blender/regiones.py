@@ -117,7 +117,12 @@ else:
         protos = to_lab(np.array([[int(c[i:i + 2], 16) / 255 for i in (1, 3, 5)] for c in r['colores']]))
         d = ((lab[:, None, :] - protos[None]) ** 2).sum(2).min(1)
         allowed = np.ones(N, bool)
-        if 'z' in r: allowed &= (C[:, 2] >= r['z'][0]) & (C[:, 2] <= r['z'][1])
+        if 'z' in r:
+            # One band [lo, hi] or several [[lo, hi], …] (a shirt and the socks below the trousers).
+            bands = r['z'] if isinstance(r['z'][0], list) else [r['z']]
+            inside = np.zeros(N, bool)
+            for lo, hi in bands: inside |= (C[:, 2] >= lo) & (C[:, 2] <= hi)
+            allowed &= inside
         cost[allowed, j] = d[allowed]
     labels = cost.argmin(1)
     # Boxes that settle a region by shape, not colour (the hands below the cuffs are skin, whatever
