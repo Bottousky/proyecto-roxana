@@ -2,7 +2,26 @@
 // the route. Obstacle w/d are half-extents, matching the world collision model.
 import { isPositionClear, isSegmentClear } from './collision.js';
 
-export function findPath(start,goal,bounds,obstacles=[],{radius=.36,cell=.6,isWalkable=()=>true}={}){
+// A walker can rest a few centimetres inside an obstacle's clearance: movement slides along a
+// surface and stops just short of it. The route then leaves from the nearest clear point, within
+// half a metre and on the walker's own side (the step to it crosses nothing), instead of refusing
+// to plan at all. An actor really embedded in a wall, or out of bounds, still gets no route.
+export function findPath(start,goal,bounds,obstacles=[],options={}){
+  const collision={radius:options.radius??.36,isWalkable:options.isWalkable??(()=>true),surfaceStep:.02};
+  if(start?.every(Number.isFinite)&&!isPositionClear(start,bounds,obstacles,collision)){
+    const touch={...collision,radius:0};
+    if(!isPositionClear(start,bounds,obstacles,touch))return [];
+    for(let r=.05;r<=.5001;r+=.05)for(let i=0;i<16;i++){
+      const lead=[start[0]+Math.cos(i*Math.PI/8)*r,start[1]+Math.sin(i*Math.PI/8)*r];
+      if(!isPositionClear(lead,bounds,obstacles,collision)||!isSegmentClear(start,lead,bounds,obstacles,touch))continue;
+      const route=planPath(lead,goal,bounds,obstacles,options);return route.length?[lead,...route]:[];
+    }
+    return [];
+  }
+  return planPath(start,goal,bounds,obstacles,options);
+}
+
+function planPath(start,goal,bounds,obstacles=[],{radius=.36,cell=.6,isWalkable=()=>true}={}){
   // Curved region joins can leave very short unwalkable wedges beside a grid
   // corner. Check planned segments more finely than the movement stride.
   const collision={radius,isWalkable,surfaceStep:.02};

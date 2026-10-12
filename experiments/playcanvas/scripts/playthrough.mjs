@@ -189,7 +189,10 @@ async function walkTo(id) {
   for (const until = Date.now() + 8000; info.target && Date.now() < until; info = await inspect()) await page.waitForTimeout(100);
   const startingArea = info.area;
   let path = geometry.path?.length ? geometry.path : [goal];
-  let waypoint = 0, best = distance(info.position, goal), replans = 0;
+  // Progress is what is left of the route, not the straight distance: a detour around a railing
+  // first takes the walker away from the goal, and that is not being stuck.
+  const remaining = position => { let left = distance(position, path[waypoint]); for (let i = waypoint + 1; i < path.length; i++) left += distance(path[i - 1], path[i]); return left; };
+  let waypoint = 0, best = remaining(info.position), replans = 0;
   const started = Date.now(), clock0 = info.clock;
   let lastProgress = clock0;
   while (info.clock - clock0 < 65 && Date.now() - started < 65000 * 5) {
@@ -197,8 +200,8 @@ async function walkTo(id) {
     assert.equal(info.area, startingArea, `Walking toward ${id} must remain in its authored area`);
     if (info.mode !== 'world') { await releaseKeys(); await settle({ stable: 180 }); continue; }
     if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await releaseKeys(); return geometry.object; }
-    if (distance(info.position, goal) < best - 0.12) { best = distance(info.position, goal); lastProgress = info.clock; }
     while (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.6) waypoint++;
+    if (remaining(info.position) < best - 0.12) { best = remaining(info.position); lastProgress = info.clock; }
     const target = path[waypoint];
     await steer(info.position, target, distance(info.position, target) > 2, info.clock - lastProgress > 1.5);
     if (info.clock - lastProgress > 6.5) {
@@ -208,7 +211,7 @@ async function walkTo(id) {
       // …and sidesteps, alternating sides, as someone would around a post.
       const side = replans % 2 ? 1 : -1, dx = target[0] - info.position[0], dz = target[1] - info.position[1];
       for (let i = 0; i < 3; i++) await keyboardNudge(info.position, [info.position[0] - dz * side, info.position[1] + dx * side]);
-      const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = (await inspect()).clock;
+      const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = (await inspect()).clock; best = remaining((await inspect()).position);
       log('navigation-replan', { id, position: info.position });
     }
     await page.waitForTimeout(60);
@@ -302,11 +305,27 @@ async function removeWire(a, b) {
   await page.locator(`button.wb-wire-chip[data-wire="${index}"]`).click();
 }
 async function knob(key, value) {
+  // A socket takes a stone (ciclo 23): the player picks it from the pouch or the box.
+  const stone = page.locator(`[data-action="stone"][data-key="${key}"][data-value="${value}"]:visible`);
+  if (await stone.count()) {
+    if ((await inspect()).puzzle.state.values[key] !== value) await stone.first().click();
+    assert.equal((await inspect()).puzzle.state.values[key], value, `The ${key} socket holds the ${value} Ω stone`);
+    return;
+  }
   const input = page.locator(`input[data-knob="${key}"]:visible`);
   const min = Number(await input.getAttribute('min')), step = Number(await input.getAttribute('step'));
   await input.press('Home');
   for (let i = 0; i < Math.round((value - min) / step); i++) await input.press('ArrowRight');
   assert.equal((await inspect()).puzzle.state.values[key], value, `The ${key} dial reaches ${value} using keyboard arrows`);
+}
+/** «Medir un camino»: the meter goes in series with one piece, or with the source. */
+async function measureBranch(branch) {
+  await setMode('current');
+  await page.locator('select[data-meter-branch]').selectOption(branch);
+  await showNumericReadings();
+  const reading = await page.locator('.wb-meter-readout').innerText();
+  report.measurements.push({ puzzle: (await inspect()).puzzle.id, mode: 'current', branch, reading });
+  return reading;
 }
 async function measure(mode, a, b) {
   await setMode(mode);
@@ -422,7 +441,10 @@ async function solvePanel(objectId, id) {
     await measure('voltage', 'pumpIn', 'pumpOut');
     await measure('voltage', 'e1a', 'e1b');
     await measure('voltage', 'e2a', 'e2b');
+    await measure('voltage', 'e3a', 'e3b');
     assert.equal((await inspect()).puzzle.state.proofs.foundLoss, true, 'Vega saw where the pressure is lost');
+    // Vega's sum of the loop, with the old joint in place: every volt accounted for (ciclo 21).
+    assert.equal((await inspect()).puzzle.state.tally?.closed, true, 'Vega closed the count of the loop');
     log('proof', { id, proof: 'foundLoss' });
   }
   if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]:not([data-mode="wire"])').count(), 0, 'The first encounter offers cables only, no instrument');
@@ -450,10 +472,10 @@ async function solvePanel(objectId, id) {
       await removeWire('trimB', 'latchOut'); await removeWire('latchIn', 'negative');
       await wire('trimB', 'latchIn'); await wire('latchOut', 'negative');
       if (adversarial) {
-        for (const value of [0, 20]) { await knob('brake', value); assert.equal((await inspect()).puzzle.result.solved, false, `brake ${value} Ω is not the firm push`); }
+        for (const value of [0, 47]) { await knob('brake', value); assert.equal((await inspect()).puzzle.result.solved, false, `brake ${value} Ω is not the firm push`); }
         await screenshot('gate-wrong-brake');
       }
-      await knob('brake', 8); break;
+      await knob('brake', 10); break;
     case 'pump': await wire('e2a', 'e2b'); break;
     case 'distribution':
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
@@ -468,13 +490,17 @@ async function solvePanel(objectId, id) {
     case 'beacon_network':
       await removeWire('opticOut', 'bearingIn'); await removeWire('bearingOut', 'signalIn');
       await wire('opticOut', 'negative'); await wire('positive', 'bearingIn');
-      await wire('bearingOut', 'negative'); await wire('positive', 'signalIn'); break;
+      await wire('bearingOut', 'negative'); await wire('positive', 'signalIn');
+      // Nereo's rule of the nodes: each voice's current and what leaves the source (ciclo 21).
+      for (const branch of ['optic', 'bearing', 'signal', 'source']) await measureBranch(branch);
+      assert.equal((await inspect()).puzzle.state.tally?.closed, true, 'Nereo wrote down the rule of the nodes');
+      break;
     case 'beacon_lens':
       // Nereo's comparison, first half: the tap with the lens elsewhere.
       await measure('voltage', 'tap', 'negative');
       await setMode('wire');
       await removeWire('positive', 'lensIn'); await wire('tap', 'lensIn');
-      if (adversarial) await wrongDials(id, [{ upper: 6 }, { upper: 36 }]);
+      if (adversarial) await wrongDials(id, [{ upper: 24 }, { upper: 15 }]);
       await knob('upper', 12); break;
     default: throw new Error(`No UI repair sequence for ${id}`);
   }
@@ -501,7 +527,15 @@ async function solvePanel(objectId, id) {
   assert.equal(await page.locator('[data-action="commission"]:visible').count(), 1, `${id}: one button carries the story on`);
   await screenshot(`${id}-operating`);
   // Looking at the board after it works keeps the way forward in the header.
-  if (id === 'beacon_lens') { await page.locator('[data-action="stay"]').click(); await measure('voltage', 'lensIn', 'lensOut'); }
+  // «Mirá lo que vi» walks through Ohm's cards (ciclo 21); staying at the table afterwards keeps the
+  // way forward in the header.
+  if (id === 'beacon_lens') {
+    await page.locator('.wb-success [data-action="reveal"]').click();
+    const nextCard = page.locator('.wb-reveal [data-action="reveal-step"][data-delta="1"]');
+    for (let i = 0; i < 10 && await nextCard.count(); i++) await nextCard.click();
+    await page.locator('.wb-reveal [data-action="reveal-end"]').click();
+    await measure('voltage', 'lensIn', 'lensOut');
+  }
   await page.locator('[data-action="commission"]:visible').first().click();
   // SCENE_FRAMES=1: a sequence of frames through each restoration scene, to judge it in motion.
   if (process.env.SCENE_FRAMES && !adversarial) {
@@ -553,8 +587,8 @@ try {
   await screenshot('road-bypass-inhibits');
   await operate('road_bypass', false);
   await solvePanel('gate_panel', 'gate');
-  // The closing line may only claim what the bench trace shows: here the brake was turned.
-  assert.ok(report.dialogue.some(line => line.includes('al ajustar la rueda')), 'The gate closing line reports the brake that was turned');
+  // The closing line may only claim what the bench trace shows: here a stone was put in the socket.
+  assert.ok(report.dialogue.some(line => line.includes('la piedra justa en el zócalo')), 'The gate closing line reports the stone that was placed');
   assert.ok(!report.dialogue.some(line => line.includes('La rueda quedó como estaba')), 'No line claims an untouched brake');
   await interact('road_nest');
   await travel('road_to_spring', 'spring');
@@ -576,7 +610,11 @@ try {
   await travel('terraces_to_lake', 'lake');
   if (adversarial) await reloadAndContinue('lake-arrival');
   await interact('nereo_lake');
-  assert.ok((await inspect()).flags.lake_cable && (await inspect()).flags.lake_return, 'Nereo makes the dock joins');
+  // Nereo fixes the terminal on the dock; the return among the reeds is the player's to close.
+  assert.ok((await inspect()).flags.lake_cable, 'Nereo fixes the dock terminal');
+  assert.ok(!(await inspect()).flags.lake_return, 'The return among the reeds waits for the player');
+  await operate('lake_return', true);
+  assert.ok((await inspect()).flags.beacon_link, 'With both joins the line to the Faro is complete');
   await interact('lake_secret');
   await travel('lake_to_lighthouse', 'lighthouse');
   await interact('nereo_tower');
@@ -597,7 +635,10 @@ try {
   const commissioned = (await inspect()).puzzle;
   assert.equal(commissioned?.id, 'beacon_lens', 'A restored mechanism remains inspectable');
   assert.equal(commissioned.state.completed, true);
-  assert.equal(await page.locator('input[data-knob]:visible').first().isDisabled(), true, 'Commissioned dial is secured');
+  // The lens's socket takes stones (ciclo 23): in service, none of them can be swapped.
+  const stones = page.locator('[data-action="stone"]:visible');
+  assert.ok(await stones.count(), 'The lens socket shows its stones');
+  for (const stone of await stones.all()) assert.equal(await stone.isDisabled(), true, 'Commissioned socket is secured');
   assert.equal(await page.locator('[data-action="reset"],[data-action="undo"],button.wb-wire-chip').count(), 0, 'Commissioned topology cannot be reset or rewired');
   await measure('voltage', 'lensIn', 'lensOut');
   assert.deepEqual((await inspect()).puzzle.state.wires, commissioned.state.wires, 'Read-only measurement preserves connections');

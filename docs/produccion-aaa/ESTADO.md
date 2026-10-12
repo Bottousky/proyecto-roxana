@@ -613,7 +613,26 @@ en la partida, para el futuro informe del docente. Detalle en [BANCOS-UX.md](BAN
 - **Banco: foco del cartel de éxito.** Desde que «¡Funciona!» espera la reacción (1,6 s oculto), el
   foco no llegaba al cartel: Enter no seguía. Ahora el foco llega cuando el cartel aparece, en su
   botón principal. Lo encontró `qa-bench-flow.mjs`.
-- **Lo que queda: las pruebas de navegador no siguen a los bancos rediseñados** (ciclos 21–25:
+- **Recorrido completo al día y verde sobre la punta** (12 oct): piedras de freno, la cuenta de Vega,
+  la regla de los nudos de Nereo y «Mirá lo que vi». Al ponerlo al día salieron **tres fallas reales
+  de caminata**, todas corregidas y con prueba:
+  - La boca de cada camino hacia un lugar dejaba un rincón donde el jugador se trababa al entrar en
+    diagonal. Ahora la boca se abre hasta 1,8 m (`src/terrain.js`, `tests/terrain-mouths.test.js`).
+    Debajo del ensanche no hay relieve.
+  - La guía de caminos del ciclo 20 arrastraba hacia afuera a quien acababa de llegar a un lugar,
+    por ejemplo en la entrada del Castillo. Ahora no actúa dentro de un lugar ni cuando cuatro
+    pasos adelante ya se está adentro. Con W sola se sigue llegando del Portal a la Plaza
+    (`scripts/qa-hold-w.mjs`).
+  - Si el viajero quedaba pegado a una baranda (en el muelle del Lago), ni el clic para caminar ni
+    el acercamiento a la palanca del retorno encontraban ruta. Ahora la ruta sale del punto libre
+    más cercano, de su lado (`src/navigation.js`, `tests/navigation.test.js`).
+- **Pruebas de navegador.** El flujo de bancos y las pruebas táctiles vertical y apaisada pasan. Las
+  pruebas táctiles esperan a que aparezca el cartel de éxito. El caminante del recorrido mide el
+  avance sobre la ruta y no en línea recta, así un desvío no cuenta como atasco.
+- **Pendiente: los bancos en el teléfono.** Con el rediseño, `qa-bench-load.mjs` da lo principal a
+  la vista en 6/9 bancos a 844×390 y en 5/9 a 390×844; antes eran 9/9. En el Taller, la Bomba y
+  la Lente, los botones y la frase de Ohm quedan debajo del borde.
+- **Antes (resuelto el mismo día): las pruebas de navegador no seguían a los bancos rediseñados** (ciclos 21–25:
   piedras de freno, piezas limitadas, «Mirá lo que vi»). `qa-bench-flow.mjs` ya pasa el Taller y
   falla en el Cerrojo, que no tiene perilla. El recorrido completo (`playthrough.mjs`) resuelve
   cada banco con la interfaz anterior. Hasta actualizarlos, la cadena de aceptación no puede

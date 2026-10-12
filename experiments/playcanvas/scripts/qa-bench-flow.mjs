@@ -66,7 +66,7 @@ await page.locator('.wb-reveal [data-action="reveal-end"]').click();
 assert.equal(await page.locator('.wb-commission-top').count(), 1, 'after looking around, the way forward stays in the header');
 await closeBench();
 
-// Cerrojo: retirar con la × del cable, tender con dos toques, girar el freno.
+// Cerrojo: retirar con la × del cable, tender con dos toques, elegir la piedra del freno.
 await open('gate');
 log('gate', '·', await say());
 const chips = page.locator('.wb-wire-chip');
@@ -79,8 +79,12 @@ b = await bench();
 log('  pasos', (await steps()).join(' / '), '·', await say());
 assert.equal(b.checks[0].met, true, 'it pushes toward the mark');
 await shot('gate-direction');
-for (let i = 0; i < 2 && !(await bench()).solved; i++) await page.locator('.wb-plate [data-action="knob"][data-delta="1"]').click();
-assert.equal((await bench()).solved, true, 'two notches of brake: firm');
+// The socket holds a copper strap: too much push. Of Edda's stones, brown-black-black (10 Ω) is the firm one.
+assert.equal((await bench()).solved, false, 'with the copper strap the latch hits');
+await page.locator('[data-action="stone"][data-key="brake"][data-value="47"]:visible').click();
+assert.equal((await bench()).solved, false, 'a 47 Ω stone leaves it trembling');
+await page.locator('[data-action="stone"][data-key="brake"][data-value="10"]:visible').click();
+assert.equal((await bench()).solved, true, 'the 10 Ω stone: firm');
 await page.locator('.wb-success').waitFor({ state: 'visible' });
 await shot('gate-success');
 await closeBench();

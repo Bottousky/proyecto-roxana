@@ -230,6 +230,10 @@ export class PlayCanvasWorld {
    * about 80°) follows its bends, drawn gently back toward its middle. Null away from any road. */
   corridorDirection(x,z,ux,uz){
     if(!this.area||!isExterior(this.area.id))return null;
+    // Inside a place the road no longer leads: whoever just arrived and walks in is not pulled back
+    // along it (the castle's entry from the Manantial dragged an arriving walker west).
+    // Nor at its mouth, when four steps ahead already land inside: the walker is entering, not following.
+    {const [w,d]=AREAS[this.area.id].bounds,inside=(px,pz)=>Math.abs(px)<=w/2&&Math.abs(pz)<=d/2;if(inside(x,z)||inside(x+ux*4,z+uz*4))return null;}
     const [gx,gz]=toKingdom(this.area.id,[x,z]);let best=null;
     for(const exit of passagesFor(this.area.id)){const pass=passageGeometry(this.area.id,exit.target);if(!pass)continue;const pts=pass.points;
       for(let i=1;i<pts.length-1;i++){const d=Math.hypot(pts[i][0]-gx,pts[i][1]-gz);if(!best||d<best.d)best={d,i,pts};}}

@@ -70,6 +70,9 @@ const after = (await game()).p;
 assert.ok(Math.hypot(after[0] - before[0], after[1] - before[1]) > .4, 'la cruceta mueve al viajero');
 note('cruceta', { before, after });
 
+// The success card waits for the receptor's answer (1,6 s) before it can be touched, as a player sees it.
+const tapCommission = async () => { await page.waitForFunction(() => { const c = document.querySelector('.wb-success'); return !!c && getComputedStyle(c).visibility === 'visible' && +getComputedStyle(c).opacity > .95; }, {}, { timeout: 8000 }); await tapEl('.wb-success [data-action="commission"]'); };
+
 // Tocar el pedestal: el viajero se acerca solo y lo usa.
 await reach('ohm_pedestal', { until: g => g.mode !== 'world' });
 let g = await read();
@@ -79,7 +82,7 @@ await capture('banco-ohm');
 await tapEl('button[data-port="heartOut"]'); await tapEl('button[data-port="negative"]');
 await page.waitForTimeout(400);
 assert.equal((await game()).puzzle?.solved, true, 'dos toques en los bornes despiertan a Ohm');
-await tapEl('.wb-success [data-action="commission"]');
+await tapCommission();
 note('ohm-despierto');
 for (let i = 0; i < 80; i++) { g = await game(); if (g.mode === 'cinematic') { await page.waitForTimeout(300); continue; } if (g.mode === 'dialogue') { await read(); continue; } if (g.mode === 'world') break; await page.waitForTimeout(200); }
 assert.equal((await game()).flags.awaken, true);
@@ -139,7 +142,7 @@ await tapEl('[data-action="mode"][data-mode="wire"]');
 for (const p of ['s2a', 's2b']) { const t = page.locator(`.wb-board button[data-port="${p}"]`); await t.scrollIntoViewIfNeeded(); const box = await t.boundingBox(); await touch(box.x + box.width / 2, box.y + box.height / 2); await page.waitForTimeout(150); }
 await page.waitForTimeout(400);
 assert.equal((await game()).puzzle?.solved, true, 'el banco del taller se resuelve tocando, sin encender nada a mano');
-await tapEl('.wb-success [data-action="commission"]');
+await tapCommission();
 for (let i = 0; i < 80; i++) { g = await game(); if (g.mode === 'cinematic') { await page.waitForTimeout(300); continue; } if (g.mode === 'dialogue') { await read(); continue; } if (g.mode === 'world') break; await page.waitForTimeout(200); }
 assert.equal((await game()).flags.workshop, true, 'el taller quedó en servicio');
 await capture('taller-encendido');

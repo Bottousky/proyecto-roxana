@@ -44,3 +44,14 @@ test('pathfinding does not teleport an embedded or out-of-bounds start to a safe
   assert.deepEqual(findPath([0,0],[3,0],[12,12],wall),[]);
   assert.deepEqual(findPath([-9,0],[-3,0],[12,12],wall),[]);
 });
+
+test('a walker resting against a railing still gets a route, leaving from its own side',()=>{
+  // The Lago's dock: the player slid along the railing and stopped 2 cm inside its clearance; click-to-walk
+  // and the approach to the reeds' lever found no route at all from there.
+  const railing=[{x:0,z:0,w:4,d:.1}],start=[1,.42],goal=[6,-3];
+  const path=findPath(start,goal,[20,20],railing,{radius:.34});
+  assert.ok(path.length,'A route exists');
+  assert.ok(path[0][1]>=.44,'It starts on the walker\'s side of the railing');
+  assertClear(path[0],path.slice(1),railing);
+  assert.deepEqual(path.at(-1),goal);
+});
