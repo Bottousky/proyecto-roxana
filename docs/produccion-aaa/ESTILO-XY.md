@@ -13,7 +13,7 @@ emulador con shaders. Decidió:
 - `http://127.0.0.1:4190/?estilo=xy&gente=3d`: además, el viajero en 3D.
 - `?estilo=hd2d`: vuelve al estilo actual. La elección se recuerda en el navegador.
 
-`scripts/qa-style.mjs` saca el mismo lugar y el mismo punto en los tres modos, en plano general y de
+Capturas de comparación en [estilo-xy/](estilo-xy/). `scripts/qa-style.mjs` saca el mismo lugar y el mismo punto en los tres modos, en plano general y de
 cerca.
 
 ## Qué cambia (`src/style.js`)
