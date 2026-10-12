@@ -1,0 +1,637 @@
+[0.1s] escena → undefined
+[3.4s] escena → c1.puerta
+[8.7s] lee: Tengo las manos de tiza.
+[11.1s] lee: …No hay vuelta. Por ahora.
+[16.0s] lee: Alguien borró todo esto a medias.
+[16.6s] escena → c1.alguien
+[19.7s] elige «Quedarte quieto y esperar» (Un punto amarillo, quieto, te mira (o algo parecido).)
+[23.2s] lee: —Hola.
+[24.6s] lee: No habla. O no habla como yo.
+[25.3s] lee: —¿Tenés nombre?
+[28.8s] lee: Un punto. Nada más… y nada menos.
+[29.5s] lee: —Te voy a decir Punto. Hasta que me digas cómo te llamás.
+[34.8s] escena → c1.ronda
+[38.9s] lee: ¿Qué es eso?
+[41.2s] lee: Si pasa por acá, los desparrama.
+[42.1s] elige «Anotarlos en la piedra.» (¿Cómo vas a saber si vuelven todos?)
+[100.1s] no pudo tocar r11: page.click: Timeout 5000ms exceeded.
+[100.2s] escena → c1.marea
+[103.3s] lee: Se llevó todo. Menos las marcas.
+[104.8s] escena → c1.vuelven
+[107.9s] lee: Cada marca era uno de ellos.
+[141.1s] lee: Quedó una marca sola.
+[141.5s] escena → c1.quien
+[147.4s] elige «Que falta uno de ellos.» (¿Qué quiere decir esa marca sola?)
+[152.0s] lee: Las marcas saben cuántos. No saben quién. Punto sí.
+[156.2s] lee: —¿El más chico? ¿El que llegaba tarde?
+[158.5s] lee: —Vamos a buscarlo.
+[164.1s] escena → c1.busqueda
+[177.4s] lee: Alguien anotó acá, hace mucho.
+[188.5s] lee: Ahí. Debajo del polvo.
+[192.7s] escena → c1.todos
+[193.8s] lee: Ahora sí.
+[204.5s] lee: —Están todos.
+[206.7s] escena → c1.gradas
+[210.3s] elige «Todavía no sé.» (Así, en fila, ¿alcanzan los asientos para la Ronda y Punto?)
+[223.8s] elige «Había más asientos que en la fila.» (Quedó un asiento libre. ¿Qué quiere decir?)
+[226.3s] lee: Mirando no se podía saber. Sentándolos, sí.
+[228.6s] elige «Uno.» (Así apretados, si se vuelven a sentar, ¿cuántos asientos sobran?)
+[232.4s] lee: Sobró uno, como antes. Apretados o separados, son trece.
+[235.6s] lee: ¿El que sobra es para mí?
+[237.3s] escena → c1.nombre
+[238.4s] lee: ¡Le salió!
+[259.8s] lee: —¡Bajen! Cada uno debajo de su marca.
+[262.8s] lee: Catorce marcas. Catorce palabras. Catorce de nosotros.
+[266.3s] elige «El 14 nombra a catorce.» (¿Qué le decís a Punto?)
+[272.9s] lee: No es una fila más: es el nombre de cuántos hay en cada una.
+[275.4s] lee: Me mira como preguntando qué hace un 1 ahí, si somos catorce.
+[276.3s] lee: —Ni idea. Mañana.
+[278.8s] escena → c2.manana
+[282.6s] lee: Desde anoche marca todo. Hasta a mí.
+[283.4s] lee: La puerta por la que entré quedó allá atrás, borrada. No hay vuelta, por ahora. Y Punto ya me cuenta entre los suyos.
+[285.8s] lee: —Sí, ya sé. El 1. Todavía no lo sé.
+[288.2s] lee: Uf. Todo lo que se llevó la Marea hay que volver a dibujarlo. Y sin tiza no se dibuja nada.
+[289.0s] lee: ¿Y vos? Tenés una tiza en la mano… ¿Sabés contar palitos?
+[290.0s] elige «Sí. ¿Te ayudo?» ()
+[293.6s] lee: ¡Por fin alguien! Soy Mara. Guardo la tiza de todos y anoto cuánta le toca a cada familia.
+[294.1s] escena → c2.marcar
+[297.9s] lee: Hay que anotar cuántos palitos llegaron.
+[300.6s] lee: La de ayer la anoté así, con marcas: la Marea me había desarmado los atados. ¿Llegó más hoy que ayer?
+[301.7s] elige «Así, de un vistazo, no se puede saber.» (Dos hileras de marcas, una arriba de la otra.)
+[307.4s] lee: Una por una, no se termina más.
+[308.2s] lee: Por eso en el depósito atamos. De a diez. Así se hizo siempre.
+[311.0s] lee: ¡Eso no es un atado! Un atado tiene diez.
+[311.9s] lee: De a cinco también se cuenta. Pero si en el depósito un atado es de diez, uno de cinco engaña al que lo lea.
+[314.1s] escena → c2.atados
+[315.9s] lee: Este es el molde de diez: diez ranuras, un palito en cada una. Cuando se llena, se ata.
+[316.6s] lee: ¿Por qué de a diez? No me preguntes. Así se hizo siempre.
+[323.2s] no pudo tocar pile0: page.click: Timeout 5000ms exceeded.
+[329.4s] no pudo tocar pile1: page.click: Timeout 5000ms exceeded.
+[336.2s] no pudo tocar pile2: page.click: Timeout 5000ms exceeded.
+[343.0s] no pudo tocar pile3: page.click: Timeout 5000ms exceeded.
+[350.0s] no pudo tocar pile4: page.click: Timeout 5000ms exceeded.
+[356.7s] no pudo tocar pile5: page.click: Timeout 5000ms exceeded.
+[363.1s] no pudo tocar pile6: page.click: Timeout 5000ms exceeded.
+[369.4s] no pudo tocar pile7: page.click: Timeout 5000ms exceeded.
+[375.8s] no pudo tocar pile8: page.click: Timeout 5000ms exceeded.
+[382.3s] no pudo tocar pile9: page.click: Timeout 5000ms exceeded.
+[400.3s] no pudo tocar llenar: page.click: Timeout 5000ms exceeded.
+[417.4s] no pudo tocar llenar: page.click: Timeout 5000ms exceeded.
+[425.6s] lee: Tres atados y siete sueltos. Treinta y siete.
+[426.5s] lee: ¿Y la hilera de ayer?
+[468.4s] lee: Ayer, treinta y cuatro; hoy, treinta y siete. Hoy llegaron tres más.
+[471.7s] lee: Entonces… el 1 de 14.
+[472.4s] lee: —Punto, vení. Mirá.
+[473.1s] lee: ¿Catorce? Tomá, de la otra bolsa.
+[482.6s] no pudo tocar llenar: page.click: Timeout 5000ms exceeded.
+[490.0s] lee: —¡Escribiste!
+[490.8s] lee: El 1 no cuenta palitos: cuenta atados.
+[491.4s] lee: Bueno, bueno. Lindo. Ahora vamos al depósito, que hay que guardar todo.
+[491.9s] escena → c2.deposito
+[496.4s] lee: El depósito. Tres cuartos: sueltos, atados y atados de atados.
+[497.3s] lee: Regla de la casa: nunca más de nueve por cuarto. Con diez, se atan y pasan al de al lado.
+[498.3s] lee: —¿Por qué nueve?
+[499.2s] lee: La Marea desparramó todo; hay que guardar de nuevo.
+[500.1s] lee: La carga de recién: tres atados y siete sueltos.
+[534.2s] lee: Otra carga: cinco sueltos.
+[555.7s] no pudo tocar room0: page.click: Element is not visible
+[556.2s] lee: "Me llevo uno"… era esto.
+[556.7s] lee: La última: seis atados y ocho sueltos.
+[630.1s] no pudo tocar room0: page.click: Timeout 5000ms exceeded.
+[630.8s] lee: Ahora se anota como se anota: una cifra por cuarto, de izquierda a derecha.
+[652.7s] elige «Un 0.» (Uno de los cuartos quedó vacío. ¿Qué escribís para ese cuarto?)
+[661.8s] lee: Ciento diez. Un atado de atados, un atado… y ningún suelto.
+[662.7s] lee: Hm. Yo siempre lo dejaba en blanco. Total, no había nada…
+[663.0s] escena → c2.cero
+[671.3s] lee: Mara, con treinta y dos palitos no alcanza ni para la puerta. Antes de la Marea teníamos muchísimo más.
+[671.9s] lee: El registro dice treinta y dos. Tres y dos.
+[675.4s] lee: Entre el 3 y el 2 hay una mancha.
+[676.4s] elige «Ahí había algo, pero no se puede saber qué.» (¿Qué había entre el 3 y el 2?)
+[680.0s] lee: Por la mancha sola no se sabe. Su tiza está guardada: eso sí se puede mirar.
+[680.7s] lee: Nuestra tiza está en casa, en nuestro depósito. Vengan a ver.
+[683.5s] elige «Trescientos veinte: 320.» (¿Qué número dice el depósito de los Oval?)
+[714.9s] lee: Así quedan dos atados y ningún suelto. Es al revés.
+[715.9s] lee: Tres, cero, dos. Trescientos dos. Faltaba el cero.
+[717.9s] lee: ¡Trescientos dos! Y yo les daba treinta y dos…
+[718.8s] lee: —Dice "ninguno" en ese cuarto. Sin él, el 3 se corre de lugar.
+[722.7s] lee: Un cuarto vacío también se escribe.
+[723.1s] escena → c2.cuantos
+[727.8s] lee: Mara, la familia Recta tiene el doble de tiza que nosotros. No es justo. ¿Cuánto más tiene?
+[728.5s] lee: Recta, cincuenta y dos. Curva, treinta y siete. Sacalo vos, que yo ya me mareé.
+[729.6s] lee: Como en la piedra: emparejar. Pero de a atados.
+[739.9s] no pudo tocar it1-7: page.click: Timeout 5000ms exceeded.
+[750.1s] no pudo tocar it1-8: page.click: Timeout 5000ms exceeded.
+[760.7s] no pudo tocar it1-9: page.click: Timeout 5000ms exceeded.
+[770.5s] no pudo tocar it0-5: page.click: Timeout 5000ms exceeded.
+[780.7s] no pudo tocar it0-6: page.click: Timeout 5000ms exceeded.
+[783.8s] desata un atado de Recta
+[789.5s] no pudo tocar cmp-untie: page.click: Timeout 5000ms exceeded.
+[799.6s] no pudo tocar it0-17: page.click: Timeout 5000ms exceeded.
+[809.9s] no pudo tocar it0-18: page.click: Timeout 5000ms exceeded.
+[819.9s] no pudo tocar it0-19: page.click: Timeout 5000ms exceeded.
+[829.4s] no pudo tocar it0-20: page.click: Timeout 5000ms exceeded.
+[838.6s] no pudo tocar it0-21: page.click: Timeout 5000ms exceeded.
+[842.7s] lee: Quince le quedaron a Recta sin pareja.
+[843.5s] lee: "Pedir prestado" era desatar.
+[844.4s] lee: Quince más. El doble serían treinta y siete más. Bueno: no es para tanto, no reclamo nada.
+[845.1s] escena → c2.cuarto
+[848.8s] lee: Antes de que vuelva la Marea, todos trajeron su tiza al depósito. Nueve, nueve y nueve: está lleno hasta el techo.
+[849.8s] lee: Y Curva llega con un palito más.
+[868.4s] lee: ¡Diez atados de atados! Y no hay más cuartos. ¿Qué hacemos?
+[869.5s] elige «Atarlos y dibujar un cuarto nuevo a la izquierda.» (Diez atados de atados y ningún cuarto a la izquierda.)
+[875.3s] lee: Mil. Nunca se había llenado tanto.
+[876.5s] lee: Siempre se puede dibujar otro cuarto.
+[877.1s] escena → c2.lugar
+[880.5s] lee: A ver si aprendí. A los Recta les debo doscientos cinco palitos. Armámelo en la pizarrita, que lo quiero ver.
+[894.5s] lee: Dos, cero, cinco. Con el cero en el medio, que yo antes dejaba en blanco.
+[895.6s] lee: «Así se hizo siempre», decía yo. Ahora sé por qué atábamos de a diez: para que cada cifra tenga su lugar.
+[896.3s] lee: —De a cinco también se podría. Pero todos tienen que saber de a cuánto.
+[897.1s] lee: Mara… te debo tres atados de ayer. Y ya no me queda ninguno.
+[897.8s] lee: ¿Y eso cómo lo anoto? ¿Menos que nada?
+[899.1s] lee: Menos que nada. Punto me mira como anoche, cuando rodeó el 1.
+[901.4s] escena → c3.deuda
+[904.2s] lee: Hoja nueva. Desde que todos devolvieron lo que les sobraba, anoto lo que cada familia tiene guardado acá, en atados.
+[905.0s] lee: Y yo, los tres que te debo.
+[905.7s] lee: Cuando no hay nada, escribo 0: eso ya lo aprendí. Pero esto no es "no hay": es que falta. ¿Cómo lo anoto?
+[906.8s] elige «Un 3 con una marca nueva delante.» (¿Cómo se anota lo que debe Curva?)
+[911.2s] lee: Tres menos… ¿menos qué? ¿Le falta algo a la cuenta?
+[913.3s] lee: Una rayita acostada. Menos tres: tres que faltan.
+[915.4s] lee: Tres, pero para el otro lado.
+[915.9s] escena → c3.pares
+[918.2s] lee: Curva, tomá: dos atados de los míos, por la cerca que me arreglaste.
+[920.3s] lee: Ahora tiene dos y debe tres.
+[928.6s] no pudo tocar cv-d0: page.click: Timeout 5000ms exceeded.
+[937.0s] no pudo tocar cv-d1: page.click: Timeout 5000ms exceeded.
+[937.9s] elige «−1» (¿Cuánto tiene Curva ahora?)
+[947.4s] lee: Y Recta tiene cuatro guardados… pero ayer le presté uno: me debe uno.
+[948.3s] elige «Tiene 3.» (¿Cuánto le queda a Recta?)
+[958.9s] no pudo tocar rc-d0: page.click: Timeout 5000ms exceeded.
+[959.1s] lee: Tres: un par se borró.
+[961.9s] lee: Y a lo que se tiene le pongo una cruz, para que nadie lo confunda con una deuda.
+[964.5s] lee: Y Cuña, que me debe cuatro desde la semana pasada.
+[966.3s] lee: Más tres: tres que se tienen. Menos cuatro: cuatro que faltan.
+[966.7s] escena → c3.linea
+[969.4s] lee: Para ver quién tiene más y quién menos, una línea en el suelo. El cero, acá. Lo que se tiene, hacia la derecha.
+[971.7s] elige «−4» (¿Qué número es menor: −4 o −1?)
+[988.6s] lee: Ahí tendría 3. Yo tengo 2.
+[1012.1s] lee: De ese lado estaría teniendo 2. ¡Ojalá! Yo debo 1.
+[1052.2s] no pudo tocar tick-4: page.click: Timeout 5000ms exceeded.
+[1054.2s] lee: Menos cuatro, más a la izquierda: es menor.
+[1055.0s] lee: O sea que yo, en −1, tengo más que Cuña. Algo es algo.
+[1055.5s] escena → c3.distancia
+[1058.2s] lee: Recta, si me prestás lo que nos separa, quedamos parejos. ¿Cuánto más que nosotros tenés?
+[1059.2s] elige «7» (¿Cuántos pasos hay de Cuña (−4) a Recta (+3)?)
+[1062.3s] lee: Pasos, de marca en marca.
+[1068.8s] no pudo tocar step-3: page.click: Timeout 5000ms exceeded.
+[1075.0s] no pudo tocar step-2: page.click: Timeout 5000ms exceeded.
+[1081.2s] no pudo tocar step-1: page.click: Timeout 5000ms exceeded.
+[1087.4s] no pudo tocar step0: page.click: Timeout 5000ms exceeded.
+[1093.8s] no pudo tocar step1: page.click: Timeout 5000ms exceeded.
+[1100.0s] no pudo tocar step2: page.click: Timeout 5000ms exceeded.
+[1106.3s] no pudo tocar step3: page.click: Timeout 5000ms exceeded.
+[1106.5s] lee: Siete. Las deudas también son pasos.
+[1107.2s] lee: Recta, por el techo del depósito que me ayudaste a tapar: un atado más.
+[1109.7s] elige «Están igual de lejos.» (¿Quién está más lejos del cero: Recta (+4) o Cuña (−4)?)
+[1114.5s] lee: Cuatro pasos cada uno.
+[1116.8s] lee: —Las barritas dicen: lo lejos del cero, sin el lado.
+[1117.6s] lee: Dos barritas. Lo anoto así.
+[1118.0s] escena → c3.perdon
+[1120.4s] lee: Curva, revisé el registro de ayer: dos deudas tuyas las anoté dos veces. Hay que sacarlas.
+[1121.0s] lee: Pero… si en la cuenta debo uno solo.
+[1125.0s] elige «Agregar un atado y una deuda: juntos valen cero.» (Hay que sacar dos deudas y en la pizarrita no queda ninguna.)
+[1157.7s] lee: Vale lo mismo que antes. Pero ahora hay una deuda para sacar.
+[1160.3s] lee: Le quedó un atado. En realidad, Curva no debía: tenía uno.
+[1165.0s] elige «Darle dos atados.» (Curva pasó de −1 a +1. ¿Qué otra cosa la habría dejado en el mismo lugar?)
+[1169.3s] lee: Lo mismo: sacar dos deudas es como dar dos atados.
+[1172.7s] elige «Que se saca algo.» (En −1 − (−2), ¿qué dice la rayita del medio, la que está suelta?)
+[1175.8s] lee: —La suelta dice "sacar". Las pegadas al número dicen "deuda". El paréntesis guarda al número con su rayita.
+[1176.5s] lee: Para no confundirlas. Bien.
+[1177.2s] lee: El mismo trazo, dos trabajos.
+[1179.8s] lee: Y yo tengo dos atados, pero tengo que pagarle cinco a Mara por las tejas.
+[1180.7s] elige «Queda debiendo 3.» (Oval tiene 2 y paga 5. ¿Cómo queda?)
+[1188.3s] lee: Te lo presto: un atado que tenés y uno que me debés.
+[1199.8s] lee: Sobró un par de lo prestado: un atado y una deuda, que no cambian nada.
+[1200.5s] lee: Me pagaste cinco: dos tuyos y tres que te presté. Me debés tres.
+[1201.0s] lee: Dos menos cinco: menos tres.
+[1205.6s] lee: Sacar atados lleva a la izquierda, aunque se pase del cero.
+[1206.0s] escena → c3.pozo
+[1209.4s] lee: —¡Punto!
+[1210.0s] lee: Cuatro debajo del suelo… como Cuña, que debe cuatro. El mismo −4.
+[1210.9s] elige «−9» (Punto está en −4. La soga que le tiramos tiene cinco nudos: sube cinco marcas. ¿Dónde queda?)
+[1218.6s] lee: Más uno: cuatro para llegar al suelo y uno más.
+[1218.9s] escena → c3.hacia
+[1222.7s] lee: —Punto, andá a saludar a alguien.
+[1230.8s] lee: —Punto… ahora señalás.
+[1232.1s] lee: Cada número dice cuánto y para qué lado, como Punto. Menos el cero, que está en el medio.
+[1232.7s] lee: Arriba, en las Terrazas, la Marea se está llevando la escalera. Dicen que en una piedra hay un signo que nadie entiende.
+[1233.4s] lee: Y me deben atados. Mañana subimos.
+[1235.5s] escena → c4.grupos
+[1238.6s] lee: Las Terrazas. Miren la escalera: la Marea se la está llevando.
+[1239.4s] lee: Desde que nadie entiende lo que dice la piedra de abajo. Lo de las deudas sí lo sabemos: tres atados cada familia.
+[1241.9s] lee: Un 4, una cruz acostada y un 3. Nadie sabe qué quiere decir.
+[1244.4s] elige «Doce atados.» (¿Cuántos atados le deben las Terrazas a Mara?)
+[1247.5s] lee: Bajemos las deudas a la pizarra. Cada familia, una fila.
+[1256.1s] no pudo tocar grp0: page.click: Timeout 5000ms exceeded.
+[1264.5s] no pudo tocar grp1: page.click: Timeout 5000ms exceeded.
+[1269.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1269.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1270.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1271.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1272.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1273.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1273.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1274.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1275.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1276.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1277.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1277.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1278.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1279.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1280.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1281.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1281.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1282.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1283.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1284.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1285.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1285.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1286.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1287.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1288.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1289.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1289.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1290.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1291.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1292.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1293.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1293.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1294.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1295.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1296.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1297.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1298.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1298.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1299.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1300.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1301.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1302.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1302.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1303.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1304.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1305.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1305.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1306.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1307.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1308.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1309.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1310.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1310.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1311.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1312.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1312.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1313.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1314.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1315.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1316.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1316.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1317.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1318.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1319.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1319.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1320.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1321.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1322.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1323.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1323.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1324.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1325.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1326.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1327.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1327.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1328.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1329.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1330.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1331.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1332.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1333.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1333.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1334.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1335.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1336.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1337.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1338.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1339.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1340.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1340.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1341.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1342.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1343.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1344.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1345.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1346.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1346.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1347.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1348.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1349.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1350.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1350.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1351.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1352.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1353.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1354.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1355.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1356.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1356.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1357.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1358.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1359.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1360.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1361.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1362.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1363.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1363.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1364.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1365.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1366.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1366.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1367.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1368.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1369.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1369.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1370.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1371.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1372.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1373.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1373.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1374.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1375.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1376.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1377.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1377.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1378.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1379.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1380.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1381.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1382.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1383.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1383.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1384.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1385.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1386.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1387.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1387.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1388.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1389.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1390.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1391.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1391.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1392.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1393.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1394.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1395.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1395.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1396.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1397.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1398.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1399.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1400.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1400.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1401.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1402.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1403.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1403.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1404.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1405.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1406.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1407.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1408.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1408.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1409.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1410.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1411.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1411.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1412.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1413.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1414.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1415.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1416.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1417.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1417.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1418.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1419.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1420.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1421.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1422.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1423.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1423.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1424.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1425.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1426.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1427.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1427.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1428.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1429.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1430.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1431.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1431.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1432.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1433.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1433.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1434.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1435.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1436.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1437.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1438.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1438.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1439.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1440.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1441.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1442.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1442.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1443.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1444.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1445.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1446.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1447.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1447.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1448.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1449.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1450.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1451.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1452.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1453.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1453.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1454.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1455.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1456.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1457.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1457.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1458.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1459.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1460.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1460.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1461.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1462.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1463.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1463.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1464.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1465.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1466.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1467.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1468.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1468.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1469.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1470.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1471.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1472.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1472.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1473.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1474.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1475.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1476.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1477.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1477.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1478.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1479.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1480.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1481.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1482.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1483.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1484.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1484.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1485.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1486.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1487.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1487.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1488.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1489.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1490.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1491.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1491.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1492.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1493.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1494.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1495.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1496.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1496.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1497.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1498.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1499.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1500.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1501.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1501.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1502.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1503.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1504.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1505.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1506.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1507.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1508.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1508.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1509.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1510.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1511.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1512.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1513.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1514.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1514.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1515.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1516.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1517.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1518.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1519.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1519.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1520.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1521.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1522.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1523.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1523.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1524.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1525.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1526.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1527.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1528.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1528.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1529.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1530.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1531.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1532.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1533.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1534.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1534.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1535.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1536.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1537.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1538.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1539.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1539.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1540.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1541.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1542.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1543.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1544.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1544.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1545.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1546.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1547.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1548.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1548.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1549.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1550.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1551.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1552.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1553.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1553.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1554.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1555.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1556.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1557.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1558.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1558.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1559.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1560.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1561.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1561.9s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1562.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1563.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1564.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1565.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1566.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1567.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1567.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1568.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1569.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1570.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1571.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1572.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1572.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1573.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1574.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1575.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1576.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1577.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1577.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1578.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1579.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1580.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1581.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1581.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1582.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1583.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1584.3s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1585.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1586.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1586.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1587.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1588.4s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1589.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1590.1s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1591.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1591.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1592.5s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1593.2s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1594.0s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1594.8s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1595.7s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1596.6s] no pudo tocar grp3: page.click: Element is outside of the viewport
+[1598.2s] {"ended":false,"final":{"mode":"play","seg":"c4.grupos"},"journal":["¿Están todos?","Demasiados para marcar","Menos que nada"],"owner":"Auditoria","photos":["c1","c2","c3"],"evidenceKinds":["door","meet","record-method","record","record-repeat","recorded","pair","check","interpret","search","predict","seat","seat-taken","interpret-seat","conserve","count","numeral","meet-mara","compare-tallies","tie","fill-quick","bundled","ring-ten","ring-rest","compare-resolved","carry","write-empty","smudge","read-oval","untie","difference","new-room","build-205","write-debt","cancel","cancel-result","read-balance","predict-balance","predict-order","place","place-wrong","predict-steps","step","abs","forgive","forgive-how","forgive-result","forgive-same","read-minus","predict-pay","pay","pay-pad","pay-result","predict-pit","pit-climb","punto-goes","predict-total","gather"],"fps":{"min":"20.0","median":"20.0","worst":{"fps":20,"seg":"c1.puerta","mode":"play"}},"errors":["[spot fuera de cuadro] grp2 (1550, 336)","[spot fuera de cuadro] grp3 (1838, 262)","atascado en c4.grupos: [\"c4.grupos\",\"\",[],[\"grp3Familia Balcón: tres deudasfalse\"]]"],"seconds":1598.212,"size":"1600x900","touch":false,"route":"directa","watch":false}

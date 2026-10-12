@@ -10,3 +10,5 @@ it*/review-*/**/*.webm
 animlab/**/bot-*/
 animlab/**/tracks.json
 animlab/**/*.pdf
+# Corridas completas del bot: las capturas se regeneran (summary.json, log.txt, state.json y *.out quedan).
+animlab/**/full-*/*.png

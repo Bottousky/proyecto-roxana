@@ -1,0 +1,2315 @@
+{
+  "version": 1,
+  "chapter": 4,
+  "segment": "c4.grupos",
+  "flags": {
+    "metApproaches": 0,
+    "recorded": 12,
+    "pairs": [
+      [
+        "mark0",
+        "r0"
+      ],
+      [
+        "mark1",
+        "r1"
+      ],
+      [
+        "mark2",
+        "r2"
+      ],
+      [
+        "mark3",
+        "r3"
+      ],
+      [
+        "mark4",
+        "r4"
+      ],
+      [
+        "mark5",
+        "r5"
+      ],
+      [
+        "mark6",
+        "r6"
+      ],
+      [
+        "mark7",
+        "r7"
+      ],
+      [
+        "mark8",
+        "r8"
+      ],
+      [
+        "mark9",
+        "r9"
+      ],
+      [
+        "mark10",
+        "r10"
+      ],
+      [
+        "mark11",
+        "r11"
+      ]
+    ],
+    "freeMark": "mark11",
+    "reading": "missing",
+    "found": true,
+    "all": true,
+    "prediction": "nose",
+    "seated": {
+      "0": "r0",
+      "1": "r1",
+      "2": "r2",
+      "3": "r3",
+      "4": "r4",
+      "6": "r10",
+      "7": "r11",
+      "8": "r9",
+      "9": "r5",
+      "10": "punto",
+      "11": "r6",
+      "12": "r7",
+      "13": "r8"
+    },
+    "chapterDone": true,
+    "c2board1Dim": true,
+    "punto14": true,
+    "c2bulk": true,
+    "zero": true,
+    "thousand": true,
+    "c3debt": true,
+    "c3pairs": true,
+    "c3line": true,
+    "c3dist": true,
+    "c3forgive": true,
+    "c3pit": true,
+    "puntoArrow": true
+  },
+  "scratch": {
+    "c1.alguien": {
+      "approaches": 0
+    },
+    "c1.ronda": {
+      "method": "marks",
+      "recorded": [
+        "r0",
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6",
+        "r7",
+        "r8",
+        "r9",
+        "r10",
+        "r11"
+      ]
+    },
+    "c1.vuelven": {
+      "links": [
+        [
+          "mark0",
+          "r0"
+        ],
+        [
+          "mark1",
+          "r1"
+        ],
+        [
+          "mark2",
+          "r2"
+        ],
+        [
+          "mark3",
+          "r3"
+        ],
+        [
+          "mark4",
+          "r4"
+        ],
+        [
+          "mark5",
+          "r5"
+        ],
+        [
+          "mark6",
+          "r6"
+        ],
+        [
+          "mark7",
+          "r7"
+        ],
+        [
+          "mark8",
+          "r8"
+        ],
+        [
+          "mark9",
+          "r9"
+        ],
+        [
+          "mark10",
+          "r10"
+        ]
+      ]
+    },
+    "c1.quien": {
+      "reading": "missing"
+    },
+    "c1.busqueda": {
+      "seen": [
+        "crack",
+        "house",
+        "smudge"
+      ]
+    },
+    "c1.todos": {
+      "links": [
+        [
+          "mark0",
+          "r0"
+        ],
+        [
+          "mark1",
+          "r1"
+        ],
+        [
+          "mark2",
+          "r2"
+        ],
+        [
+          "mark3",
+          "r3"
+        ],
+        [
+          "mark4",
+          "r4"
+        ],
+        [
+          "mark5",
+          "r5"
+        ],
+        [
+          "mark6",
+          "r6"
+        ],
+        [
+          "mark7",
+          "r7"
+        ],
+        [
+          "mark8",
+          "r8"
+        ],
+        [
+          "mark9",
+          "r9"
+        ],
+        [
+          "mark10",
+          "r10"
+        ],
+        [
+          "mark11",
+          "r11"
+        ]
+      ]
+    },
+    "c1.gradas": {
+      "prediction": "nose",
+      "seated": {
+        "0": "r0",
+        "1": "r1",
+        "2": "r2",
+        "3": "r3",
+        "4": "r4",
+        "6": "r10",
+        "7": "r11",
+        "8": "r9",
+        "9": "r5",
+        "10": "punto",
+        "11": "r6",
+        "12": "r7",
+        "13": "r8"
+      },
+      "conserve": "none"
+    },
+    "c1.nombre": {
+      "marked": true,
+      "counted": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13
+      ],
+      "countRepeats": 0,
+      "lined": true,
+      "named": true
+    },
+    "c2.atados": {
+      "bundles": 3
+    },
+    "c2.deposito": {
+      "counts": [
+        0,
+        1,
+        1
+      ],
+      "load": 3,
+      "written": "110"
+    },
+    "c3.linea": {
+      "placed": {
+        "recta": 3,
+        "oval-a": 2,
+        "curva": -1,
+        "cuna": -4
+      },
+      "drawn": true,
+      "prediction": "espiral",
+      "labeled": true
+    },
+    "c4.grupos": {
+      "moved": [
+        0,
+        1,
+        2
+      ],
+      "guess": "12"
+    }
+  },
+  "evidence": [
+    {
+      "t": "2026-10-11T20:52:30.557Z",
+      "seg": "c1.puerta",
+      "run": 1,
+      "kind": "door"
+    },
+    {
+      "choice": "wait",
+      "t": "2026-10-11T20:52:45.507Z",
+      "seg": "c1.alguien",
+      "run": 1,
+      "kind": "meet"
+    },
+    {
+      "choice": "marks",
+      "t": "2026-10-11T20:53:08.252Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-method"
+    },
+    {
+      "id": "r0",
+      "n": 1,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:10.914Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r0",
+      "t": "2026-10-11T20:53:12.508Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r1",
+      "n": 2,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:14.691Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r1",
+      "t": "2026-10-11T20:53:16.533Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r2",
+      "n": 3,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:18.867Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r2",
+      "t": "2026-10-11T20:53:20.847Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r3",
+      "n": 4,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:23.091Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r3",
+      "t": "2026-10-11T20:53:25.194Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r4",
+      "n": 5,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:27.537Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r4",
+      "t": "2026-10-11T20:53:31.518Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r5",
+      "n": 6,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:34.039Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r5",
+      "t": "2026-10-11T20:53:35.703Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r6",
+      "n": 7,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:37.800Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r6",
+      "t": "2026-10-11T20:53:39.598Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r7",
+      "n": 8,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:41.690Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r7",
+      "t": "2026-10-11T20:53:43.517Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r8",
+      "n": 9,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:45.531Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r8",
+      "t": "2026-10-11T20:53:47.419Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r9",
+      "n": 10,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:49.637Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r9",
+      "t": "2026-10-11T20:53:51.408Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r10",
+      "n": 11,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:53.687Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "id": "r10",
+      "t": "2026-10-11T20:53:55.609Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record-repeat"
+    },
+    {
+      "id": "r11",
+      "n": 12,
+      "viaHint": false,
+      "t": "2026-10-11T20:53:57.788Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "record"
+    },
+    {
+      "count": 12,
+      "repeats": 11,
+      "t": "2026-10-11T20:53:59.071Z",
+      "seg": "c1.ronda",
+      "run": 1,
+      "kind": "recorded"
+    },
+    {
+      "mark": "mark0",
+      "dot": "r0",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:13.604Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark1",
+      "dot": "r1",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:15.630Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark2",
+      "dot": "r2",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:17.585Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark3",
+      "dot": "r3",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:19.622Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark4",
+      "dot": "r4",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:21.695Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark5",
+      "dot": "r5",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:23.808Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark6",
+      "dot": "r6",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:25.930Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark7",
+      "dot": "r7",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:27.989Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark8",
+      "dot": "r8",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:30.015Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark9",
+      "dot": "r9",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:32.092Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "mark": "mark10",
+      "dot": "r10",
+      "viaHint": false,
+      "t": "2026-10-11T20:54:34.186Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "verdict": "left-more",
+      "pairs": 11,
+      "double": null,
+      "final": false,
+      "t": "2026-10-11T20:54:35.277Z",
+      "seg": "c1.vuelven",
+      "run": 1,
+      "kind": "check"
+    },
+    {
+      "reading": "missing",
+      "t": "2026-10-11T20:54:53.399Z",
+      "seg": "c1.quien",
+      "run": 1,
+      "kind": "interpret"
+    },
+    {
+      "place": "crack",
+      "t": "2026-10-11T20:55:09.956Z",
+      "seg": "c1.busqueda",
+      "run": 1,
+      "kind": "search"
+    },
+    {
+      "place": "house",
+      "t": "2026-10-11T20:55:12.767Z",
+      "seg": "c1.busqueda",
+      "run": 1,
+      "kind": "search"
+    },
+    {
+      "place": "smudge",
+      "t": "2026-10-11T20:55:22.268Z",
+      "seg": "c1.busqueda",
+      "run": 1,
+      "kind": "search"
+    },
+    {
+      "mark": "mark11",
+      "dot": "r11",
+      "viaHint": false,
+      "t": "2026-10-11T20:55:39.786Z",
+      "seg": "c1.todos",
+      "run": 1,
+      "kind": "pair"
+    },
+    {
+      "verdict": "equal",
+      "pairs": 12,
+      "double": null,
+      "final": true,
+      "t": "2026-10-11T20:55:40.841Z",
+      "seg": "c1.todos",
+      "run": 1,
+      "kind": "check"
+    },
+    {
+      "prediction": "nose",
+      "why": null,
+      "t": "2026-10-11T20:55:56.218Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "predict"
+    },
+    {
+      "seat": 7,
+      "who": "r11",
+      "t": "2026-10-11T20:55:58.658Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat"
+    },
+    {
+      "seat": 7,
+      "t": "2026-10-11T20:55:59.742Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat-taken"
+    },
+    {
+      "seat": 6,
+      "who": "r10",
+      "t": "2026-10-11T20:56:01.869Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat"
+    },
+    {
+      "seat": 6,
+      "t": "2026-10-11T20:56:02.787Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat-taken"
+    },
+    {
+      "seat": 8,
+      "who": "r9",
+      "t": "2026-10-11T20:56:04.596Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "seat"
+    },
+    {
+      "reading": "seats",
+      "t": "2026-10-11T20:56:09.570Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "interpret-seat"
+    },
+    {
+      "answer": "none",
+      "t": "2026-10-11T20:56:14.336Z",
+      "seg": "c1.gradas",
+      "run": 1,
+      "kind": "conserve"
+    },
+    {
+      "mark": 0,
+      "word": "uno",
+      "t": "2026-10-11T20:56:24.644Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 1,
+      "word": "dos",
+      "t": "2026-10-11T20:56:25.588Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 2,
+      "word": "tres",
+      "t": "2026-10-11T20:56:26.716Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 3,
+      "word": "cuatro",
+      "t": "2026-10-11T20:56:28.238Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 4,
+      "word": "cinco",
+      "t": "2026-10-11T20:56:29.614Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 5,
+      "word": "seis",
+      "t": "2026-10-11T20:56:30.850Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 6,
+      "word": "siete",
+      "t": "2026-10-11T20:56:32.286Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 7,
+      "word": "ocho",
+      "t": "2026-10-11T20:56:33.780Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 8,
+      "word": "nueve",
+      "t": "2026-10-11T20:56:35.512Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 9,
+      "word": "diez",
+      "t": "2026-10-11T20:56:36.683Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 10,
+      "word": "once",
+      "t": "2026-10-11T20:56:38.315Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 11,
+      "word": "doce",
+      "t": "2026-10-11T20:56:39.821Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 12,
+      "word": "trece",
+      "t": "2026-10-11T20:56:41.271Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "mark": 13,
+      "word": "catorce",
+      "t": "2026-10-11T20:56:42.715Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "count"
+    },
+    {
+      "answer": "name",
+      "t": "2026-10-11T20:56:53.716Z",
+      "seg": "c1.nombre",
+      "run": 1,
+      "kind": "numeral"
+    },
+    {
+      "choice": "help",
+      "t": "2026-10-11T20:57:16.604Z",
+      "seg": "c2.manana",
+      "run": 1,
+      "kind": "meet-mara"
+    },
+    {
+      "answer": "cant",
+      "t": "2026-10-11T20:57:28.269Z",
+      "seg": "c2.marcar",
+      "run": 1,
+      "kind": "compare-tallies"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-11T20:58:52.611Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "t": "2026-10-11T20:58:53.930Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "fill-quick"
+    },
+    {
+      "n": 2,
+      "t": "2026-10-11T20:59:10.332Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "t": "2026-10-11T20:59:11.445Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "fill-quick"
+    },
+    {
+      "n": 3,
+      "t": "2026-10-11T20:59:25.866Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "bundles": 3,
+      "loose": 7,
+      "tieTries": 0,
+      "t": "2026-10-11T20:59:28.507Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "bundled"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-11T20:59:35.074Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-ten"
+    },
+    {
+      "n": 2,
+      "t": "2026-10-11T20:59:37.757Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-ten"
+    },
+    {
+      "n": 3,
+      "t": "2026-10-11T20:59:40.553Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-ten"
+    },
+    {
+      "t": "2026-10-11T20:59:41.774Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "ring-rest"
+    },
+    {
+      "yesterday": 34,
+      "today": 37,
+      "t": "2026-10-11T20:59:43.535Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "compare-resolved"
+    },
+    {
+      "t": "2026-10-11T21:00:18.082Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "fill-quick"
+    },
+    {
+      "n": 1,
+      "t": "2026-10-11T21:00:30.894Z",
+      "seg": "c2.atados",
+      "run": 1,
+      "kind": "tie"
+    },
+    {
+      "from": 0,
+      "t": "2026-10-11T21:01:31.911Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "from": 1,
+      "t": "2026-10-11T21:02:06.189Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "from": 0,
+      "t": "2026-10-11T21:02:49.005Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "choice": "zero",
+      "attempt": 0,
+      "t": "2026-10-11T21:03:19.055Z",
+      "seg": "c2.deposito",
+      "run": 1,
+      "kind": "write-empty"
+    },
+    {
+      "answer": "unknown",
+      "t": "2026-10-11T21:03:42.889Z",
+      "seg": "c2.cero",
+      "run": 1,
+      "kind": "smudge"
+    },
+    {
+      "answer": "320",
+      "t": "2026-10-11T21:03:49.865Z",
+      "seg": "c2.cero",
+      "run": 1,
+      "kind": "read-oval"
+    },
+    {
+      "side": "cmp-a",
+      "t": "2026-10-11T21:05:29.060Z",
+      "seg": "c2.cuantos",
+      "run": 1,
+      "kind": "untie"
+    },
+    {
+      "pairs": 10,
+      "untied": 1,
+      "mixed": 0,
+      "left": 15,
+      "t": "2026-10-11T21:06:23.564Z",
+      "seg": "c2.cuantos",
+      "run": 1,
+      "kind": "difference"
+    },
+    {
+      "from": 0,
+      "t": "2026-10-11T21:06:42.370Z",
+      "seg": "c2.cuarto",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "from": 1,
+      "t": "2026-10-11T21:06:49.192Z",
+      "seg": "c2.cuarto",
+      "run": 1,
+      "kind": "carry"
+    },
+    {
+      "choice": "build",
+      "t": "2026-10-11T21:06:56.252Z",
+      "seg": "c2.cuarto",
+      "run": 1,
+      "kind": "new-room"
+    },
+    {
+      "counts": [
+        2,
+        0,
+        5
+      ],
+      "value": 205,
+      "t": "2026-10-11T21:07:15.993Z",
+      "seg": "c2.lugar",
+      "run": 1,
+      "kind": "build-205"
+    },
+    {
+      "choice": "mark",
+      "t": "2026-10-11T21:07:32.872Z",
+      "seg": "c3.deuda",
+      "run": 1,
+      "kind": "write-debt"
+    },
+    {
+      "t": "2026-10-11T21:07:47.713Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel"
+    },
+    {
+      "t": "2026-10-11T21:07:56.349Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel"
+    },
+    {
+      "haves": 0,
+      "debts": 1,
+      "wrong": 0,
+      "t": "2026-10-11T21:07:56.350Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel-result"
+    },
+    {
+      "answer": "-1",
+      "expect": "-1",
+      "t": "2026-10-11T21:08:03.943Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "read-balance"
+    },
+    {
+      "answer": "+3",
+      "expect": "+3",
+      "t": "2026-10-11T21:08:14.346Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "predict-balance"
+    },
+    {
+      "t": "2026-10-11T21:08:18.144Z",
+      "seg": "c3.pares",
+      "run": 1,
+      "kind": "cancel"
+    },
+    {
+      "answer": "espiral",
+      "t": "2026-10-11T21:08:37.847Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "predict-order"
+    },
+    {
+      "family": "recta",
+      "at": 3,
+      "t": "2026-10-11T21:08:44.409Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "family": "oval-a",
+      "at": 3,
+      "t": "2026-10-11T21:08:51.939Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place-wrong"
+    },
+    {
+      "family": "oval-a",
+      "at": 2,
+      "t": "2026-10-11T21:09:05.944Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "family": "curva",
+      "at": 2,
+      "t": "2026-10-11T21:09:15.199Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place-wrong"
+    },
+    {
+      "family": "curva",
+      "at": -1,
+      "t": "2026-10-11T21:09:34.916Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "family": "cuna",
+      "at": -4,
+      "t": "2026-10-11T21:09:51.182Z",
+      "seg": "c3.linea",
+      "run": 1,
+      "kind": "place"
+    },
+    {
+      "answer": "7",
+      "t": "2026-10-11T21:10:05.464Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "predict-steps"
+    },
+    {
+      "at": -3,
+      "t": "2026-10-11T21:10:07.874Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": -2,
+      "t": "2026-10-11T21:10:14.073Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": -1,
+      "t": "2026-10-11T21:10:20.493Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 0,
+      "t": "2026-10-11T21:10:26.557Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 1,
+      "t": "2026-10-11T21:10:32.863Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 2,
+      "t": "2026-10-11T21:10:39.247Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "at": 3,
+      "t": "2026-10-11T21:10:45.501Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "step"
+    },
+    {
+      "answer": "same",
+      "t": "2026-10-11T21:10:55.974Z",
+      "seg": "c3.distancia",
+      "run": 1,
+      "kind": "abs"
+    },
+    {
+      "removed": 1,
+      "t": "2026-10-11T21:11:07.027Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive"
+    },
+    {
+      "choice": "pair",
+      "t": "2026-10-11T21:11:11.106Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive-how"
+    },
+    {
+      "removed": 2,
+      "t": "2026-10-11T21:11:43.624Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive"
+    },
+    {
+      "value": 1,
+      "t": "2026-10-11T21:11:43.624Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive-result"
+    },
+    {
+      "answer": "give",
+      "t": "2026-10-11T21:11:50.968Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "forgive-same"
+    },
+    {
+      "answer": "take",
+      "t": "2026-10-11T21:11:58.884Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "read-minus"
+    },
+    {
+      "answer": "-3",
+      "t": "2026-10-11T21:12:06.715Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "predict-pay"
+    },
+    {
+      "paid": 1,
+      "t": "2026-10-11T21:12:08.602Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "paid": 2,
+      "t": "2026-10-11T21:12:10.542Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "lent": 1,
+      "t": "2026-10-11T21:12:13.298Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "paid": 3,
+      "t": "2026-10-11T21:12:15.115Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "lent": 2,
+      "t": "2026-10-11T21:12:17.148Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "paid": 4,
+      "t": "2026-10-11T21:12:19.061Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "lent": 3,
+      "t": "2026-10-11T21:12:21.112Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "lent": 4,
+      "t": "2026-10-11T21:12:22.195Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-pad"
+    },
+    {
+      "paid": 5,
+      "t": "2026-10-11T21:12:23.235Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay"
+    },
+    {
+      "value": -3,
+      "padded": true,
+      "t": "2026-10-11T21:12:23.236Z",
+      "seg": "c3.perdon",
+      "run": 1,
+      "kind": "pay-result"
+    },
+    {
+      "answer": "-9",
+      "t": "2026-10-11T21:12:36.726Z",
+      "seg": "c3.pozo",
+      "run": 1,
+      "kind": "predict-pit"
+    },
+    {
+      "to": 1,
+      "steps": 5,
+      "t": "2026-10-11T21:12:41.996Z",
+      "seg": "c3.pozo",
+      "run": 1,
+      "kind": "pit-climb"
+    },
+    {
+      "to": "recta",
+      "value": 4,
+      "t": "2026-10-11T21:12:49.147Z",
+      "seg": "c3.hacia",
+      "run": 1,
+      "kind": "punto-goes"
+    },
+    {
+      "to": "oval-a",
+      "value": -3,
+      "t": "2026-10-11T21:12:52.879Z",
+      "seg": "c3.hacia",
+      "run": 1,
+      "kind": "punto-goes"
+    },
+    {
+      "answer": "12",
+      "t": "2026-10-11T21:13:10.583Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "predict-total"
+    },
+    {
+      "family": "peldano",
+      "row": 0,
+      "t": "2026-10-11T21:13:15.087Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    },
+    {
+      "family": "rampa",
+      "row": 1,
+      "t": "2026-10-11T21:13:23.496Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    },
+    {
+      "family": "cornisa",
+      "row": 2,
+      "t": "2026-10-11T21:13:32.133Z",
+      "seg": "c4.grupos",
+      "run": 1,
+      "kind": "gather"
+    }
+  ],
+  "journal": [
+    {
+      "id": "c1",
+      "title": "¿Están todos?",
+      "abbr": "Misma cantidad: se pueden emparejar uno a uno sin que sobre nada.",
+      "body": [
+        "Uno a uno quiere decir: cada cosa de un lado con una sola del otro, y ninguna usada dos veces.",
+        "Si al emparejar así sobra algo de un solo lado, ese lado tiene más. Si sobran de los dos lados, todavía no se terminó de emparejar. La forma, el tamaño y la distancia no cambian cuántos son.",
+        "Contar también es emparejar: cada cosa con una palabra, en orden, sin saltear ni repetir; la última palabra dice cuántas hay.",
+        "El número es lo que no cambia entre todas las colecciones que se pueden emparejar así. \"14\" y \"catorce\" son nombres de ese número: el 14 no tiene catorce cosas adentro (cómo funciona su escritura es otra pregunta).",
+        "Todo esto vale para colecciones que se terminan. Con colecciones que no se terminan pasan cosas raras; Punto todavía no lo sabe."
+      ],
+      "seen": [
+        "Antes de la Marea hiciste una marca por cada uno de la Ronda. Cuando tocaste a alguien ya anotado, la marca no se repitió: una por cada uno.",
+        "Al volver, emparejaste marcas y puntos uno a uno: sobró una marca, y faltaba el más chico.",
+        "En las gradas, para la Ronda y Punto, dijiste \"todavía no sé\". Al sentarlos de a uno, sobró un asiento.",
+        "Cuando Punto los apretó en una fila corta, pensaste que sobrarían ninguno; al sentarse otra vez sobró uno, como antes.",
+        "Contaste las marcas de Punto: una palabra por marca. La última fue \"catorce\"."
+      ],
+      "moments": [
+        {
+          "id": "c1.todos",
+          "label": "Desplegar: emparejar marcas y puntos"
+        },
+        {
+          "id": "c1.nombre",
+          "label": "Desplegar: el número y sus nombres"
+        }
+      ]
+    },
+    {
+      "id": "c2",
+      "title": "Demasiados para marcar",
+      "abbr": "El lugar dice el tamaño del grupo; el cero guarda el lugar vacío.",
+      "body": [
+        "Para muchas cosas, las marcas no alcanzan: hay que agrupar. Acá, de a diez.",
+        "Un numeral es una lista de cuántos grupos hay de cada tamaño: el de la derecha cuenta sueltos, el siguiente atados de diez, el siguiente atados de cien… Cada lugar vale diez veces el de su derecha.",
+        "\"Me llevo uno\": cuando se juntan diez de un tamaño, se atan y pasan como uno al lugar de la izquierda.",
+        "El 0 dice \"ninguno\" en ese lugar: ningún grupo de ese tamaño. Sin él, las demás cifras se correrían de lugar.",
+        "Una resta también se puede leer como comparación: emparejar atado con atado y suelto con suelto; si no queda pareja, se desata un atado (\"pedir prestado\"). Lo que sobra es la diferencia.",
+        "Diez es una costumbre, no una ley: se puede agrupar de a otra cantidad, siempre que todos sepan de a cuánto."
+      ],
+      "seen": [
+        "Ataste la carga en el molde de diez: 3 atados y 7 sueltos, 37.",
+        "Viste que dos hileras largas de marcas no se comparan de un vistazo; agrupadas de a diez, sí: 34 ayer, 37 hoy.",
+        "En el depósito, 5 veces un cuarto juntó diez y lo ataste para pasarlo al de al lado: eso es \"me llevo uno\".",
+        "Para el cuarto vacío escribiste 0 desde el principio.",
+        "En el registro de los Oval faltaba un cero: 32 en lugar de 302. Lo comprobaste mirando su tiza guardada.",
+        "Para comparar a Recta con Curva emparejaste atados con atados y sueltos con sueltos, desataste un atado cuando no quedaba pareja: sobraron 15.",
+        "Cuando el último cuarto juntó diez, dibujaste un cuarto nuevo: 1000."
+      ],
+      "moments": [
+        {
+          "id": "c2.cero",
+          "label": "Desplegar: el cero que faltaba"
+        },
+        {
+          "id": "c2.lugar",
+          "label": "Desplegar: lo que vale el lugar"
+        }
+      ]
+    },
+    {
+      "id": "c3",
+      "title": "Menos que nada",
+      "abbr": "El signo dice hacia qué lado; un tener y un deber se anulan de a pares.",
+      "body": [
+        "Un número con signo dice cuánto y para qué lado: +3, tres que se tienen; −3, tres que se deben (o tres debajo del cero).",
+        "Juntar lo que se tiene con lo que se debe es emparejar: cada par vale cero y se borra; lo que sobra es el resultado.",
+        "En la línea, más a la derecha es más: −4 es menos que −1, aunque 4 sea más que 1.",
+        "La distancia no tiene signo: de −4 a +3 hay 7 pasos. Lo lejos que está un número del cero se escribe con barritas: |−4| = |+4| = 4.",
+        "Sacar una deuda sube el valor, igual que dar un atado: −1 − (−2) = −1 + 2 = +1. Si no hay deudas para sacar, se agregan pares que valen cero.",
+        "Pagar más de lo que se tiene deja deudas: 2 − 5 = −3. Para poder sacar los atados que faltan, se agregan pares que valen cero.",
+        "\"Deber 4\" y \"estar 4 debajo del suelo\" son dos lecturas del mismo número: −4.",
+        "El mismo signo \"−\" se usa para \"menos tres\" y para \"restar\": los paréntesis ayudan a no confundirlos.",
+        "Dato: los signos + y − aparecen impresos en 1489 (Widmann) para marcar exceso y faltante en cuentas de comercio."
+      ],
+      "seen": [
+        "Para anotar la deuda de Curva elegiste una marca nueva delante del número: −3.",
+        "Emparejaste atados con deudas y se borraron de a pares.",
+        "Anticipaste que −4 es menor que −1.",
+        "Cuando una familia quedó en una marca equivocada, te dijo lo que tendría o debería ahí.",
+        "Anticipaste siete pasos de −4 a +3, y Punto los dio.",
+        "+4 y −4 están igual de lejos del cero.",
+        "Para sacar dos deudas cuando quedaba una sola, agregaste un atado y una deuda (valen cero) y sacaste la deuda: −1 − (−2) = +1.",
+        "Viste que sacar dos deudas deja igual que dar dos atados.",
+        "Anticipaste que Oval, con 2 y pagando 5, quedaba debiendo 3: 2 − 5 = −3.",
+        "Desde −4, subir cinco: anticipaste −9; Punto quedó en +1."
+      ],
+      "moments": [
+        {
+          "id": "c3.hacia",
+          "label": "Desplegar: cuánto y hacia dónde"
+        }
+      ]
+    }
+  ],
+  "completed": [
+    "c1.puerta",
+    "c1.alguien",
+    "c1.ronda",
+    "c1.marea",
+    "c1.vuelven",
+    "c1.quien",
+    "c1.busqueda",
+    "c1.todos",
+    "c1.gradas",
+    "c1.nombre",
+    "c2.manana",
+    "c2.marcar",
+    "c2.atados",
+    "c2.deposito",
+    "c2.cero",
+    "c2.cuantos",
+    "c2.cuarto",
+    "c2.lugar",
+    "c3.deuda",
+    "c3.pares",
+    "c3.linea",
+    "c3.distancia",
+    "c3.perdon",
+    "c3.pozo",
+    "c3.hacia"
+  ],
+  "moments": [
+    "c1.marea",
+    "c1.todos",
+    "c1.nombre",
+    "c2.cero",
+    "c2.lugar",
+    "c3.hacia"
+  ],
+  "log": [
+    {
+      "who": null,
+      "text": "Tengo las manos de tiza."
+    },
+    {
+      "who": null,
+      "text": "…No hay vuelta. Por ahora."
+    },
+    {
+      "who": null,
+      "text": "Alguien borró todo esto a medias."
+    },
+    {
+      "who": null,
+      "text": "Algo se movió."
+    },
+    {
+      "who": "student",
+      "text": "Hola."
+    },
+    {
+      "who": null,
+      "text": "No habla. O no habla como yo."
+    },
+    {
+      "who": "student",
+      "text": "¿Tenés nombre?"
+    },
+    {
+      "who": null,
+      "text": "Un punto. Nada más… y nada menos."
+    },
+    {
+      "who": "student",
+      "text": "Te voy a decir Punto. Hasta que me digas cómo te llamás."
+    },
+    {
+      "who": "student",
+      "text": "¿Son tu familia?"
+    },
+    {
+      "who": null,
+      "text": "¿Qué es eso?"
+    },
+    {
+      "who": null,
+      "text": "Si pasa por acá, los desparrama."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Ese ya tiene su marca. Una marca por cada uno."
+    },
+    {
+      "who": null,
+      "text": "Se llevó todo. Menos las marcas."
+    },
+    {
+      "who": null,
+      "text": "No paran de moverse."
+    },
+    {
+      "who": null,
+      "text": "Cada marca era uno de ellos."
+    },
+    {
+      "who": null,
+      "text": "Quedó una marca sola."
+    },
+    {
+      "who": null,
+      "text": "Las marcas saben cuántos. No saben quién. Punto sí."
+    },
+    {
+      "who": "student",
+      "text": "¿El más chico? ¿El que llegaba tarde?"
+    },
+    {
+      "who": "student",
+      "text": "Vamos a buscarlo."
+    },
+    {
+      "who": null,
+      "text": "Por acá tiene que estar."
+    },
+    {
+      "who": null,
+      "text": "Nadie."
+    },
+    {
+      "who": null,
+      "text": "Alguien anotó acá, hace mucho."
+    },
+    {
+      "who": null,
+      "text": "Ahí. Debajo del polvo."
+    },
+    {
+      "who": null,
+      "text": "Lo encontramos."
+    },
+    {
+      "who": null,
+      "text": "Ahora sí."
+    },
+    {
+      "who": "student",
+      "text": "Están todos."
+    },
+    {
+      "who": null,
+      "text": "Unas gradas. ¿Habrá lugar para la Ronda y Punto?"
+    },
+    {
+      "who": null,
+      "text": "¿Y para mí?"
+    },
+    {
+      "who": null,
+      "text": "Uno por asiento."
+    },
+    {
+      "who": null,
+      "text": "Ese asiento ya tiene a alguien."
+    },
+    {
+      "who": null,
+      "text": "Ese asiento ya tiene a alguien."
+    },
+    {
+      "who": null,
+      "text": "Mirando no se podía saber. Sentándolos, sí."
+    },
+    {
+      "who": null,
+      "text": "Sobró uno, como antes. Apretados o separados, son trece."
+    },
+    {
+      "who": null,
+      "text": "¿El que sobra es para mí?"
+    },
+    {
+      "who": null,
+      "text": "¡Le salió!"
+    },
+    {
+      "who": null,
+      "text": "¿Cuántos somos?"
+    },
+    {
+      "who": "student",
+      "text": "¡Bajen! Cada uno debajo de su marca."
+    },
+    {
+      "who": null,
+      "text": "Catorce marcas. Catorce palabras. Catorce de nosotros."
+    },
+    {
+      "who": null,
+      "text": "No es una fila más: es el nombre de cuántos hay en cada una."
+    },
+    {
+      "who": null,
+      "text": "Me mira como preguntando qué hace un 1 ahí, si somos catorce."
+    },
+    {
+      "who": "student",
+      "text": "Ni idea. Mañana."
+    },
+    {
+      "who": null,
+      "text": "Desde anoche marca todo. Hasta a mí."
+    },
+    {
+      "who": null,
+      "text": "La puerta por la que entré quedó allá atrás, borrada. No hay vuelta, por ahora. Y Punto ya me cuenta entre los suyos."
+    },
+    {
+      "who": "student",
+      "text": "Sí, ya sé. El 1. Todavía no lo sé."
+    },
+    {
+      "who": "Mara",
+      "text": "Uf. Todo lo que se llevó la Marea hay que volver a dibujarlo. Y sin tiza no se dibuja nada."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y vos? Tenés una tiza en la mano… ¿Sabés contar palitos?"
+    },
+    {
+      "who": "Mara",
+      "text": "¡Por fin alguien! Soy Mara. Guardo la tiza de todos y anoto cuánta le toca a cada familia."
+    },
+    {
+      "who": "Mara",
+      "text": "Hay que anotar cuántos palitos llegaron."
+    },
+    {
+      "who": "Mara",
+      "text": "La de ayer la anoté así, con marcas: la Marea me había desarmado los atados. ¿Llegó más hoy que ayer?"
+    },
+    {
+      "who": null,
+      "text": "Una por una, no se termina más."
+    },
+    {
+      "who": "Mara",
+      "text": "Por eso en el depósito atamos. De a diez. Así se hizo siempre."
+    },
+    {
+      "who": "Mara",
+      "text": "¡Eso no es un atado! Un atado tiene diez."
+    },
+    {
+      "who": null,
+      "text": "De a cinco también se cuenta. Pero si en el depósito un atado es de diez, uno de cinco engaña al que lo lea."
+    },
+    {
+      "who": "Mara",
+      "text": "Este es el molde de diez: diez ranuras, un palito en cada una. Cuando se llena, se ata."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Por qué de a diez? No me preguntes. Así se hizo siempre."
+    },
+    {
+      "who": null,
+      "text": "Tres atados y siete sueltos. Treinta y siete."
+    },
+    {
+      "who": null,
+      "text": "¿Y la hilera de ayer?"
+    },
+    {
+      "who": null,
+      "text": "Quedan cuatro marcas: no alcanzan para otra ronda de diez. Quedan sueltas."
+    },
+    {
+      "who": null,
+      "text": "Ayer, treinta y cuatro; hoy, treinta y siete. Hoy llegaron tres más."
+    },
+    {
+      "who": null,
+      "text": "Entonces… el 1 de 14."
+    },
+    {
+      "who": "student",
+      "text": "Punto, vení. Mirá."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Catorce? Tomá, de la otra bolsa."
+    },
+    {
+      "who": "student",
+      "text": "¡Escribiste!"
+    },
+    {
+      "who": null,
+      "text": "El 1 no cuenta palitos: cuenta atados."
+    },
+    {
+      "who": "Mara",
+      "text": "Bueno, bueno. Lindo. Ahora vamos al depósito, que hay que guardar todo."
+    },
+    {
+      "who": "Mara",
+      "text": "El depósito. Tres cuartos: sueltos, atados y atados de atados."
+    },
+    {
+      "who": "Mara",
+      "text": "Regla de la casa: nunca más de nueve por cuarto. Con diez, se atan y pasan al de al lado."
+    },
+    {
+      "who": "student",
+      "text": "¿Por qué nueve?"
+    },
+    {
+      "who": "Mara",
+      "text": "La Marea desparramó todo; hay que guardar de nuevo."
+    },
+    {
+      "who": "Mara",
+      "text": "La carga de recién: tres atados y siete sueltos."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": "Mara",
+      "text": "Otra carga: cinco sueltos."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Mara: \"Ya sabés cómo es. Si querés, guardá todos de una vez; atar, lo atás vos.\""
+    },
+    {
+      "who": null,
+      "text": "Ese cuarto está vacío. Elegí algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "\"Me llevo uno\"… era esto."
+    },
+    {
+      "who": "Mara",
+      "text": "La última: seis atados y ocho sueltos."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Ese cuarto está vacío. Elegí algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": null,
+      "text": "Elegí primero algo de la carga."
+    },
+    {
+      "who": "Mara",
+      "text": "Ahora se anota como se anota: una cifra por cuarto, de izquierda a derecha."
+    },
+    {
+      "who": "Mara",
+      "text": "Ciento diez. Un atado de atados, un atado… y ningún suelto."
+    },
+    {
+      "who": "Mara",
+      "text": "Hm. Yo siempre lo dejaba en blanco. Total, no había nada…"
+    },
+    {
+      "who": "Oval",
+      "text": "Mara, con treinta y dos palitos no alcanza ni para la puerta. Antes de la Marea teníamos muchísimo más."
+    },
+    {
+      "who": "Mara",
+      "text": "El registro dice treinta y dos. Tres y dos."
+    },
+    {
+      "who": null,
+      "text": "Entre el 3 y el 2 hay una mancha."
+    },
+    {
+      "who": null,
+      "text": "Por la mancha sola no se sabe. Su tiza está guardada: eso sí se puede mirar."
+    },
+    {
+      "who": "Oval",
+      "text": "Nuestra tiza está en casa, en nuestro depósito. Vengan a ver."
+    },
+    {
+      "who": null,
+      "text": "Así quedan dos atados y ningún suelto. Es al revés."
+    },
+    {
+      "who": null,
+      "text": "Tres, cero, dos. Trescientos dos. Faltaba el cero."
+    },
+    {
+      "who": "Mara",
+      "text": "¡Trescientos dos! Y yo les daba treinta y dos…"
+    },
+    {
+      "who": "student",
+      "text": "Dice \"ninguno\" en ese cuarto. Sin él, el 3 se corre de lugar."
+    },
+    {
+      "who": "Mara",
+      "text": "Un cuarto vacío también se escribe."
+    },
+    {
+      "who": "Curva",
+      "text": "Mara, la familia Recta tiene el doble de tiza que nosotros. No es justo. ¿Cuánto más tiene?"
+    },
+    {
+      "who": "Mara",
+      "text": "Recta, cincuenta y dos. Curva, treinta y siete. Sacalo vos, que yo ya me mareé."
+    },
+    {
+      "who": null,
+      "text": "Como en la piedra: emparejar. Pero de a atados."
+    },
+    {
+      "who": null,
+      "text": "Ya no queda ninguna pareja del mismo tipo. Un atado se puede desatar en diez sueltos."
+    },
+    {
+      "who": null,
+      "text": "Quince le quedaron a Recta sin pareja."
+    },
+    {
+      "who": null,
+      "text": "\"Pedir prestado\" era desatar."
+    },
+    {
+      "who": "Curva",
+      "text": "Quince más. El doble serían treinta y siete más. Bueno: no es para tanto, no reclamo nada."
+    },
+    {
+      "who": "Mara",
+      "text": "Antes de que vuelva la Marea, todos trajeron su tiza al depósito. Nueve, nueve y nueve: está lleno hasta el techo."
+    },
+    {
+      "who": "Mara",
+      "text": "Y Curva llega con un palito más."
+    },
+    {
+      "who": null,
+      "text": "Ese cuarto no tiene diez."
+    },
+    {
+      "who": null,
+      "text": "Ese cuarto no tiene diez."
+    },
+    {
+      "who": "Mara",
+      "text": "¡Diez atados de atados! Y no hay más cuartos. ¿Qué hacemos?"
+    },
+    {
+      "who": "Mara",
+      "text": "Mil. Nunca se había llenado tanto."
+    },
+    {
+      "who": null,
+      "text": "Siempre se puede dibujar otro cuarto."
+    },
+    {
+      "who": "Mara",
+      "text": "A ver si aprendí. A los Recta les debo doscientos cinco palitos. Armámelo en la pizarrita, que lo quiero ver."
+    },
+    {
+      "who": "Mara",
+      "text": "Dos, cero, cinco. Con el cero en el medio, que yo antes dejaba en blanco."
+    },
+    {
+      "who": "Mara",
+      "text": "«Así se hizo siempre», decía yo. Ahora sé por qué atábamos de a diez: para que cada cifra tenga su lugar."
+    },
+    {
+      "who": "student",
+      "text": "De a cinco también se podría. Pero todos tienen que saber de a cuánto."
+    },
+    {
+      "who": "Curva",
+      "text": "Mara… te debo tres atados de ayer. Y ya no me queda ninguno."
+    },
+    {
+      "who": "Mara",
+      "text": "¿Y eso cómo lo anoto? ¿Menos que nada?"
+    },
+    {
+      "who": null,
+      "text": "Menos que nada. Punto me mira como anoche, cuando rodeó el 1."
+    },
+    {
+      "who": "Mara",
+      "text": "Hoja nueva. Desde que todos devolvieron lo que les sobraba, anoto lo que cada familia tiene guardado acá, en atados."
+    },
+    {
+      "who": "Curva",
+      "text": "Y yo, los tres que te debo."
+    },
+    {
+      "who": "Mara",
+      "text": "Cuando no hay nada, escribo 0: eso ya lo aprendí. Pero esto no es \"no hay\": es que falta. ¿Cómo lo anoto?"
+    },
+    {
+      "who": "Mara",
+      "text": "Tres menos… ¿menos qué? ¿Le falta algo a la cuenta?"
+    },
+    {
+      "who": "Mara",
+      "text": "Una rayita acostada. Menos tres: tres que faltan."
+    },
+    {
+      "who": null,
+      "text": "Tres, pero para el otro lado."
+    },
+    {
+      "who": "Oval",
+      "text": "Curva, tomá: dos atados de los míos, por la cerca que me arreglaste."
+    },
+    {
+      "who": "Mara",
+      "text": "Ahora tiene dos y debe tres."
+    },
+    {
+      "who": "Mara",
+      "text": "Y Recta tiene cuatro guardados… pero ayer le presté uno: me debe uno."
+    },
+    {
+      "who": null,
+      "text": "Tres: un par se borró."
+    },
+    {
+      "who": "Mara",
+      "text": "Y a lo que se tiene le pongo una cruz, para que nadie lo confunda con una deuda."
+    },
+    {
+      "who": "Mara",
+      "text": "Y Cuña, que me debe cuatro desde la semana pasada."
+    },
+    {
+      "who": null,
+      "text": "Más tres: tres que se tienen. Menos cuatro: cuatro que faltan."
+    },
+    {
+      "who": "Mara",
+      "text": "Para ver quién tiene más y quién menos, una línea en el suelo. El cero, acá. Lo que se tiene, hacia la derecha."
+    },
+    {
+      "who": "Oval",
+      "text": "Ahí tendría 3. Yo tengo 2."
+    },
+    {
+      "who": "Curva",
+      "text": "De ese lado estaría teniendo 2. ¡Ojalá! Yo debo 1."
+    },
+    {
+      "who": null,
+      "text": "Menos cuatro, más a la izquierda: es menor."
+    },
+    {
+      "who": "Curva",
+      "text": "O sea que yo, en −1, tengo más que Cuña. Algo es algo."
+    },
+    {
+      "who": "Cuña",
+      "text": "Recta, si me prestás lo que nos separa, quedamos parejos. ¿Cuánto más que nosotros tenés?"
+    },
+    {
+      "who": null,
+      "text": "Pasos, de marca en marca."
+    },
+    {
+      "who": null,
+      "text": "Siete. Las deudas también son pasos."
+    },
+    {
+      "who": "Mara",
+      "text": "Recta, por el techo del depósito que me ayudaste a tapar: un atado más."
+    },
+    {
+      "who": null,
+      "text": "Cuatro pasos cada uno."
+    },
+    {
+      "who": "student",
+      "text": "Las barritas dicen: lo lejos del cero, sin el lado."
+    },
+    {
+      "who": "Mara",
+      "text": "Dos barritas. Lo anoto así."
+    },
+    {
+      "who": "Mara",
+      "text": "Curva, revisé el registro de ayer: dos deudas tuyas las anoté dos veces. Hay que sacarlas."
+    },
+    {
+      "who": "Curva",
+      "text": "Pero… si en la cuenta debo uno solo."
+    },
+    {
+      "who": null,
+      "text": "Vale lo mismo que antes. Pero ahora hay una deuda para sacar."
+    },
+    {
+      "who": null,
+      "text": "Le quedó un atado. En realidad, Curva no debía: tenía uno."
+    },
+    {
+      "who": null,
+      "text": "Lo mismo: sacar dos deudas es como dar dos atados."
+    },
+    {
+      "who": "student",
+      "text": "La suelta dice \"sacar\". Las pegadas al número dicen \"deuda\". El paréntesis guarda al número con su rayita."
+    },
+    {
+      "who": "Mara",
+      "text": "Para no confundirlas. Bien."
+    },
+    {
+      "who": null,
+      "text": "El mismo trazo, dos trabajos."
+    },
+    {
+      "who": "Oval",
+      "text": "Y yo tengo dos atados, pero tengo que pagarle cinco a Mara por las tejas."
+    },
+    {
+      "who": "Mara",
+      "text": "Te lo presto: un atado que tenés y uno que me debés."
+    },
+    {
+      "who": null,
+      "text": "Sobró un par de lo prestado: un atado y una deuda, que no cambian nada."
+    },
+    {
+      "who": "Mara",
+      "text": "Me pagaste cinco: dos tuyos y tres que te presté. Me debés tres."
+    },
+    {
+      "who": null,
+      "text": "Dos menos cinco: menos tres."
+    },
+    {
+      "who": null,
+      "text": "Sacar atados lleva a la izquierda, aunque se pase del cero."
+    },
+    {
+      "who": "student",
+      "text": "¡Punto!"
+    },
+    {
+      "who": "Mara",
+      "text": "Cuatro debajo del suelo… como Cuña, que debe cuatro. El mismo −4."
+    },
+    {
+      "who": null,
+      "text": "Más uno: cuatro para llegar al suelo y uno más."
+    },
+    {
+      "who": "student",
+      "text": "Punto, andá a saludar a alguien."
+    },
+    {
+      "who": "student",
+      "text": "Punto… ahora señalás."
+    },
+    {
+      "who": null,
+      "text": "Cada número dice cuánto y para qué lado, como Punto. Menos el cero, que está en el medio."
+    },
+    {
+      "who": "Mara",
+      "text": "Arriba, en las Terrazas, la Marea se está llevando la escalera. Dicen que en una piedra hay un signo que nadie entiende."
+    },
+    {
+      "who": "Mara",
+      "text": "Y me deben atados. Mañana subimos."
+    },
+    {
+      "who": "Mara",
+      "text": "Las Terrazas. Miren la escalera: la Marea se la está llevando."
+    },
+    {
+      "who": "Peldaño",
+      "text": "Desde que nadie entiende lo que dice la piedra de abajo. Lo de las deudas sí lo sabemos: tres atados cada familia."
+    },
+    {
+      "who": null,
+      "text": "Un 4, una cruz acostada y un 3. Nadie sabe qué quiere decir."
+    },
+    {
+      "who": "Mara",
+      "text": "Bajemos las deudas a la pizarra. Cada familia, una fila."
+    }
+  ],
+  "createdAt": "2026-10-11T20:52:26.813Z",
+  "updatedAt": "2026-10-11T21:13:32.565Z",
+  "owner": "Auditoria",
+  "chaptersDone": [
+    1,
+    2,
+    3
+  ]
+}
