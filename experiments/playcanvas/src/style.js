@@ -1,4 +1,4 @@
-import {ShaderChunks,SHADERLANGUAGE_GLSL,StandardMaterial,Quat,Vec3} from 'playcanvas';
+import {ShaderChunks,SHADERLANGUAGE_GLSL,StandardMaterial,Quat,Vec3,Texture,PIXELFORMAT_RGBA8,FILTER_NEAREST,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
 
 // Two looks for the same kingdom. «hd2d» is the original: pixel-art surfaces, a long lens and a
 // miniature blur. «xy» follows Pokémon X and Y as an upscaled emulator shows them: a closer camera,
@@ -120,6 +120,7 @@ export async function attachFigure(app,actor,url,pitch){
   }
   // Matte painted materials, like the world's: no glossy highlight washing the colours out.
   for(const r of model.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial))continue;m.useMetalness=true;m.metalness=0;m.metalnessMap=null;m.glossInvert=false;m.glossMap=null;m.gloss=.1;m.specularityFactor=0;m.ambient.set(.42,.42,.46);m.diffuse.set(.74,.72,.72);m.update();} // its texture already carries painted light: the sky's fill and full sun would wash it
+  if(actor.figure.bones)await applyAppearance(app,model,url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.json',url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.png');
   celShade(app);updateFigure(actor,0,0,0);
 }
 export function updateFigure(actor,dx,dz,dt){
@@ -150,4 +151,51 @@ function skinnedPose(f,a){
   turn(f,'antebrazo-izq',-.25-Math.max(0,-s)*.3);turn(f,'antebrazo-der',-.25-Math.max(0,s)*.3);
   turn(f,'cuerpo',a.moving?0:-.05+idle*.012);turn(f,'cabeza',a.moving?-.3:-.34+Math.sin(f.time*.9)*.03);
   const hips=f.bones.cadera;if(hips){const p=hips.restPos;hips.entity.setLocalPosition(p.x,p.y+(a.moving?Math.abs(c)*.035:idle*.006),p.z);}
+}
+
+// ── Appearance: hair, skin and clothes tinted by region ─────────────────────────────────────
+// The figure carries a region map (scripts/blender/regiones.py → viajero-3d.py): one value per region.
+// A tinted region keeps the painted light (each point's brightness relative to the region's own
+// sample colour) and takes the chosen colour. Palettes are chosen by hand so every mix looks right.
+export const APPEARANCE={
+  pelo:{castaño:'#6a4532',oscuro:'#2c221e',rubio:'#d2a95a',pelirrojo:'#a9492a',ceniza:'#a49d95',azul:'#3d5d9a'},
+  piel:{'1':'#f6d9c3','2':'#f0c7a6','3':'#d9a27c','4':'#b97a52','5':'#8c5536','6':'#5e3624'},
+  ropa:{'verde azulado':'#2f6f80',granate:'#7a2f36',bosque:'#3b6a3c',azul:'#2c4e8e',mostaza:'#b4862e',grafito:'#4c5058'},
+  bufanda:{mostaza:'#e5a63d',roja:'#c7413a',blanca:'#ece6da',verde:'#5e9b4f',violeta:'#7c58a8',celeste:'#6fb4d6'},
+};
+/** The appearance asked in the address (?pelo=rubio&piel=4&ropa=granate&bufanda=roja); later, the player's register. */
+export function chosenAppearance(){const q=new URLSearchParams(globalThis.location?.search||'');return Object.fromEntries(Object.keys(APPEARANCE).map(k=>[k,APPEARANCE[k][q.get(k)]??null]).filter(([,v])=>v));}
+const linear=hex=>{const c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);return c.map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);};
+const tintPS=`
+uniform vec3 material_diffuse;
+uniform sampler2D uRegionMap;
+uniform vec3 uRegionBase[16];
+uniform vec3 uRegionTint[16];
+void getAlbedo() {
+	dAlbedo = material_diffuse.rgb;
+	#ifdef STD_DIFFUSE_TEXTURE
+		vec3 tex = {STD_DIFFUSE_TEXTURE_DECODE}(texture2DBias({STD_DIFFUSE_TEXTURE_NAME}, {STD_DIFFUSE_TEXTURE_UV}, textureBias)).{STD_DIFFUSE_TEXTURE_CHANNEL};
+		int region = int(texture2D(uRegionMap, {STD_DIFFUSE_TEXTURE_UV}).r * 16.0);
+		vec3 base = vec3(1.0), tint = vec3(-1.0);
+		for (int i = 0; i < 16; i++) if (i == region) { base = uRegionBase[i]; tint = uRegionTint[i]; }
+		if (tint.x >= 0.0) {
+			float lb = max(dot(base, vec3(0.2126, 0.7152, 0.0722)), 0.02);
+			float l = dot(tex, vec3(0.2126, 0.7152, 0.0722));
+			tex = tint * clamp(l / lb, 0.0, 2.2);
+		}
+		dAlbedo *= tex;
+	#endif
+}
+`;
+export async function applyAppearance(app,figureModel,regionsUrl,mapUrl,chosen=chosenAppearance()){
+  const info=await fetch(regionsUrl).then(r=>r.json()).catch(()=>null);if(!info)return;
+  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=mapUrl;});
+  const map=new Texture(app.graphicsDevice,{name:'regiones',width:img.width,height:img.height,format:PIXELFORMAT_RGBA8,mipmaps:false,minFilter:FILTER_NEAREST,magFilter:FILTER_NEAREST,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE,flipY:false});map.setSource(img);
+  const base=new Float32Array(48),tint=new Float32Array(48).fill(-1);
+  info.regiones.forEach((r,i)=>{base.set(linear(r.muestra),i*3);
+    // Skin is always drawn from its sample: the pictures painted coat colour on some fingertips.
+    const want=r.tenible&&chosen[r.tenible]?chosen[r.tenible]:r.tenible==='piel'?r.muestra:null;if(want)tint.set(linear(want),i*3);});
+  for(const r of figureModel.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial)||!m.diffuseMap)continue;
+    m.shaderChunksVersion='2.22';m.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',tintPS);
+    m.setParameter('uRegionMap',map);m.setParameter('uRegionBase[0]',base);m.setParameter('uRegionTint[0]',tint);m.update();}
 }

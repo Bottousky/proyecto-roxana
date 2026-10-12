@@ -38,6 +38,12 @@ def bounds():
 lo, hi = bounds(); s = 2.0 / (hi.z - lo.z)
 body.scale = (s, s, s); bpy.ops.object.transform_apply(scale=True)
 lo, hi = bounds(); body.location = (-(lo.x + hi.x) / 2, -(lo.y + hi.y) / 2, -lo.z); bpy.ops.object.transform_apply(location=True)
+# The master: the full-resolution shape, normalised, before anything is simplified. It is what the
+# print kit and the colour regions start from (scripts/blender/regiones.py).
+master_path = os.environ.get('MAESTRO') or out.replace('.glb', '-maestro.glb')
+bpy.ops.object.select_all(action='DESELECT'); body.select_set(True)
+bpy.ops.export_scene.gltf(filepath=master_path, export_format='GLB', export_yup=True, use_selection=True, export_materials='NONE')
+print('maestro', master_path, len(body.data.polygons), 'caras')
 # Simplify to a game budget.
 dec = body.modifiers.new('simplificar', 'DECIMATE'); dec.ratio = min(1.0, target_faces / max(1, len(body.data.polygons)))
 bpy.ops.object.modifier_apply(modifier=dec.name)
@@ -143,6 +149,34 @@ bpy.context.view_layer.objects.active = body; body.select_set(True)
 bpy.ops.object.bake(type='EMIT', margin=8)
 color_path = out.replace('.glb', '-color.png'); bake.filepath_raw = color_path; bake.file_format = 'PNG'; bake.save()
 print('textura', color_path)
+
+# The region map (scripts/blender/regiones.py): each game face takes the region of the nearest master
+# face; the map is baked flat, one value per region (R = (index + .5) / 16), for tinting in the game.
+regions_npy = os.environ.get('REGIONES')
+if regions_npy:
+    import numpy as np
+    from mathutils.bvhtree import BVHTree
+    labels = np.load(regions_npy)
+    bpy.ops.import_scene.gltf(filepath=master_path)
+    master = [o for o in scene.objects if o.type == 'MESH' and o is not body][0]
+    bm_m = bmesh.new(); bm_m.from_mesh(master.data); bm_m.transform(master.matrix_world); bm_m.faces.ensure_lookup_table()
+    mtree = BVHTree.FromBMesh(bm_m)
+    attr = body.data.color_attributes.new('region', 'FLOAT_COLOR', 'CORNER')
+    for p in body.data.polygons:
+        hit = mtree.find_nearest(body.matrix_world @ p.center)
+        value = (labels[hit[2]] + .5) / 16 if hit[2] is not None else 0
+        for li in range(p.loop_start, p.loop_start + p.loop_total): attr.data[li].color = (value, value, value, 1)
+    bpy.data.objects.remove(master)
+    nt.nodes.clear(); o2 = nt.nodes.new('ShaderNodeOutputMaterial'); e2 = nt.nodes.new('ShaderNodeEmission'); vc = nt.nodes.new('ShaderNodeVertexColor'); vc.layer_name = 'region'
+    nt.links.new(vc.outputs[0], e2.inputs[0]); nt.links.new(e2.outputs[0], o2.inputs[0])
+    region_img = bpy.data.images.new('viajero-regiones', size, size, float_buffer=False); region_img.colorspace_settings.name = 'Non-Color'
+    rt = nt.nodes.new('ShaderNodeTexImage'); rt.image = region_img; nt.nodes.active = rt
+    body.data.materials.clear(); body.data.materials.append(mat)
+    bpy.ops.object.select_all(action='DESELECT'); body.select_set(True); bpy.context.view_layer.objects.active = body
+    scene.render.bake.use_pass_direct = False
+    bpy.ops.object.bake(type='EMIT', margin=8, margin_type='EXTEND')
+    region_path = out.replace('.glb', '-regiones.png'); region_img.filepath_raw = region_path; region_img.file_format = 'PNG'; region_img.save()
+    print('regiones', region_path)
 
 # The game material: the baked colour, nothing else.
 game = bpy.data.materials.new('viajero-juego'); game.use_nodes = True; g = game.node_tree

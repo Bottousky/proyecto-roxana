@@ -19,7 +19,7 @@ const browser = await chromium.launch({ headless: true, executablePath: chromePa
 for (const look of looks) {
   const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
   const errors = []; page.on('pageerror', e => errors.push(e.message));
-  await page.goto((process.env.GAME_URL || 'http://127.0.0.1:4190/') + query[look], { waitUntil: 'networkidle' });
+  await page.goto((process.env.GAME_URL || 'http://127.0.0.1:4190/') + query[look] + (process.env.EXTRA ? '&' + process.env.EXTRA : ''), { waitUntil: 'networkidle' });
   await page.locator('#title-settings').click();
   await page.locator('#import-save').setInputFiles(process.env.IMPORT || 'output/playcanvas-playthrough/verified-save.json');
   await page.locator('#transition').waitFor({ state: 'hidden', timeout: 120000 });
@@ -35,12 +35,12 @@ for (const look of looks) {
   await page.evaluate(([x, z]) => { const w = window.__ohmdal.world; w.player.position.set(x, 0, z); w.ohm.position.set(x + 1.6, 0, z + .4); }, at);
   await page.addStyleTag({ content: '#hud,#toast,#interaction,#arrival,#touch-controls,#field-meter{display:none!important}' });
   await page.waitForTimeout(2500);
-  await page.screenshot({ path: `${out}/${area}-${look}.png` });
+  await page.screenshot({ path: `${out}/${area}-${look}${process.env.TAG ? '-' + process.env.TAG : ''}.png` });
   // Close-up: the camera's own zoom, as the game frames a conversation.
   await page.evaluate(() => { const w = window.__ohmdal.world; w.closeUp = w.restPose; w.restPose = p => { const r = w.closeUp(p); return { ...r, zoom: 3.2, focus: [p[0], r.focus[1], p[2] - .6] }; }; });
   await page.waitForTimeout(2500);
   await page.screenshot({ path: `${out}/${area}-${look}-cerca.png` });
-  await crop(page, `${out}/${area}-${look}-retrato.png`);
+  await crop(page, `${out}/${area}-${look}-retrato${process.env.TAG ? '-' + process.env.TAG : ''}.png`);
   // Walking sideways, mid-stride.
   await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(700);
   await crop(page, `${out}/${area}-${look}-camina.png`);

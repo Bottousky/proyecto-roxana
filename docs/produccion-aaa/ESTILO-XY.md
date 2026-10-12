@@ -88,3 +88,53 @@ una máscara de pelo y de piel, y un shader cambia el tono dentro de la máscara
 pintada. Solo para el viajero, con 6 u 8 colores elegidos a mano en la pantalla donde se pide el
 nombre, y guardado en el registro del Instituto. Con sprites también se puede, pero hay que hacer
 una máscara para cada uno de los 20 cuadros.
+
+## Maestro, regiones, apariencia y kit de impresión (ciclo 28)
+
+El usuario quiere más adelante productos físicos: figuras impresas en 3D, en una granja propia o de un
+tercero, con colores de ropa, pelo y piel elegidos por cada uno. Por eso cada personaje se prepara
+desde ya para tres destinos con un mismo modelo:
+
+| Destino | Qué usa |
+|---|---|
+| El juego | Modelo de 16 mil caras, textura, mapa de regiones y esqueleto (`public/assets/xy/viajero-*`) |
+| La personalización | El mapa de regiones y las paletas de `APPEARANCE` en `src/style.js` |
+| La impresión | El maestro de 305 mil caras, separado en piezas por región (`~/code/ohmdal-3d/<personaje>/out/kit`) |
+
+Cómo se hace:
+1. **Maestro:** `viajero-3d.py` exporta la forma normalizada (2 m, pies en el suelo, frente a −Y)
+   antes de simplificarla: `<personaje>-maestro.glb`.
+2. **Regiones:** `regiones.py`. A cada cara del maestro le pone el color de las vistas, con
+   oclusión. Con `explorar` agrupa los colores y deja un informe y una vista previa. Con `asignar`
+   aplica la configuración del personaje (`personajes/<personaje>.json`): cada región con colores de
+   muestra, una franja de alturas y cajas que deciden por forma (las manos debajo de los puños son
+   piel). Al final limpia puntos sueltos por mayoría de vecinos.
+3. **Juego:** `viajero-3d.py`, con `REGIONES=…npy`, pasa la región de cada cara del maestro al
+   modelo del juego y hornea `<personaje>-regiones.png`. El shader de la figura tiñe cada región
+   elegida conservando la luz pintada. La piel siempre se pinta desde su color de muestra, lo que
+   además corrige las puntas de los dedos.
+4. **Kit:** `kit.py` escala la figura a 90 mm y exporta una pieza STL por región, más el personaje
+   entero en OBJ con un material por región, que Bambu Studio y PrusaSlicer asignan a filamentos.
+   Hay un resumen en `kits/viajero/kit.json`.
+
+Para probar la apariencia: `?estilo=xy&gente=3d&pelo=rubio&piel=2&ropa=granate&bufanda=blanca`.
+- **Pelo:** castaño, oscuro, rubio, pelirrojo, ceniza, azul.
+- **Piel:** tonos del 1 al 6.
+- **Ropa:** verde azulado, granate, bosque, azul, mostaza, grafito.
+- **Bufanda:** mostaza, roja, blanca, verde, violeta, celeste.
+
+Lo que falta para producir:
+- pose de impresión, más compacta que la pose A;
+- base;
+- encastres entre piezas;
+- espesor mínimo (dedos, flecos y rulos de al menos 1,5–2 mm);
+- piezas sólidas en vez de superficies;
+- formato 3MF multicolor;
+- revisar la licencia de Hunyuan antes de vender.
+
+En el juego falta la pantalla para elegir la apariencia y guardarla en el registro del Instituto.
+
+Defectos del viajero a pulir:
+- manchas de cuero en el borde de bolsillos y puños;
+- pelo invadiendo las mejillas;
+- puntitos en los bordes entre regiones del juego.
