@@ -100,3 +100,9 @@ idéntico y ocupa 9,1 MB. La diferencia con antes son las cercas y portones nuev
   aparecen como estanques y se pierden otras casas, así que se dejó el mapa anterior. De esa prueba
   quedaron dos arreglos al script: completa el nombre que pide la partida nueva y da más tiempo a
   cada toma.
+  **Hecho el 12 oct 2026 en una Mac M2 con GPU.** Con GPU el error seguía en el Taller de Lumen y
+  en las torres del Castillo y del portón de la Calzada: su pizarra gris verdosa, iluminada, se
+  parece al agua. El horneado ahora saca una segunda toma con sólo los techos, tal como los dibuja
+  el juego, y suma las plantas de `world-layout`. Bajo un techo nunca hay agua, y los techos fríos
+  se pintan de pizarra (ver [MAPA.md](MAPA.md)). Las seis casas del pueblo ya aparecen en su lugar
+  nuevo.

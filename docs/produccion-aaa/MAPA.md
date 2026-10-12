@@ -19,9 +19,14 @@ garabatos. Quería un mapa de juego AAA que siguiera de verdad la geografía del
    - todo, con tinta en los bordes y grano de papel.
 3. **Caminos desde los datos de caminar**: los pasajes entre lugares y los senderos y patios de cada
    uno (`passageGeometry`, `AREA_LAYOUTS`).
-4. **Fidelidad medida**: el río del juego (`WATERCOURSE`) debe caer sobre agua pintada y cada
-   lugar y sus caminos sobre tierra. En la imagen actual: **río 100 % de 35 puntos, tierra 100 % de
-   91**. Si cae por debajo de 90 % o 95 %, el horneado falla.
+4. **Techos desde el propio juego** (12 oct 2026): una segunda toma con sólo los techos (textura
+   `roof`, blanco sobre negro), más las plantas de `AREA_LAYOUTS` (casas y fondo del pueblo). Bajo
+   un techo nunca se pinta agua. Hacía falta: la pizarra gris verdosa (`#648b89`) del Taller de
+   Lumen y de las torres sale casi cian en la toma y el clasificador la tomaba por agua. Los techos
+   cálidos se pintan de teja y los fríos, de pizarra.
+5. **Fidelidad medida**: el río del juego (`WATERCOURSE`) debe caer sobre agua pintada, y cada
+   lugar, sus caminos y sus techos sobre tierra. En la imagen actual: **río 100 % de 35 puntos,
+   tierra 100 % de 107**. Si cae por debajo de 90 % o 95 %, el horneado falla.
 
 Resultado: `public/assets/map/kingdom-map.webp`, de 2048×4096 px y 1,2 MB, y su `kingdom-map.json`.
 Se copia a la raíz (`public/assets/map/`), que es la fuente de `sync-game.mjs`. Hay que volver a

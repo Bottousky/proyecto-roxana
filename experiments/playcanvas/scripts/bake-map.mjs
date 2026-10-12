@@ -9,7 +9,7 @@ import { chromium } from 'playwright';
 import { mkdir, writeFile, readFile } from 'node:fs/promises';
 import { gunzipSync } from 'node:zlib';
 import { resolve } from 'node:path';
-import { chromePath, gpuArgs } from './chrome.mjs';
+import { chromePath, gpuArgs, nameTraveller } from './chrome.mjs';
 import { KINGDOM, EXTERIORS, passageGeometry, WATERCOURSE } from '../src/game/kingdom-geography.js';
 import { AREA_LAYOUTS } from '../src/game/world-layout.js';
 
@@ -31,6 +31,13 @@ for (const id of EXTERIORS) {
   for (const p of layout.paths ?? []) roads.push({ width: p.width, points: p.points.map(([x, z]) => [x + k.x, z + k.z]) });
   for (const c of layout.courts ?? []) courts.push(c.r != null ? { x: c.x + k.x, z: c.z + k.z, r: c.r } : { x: c.x + k.x, z: c.z + k.z, w: c.w, d: c.d });
 }
+// Roofs, from the same layout: seen from above a roof is never water, whatever tint the light gives it
+// (the Taller de Lumen's grey-green slate once came out as a pond). Footprint plus eaves, turned as built.
+const roofs = [];
+for (const id of EXTERIORS) {
+  const k = KINGDOM[id], layout = AREA_LAYOUTS[id] ?? {};
+  for (const b of [...layout.buildings ?? [], ...layout.backdrop ?? []]) roofs.push({ x: b.x + k.x, z: b.z + k.z, w: b.w + 1, d: b.d + 1, rotation: b.options?.rotation || 0 });
+}
 
 // Hillshade from the game's own relief (src/data/relief.bin.gz): every hill, and the Monte Quieto,
 // reads as topography, lit from the north-west as on a classic map. Half the map's resolution.
@@ -41,9 +48,7 @@ const browser = await chromium.launch({ headless: true, executablePath: chromePa
 const page = await browser.newPage({ viewport: { width: TILE_PX, height: TILE_PX }, deviceScaleFactor: 1 });
 await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
-// A new journey first asks for the school name (unless this browser already stored one).
-const nameField = page.locator('#player-name');
-if (await nameField.isVisible({ timeout: 5000 }).catch(() => false)) { await nameField.fill('Cartógrafo'); await page.locator('#name-form button').click(); }
+await nameTraveller(page, 'Cartógrafo');
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 180000 });
 for (let i = 0; i < 80 && await page.evaluate(() => window.__ohmdal.mode === 'dialogue'); i++) { await page.keyboard.press('Enter'); await page.waitForTimeout(120); }
 await page.waitForTimeout(1500);
@@ -74,6 +79,28 @@ for (let r = 0; r < rows; r++) for (let c = 0; c < cols; c++) {
   process.stdout.write(`\rtoma ${tiles.length}/${rows * cols}`);
 }
 console.log('');
+// The same tiles once more with only the roofs, white on black, as the game draws them: houses, the
+// castle's and the gate's towers, the Casa de Compuertas. A grey-green slate roof photographs close
+// to water; this says where the roofs are, so none of them is painted as a pond.
+await page.evaluate(() => {
+  const w = window.__ohmdal.world, app = w.app; let white = null;
+  for (const r of app.root.findComponents('render')) for (const mi of r.meshInstances) {
+    if (mi.material?.diffuseMap?.name !== 'roof') { mi.visible = false; continue; }
+    if (!white) { white = new mi.material.constructor(); white.useLighting = false; white.useFog = false; white.diffuse.set(0, 0, 0); white.emissive.set(1, 1, 1); white.update(); }
+    mi.material = white;
+  }
+  const f = w.frame; f.dof.enabled = false; f.vignette.intensity = 0; f.bloom.intensity = 0; f.update();
+  const cam = w.camera.camera, black = cam.clearColor.clone(); black.set(0, 0, 0, 1); cam.clearColor = black;
+});
+const roofTiles = [];
+for (const t of tiles) {
+  const cx = EXTENT.x0 + (t.c + .5) * TILE_M, cz = EXTENT.z0 + (t.r + .5) * TILE_M;
+  await page.evaluate(({ cx, cz }) => { window.__ohmdal.world.camera.setPosition(cx, 400, cz); }, { cx, cz });
+  await page.waitForTimeout(250);
+  roofTiles.push({ r: t.r, c: t.c, data: (await page.locator('canvas').first().screenshot({ type: 'png', timeout: 240000 })).toString('base64') });
+  process.stdout.write(`\rtechos ${roofTiles.length}/${tiles.length}`);
+}
+console.log('');
 
 const width = cols * TILE_PX, height = rows * TILE_PX;
 const SW = width / 2, SH = height / 2, shade = new Uint8Array(SW * SH * 4), step = 2 / PXM, light = [-.55, .62, -.55], ll = Math.hypot(...light);
@@ -85,9 +112,9 @@ for (let j = 0; j < SH; j++) for (let i = 0; i < SW; i++) {
 }
 const meta = { pxPerMetre: PXM, x0: EXTENT.x0, z0: EXTENT.z0, width, height, metresWide: cols * TILE_M, metresTall: rows * TILE_M, north: '-z' };
 const stitch = await browser.newPage();
-// Fidelity probes: the river's course must be painted as water, each place and its roads as land.
-const probes = { water: WATERCOURSE.filter((_, i) => i % 2 === 0), land: [...EXTERIORS.map(id => [KINGDOM[id].x, KINGDOM[id].z]), ...roads.filter(r => !r.bridge).flatMap(r => r.points.filter((_, i) => i % 6 === 3))] };
-const [rawUrl, mapUrl, fidelity] = await stitch.evaluate(async ({ tiles, width, height, size, meta, roads, courts, radius, probes, shadeData, SW, SH }) => {
+// Fidelity probes: the river's course must be painted as water, each place, its roads and its roofs as land.
+const probes = { water: WATERCOURSE.filter((_, i) => i % 2 === 0), land: [...EXTERIORS.map(id => [KINGDOM[id].x, KINGDOM[id].z]), ...roads.filter(r => !r.bridge).flatMap(r => r.points.filter((_, i) => i % 6 === 3)), ...roofs.map(b => [b.x, b.z])] };
+const [rawUrl, mapUrl, fidelity] = await stitch.evaluate(async ({ tiles, roofTiles, width, height, size, meta, roads, courts, roofs, radius, probes, shadeData, SW, SH }) => {
   const raw = document.createElement('canvas'); raw.width = width; raw.height = height;
   { const g = raw.getContext('2d'); for (const t of tiles) { const img = new Image(); img.src = `data:image/png;base64,${t.data}`; await img.decode(); g.drawImage(img, t.c * size, t.r * size); } }
   const canvas = document.createElement('canvas'); canvas.width = width; canvas.height = height;
@@ -134,8 +161,10 @@ void main(){
   const blur = head + `uniform sampler2D t; uniform vec2 dir; uniform float spread;
 void main(){ float acc = 0., wsum = 0.; for (int i = -36; i <= 36; i++) { float w = exp(-float(i * i) / spread); acc += texture(t, uv + dir * float(i) * px).r * w; wsum += w; } o = vec4(acc / wsum, 0., 0., 1.); }`;
   // 2b · Clean water: specks of glare at sea and stray wet pixels on land are not islands or ponds.
-  const clean = head + `uniform sampler2D M; uniform sampler2D S;
-void main(){ vec4 m = texture(M, uv); float w = smoothstep(.42, .58, texture(S, uv).r); o = vec4(w, m.g * (1. - w), m.b * (1. - w), m.a * (1. - w)); }`;
+  // Under a roof of the layout (L) there is roof, whatever the photograph's colour suggested.
+  const clean = head + `uniform sampler2D M; uniform sampler2D S; uniform sampler2D L;
+void main(){ vec4 m = texture(M, uv); float under = texture(L, uv).r, w = smoothstep(.42, .58, texture(S, uv).r) * (1. - under);
+  o = vec4(w, m.g * (1. - w) * (1. - under), m.b * (1. - w) * (1. - under), max(m.a * (1. - w), under)); }`;
   // 4 · The painter.
   const compose = head + `uniform sampler2D K; uniform sampler2D M; uniform sampler2D W; uniform sampler2D S; uniform float pxm;
 float mask(vec2 off, int ch){ vec4 v = texture(M, uv + off * px); return ch == 0 ? v.r : ch == 1 ? v.g : ch == 2 ? v.b : v.a; }
@@ -162,7 +191,8 @@ void main(){
   // Stone and cobble: warm sand with a speckle.
   vec3 stoneCol = vec3(.80, .74, .60) * (.9 + .18 * noise(metres * 2.2));
   // Roofs: warmer, slate or terracotta as the render says.
-  vec3 roofCol = mix(vec3(.38, .42, .42), vec3(.66, .38, .27), smoothstep(.1, .25, hsl(k).y)) * (.85 + .5 * l);
+  // Tiles where the photograph is warm and saturated; slate otherwise (the grey-green roofs are slate).
+  vec3 kh = hsl(k), roofCol = mix(vec3(.38, .42, .42), vec3(.66, .38, .27), smoothstep(.1, .25, kh.y) * hueNear(kh.x, 22., 30., 50.)) * (.85 + .5 * l);
   // Water: shallow by the shore, deep offshore, rings of ripples parallel to the coast.
   vec3 waterCol = mix(vec3(.38, .58, .57), vec3(.16, .32, .38), smoothstep(.55, .97, deep));
   float rings = 0.; for (int r = 0; r < 4; r++) { float lv = .58 + float(r) * .09; rings = max(rings, 1. - smoothstep(.0, .008 + .002 * float(r), abs(deep - lv))); }
@@ -208,7 +238,13 @@ void main(){
     for (const [uniform, value] of Object.entries(uniforms)) { const u = gl.getUniformLocation(pr, uniform); if (Array.isArray(value)) gl.uniform2f(u, ...value); else if (Number.isInteger(value) && uniform === 'R') gl.uniform1i(u, value); else gl.uniform1f(u, value); }
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   };
-  const source = texture(raw), K = texture(null), M0 = texture(null), M = texture(null), B1 = texture(null), B2 = texture(null);
+  const roofMask = document.createElement('canvas'); roofMask.width = width; roofMask.height = height;
+  { const g = roofMask.getContext('2d');
+    for (const t of roofTiles) { const img = new Image(); img.src = `data:image/png;base64,${t.data}`; await img.decode(); g.drawImage(img, t.c * size, t.r * size); }
+    // Bright is roof; the rest of the render (tone mapping, edges) is not.
+    const d = g.getImageData(0, 0, width, height), p = d.data; for (let i = 0; i < p.length; i += 4) { const v = Math.max(p[i], p[i + 1], p[i + 2]) > 110 ? 255 : 0; p[i] = p[i + 1] = p[i + 2] = v; p[i + 3] = 255; } g.putImageData(d, 0, 0);
+    g.fillStyle = '#fff'; for (const b of roofs) { g.save(); g.translate((b.x - meta.x0) * meta.pxPerMetre, (b.z - meta.z0) * meta.pxPerMetre); g.rotate(-b.rotation); g.fillRect(-b.w / 2 * meta.pxPerMetre, -b.d / 2 * meta.pxPerMetre, b.w * meta.pxPerMetre, b.d * meta.pxPerMetre); g.restore(); } }
+  const source = texture(raw), L = texture(roofMask), K = texture(null), M0 = texture(null), M = texture(null), B1 = texture(null), B2 = texture(null);
   const S = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, S); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, false);
   gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA8, SW, SH, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array(atob(shadeData).split('').map(c => c.charCodeAt(0))));
   for (const [key, v] of [[gl.TEXTURE_MIN_FILTER, gl.LINEAR], [gl.TEXTURE_MAG_FILTER, gl.LINEAR], [gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE], [gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE]]) gl.texParameteri(gl.TEXTURE_2D, key, v);
@@ -218,7 +254,7 @@ void main(){
   run(blurProgram, { t: M0 }, target(B1), { dir: [1, 0], spread: small });
   run(blurProgram, { t: B1 }, target(B2), { dir: [0, 1], spread: small });
   const cleanTarget = target(M);
-  run(program(clean), { M: M0, S: B2 }, cleanTarget);
+  run(program(clean), { M: M0, S: B2, L }, cleanTarget);
   // Read the clean classification where the game says there is water, and where it says there is land.
   const readWater = ([x, z]) => { const px = Math.round((x - meta.x0) * meta.pxPerMetre), py = Math.round((z - meta.z0) * meta.pxPerMetre); if (px < 0 || py < 0 || px >= width || py >= height) return null; const v = new Uint8Array(4); gl.bindFramebuffer(gl.FRAMEBUFFER, cleanTarget); gl.readPixels(px, height - 1 - py, 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, v); return v[0] / 255; };
   const share = (points, wantWater) => { const seen = points.map(readWater).filter(v => v !== null); return { probes: seen.length, agree: seen.filter(v => wantWater ? v > .5 : v < .5).length }; };
@@ -240,9 +276,9 @@ void main(){
   for (const r of roads) stroke(r.points, roadPx(r.width) + 2.4, r.bridge ? 'rgba(52,44,32,.8)' : 'rgba(84,66,42,.55)');
   for (const r of roads) stroke(r.points, roadPx(r.width), r.bridge ? 'rgba(190,170,132,.95)' : r.trail ? 'rgba(201,182,138,.78)' : 'rgba(214,196,152,.88)');
   return [raw.toDataURL('image/webp', .88), out.toDataURL('image/webp', .86), fidelity];
-}, { tiles, width, height, size: TILE_PX, meta, roads, courts, probes, shadeData: Buffer.from(shade).toString('base64'), SW, SH, radius: Number(process.env.RADIUS || Math.max(2, Math.round(PXM * .45))) });
+}, { tiles, roofTiles, width, height, size: TILE_PX, meta, roads, courts, roofs, probes, shadeData: Buffer.from(shade).toString('base64'), SW, SH, radius: Number(process.env.RADIUS || Math.max(2, Math.round(PXM * .45))) });
 const pct = f => Math.round(f.agree / Math.max(1, f.probes) * 100);
-console.log(`fidelidad: el río del juego cae sobre agua pintada en ${pct(fidelity.water)}% de ${fidelity.water.probes} puntos; lugares y caminos sobre tierra en ${pct(fidelity.land)}% de ${fidelity.land.probes}`);
+console.log(`fidelidad: el río del juego cae sobre agua pintada en ${pct(fidelity.water)}% de ${fidelity.water.probes} puntos; lugares, caminos y techos sobre tierra en ${pct(fidelity.land)}% de ${fidelity.land.probes}`);
 if (!process.env.OUT && (pct(fidelity.water) < 90 || pct(fidelity.land) < 95)) { console.error('El mapa pintado no coincide con la geografía del juego.'); process.exit(1); }
 meta.fidelity = { river: pct(fidelity.water), land: pct(fidelity.land) };
 await writeFile(resolve(out, name), Buffer.from(mapUrl.split(',')[1], 'base64'));
