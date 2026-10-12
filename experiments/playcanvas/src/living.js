@@ -1,4 +1,5 @@
 import {SHADERLANGUAGE_GLSL} from 'playcanvas';
+import {XY} from './style.js';
 
 // Leaves, ferns, hedges, crops and sown plants share one albedo: PlayCanvas's own, then pulled
 // toward the forgotten kingdom. Nothing green ever reaches a garden's saturation, and around a
@@ -20,13 +21,18 @@ void getAlbedo() {
 		dry = max(dry, (1.0 - vVertexColor.a) * uLifeInAlpha);
 	#endif
 	float lum = dot(dAlbedo, vec3(0.3, 0.59, 0.11));
-	dAlbedo = mix(dAlbedo, vec3(lum), 0.2);
-	dAlbedo = mix(dAlbedo, vec3(lum * 1.2, lum * 1.0, lum * 0.6), dry * 0.8) * (1.0 - 0.14 * dry);
+	#ifdef XY_LOOK
+		// X and Y: no grey. A forgotten place turns autumn gold and keeps its colour.
+		dAlbedo = mix(dAlbedo, vec3(lum * 1.42, lum * 1.12, lum * 0.42), dry * 0.62);
+	#else
+		dAlbedo = mix(dAlbedo, vec3(lum), 0.2);
+		dAlbedo = mix(dAlbedo, vec3(lum * 1.2, lum * 1.0, lum * 0.6), dry * 0.8) * (1.0 - 0.14 * dry);
+	#endif
 }
 `;
 export function makeLiving(material,{lifeInAlpha=false}={}){
   material.shaderChunksVersion='2.22';
-  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',livingPS);
+  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',(XY?'#define XY_LOOK\n':'')+livingPS);
   material.setParameter('uDry',0);material.setParameter('uLifeInAlpha',lifeInAlpha?1:0);material.update();
   return material;
 }

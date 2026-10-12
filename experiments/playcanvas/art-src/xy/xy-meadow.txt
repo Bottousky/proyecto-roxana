@@ -1,0 +1,5 @@
+Saved `xy-meadow.png` — **1024 × 1024**, **1,628,515 bytes**. Generated with the built-in image_gen tool.
+
+Exact prompt:
+
+> Generate exactly ONE image, square, 1024x1024 pixels. Top-down seamless grass lawn: fresh bright spring green with soft lighter and darker patches and a few tiny soft blade strokes, like a tidy village lawn. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, flat even light). It must tile seamlessly on all four edges: left and right edges match continuously, top and bottom edges match continuously, including the corners. Grass fills the entire square edge to edge. No border, text, or watermark.

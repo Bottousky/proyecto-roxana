@@ -1,0 +1,5 @@
+Saved `xy-rock.png` — **1024 × 1024**, **1,248,504 bytes**. Generated with the built-in image_gen tool.
+
+Exact prompt:
+
+> Generate exactly ONE image: a square 1024x1024 seamless natural rock face texture of a hillside cliff. Large soft angular grey rock planes with gentle lighter tops, clean shapes, and a few tiny moss specks. Clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town: soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail. No pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it; flat even light. The texture fills the entire image, viewed straight on, with no border, text, or scenery. It must tile seamlessly on all four edges: rock shapes and colours crossing the left edge continue at the right edge, and those crossing the top edge continue at the bottom edge.

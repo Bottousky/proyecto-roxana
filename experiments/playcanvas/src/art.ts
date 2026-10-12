@@ -1,4 +1,5 @@
 import {Asset,Application,Texture,TextureAtlas,Sprite,Vec2,Vec4,FILTER_LINEAR,FILTER_LINEAR_MIPMAP_LINEAR,FILTER_NEAREST,ADDRESS_REPEAT,ADDRESS_CLAMP_TO_EDGE,PIXELFORMAT_RGBA8} from 'playcanvas';
+import {XY,XY_SURFACES} from './style.js';
 import {opaqueBounds,actorFrameLayout,isolateFigure} from './game/actor-animation.js';
 export const textures=new Map<string,Texture>();
 const images=new Map<string,Promise<HTMLImageElement>>();
@@ -31,8 +32,9 @@ export async function surface(app:Application,name:string){
   if(name==='foliage'||name==='fern')return texture(app,name,name==='foliage'?foliage():fern());
   // Pixel-art surfaces generated for HD-2D (art-src/hd2d → scripts/hd2d-textures.py).
   const pixelArt:Record<string,string>={cobble:'cobble',stone:'stone',wood:'wood',roof:'roof',ground:'meadow',burlap:'burlap',hay:'hay',iron:'iron',plaster:'plaster',awning:'awning',endgrain:'endgrain',flagstone:'flagstone',rock:'rock',moss:'moss',timber:'timber'};
-  if(pixelArt[name])return texture(app,name,await image(`/assets/hd2d/${pixelArt[name]}.png`),true,false,true);
-  if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image('/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}
+  // In the X and Y look the same surfaces are filtered smooth: painted, not pixels.
+  if(pixelArt[name]){const file=pixelArt[name];return texture(app,name,await image(XY&&XY_SURFACES.has(file)?`/assets/xy/${file}.png`:`/assets/hd2d/${file}.png`),true,false,!XY);}
+  if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image(XY?'/assets/xy/trees.png':'/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}
   if(name.startsWith('bank'))return texture(app,name,crop(await image('/assets/art-polish/waterside-plants.webp'),Number(name.slice(4)),0,3,1));
   if(name==='water'){const c=canvas(256,256),x=c.getContext('2d')!;x.fillStyle='#356e70';x.fillRect(0,0,256,256);for(let i=0;i<40;i++){const y=(i*61)%256,xx=(i*97)%256;x.strokeStyle=i%3?'#669b922a':'#b7c9a63a';x.lineWidth=1;x.beginPath();x.moveTo(xx,y);x.quadraticCurveTo(xx+9,y-2,xx+18,y);x.stroke();}return texture(app,name,c,true);}
   const urls:Record<string,string>={workshopRug:'workshop-rug.webp',kingdomBanner:'kingdom-banner.webp'};

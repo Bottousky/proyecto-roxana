@@ -1,0 +1,7 @@
+Saved `xy-plants-b.png` — **1024×1024**, **1,578,744 bytes**, **alpha: yes**. Generated with the built-in image_gen tool.
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image: a square 1024x1024 sprite sheet with a fully transparent background (real alpha channel). Use case: stylized-concept. A 4 by 4 grid of garden plants, exactly 16 plant sprites, one in each equal 256x256 cell. Grid is implicit: no grid lines or cell borders. Read rows from top to bottom and columns from left to right. Row 1: four round leafy green shrubs of slightly different sizes. Row 2: four round flowering shrubs, respectively with pink, white, yellow and red flowers. Row 3: four clumps of cattail reeds with brown heads. Row 4: lavender; sunflowers; pink roses bush; a clump of tulips in red, pink, yellow and purple. Style: clean cel-shaded 3D-render look of a modern handheld RPG (like a bright 3DS-era town): soft rounded volumes, two-tone toon shading with a soft lighter top, thin darker-green outline, bright fresh colours, low detail, no pixel art, no noise. Each item is horizontally centred in its cell and stands at the bottom of its cell, with a small transparent safety margin so no part is cropped or crosses into another cell. Fully TRANSPARENT background, nothing else in the image, no ground, no pots, no ground shadows, no text, no labels, no watermark.
+```

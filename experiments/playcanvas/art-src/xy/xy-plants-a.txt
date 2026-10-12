@@ -1,0 +1,14 @@
+Saved `xy-plants-a.png` — 1024×1024, 1,418,910 bytes, alpha channel: **yes**. Generated once using the built-in image_gen tool.
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image: a square 1024x1024 sprite sheet with a fully transparent background (real alpha channel). Use case: stylized-concept. Asset type: ground plant sprites for a handheld RPG.
+Composition: an invisible 4 by 4 grid of equal 256x256 cells, exactly 16 separate plant sprites, one per cell. Each item is horizontally centred in its cell, standing at the bottom of its cell, entirely contained within that cell with a small safety margin. No plant may cross into another cell. Do not draw grid lines.
+Row 1, left to right: four low tufts of short lawn grass, with small natural variations.
+Row 2, left to right: four clumps of tall grass with golden seed heads, with small natural variations.
+Row 3, left to right: daisies with white petals; yellow buttercups; blue bellflowers; red poppies.
+Row 4, left to right: a fern; a clover patch with tiny white flowers; a broad-leaf plant; a second fern.
+Style: clean cel-shaded 3D-render look of a modern handheld RPG, like a bright 3DS-era town. Soft rounded volumes, two-tone toon shading with a soft lighter top, thin darker-green outline, bright fresh colours, low detail. No pixel art, no noise.
+Background and exclusions: fully TRANSPARENT empty space with real alpha, nothing else in the image, no ground, no ground shadows, no text, no labels, no borders, no props.
+```

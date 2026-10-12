@@ -1,0 +1,6 @@
+Saved `xy-timber.png` — **1024×1024**, **1,221,153 bytes**. Generated once using the built-in tool.
+
+Exact prompt:
+```text
+Generate exactly one square 1024x1024 image. Front view seamless half-timbered wall: cream white plaster panels framed by dark brown timber beams in exactly this layout per tile: a vertical beam at the left edge and in the middle, a horizontal beam at mid height, and diagonal braces forming X shapes in each half (like a Tudor timber frame), beams soft and clean. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, flat even light). It must tile seamlessly on all four edges. Flat orthographic front view, texture fills the entire image, no perspective, no border, no text. Match opposite edges precisely so timber and plaster continue seamlessly when repeated horizontally and vertically.
+```

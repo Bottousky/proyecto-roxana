@@ -1,4 +1,5 @@
 import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
+import {XY,XY_LENS,XY_GRADES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure} from './style.js';
 import {surface,actorArt} from './art.ts';
 import {AREAS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -67,7 +68,7 @@ const waitFrame=()=>new Promise(r=>requestAnimationFrame(r));
 // A long lens, low over the diorama: the perspective recedes to the top of the frame and the
 // depth of field blurs near and far like a tilt-shift photograph. ?lens=0 restores the old
 // orthographic view; ?lens=distance,pitch tries another framing.
-const LENS=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('lens');if(q==='0')return {fov:false,distance:1,pitch:0};const [distance,pitch]=(q||'1.3,26').split(',').map(Number);return {fov:true,distance:distance||1.3,pitch:pitch||26};})();
+const LENS=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('lens');if(!q&&XY)return {...XY_LENS};if(q==='0')return {fov:false,distance:1,pitch:0};const [distance,pitch]=(q||'1.3,26').split(',').map(Number);return {fov:true,distance:distance||1.3,pitch:pitch||26};})();
 
 // ?dof=range,radius tries another depth of field on the same camera (comparisons for QA).
 const DOF=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('dof');if(!q)return null;const [range,radius]=q.split(',').map(Number);return {range:range||null,radius:radius||null};})();
@@ -92,7 +93,7 @@ export class PlayCanvasWorld {
     f.colorEnhance.enabled=true;f.colorEnhance.vibrance=.12;f.colorEnhance.shadows=.15;
     f.grading.enabled=true;this.grade=[...GRADES.morning];
     f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=DOF?.radius??3;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
-    f.update();
+    f.update();xyFrame(f,this.app,this.camera.camera);
   }
   focusFrame(){
     if(!this.frame?.enabled||!this.player)return;
@@ -115,7 +116,7 @@ export class PlayCanvasWorld {
   }
   async loadArtAssets(){
     if(this.booted)return {ok:true,missing:[]};
-    try{await this.build();this.booted=true;return {ok:true,missing:[]};}catch(error){console.error(error);return {ok:false,missing:[error.message]};}
+    try{await this.build();celShade(this.app);this.booted=true;return {ok:true,missing:[]};}catch(error){console.error(error);return {ok:false,missing:[error.message]};}
   }
   async build(){
     const [data,binary]=await Promise.all([fetch(sceneUrl).then(r=>{if(!r.ok)throw new Error('Falta el mundo');return r.json();}),fetch(geometryUrl).then(async r=>{if(!r.ok)throw new Error('Falta la geometría');const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
@@ -158,7 +159,7 @@ export class PlayCanvasWorld {
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
     }
-    this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
+    this.playerActor=await this.makeActor('player',0,0,'player');if(PEOPLE_3D)await attachFigure(this.app,this.playerActor,'./assets/xy/viajero.glb',LENS.pitch||28.37);this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
     this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();
@@ -170,6 +171,7 @@ export class PlayCanvasWorld {
   }
   animateActor(a,dx,dz,dt,{paused=false,reducedMotion=false}={}){
     a.animation=advanceActor(a.animation,paused?0:dx,paused?0:dz,dt,{reducedMotion});a.script.showFrame(a.animation,a.name==='ohm',this.clock);
+    if(a.figure)updateFigure(a,paused?0:dx,paused?0:dz,dt);
   }
   context(id){
     const context=Object.create(this);context.area=AREAS[id];context.coreBounds=context.area.bounds;context.bounds=travelBounds(id);context.obstacles=this.localObstacles(id);context.actors=this.regions.get(id).actors;return context;
@@ -535,7 +537,7 @@ export class PlayCanvasWorld {
   }
   updateEnvironment(dt,reduced){
     const f=this.state.flags,phase=journeyPhase(this.state),inside=this.indoors(),mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
-    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}const lit=!inside||!!this.home||f.workshop;this.sun.light.intensity+=((inside?(this.home?.16:lit?.85:.5):phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?(this.home?'#3a2e26':lit?'#7c7967':'#4d5a63'):n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
+    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}const lit=!inside||!!this.home||f.workshop;this.sun.light.intensity+=((inside?(this.home?.16:lit?.85:.5):phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,xySun(color(phase.sun)),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?(this.home?'#3a2e26':lit?'#7c7967':'#4d5a63'):XY?(n>.7?'#7d93c4':'#a9bcd6'):n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
     // A place nobody has restored yet is literally dimmer: muted and cool. Its colour floods
     // back with the restoration, and crossing into a forgotten place drains it again.
     const alive=f[power[this.area.id]]?1:0;this.vitality??=alive;
@@ -547,7 +549,7 @@ export class PlayCanvasWorld {
       if(changed&&this.lifeClock>.12){this.lifeClock=0;this.lifeApplied=true;this.lifeShown={...this.areaLife};updateGroundLife(this.grounds||[],new Float32Array(reach));recolorFlora(this,this.areaLife);
         for(const l of this.living||[]){if(!isExterior(l.area)&&l.area!=='landscape')continue;setDry(l.material,1-(l.area==='landscape'?WILD_LIFE:this.areaLife[l.area]??1));}}}
     this.restoration=Math.max(0,(this.restoration||0)-dt);this.vitality+=(alive-this.vitality)*Math.min(1,dt*(this.restoration>0?.75:alive?.5:1.2));const v=this.vitality;
-    if(this.frame?.enabled){const base=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade,target=[base[0]*(.86+.14*v),base[1]*(.97+.03*v),base[2]*(.99+.01*v),base[3]*(1.03-.03*v),base[4]*(.97+.03*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
+    if(this.frame?.enabled){const grades=XY?XY_GRADES:GRADES,base=grades[inside?'inside':phase.id]||grades.morning,g=this.grade,target=[base[0]*(.86+.14*v),base[1]*(.97+.03*v),base[2]*(.99+.01*v),base[3]*(1.03-.03*v),base[4]*(.97+.03*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
       if(moved>.0005||!this.gradeApplied){this.gradeApplied=true;const f=this.frame.grading;f.saturation=g[0];f.tint=new Color(g[1],g[2],g[3]);f.brightness=g[4];this.frame.update();}}
     for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?2.4:n*3.2):0;light.entity.light.range=light.area==='workshop'?11:9;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}

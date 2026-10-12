@@ -1,4 +1,5 @@
 import {SHADERLANGUAGE_GLSL,Texture,PIXELFORMAT_RGBA8,FILTER_LINEAR,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
+import {XY} from './style.js';
 import shore from './data/shore.json';
 
 // The meadow and every paved square or road are one surface. The paving outline comes
@@ -30,14 +31,23 @@ void getAlbedo(){
   #endif
   // Broad lush and sun-dried patches, then a finer mottling.
   float broad=gNoise(p*0.045)*0.65+gNoise(p*0.11+7.3)*0.35,fine=gNoise(p*0.6+3.1);
-  grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad))*(0.93+0.14*fine);
+  #ifdef XY_LOOK
+    grass*=mix(vec3(0.9,1.0,0.9),vec3(1.05,1.08,0.9),smoothstep(0.25,0.8,broad))*(0.96+0.08*fine);
+  #else
+    grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad))*(0.93+0.14*fine);
+  #endif
   // A forgotten kingdom: the meadow never reaches a garden's green, and around a place nobody has
   // restored yet it dries to straw and grey olive. Restoring the place greens it again.
   float dry=0.0;
   for(int i=0;i<8;i++){vec4 l=uLife[i];float w=1.0-smoothstep(l.z*0.55,l.z,distance(p,l.xy));dry=max(dry,w*(1.0-l.w));}
   float lum=dot(grass,vec3(0.3,0.59,0.11));
-  grass=mix(grass,vec3(lum),0.2);
-  grass=mix(grass,vec3(lum*1.16,lum*1.0,lum*0.66),dry*0.72)*(1.0-0.1*dry);
+  #ifdef XY_LOOK
+    // X and Y: a forgotten lawn turns autumn gold, never grey.
+    grass=mix(grass,vec3(lum*1.4,lum*1.12,lum*0.45),dry*0.58);
+  #else
+    grass=mix(grass,vec3(lum),0.2);
+    grass=mix(grass,vec3(lum*1.16,lum*1.0,lum*0.66),dry*0.72)*(1.0-0.1*dry);
+  #endif
   vec2 uv=(p-uShoreRect.xy)/uShoreRect.zw;
   float cover=texture2D(uShoreMap,uv).g;
   float edge=gNoise(p*2.3)*0.6+gNoise(p*5.7+1.7)*0.4;
@@ -67,7 +77,7 @@ const tones=new Float32Array(shore.paving.flatMap(h=>[0,2,4].map(i=>lin(parseInt
 
 export function makeGround(material,{shoreMap,meadow,cobble,ao}){
   material.shaderChunksVersion='2.22';
-  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',diffusePS);
+  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',(XY?'#define XY_LOOK\n':'')+diffusePS);
   material.setParameter('uShoreMap',shoreMap);material.setParameter('uShoreRect',[shore.x0,shore.z0,shore.width,shore.depth]);material.setParameter('uShoreSize',shore.pixels);
   material.setParameter('uMeadow',meadow);material.setParameter('uGroundAo',ao);material.setParameter('uCobble',cobble);material.setParameter('uPave[0]',tones);
   material.setParameter('uClouds',[0,0,.035]);material.setParameter('uLife[0]',new Float32Array(32));material.update();

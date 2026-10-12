@@ -1,0 +1,6 @@
+`xy-stone.png` — 1024 × 1024 pixels, 1,083,472 bytes. Generated using the built-in image_gen tool.
+
+Exact prompt:
+```text
+Generate exactly ONE square image, 1024x1024 pixels. Front view seamless wall of light warm beige cut stone blocks in running bond, soft clean mortar lines, slightly rounded block corners. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, flat even light). It must tile seamlessly on all four edges: matching stone shapes, mortar lines, and colours across left/right and top/bottom boundaries. Orthographic straight-on wall texture filling the entire frame, no perspective, no border, no text, no objects.
+```

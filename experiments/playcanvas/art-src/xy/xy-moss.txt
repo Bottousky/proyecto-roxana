@@ -1,0 +1,5 @@
+Saved `xy-moss.png` — 1024 × 1024 pixels, 1,679,202 bytes. Generated with the built-in image tool.
+
+Exact prompt:
+
+> Generate exactly one square 1024x1024 image. Top-down seamless soft cushion moss and low clover, bright green with soft yellow-green highlights, rounded clumps. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, flat even light). It must tile seamlessly on all four edges, with matching forms and colours wrapping across opposite edges. Fill the entire square with the texture; no border, text, or watermark.
