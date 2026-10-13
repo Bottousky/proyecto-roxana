@@ -112,3 +112,31 @@ html[data-estilo="xy"] .kmap-compass .ring{fill:#fff;stroke:var(--xy-blue)}
 html[data-estilo="xy"] .kmap-compass .needle-n{fill:#e8503a;stroke:#fff}
 html[data-estilo="xy"] .kmap-compass .needle-s{fill:#fff;stroke:var(--xy-soft)}
 html[data-estilo="xy"] .kmap-compass text{fill:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800}
+/* Elegir la apariencia: un dibujo que responde al instante y cuatro filas de colores. En el camino,
+   el panel queda a un costado sin tapar ni desenfocar al viajero, que cambia en vivo. */
+.look{display:grid;grid-template-columns:104px minmax(0,1fr);gap:12px;align-items:center;margin:4px 0 6px}
+.look-preview{width:104px;height:122px;filter:drop-shadow(0 3px 0 #d5dde5)}
+.look-preview [data-part]{stroke:#25313b;stroke-width:2.4;stroke-linejoin:round}
+.look-groups{display:grid;gap:6px;min-width:0}
+.look fieldset{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:0;padding:0;border:0;min-width:0}
+.look legend{float:left;width:62px;margin-right:2px;font:800 13px var(--xy-font,inherit);color:var(--xy-ink,#25313b)}
+.look-swatch{width:31px;height:31px;min-height:31px!important;padding:0!important;border-radius:50%!important;background:var(--swatch)!important;border:3px solid #fff!important;box-shadow:0 0 0 2px #d5dde5,0 2px 0 2px #c9d3dc!important;cursor:pointer;transition:transform .12s}
+.look-swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--xy-blue,#2f8fd6),0 3px 0 3px var(--xy-blue-deep,#1f6fb0)!important;transform:scale(1.08)}
+.look-swatch:focus-visible{outline:3px solid #f2b33a;outline-offset:3px}
+.look-ask{margin:6px 0 0;font:800 15px var(--xy-font,inherit);color:var(--xy-ink,#25313b)}
+.look-ask span{display:block;font-weight:600;font-size:12px;color:var(--xy-soft,#55626e)}
+.look-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e3eaf0}
+.look-row>span{display:flex;flex-direction:column;gap:2px;font-weight:700;color:var(--xy-ink,#25313b)}
+.look-row button{min-height:44px;padding:8px 18px}
+.look-done{margin-top:10px;min-height:46px;width:100%}
+.modal-layer:has(.look-modal){background:none!important;backdrop-filter:none!important}
+.modal.look-modal{justify-self:end;width:min(520px,100%)}
+@media (max-width:600px) and (orientation:portrait){.modal-layer:has(.look-modal){align-items:start}.modal.look-modal{justify-self:stretch;max-height:52dvh;overflow:auto}}
+@media (max-width:420px){.look{grid-template-columns:84px minmax(0,1fr);gap:8px}.look-preview{width:84px;height:98px}.look legend{width:100%;float:none;margin-bottom:2px}.look-swatch{width:30px;height:30px}}
+@media (orientation:landscape) and (max-height:540px){
+  .modal.look-modal{max-height:calc(100dvh - 20px);overflow:auto;padding:16px 20px}.look-modal h2{font-size:20px}
+  .name-modal .modal-intro{display:none}.name-modal h2{font-size:24px;margin-bottom:4px}.name-modal .name-form{gap:8px;margin-top:8px}
+  .look{grid-template-columns:72px minmax(0,1fr);gap:10px;margin:0}.look-preview{width:72px;height:84px}.look-swatch{width:28px;height:28px;min-height:28px!important}.look-groups{gap:4px}.look-ask{margin:0}
+  .modal.name-modal{padding:16px 22px}
+}
+body:has(.look-modal) #touch-controls{display:none}

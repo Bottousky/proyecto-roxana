@@ -128,7 +128,7 @@ export async function attachFigure(app,actor,url,pitch,{chosen,size=1}={}){
   }
   // Matte painted materials, like the world's: no glossy highlight washing the colours out.
   for(const r of model.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial))continue;m.useMetalness=true;m.metalness=0;m.metalnessMap=null;m.glossInvert=false;m.glossMap=null;m.gloss=.1;m.specularityFactor=0;m.ambient.set(.42,.42,.46);m.diffuse.set(.74,.72,.72);m.update();} // its texture already carries painted light: the sky's fill and full sun would wash it
-  if(actor.figure.bones)await applyAppearance(app,model,url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.json',url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.png',chosen??{});
+  if(actor.figure.bones)actor.figure.setAppearance=await applyAppearance(app,model,url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.json',url.replace(/\.glb$/,'').replace('-hy','')+'-regiones.png',chosen??{});
   celShade(app);updateFigure(actor,0,0,0);
 }
 export function updateFigure(actor,dx,dz,dt){
@@ -185,8 +185,13 @@ export const APPEARANCE={
   ropa:{'verde azulado':'#2f6f80',granate:'#7a2f36',bosque:'#3b6a3c',azul:'#2c4e8e',mostaza:'#b4862e',grafito:'#4c5058'},
   bufanda:{mostaza:'#e5a63d',roja:'#c7413a',blanca:'#ece6da',verde:'#5e9b4f',violeta:'#7c58a8',celeste:'#6fb4d6'},
 };
-/** The appearance asked in the address (?pelo=rubio&piel=4&ropa=granate&bufanda=roja); later, the player's register. */
-export function chosenAppearance(){const q=new URLSearchParams(globalThis.location?.search||'');return Object.fromEntries(Object.keys(APPEARANCE).map(k=>[k,APPEARANCE[k][q.get(k)]??null]).filter(([,v])=>v));}
+/** What the traveller looks like at first: the colours of the model as it was painted. */
+export const APPEARANCE_DEFAULT={pelo:'castaño',piel:'2',ropa:'verde azulado',bufanda:'mostaza'};
+/** The traveller's look, by name, kept in the Instituto Roxana's register beside the name. */
+export function savedAppearance(){try{const a=JSON.parse(globalThis.localStorage?.getItem('roxana.escuela.v1')||'null')?.apariencia;return a&&typeof a==='object'?Object.fromEntries(Object.keys(APPEARANCE).filter(k=>APPEARANCE[k][a[k]]).map(k=>[k,a[k]])):{};}catch{return {};}}
+/** Names to colours. The address can still ask for one (?pelo=rubio&piel=4&ropa=granate&bufanda=roja). */
+export function appearanceColours(names){return Object.fromEntries(Object.keys(APPEARANCE).map(k=>[k,APPEARANCE[k][names?.[k]]??null]).filter(([,v])=>v));}
+export function chosenAppearance(){const q=new URLSearchParams(globalThis.location?.search||'');return appearanceColours({...savedAppearance(),...Object.fromEntries(Object.keys(APPEARANCE).filter(k=>q.get(k)).map(k=>[k,q.get(k)]))});}
 const linear=hex=>{const c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);return c.map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);};
 const tintPS=`
 uniform vec3 material_diffuse;
@@ -213,13 +218,17 @@ export async function applyAppearance(app,figureModel,regionsUrl,mapUrl,chosen=c
   const info=await fetch(regionsUrl).then(r=>r.json()).catch(()=>null);if(!info)return;
   const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=mapUrl;});
   const map=new Texture(app.graphicsDevice,{name:'regiones',width:img.width,height:img.height,format:PIXELFORMAT_RGBA8,mipmaps:false,minFilter:FILTER_NEAREST,magFilter:FILTER_NEAREST,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE,flipY:false});map.setSource(img);
-  const base=new Float32Array(48),tint=new Float32Array(48).fill(-1);
-  info.regiones.forEach((r,i)=>{base.set(linear(r.muestra),i*3);
-    // Skin is always drawn from its sample: the pictures painted coat colour on some fingertips.
-    const want=r.tenible&&chosen[r.tenible]?chosen[r.tenible]:r.tenible==='piel'?r.muestra:null;if(want)tint.set(linear(want),i*3);});
+  const base=new Float32Array(48),tint=new Float32Array(48),materials=[];
+  info.regiones.forEach((r,i)=>base.set(linear(r.muestra),i*3));
   for(const r of figureModel.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial)||!m.diffuseMap)continue;
     m.shaderChunksVersion='2.22';m.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',tintPS);
-    m.setParameter('uRegionMap',map);m.setParameter('uRegionBase[0]',base);m.setParameter('uRegionTint[0]',tint);m.update();}
+    m.setParameter('uRegionMap',map);m.setParameter('uRegionBase[0]',base);m.update();materials.push(m);}
+  // Returned so the look can change while playing (the register's chooser): only the tints move.
+  const set=look=>{tint.fill(-1);info.regiones.forEach((r,i)=>{
+    // Skin is always drawn from its sample: the pictures painted coat colour on some fingertips.
+    const want=r.tenible&&look[r.tenible]?look[r.tenible]:r.tenible==='piel'?r.muestra:null;if(want)tint.set(linear(want),i*3);});
+    for(const m of materials)m.setParameter('uRegionTint[0]',tint);};
+  set(chosen);return set;
 }
 
 // Ohm: a round body on two feet. It waddles (the body rocks side to side over the stepping foot),

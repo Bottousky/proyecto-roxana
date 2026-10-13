@@ -284,6 +284,8 @@ export class PlayCanvasWorld {
     return pointOnPaving(AREA_LAYOUTS[this.area.id],x,z)?'stone':'grass';
   }
   getPlayerPosition(){return this.player?[this.player.position.x,this.player.position.z]:[0,0];}
+  /** The traveller's look changed in the register: tint the 3D figure again (colours from style.js). */
+  setPlayerAppearance(look){this.playerActor?.figure?.setAppearance?.(look);}
   setPlayerPosition(p){const q=this.nearestWalkable(p);this.player.position.set(q[0],this.groundHeight(...q),q[1]);const o=this.nearestWalkable([q[0]-1,q[1]+.7]);this.ohm.position.set(o[0],this.groundHeight(...o),o[1]);this.route=[];this.target=null;this.companionRoute=[];}
   setTarget(p){this.route=findPath(this.getPlayerPosition(),p,this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});this.target=this.route.shift()||null;}
   getInteractions(){if(!this.area)return [];return [...this.area.objects.filter(o=>!o.character&&o.kind!=='npc'),...this.area.exits,...this.doorInteractions(),...(this.home?[]:getInhabitantInteractions(this))].filter(o=>!o.hidden&&(!o.requiresFlag||this.state.flags[o.requiresFlag]));}
@@ -442,8 +444,16 @@ export class PlayCanvasWorld {
     this.syncActors();this.updateAwakening(dt,reduced);this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=this.restPose(p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
+      // Choosing a look: the camera comes close to the traveller, who stands clear of the panel
+      // (to its left on a wide screen, below it on a tall one).
+      // portraitAim (main.js) says where on screen the traveller should stand; the camera slides
+      // until the figure is there, whatever the screen and panel sizes.
+      if(this.portrait){const tall=this.canvas.clientWidth<this.canvas.clientHeight,aim=this.portraitAim||{x:.5,y:.6},at=this.getScreenPosition({x:p.x,z:p.z,ground:true}),shift=this.portraitShift??={x:0,z:0};
+        if(at&&Number.isFinite(at.x)){shift.x=Math.max(-7,Math.min(7,shift.x+(at.x/this.canvas.clientWidth-aim.x)*dt*30));shift.z=Math.max(-7,Math.min(7,shift.z+(at.y/this.canvas.clientHeight-aim.y)*dt*30));}
+        wanted.set(p.x+ox+shift.x,p.y+.9,p.z+oz+shift.z);rest.zoom=tall?1.7:2.3;}
+      else this.portraitShift=null;
       // Conversations keep the camera where the interaction began: the portrait says who speaks.
-      this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
+      this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect&&!this.portrait?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
     this.positionCamera();this.focusFrame();this.updateSeeThrough();
   }
   // The current speaker gives a small hop as each of their lines begins.
