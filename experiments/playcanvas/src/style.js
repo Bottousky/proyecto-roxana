@@ -73,11 +73,14 @@ export function xyFrame(frame,app,cameraComponent){
   frame.update();
   // The compose pass does not bind the scene depth by itself: the ink reads it every frame.
   const params=new Float32Array(4),depth=device.scope.resolve('uInkDepth'),camera=device.scope.resolve('uInkCamera'),linear=device.scope.resolve('uInkLinear');
-  app.on('prerender',()=>{const internal=cameraComponent.camera;if(!internal.sceneDepthMap)return;depth.setValue(internal.sceneDepthMap);camera.setValue(internal.fillShaderParams(params));linear.setValue(internal.shaderParams.sceneDepthMapLinear?1:0);});
+  // Before the first depth pass (and while a place is swapped) the ink reads a flat stand-in: no edges.
+  const flat=new Texture(device,{name:'tinta-vacia',width:1,height:1,format:PIXELFORMAT_RGBA8,mipmaps:false});flat.lock().set([0,0,0,255]);flat.unlock();
+  depth.setValue(flat);linear.setValue(1);
+  app.on('prerender',()=>{const internal=cameraComponent.camera;if(!internal.sceneDepthMap){depth.setValue(flat);linear.setValue(1);return;}depth.setValue(internal.sceneDepthMap);camera.setValue(internal.fillShaderParams(params));linear.setValue(internal.shaderParams.sceneDepthMapLinear?1:0);});
 }
 
 /** The X and Y camera: nearer and steeper than the HD-2D long lens. */
-export const XY_LENS={fov:true,distance:.52,pitch:40};
+export const XY_LENS={fov:true,distance:.6,pitch:43};
 
 // The X and Y light through the day: clean and saturated by day, a warm but still colourful sunset,
 // a blue dusk and night that keep their hues. [saturation, tint r, g, b, brightness]

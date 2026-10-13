@@ -152,3 +152,38 @@ Lo nuevo con Edda:
 - **La capa.** Es lo más difícil: debajo, la camisa y las mangas quedan mezcladas en las regiones
   del kit. En el juego no se nota, porque se ve la textura pintada. Para imprimir, la capa va a
   necesitar retoque a mano o una pieza aparte.
+
+## El elenco completo, la interfaz y el Arco I jugado en X e Y (ciclo 28, 12–13 oct 2026)
+
+- **Diez personajes en 3D:** el viajero, Edda, Lumen, Marín, Vega, Nereo, Tala, Yesca, Ivara y Ohm,
+  cada uno con su esqueleto, sus regiones de color (`personajes/`) y su kit (`kits/`). Ohm es un
+  robot, con cuerpo y dos pies, y camina balanceándose. La cola de formas (`scripts/ia3d/cola.sh`)
+  trabaja de a uno, porque hay una sola GPU. Las texturas van en JPEG: los diez modelos pesan 22 MB.
+- **Animaciones compartidas:** caminar; hablar (gesto de mano y asentir); festejar (brazos arriba y
+  saltito); en reposo, respirar y mirar alrededor.
+- **Bancos en X e Y** (`src/puzzles.css`, bloque final): paneles blancos redondeados, encabezado
+  celeste, mesa de roble claro, botones con forma de píldora, cartel de éxito con sello verde,
+  pista amarilla. Lo que está sobre la mesa conserva su tinta clara.
+- **Interfaz del juego en X e Y** (`src/xy-ui.css`): diálogo con caja blanca y borde azul,
+  instrumento de viaje y objetivo en tarjeta blanca, avisos E y Q como botones de píldora,
+  botones redondos blancos, cartel de llegada.
+- **Cielo y portada:** cielo azul de verdad. La portada es el reino real, sacado del juego
+  (`scripts/portada.mjs`), con el viajero y Ohm en primer plano.
+- **Saturación:** con la cámara cercana, las llegadas mostraban sobre todo los arbustos del camino.
+  En X e Y la vegetación de relleno baja a cerca del 40 % y la cámara se abrió un poco (distancia
+  0,6, inclinación 43°).
+- **Interiores:** sin restaurar se ven, en penumbra pero legibles.
+- **Errores encontrados y corregidos al jugar:**
+  - Quien quedaba apoyado en una baranda (en el muelle del Lago, después de hablar con Nereo) no se
+    podía mover. Ahora sale hacia el punto libre más cercano (`src/collision.js`, con su prueba).
+  - El contorno pedía la profundidad antes de que existiera. Ahora usa una textura de reserva.
+- **Verificado:** el recorrido completo en `?estilo=xy&gente=3d` pasa de punta a punta, sin errores
+  (`output/pt-xy3`): 9 lugares, 9 bancos, 9 recuerdos, final y recarga. Flujo de bancos correcto.
+  Pruebas: raíz 340/340, PlayCanvas 111/111.
+
+**Pendiente:**
+- los bancos en el teléfono (3 o 4 de 9 necesitan desplazarse);
+- la pantalla para elegir pelo, piel y ropa del viajero;
+- las caras de cerca, que dependen de la textura proyectada;
+- simplificar la geometría de los personajes;
+- decidir si el estilo X e Y pasa a ser el estilo por defecto.

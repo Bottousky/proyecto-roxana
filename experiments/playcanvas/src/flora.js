@@ -106,8 +106,8 @@ export async function sowFlora(world){
       if(shoreline)pool=REEDS;
       else if(clear==='low'){if(r>.18)continue;pool=SHORT;}
       else if(garden){if(r>.35)continue;pool=GARDEN;}
-      else if(edge){if(r>.3)continue;pool=EDGE;}
-      else if(!inside){if(r>.1+patch*.55)continue;pool=WILD;}
+      else if(edge){if(r>(XY?.18:.3))continue;pool=EDGE;}
+      else if(!inside){if(r>(.1+patch*.55)*(XY?.4:1))continue;pool=WILD;}
       else{if(r>patch*.3-.06)continue;pool=LOW;}
       let [sheet,row,height]=pick(pool,hash(gx,gz,4));
       if(clear==='bloom'&&FLOWERS.has(sheet+row))[sheet,row,height]=['a',0,.4];
@@ -135,7 +135,8 @@ export async function sowFlora(world){
   for(let j=0;j<grid.rows;j+=2)for(let i=0;i<grid.cols;i+=2){
     const X=grid.x0+(i+hash(i,j,70)*2)*grid.cell,Z=grid.z0+(j+hash(i,j,71)*2)*grid.cell,y=reliefHeight(X,Z);
     if(y<.4||reliefSlope(X,Z)>.8||claimed.has(Math.floor(X/SPACING)+','+Math.floor(Z/SPACING))||quietMountKeepsClear(X,Z,y))continue;
-    if(hash(i,j,72)>.25+noise(X*.05,Z*.05)*.55)continue;
+    // X and Y: painted plants are bigger and brighter; far fewer read as a clean, open countryside.
+    if(hash(i,j,72)>(.25+noise(X*.05,Z*.05)*.55)*(XY?.38:1))continue;
     const [sheet,row,height]=pick(WILD,hash(i,j,73)),cell=plants[sheet][row*4+Math.floor(hash(i,j,74)*4)];if(!cell)continue;
     const h=height*(.9+hash(i,j,75)*.5),w=h*cell.aspect,b=batches[sheet],base=b.positions.length/3,tint=.8+hash(i,j,76)*.2,[u0,v0,u1,v1]=cell.uv;
     b.positions.push(X-w/2,y,Z, X+w/2,y,Z, X+w/2,y+h,Z, X-w/2,y+h,Z);b.uvs.push(u0,v1,u1,v1,u1,v0,u0,v0);

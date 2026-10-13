@@ -38,5 +38,14 @@ html[data-estilo="xy"] :is(#ohm-button,#journal-button,#map-button,#guide-button
 html[data-estilo="xy"] :is(#ohm-button,#journal-button,#map-button,#guide-button,#pause-button) *{color:var(--xy-blue-deep)!important;stroke:currentColor}
 html[data-estilo="xy"] #travel-instrument{border-radius:24px!important}
 /* The title: the kingdom itself (scripts/portada.mjs), a soft shade on the left so the name reads. */
-html[data-estilo="xy"] .title-art{background-image:linear-gradient(90deg,#0d2a44cc 0%,#0d2a4488 30%,#0d2a4400 55%),url('/assets/xy/portada.webp')!important;background-size:cover!important;background-position:center!important}
+html[data-estilo="xy"] .title-art{background-image:linear-gradient(90deg,#0d2a44dd 0%,#0d2a4499 28%,#0d2a4400 48%),url('/assets/xy/portada.webp')!important;background-size:cover!important;background-position:center!important}
 html[data-estilo="xy"] .title-screen :is(h1,.title-logo){text-shadow:0 3px 0 #0d2a4480,0 0 30px #0d2a4466}
+/* The arrival banner: a white rounded plate with the place's name, as when entering a town. */
+html[data-estilo="xy"] .arrival{background:none!important}
+html[data-estilo="xy"] .arrival::before,html[data-estilo="xy"] .arrival::after{display:none!important}
+html[data-estilo="xy"] .arrival h2{display:inline-block;background:#fff;color:var(--xy-blue-deep)!important;font-family:var(--xy-font)!important;font-weight:800;padding:8px 28px 10px;border-radius:999px;border:4px solid var(--xy-blue);box-shadow:0 6px 0 var(--xy-blue-deep),0 14px 30px #0b2a4440;text-shadow:none!important}
+html[data-estilo="xy"] .arrival p{color:#fff!important;font-family:var(--xy-font)!important;font-weight:700;text-shadow:0 2px 0 #0b2a44aa,0 0 14px #0b2a4488!important}
+html[data-estilo="xy"] .arrival .eyebrow{color:#fff!important;text-shadow:0 2px 0 #0b2a44aa!important}
+html[data-estilo="xy"] .arrival-line{display:none}
+html[data-estilo="xy"] .title-shade{background:linear-gradient(0deg,#0d2a4455,transparent 30%)!important}
+html[data-estilo="xy"] .title-art{background-position:60% center!important}
