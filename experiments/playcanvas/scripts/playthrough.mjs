@@ -347,6 +347,11 @@ async function talkToEveryone(label) {
     const heard = report.dialogue.length;
     await interact(id);
     assert.ok(report.dialogue.length > heard, `${id} answers (${label})`);
+    // A neighbour with a minijuego (ciclo 29) opens its table after the request: leave it unsolved.
+    if ((await inspect()).mode === 'puzzle') {
+      await page.keyboard.press('Escape'); await settle();
+      assert.equal(Boolean((await inspect()).flags[id === 'tala_spring' ? 'tala_lantern' : id === 'marin_spring' ? 'marin_cart' : id]), false, `${id}: leaving the table does not solve it`);
+    }
     assert.equal((await inspect()).mode, 'world', `${id}: the conversation gives control back`);
     spoken.set(id, (spoken.get(id) || 0) + 1);
   }
