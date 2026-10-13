@@ -5,7 +5,7 @@ fs.mkdirSync(out,{recursive:true});
 const modules=['main','state','content','electrical','puzzle-model','puzzles','bench-evidence','bench-diagnosis','understanding','schematic','journal','journal-pdf','field-notes','audio','world-circuits','world-feedback','world-inhabitants','world-interaction','world-audio','world-map','world-layout','kingdom-geography','story-time','travel-instrument','journey-guide','cinematics','cinematic-progress','interaction-prompt','navigation','collision','actor-animation','kingdom-map','quiet-mount'];
 for(const name of modules){
  let text=fs.readFileSync(new URL(name+'.js',root),'utf8');
- if(name==='main')text=text.replace("import {ContinuousWorld as World} from './continuous-world.js';","import {PlayCanvasWorld as World} from '../world.js';\nimport '../fonts.css';").replace(/^import '@fontsource\/.*\r?\n/gm,'').replaceAll('Jugar Ohmdal.cmd','Jugar PlayCanvas.cmd');
+ if(name==='main')text=text.replace("import {ContinuousWorld as World} from './continuous-world.js';","import {PlayCanvasWorld as World} from '../world.js';\nimport '../fonts.css';").replace(/^import '@fontsource\/.*\r?\n/gm,'').replaceAll('Jugar Ohmdal.cmd','Jugar PlayCanvas.cmd').replace("import './journal.css';","import './journal.css';\nimport '../xy-ui.css';");
  if(name==='state')text=text.replace("'ohmdal.la-luz.v1'","'ohmdal.playcanvas.arc1.v1'").replace("'ohmdal.settings.v1'","'ohmdal.playcanvas.settings.v1'");
  if(name==='content')text=text.replace("secret('lake_secret', 11, 7.5,", "secret('lake_secret', 3, 9.5,");
  if(name==='world-inhabitants')text=text.replace('if (actor.g === world.player || !object?.character) continue;', 'if (actor.g === world.player || !object?.character || actor.inhabitant) continue;');

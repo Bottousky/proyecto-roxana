@@ -1,0 +1,37 @@
+{
+ "personaje": "Tala",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "pantalon",
+   "caras": 49542,
+   "archivo": "pieza-pantalon.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 48279,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "tunica",
+   "caras": 60221,
+   "archivo": "pieza-tunica.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 94061,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "chaleco",
+   "caras": 12302,
+   "archivo": "pieza-chaleco.stl"
+  },
+  {
+   "pieza": "pelo",
+   "caras": 90881,
+   "archivo": "pieza-pelo.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

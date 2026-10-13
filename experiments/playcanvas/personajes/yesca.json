@@ -1,0 +1,16 @@
+{
+  "nombre": "Yesca",
+  "nota": "Herrera: pelo y camisa comparten el naranja; se separan por altura. Pechera de cuero, delantal-falda caqui.",
+  "esqueleto": { "axila": 1.16, "entrepierna": 0.66, "rodilla": 0.43 },
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#f5bd8a", "colores": ["#f8c18c", "#e58e5a"], "z": [0.72, 1.74] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#c4511f", "colores": ["#b2451c", "#cf5b26", "#903115", "#69200c"], "z": [1.42, 2.0] },
+    { "nombre": "anteojos", "muestra": "#4f8f92", "colores": ["#548b8e"], "z": [1.76, 1.96] },
+    { "nombre": "camisa", "tenible": "ropa", "muestra": "#d0602a", "colores": ["#cf5b26", "#b2451c", "#903115"], "z": [0.92, 1.44] },
+    { "nombre": "pechera", "muestra": "#5e3d27", "colores": ["#634129", "#402515"], "z": [1.0, 1.46] },
+    { "nombre": "delantal", "tenible": "ropa2", "muestra": "#b08449", "colores": ["#b4874c", "#9b703d"], "z": [0.6, 1.12] },
+    { "nombre": "pantalon", "muestra": "#4c4a41", "colores": ["#4c4a41", "#151411"], "z": [0.28, 0.76] },
+    { "nombre": "botas", "muestra": "#7a4b28", "colores": ["#80502b", "#634129", "#402515", "#151411"], "z": [0.0, 0.5] }
+  ]
+}

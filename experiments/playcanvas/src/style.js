@@ -229,3 +229,6 @@ function robotPose(f,a){
   const hips=f.bones.cadera;if(hips){const p=hips.restPos;hips.entity.setLocalPosition(p.x,p.y+(walking?Math.abs(Math.cos(a.phase*Math.PI))*.05:Math.sin(t*2.4)*.01*calm)+talk*.05+cheer*.35,p.z);}
 }
 function b2(b,f,roll,pitch){b.delta.setFromAxisAngle(b.z,roll*57.2958);b.delta2.setFromAxisAngle(b.x,pitch*57.2958);b.rotation.mul2(b.rest,b.delta).mul(b.delta2);b.entity.setLocalRotation(b.rotation);}
+
+/** X and Y skies: clear blue by day, a coral sunset, a blue dusk and a deep blue night. */
+export const XY_SKIES={morning:'#3d9ae2',afternoon:'#4a9edc','next-morning':'#3f9de4',sunset:'#de7a58',dusk:'#3b55a6',night:'#13284f'}; // deep: tone mapping lightens them

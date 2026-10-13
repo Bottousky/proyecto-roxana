@@ -1,0 +1,15 @@
+{
+  "nombre": "Tala",
+  "nota": "Chaleco y pantalón comparten el verde azulado; se separan por altura. Las manos debajo de las mangas son piel.",
+  "esqueleto": { "axila": 1.2, "entrepierna": 0.74, "rodilla": 0.45 },
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#f2bd8c", "colores": ["#f7c793", "#eaac77", "#cb804e"], "z": [0.8, 1.76],
+      "forzar": [{ "absx": [0.33, 0.7], "z": [0.6, 0.98] }] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#4a3a2c", "colores": ["#45382c", "#211912", "#695543"], "z": [1.25, 2.0] },
+    { "nombre": "tunica", "tenible": "ropa", "muestra": "#f2bc55", "colores": ["#f4be56", "#d79f42", "#ae7d31"], "z": [0.78, 1.42] },
+    { "nombre": "chaleco", "tenible": "ropa2", "muestra": "#3a5d58", "colores": ["#3a5955", "#213533"], "z": [1.0, 1.44] },
+    { "nombre": "pantalon", "muestra": "#3a5955", "colores": ["#3a5955", "#213533"], "z": [0.28, 0.86] },
+    { "nombre": "cuero", "muestra": "#7a5028", "colores": ["#4e331b", "#966735", "#734c26", "#211912"], "z": [0.0, 1.5] }
+  ]
+}

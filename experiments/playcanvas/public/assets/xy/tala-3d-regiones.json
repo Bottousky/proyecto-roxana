@@ -1,0 +1,34 @@
+{
+ "regiones": [
+  {
+   "nombre": "piel",
+   "muestra": "#f2bd8c",
+   "tenible": "piel"
+  },
+  {
+   "nombre": "pelo",
+   "muestra": "#4a3a2c",
+   "tenible": "pelo"
+  },
+  {
+   "nombre": "tunica",
+   "muestra": "#f2bc55",
+   "tenible": "ropa"
+  },
+  {
+   "nombre": "chaleco",
+   "muestra": "#3a5d58",
+   "tenible": "ropa2"
+  },
+  {
+   "nombre": "pantalon",
+   "muestra": "#3a5955",
+   "tenible": null
+  },
+  {
+   "nombre": "cuero",
+   "muestra": "#7a5028",
+   "tenible": null
+  }
+ ]
+}

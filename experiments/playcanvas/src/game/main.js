@@ -11,6 +11,7 @@ import './art-polish.css';
 import './journey-ui.css';
 import './hud.css';
 import './journal.css';
+import '../xy-ui.css';
 import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';

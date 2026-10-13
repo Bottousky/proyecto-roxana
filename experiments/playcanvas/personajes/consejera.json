@@ -1,0 +1,15 @@
+{
+  "nombre": "Ivara",
+  "nota": "Consejera del Castillo: capa violeta con bordados dorados, vestido azul noche, blusa crema, libro de cuero. El vestido largo tapa las piernas: el esqueleto sube la entrepierna.",
+  "esqueleto": { "axila": 1.18, "entrepierna": 0.8, "rodilla": 0.44 },
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#c98d55", "colores": ["#cc8f51"], "z": [0.8, 1.76] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#2a1f1c", "colores": ["#191415", "#3e2d23"], "z": [1.45, 2.0] },
+    { "nombre": "capa", "tenible": "ropa", "muestra": "#7e4b72", "colores": ["#835270", "#51334b", "#a2716f"], "z": [0.62, 1.55] },
+    { "nombre": "vestido", "tenible": "ropa2", "muestra": "#3f4352", "colores": ["#44464f", "#2d2d35"], "z": [0.33, 1.38] },
+    { "nombre": "blusa", "muestra": "#efd9b0", "colores": ["#edd2a5"], "z": [0.92, 1.35] },
+    { "nombre": "oro", "muestra": "#e6ad5c", "colores": ["#eeb461", "#ae875d"], "z": [0.33, 1.7] },
+    { "nombre": "cuero", "muestra": "#7a4a26", "colores": ["#5e361c", "#8d582e", "#6e5b4b"], "z": [0.0, 1.3] }
+  ]
+}
