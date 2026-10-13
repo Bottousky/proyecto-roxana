@@ -39,7 +39,7 @@ export const WORDS = {
     text: 'Cuánto le cuesta a la corriente atravesar algo. Con el mismo empuje, más resistencia deja pasar menos. La unidad lleva el nombre de Georg Ohm, que midió esto en 1827.' },
   anillos: { world: 'Los anillos de las piedras', term: 'Código de colores · tolerancia', unit: '±5 %', symbol: 'rings', from: 'gate',
     text: 'Los anillos escriben un número: dos cifras y cuántos ceros les siguen. El último, dorado, dice cuánto puede correrse la piedra de lo escrito: un 5 %, para arriba o para abajo.' },
-  tension: { world: 'La fuerza, el empuje', term: 'Tensión', unit: 'voltio (V)', symbol: 'battery', from: 'pump',
+  tension: { world: 'La fuerza, el empuje', term: 'Tensión', unit: 'voltio (V)', symbol: 'battery', from: 'tala_lantern',
     text: 'La diferencia de empuje entre dos puntos. Por eso siempre se mide entre dos lugares, nunca en uno solo.' },
   caida: { world: 'Lo que se pierde en el camino', term: 'Caída de tensión', unit: 'voltio (V)', symbol: 'drop', from: 'pump',
     text: 'La parte del empuje que se queda en un tramo. Sumadas las de una vuelta, dan la tensión de la fuente.' },
@@ -172,6 +172,40 @@ const REVEALS = {
         text: `La fuente entrega la suma: ${amps(now.current)}. Todo lo que entra a un punto donde se juntan los cables, sale de él. Y si una voz se apaga, las otras siguen con su empuje.` },
     ],
     question: 'Si sumaras una cuarta voz de 18 Ω, ¿cuánta corriente le pedirías a la fuente?',
+  }),
+  // Minijuegos del Manantial (ciclo 29).
+  tala_lantern: ({ now }) => ({
+    cards: [
+      { spot: ['lantern'], title: 'Entre dos puntos', words: ['tension'], tags: { lantern: volts(V(now, 'lantern')) },
+        text: `La fuerza no está en un lugar: es una diferencia de empuje entre dos. Entre los dos extremos del farol hay ${volts(V(now, 'lantern'))}, casi los ${volts(PUZZLES.tala_lantern.voltage)} de la pila. Se llama tensión y se mide en voltios.` },
+      { spot: ['cord'], title: 'El cordón casi no se queda con nada', tags: { cord: volts(V(now, 'cord')) },
+        text: `Entre los extremos del cordón, ${volts(V(now, 'cord'))}. Las cargas lo atraviesan sin que les cueste: un buen conductor deja pasar sin quedarse con empuje.` },
+      { spot: ['cord', 'lantern'], title: 'La misma corriente', words: ['corriente'], tags: { lantern: amps(I(now, 'lantern')) },
+        text: `Por el cordón y por el farol pasan los mismos ${amps(I(now, 'lantern'))}: están en la misma vuelta. Lo que cambia no es cuántas cargas pasan, sino cuánto empuje deja cada una al atravesarlos.` },
+    ],
+    question: 'Si un empalme viejo se quedara con mucho empuje, ¿qué le pasaría a la bomba de Vega?',
+  }),
+  marin_cart: ({ now }) => ({
+    cards: [
+      { spot: ['front', 'rear'], title: 'En fila', words: ['serie'], tags: { front: volts(V(now, 'front')), rear: volts(V(now, 'rear')) },
+        text: `Los dos faroles están en la misma vuelta: las mismas cargas atraviesan uno y después el otro. El delantero se queda con ${volts(V(now, 'front'))} y el trasero con ${volts(V(now, 'rear'))}.` },
+      { spot: ['rear'], title: 'El que más frena, más se queda', words: ['resistencia'],
+        text: 'El trasero frena el doble que el delantero, y se queda con el doble del empuje. Por eso brilla más: con la misma corriente, recibe más fuerza.' },
+      { spot: ['front', 'rear'], title: 'La cuenta cierra', words: ['cuenta_vuelta'],
+        text: `${volts(V(now, 'front'))} más ${volts(V(now, 'rear'))} dan ${volts(V(now, 'front') + V(now, 'rear'))}, casi los ${volts(PUZZLES.marin_cart.voltage)} de la batería; el resto se queda en los cables. En una vuelta, ningún voltio se pierde.` },
+    ],
+    question: 'Si Marín agregara un tercer farol en la misma fila, ¿los otros dos brillarían más o menos?',
+  }),
+  edda_contact: ({ now, before }) => ({
+    cards: [
+      { spot: ['contact'], title: 'Dejaba pasar', words: ['conductor'], tags: { contact: `antes ${volts(V(before, 'contact'))}` },
+        text: `El contacto dejaba pasar la corriente: la baliza prendía. Pero se quedaba con ${volts(V(before, 'contact'))} de los ${volts(PUZZLES.edda_contact.voltage)}. Lo que se queda un contacto se vuelve calor: por eso estaba tibio.` },
+      { spot: ['beacon'], title: 'A la baliza le llegaba la mitad', words: ['caida'], tags: { beacon: `antes ${volts(V(before, 'beacon'))}` },
+        text: `A la baliza le llegaban ${volts(V(before, 'beacon'))}. El empuje se reparte en la vuelta: lo que se queda el contacto no llega a la baliza.` },
+      { spot: ['contact', 'beacon'], title: 'El puente', tags: { beacon: volts(V(now, 'beacon')) },
+        text: `Tu cable le ofrece a la corriente un camino que casi no frena, al lado del contacto. Ahora la baliza recibe ${volts(V(now, 'beacon'))}.` },
+    ],
+    question: 'Si en la bomba hubiera tres empalmes y uno solo robara, ¿cómo lo encontrarías sin desarmar nada?',
   }),
   drawer: ({ id, state }) => {
     const k = PUZZLES[id].knobs[0], weighed = weighedStones(state).filter(v => v !== RIDDLE_STONE), off = v => (stoneIn(k, v).actual - v) / v * 100;

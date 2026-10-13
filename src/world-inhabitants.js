@@ -30,11 +30,19 @@ export function inhabitantPlan(area, object, state = {}) {
     case 'edda_tower':
       set(final ? 'teaching' : f.beacon_network ? 'observing-the-lens' : f.beacon_supply ? 'comparing-services' : 'sketching-the-base',
         final ? [[-4, -10], [-4.2, -9.3]] : f.beacon_network ? [[-3.8, -7], [-4.4, -6.4]] : f.beacon_supply ? [[-3.8, 1], [-4.3, 1.8]] : [[-4, 12], [-3.8, 10.7]], final ? [-4, -12.5] : [0, f.beacon_network ? -12 : f.beacon_supply ? -4 : 4], 7); break;
+    // While the Plaza has no water (gate open, pump not yet), Marín and Tala are at the Manantial.
     case 'marin':
+      plan.present = !(f.gate && !f.pump);
       set(final ? 'bread-for-the-festival' : 'bakery-round', [[object.x, object.z], [-4.8, -5.8]], [-5.15, -10.3], 4.5); break;
     case 'tala_plaza':
-      plan.present = !final || Boolean(f.epilogue_shared);
+      plan.present = (!final || Boolean(f.epilogue_shared)) && !(f.gate && !f.pump);
       set(f.epilogue_shared ? 'trying-her-own-question' : 'collecting-questions', [[11.2, 6], [12, 7]], final ? [0, -2] : [11, -7], 4.5); break;
+    case 'tala_spring':
+      plan.present = Boolean(f.gate) && !f.pump;
+      set(f.tala_lantern ? 'watching-the-pump' : 'waiting-with-her-lantern', f.tala_lantern ? [[1.2, -2.4], [.4, -3.2]] : [[object.x, object.z], [object.x + .7, object.z - .7]], f.tala_lantern ? [2.5, -5.5] : [0, 10], 5); break;
+    case 'marin_spring':
+      plan.present = Boolean(f.gate) && !f.pump;
+      set('filling-the-cart', [[object.x, object.z], [object.x - .7, object.z - .7]], [-6.5, 2], 5); break;
     case 'lumen':
       set(f.workshop ? 'comparing-old-and-new' : 'sorting-parts', f.workshop ? [[-2.7, -2.2], [-3.7, -3.2]] : [[-3.5, 1.5], [-4, -.4]], [3, -3], 7); break;
     case 'vega_spring':

@@ -75,7 +75,8 @@ test('a source short trips protection and removes supply current before operatin
 
 // Each bench's canonical repair lives with the puzzle itself.
 // Installations to repair; an optional tray of stones is weighed, not repaired (its own test below).
-const solutions = Object.fromEntries(Object.keys(PUZZLES).filter(id => !PUZZLES[id].optional).map(id => [id, s => PUZZLES[id].solve(s)]));
+// Minijuegos that ask to look (Tala's readings) are done by what was seen, not by a repair: tested below.
+const solutions = Object.fromEntries(Object.keys(PUZZLES).filter(id => !PUZZLES[id].optional && !PUZZLES[id].readings).map(id => [id, s => PUZZLES[id].solve(s)]));
 
 test("Lumen's drawer is done by weighing three stones and the riddle one, with the bench off", () => {
   const s = initialPuzzleSnapshot('drawer');

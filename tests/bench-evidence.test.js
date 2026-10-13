@@ -150,11 +150,16 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   } };
   // Vega sums with the old joint in place, before the repair: that is where the volts went.
   if (tally?.before) { takeSum(); assert.equal(bench.state.tally.closed, true, `${id}: the sum closes on the faulty loop`); }
+  // A minijuego done by its sum (Marín's cart): the sum is the whole task.
+  const sumIsTheTask = tally && !tally.before && PUZZLES[id].done;
+  if (sumIsTheTask) takeSum();
+  // A minijuego done by what the neighbour sees (Tala's lantern): each reading, once.
+  for (const r of PUZZLES[id].readings ?? []) probe('voltage', ...r.across);
   const movable = () => bench.state.wires.findIndex(w => !isSealed(id, w));
   while (movable() >= 0) click({ wire: String(movable()) });
   for (const [a, b] of target.wires.filter(w => !isSealed(id, w))) { bench.touchPort(a); bench.touchPort(b); }
   // Lumen's drawer: three stones weighed, then the riddle stone, answered before it can be weighed.
-  if (PUZZLES[id].done) {
+  if (PUZZLES[id].weighs) {
     for (const v of [10, 12, 100]) { click({ action: 'stone', key: 'tray', value: String(v) }); probe('weigh', 'trayA', 'trayB'); }
     click({ action: 'stone', key: 'tray', value: '220' }); probe('weigh', 'trayA', 'trayB');
     assert.equal(bench.state.weighed.includes(220), false, 'Lumen covers the riddle stone until it is answered');
@@ -184,7 +189,7 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
     if (!PUZZLES[id].tally) assert.equal(bench.result.commissionable, true, id);
   }
   // Nereo's knots: every part measured on this montage, then the brief is complete.
-  if (tally && !tally.before) {
+  if (tally && !tally.before && !sumIsTheTask) {
     assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the keeper's sum`);
     takeSum();
     assert.equal(bench.state.tally.closed, true, `${id}: the sum closes`);
@@ -193,7 +198,7 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   assert.ok(bench.result.checks.every(c => c.met), `${id}: every item of the brief is ticked`);
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
   // Measurements are only the ones the player took for a requested proof, never invented.
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, (proof?.measure ? 2 : proof?.continuityOpen || proof?.voltageAcross ? 1 : 0) + (tally?.parts.length ?? 0) + (PUZZLES[id].done ? 5 : 0), 'only the measurements the player took: the requested proof and the keeper\'s sum');
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, (proof?.measure ? 2 : proof?.continuityOpen || proof?.voltageAcross ? 1 : 0) + (tally?.parts.length ?? 0) + (PUZZLES[id].weighs ? 5 : 0) + (PUZZLES[id].readings?.length ?? 0), 'only the measurements the player took: the requested proof and the keeper\'s sum');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }

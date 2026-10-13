@@ -15,7 +15,7 @@ await page.goto(url, { waitUntil: 'networkidle' });
 await page.locator('#new-game').click();
 await nameTraveller(page);
 await page.waitForFunction(() => window.__ohmdal?.mode === 'dialogue', {}, { timeout: 60000 });
-const ids = ['awaken', 'workshop', 'gate', 'pump', 'distribution', 'irrigation', 'beacon_supply', 'beacon_network', 'beacon_lens'];
+const ids = ['awaken', 'workshop', 'gate', 'pump', 'distribution', 'irrigation', 'beacon_supply', 'beacon_network', 'beacon_lens', ...(process.env.MINIS ? ['tala_lantern', 'marin_cart', 'edda_contact'] : [])];
 const rows = [];
 for (const id of ids) {
   await page.evaluate(id => { document.querySelector('#dialogue')?.classList.add('hidden'); const w = window.__ohmdal.workbench; document.querySelector('#workbench').classList.remove('hidden'); w.open(id, undefined); }, id);
@@ -49,5 +49,5 @@ for (const id of ids) {
 console.log(`${width}×${height}`);
 for (const r of rows) console.log(`${r.id.padEnd(15)} principal${r.asking ? ' (pregunta)' : ''} ${r.hidden.length ? 'CORTADO: ' + r.hidden.join(', ') : 'a la vista'} · desplaza ${String(r.scroll).padStart(4)} px · tablero ${r.boardFits ? 'entero' : 'cortado'} · textos ${String(r.texts).padStart(2)} · controles ${String(r.controls).padStart(2)} · placas encimadas ${r.overlaps} · nombres pisados ${r.crossed.length}${r.crossed.length ? ' (' + r.crossed.join(', ') + ')' : ''}`);
 const sum = k => rows.reduce((a, r) => a + (typeof r[k] === 'number' ? r[k] : r[k].length), 0);
-console.log(`bancos con lo principal a la vista ${rows.filter(r => !r.hidden.length).length}/9 · total · textos ${sum('texts')} · controles ${sum('controls')} · nombres pisados ${sum('crossed')} · bancos que desplazan ${rows.filter(r => r.scroll > 0).length}/9`);
+console.log(`bancos con lo principal a la vista ${rows.filter(r => !r.hidden.length).length}/${rows.length} · total · textos ${sum('texts')} · controles ${sum('controls')} · nombres pisados ${sum('crossed')} · bancos que desplazan ${rows.filter(r => r.scroll > 0).length}/${rows.length}`);
 await browser.close();

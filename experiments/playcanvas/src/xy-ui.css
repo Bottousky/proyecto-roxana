@@ -140,3 +140,6 @@ html[data-estilo="xy"] .kmap-compass text{fill:var(--xy-blue-deep);font-family:v
   .modal.name-modal{padding:16px 22px}
 }
 body:has(.look-modal) #touch-controls{display:none}
+/* El rumbo bajo el instrumento: texto chico en su propio renglón, sin sombra, sobre la tarjeta. */
+html[data-estilo="xy"] #hud #travel-instrument #travel-bearing{position:relative;z-index:3;color:var(--xy-soft);text-shadow:none;font-weight:700;font-family:var(--xy-font);padding:6px 0 2px 23px}
+html[data-estilo="xy"] #hud #travel-instrument #travel-bearing::before{color:var(--xy-blue)}

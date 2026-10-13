@@ -19,7 +19,7 @@ test('every staged conversation, character and exit resolves inside the shipped 
       ['dialogue', 'lockedDialogue', 'afterDialogue'].forEach(key => checkDialogue(object[key], object.id));
       if (object.character) assert.ok(CHARACTERS[object.character], `${object.id}: character`);
       if (object.target) assert.ok(AREAS[object.target], `${object.id}: exit target`);
-      if (object.puzzle) assert.ok(PUZZLE_STORY[object.puzzle] || (object.optional && SIDE_BENCHES[object.puzzle]), `${object.id}: puzzle story`);
+      if (object.puzzle) assert.ok(PUZZLE_STORY[object.puzzle] || ((object.optional || object.mini) && SIDE_BENCHES[object.puzzle]), `${object.id}: puzzle story`);
       assert.ok(Math.abs(object.x) < area.bounds[0] / 2, `${object.id}: x inside playable bounds`);
       assert.ok(Math.abs(object.z) < area.bounds[1] / 2, `${object.id}: z inside playable bounds`);
     }

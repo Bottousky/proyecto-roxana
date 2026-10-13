@@ -348,6 +348,37 @@ export const DIALOGUES = {
     ['ohm', 'Guardé las dos lecturas: con la bomba quieta y trabajando. Una sola habría contado menos.'],
     ['vega', 'El Castillo decide el reparto. Voy a las Terrazas a preparar los canales. Cuando llegues, no vas a encontrarme esperando.']),
   spring_after: d(['vega', 'La marca de agua sube despacio. Es buena señal: una instalación estable no necesita demostrar su fuerza todo el tiempo.']),
+  // Minijuegos (ciclo 29): vecinos con un problema chico, un concepto cada uno, antes de la bomba.
+  pump_locked_tala: d(['vega', 'Antes de abrir la caja, Tala tiene una pregunta sobre su farol. Respondésela: acá vamos a necesitar lo mismo.']),
+  tala_spring_ask: d(
+    ['tala', 'La fuente de la Plaza se secó. Vine a ver de dónde sale el agua.'],
+    ['tala', 'Vega dice que hay que mirar dónde se queda la fuerza. Yo traje mi farol: ¿dónde está su fuerza?'],
+    ['player', 'La fuerza se compara entre dos puntos. Probemos con el tuyo.'],
+    ['ohm', '«Comparar dos puntos»: dos puntas, dos lugares. Nunca uno solo.']),
+  tala_lantern_complete: d(
+    ['tala', 'En el farol, casi seis. En el cordón, casi nada. Y por los dos pasa lo mismo.'],
+    ['player', 'La fuerza se queda donde se trabaja. El cobre sano sólo deja pasar.'],
+    ['tala', 'Lo anoto. Ahora quiero ver la bomba de Vega: si una unión se queda con fuerza, se va a notar.']),
+  tala_spring_after: d(['tala', 'Si un cordón sano casi no se queda con nada, una unión que se queda con mucho… ¿es una ladrona?']),
+  marin_spring_ask: d(
+    ['marin', 'Sin agua en la fuente no hay masa. Vine con el carro a buscar un poco.'],
+    ['marin', 'Y mirá mis faroles: el de atrás brilla más que el de adelante, y están en la misma fila. ¿Quién se queda con más fuerza?'],
+    ['ohm', 'Si comparás los dos extremos de cada farol, Marín puede sumar. Le gustan las cuentas que cierran.']),
+  marin_cart_complete: d(
+    ['marin', 'Cuatro y ocho, doce. ¡Lo mismo que empuja la batería!'],
+    ['player', 'En una sola vuelta, la fuerza se reparte entre los que están en fila. El que más frena, más se queda.'],
+    ['marin', 'Como el pan entre los vecinos: ninguno se pierde, cada uno se queda con su parte. Tala va a decir que conté mal.']),
+  marin_spring_after: d(['marin', 'Ahora cuento voltios además de panes. Tala dice que es lo mismo. Yo digo que el pan se come.']),
+  edda_contact_locked: d(['edda', 'Primero la puerta. La baliza esperó años: puede esperar un rato más.']),
+  edda_contact_ask: d(
+    ['edda', 'Esa baliza del costado brilla a medias desde que tengo memoria.'],
+    ['edda', 'Mi abuela decía que el contacto del poste «se queda con un pedazo». Nunca supe un pedazo de qué.'],
+    ['player', 'Con la baliza encendida, comparando los extremos de cada pieza se ve dónde se queda la fuerza.']),
+  edda_contact_complete: d(
+    ['edda', 'La mitad. El contacto se quedaba con la mitad, y sólo tenía que dejar pasar.'],
+    ['player', 'Dejaba pasar, pero no entregaba todo. Con el puente, la baliza recibe lo suyo.'],
+    ['edda', 'Se lo voy a contar a la abuela. Bueno, a su cuaderno. Ella lo va a saber igual.']),
+  edda_contact_after: d(['edda', 'La baliza ya no parpadea. Me había acostumbrado a que sí.']),
   spring_levels: d(
     ['narrator', 'En un muro hay fechas y alturas. Los años de sequía están escritos con la misma letra que los de abundancia.'],
     ['vega', 'Las dos cosas hay que anotarlas. Si sólo recordás lo que salió bien, el río te sorprende dos veces.']),
@@ -732,6 +763,7 @@ export const AREAS = {
       lever('road_return', 8, 1, 'Ajustar el cierre bajo las hojas', 'road_return', 'El contacto del poste este queda unido.', 'El contacto del poste este queda separado.'),
       { id: 'road_bypass', kind: 'lever', x: 0, z: 3.5, label: 'El puente de cobre del centro', flag: 'road_bypass', action: { type: 'toggle', flag: 'road_bypass', onLabel: 'Cerrar el puente de cobre', offLabel: 'Abrir el puente de cobre', onText: 'La pieza de cobre une las dos líneas. Las balizas quedan oscuras.', offText: 'La pieza se levanta y deja separados sus dos contactos.' } },
       panel('gate_panel', 4.5, -6, 'Regulador de la Puerta de Ohm', 'gate', ['bridge_ready'], 'gate_locked', 'road_after'),
+      { ...panel('edda_post', -9.4, 3.4, 'La baliza del costado', 'edda_contact', ['gate'], 'edda_contact_locked', 'edda_contact_after'), dialogue: 'edda_contact_ask', mini: true, optional: true },
       lore('road_memorial', -8, -6, 'La instrucción de los tres golpes', 'road_memorial'),
       secret('road_nest', 10, 7, 'Un nido entre fusibles', 'road_nest'),
     ],
@@ -743,7 +775,10 @@ export const AREAS = {
       npc('vega_spring', -4.2, -1.4, 'vega', 'vega_spring', { flag: 'pump', afterDialogue: 'spring_after' }),
       lever('spring_sluice', -6.5, 2, 'Desviar el agua hacia la rueda', 'spring_sluice', 'El canal conduce el agua hacia los álabes de la rueda.', 'El agua vuelve al desvío y deja de impulsar la rueda.'),
       lever('spring_coupling', 7.5, -1, 'Acoplar la rueda al generador', 'spring_coupling', 'El eje de la rueda queda unido al generador.', 'El generador queda separado de la rueda.'),
-      panel('pump_panel', 2.5, -5.5, 'Caja de conexiones de la bomba', 'pump', ['spring_drive'], 'pump_locked', 'spring_after'),
+      { ...panel('pump_panel', 2.5, -5.5, 'Caja de conexiones de la bomba', 'pump', ['spring_drive', 'tala_lantern'], 'pump_locked', 'spring_after'), lockedBy: { tala_lantern: 'pump_locked_tala' } },
+      // Minijuegos: Tala (en el camino principal) y Marín (opcional), mientras falta el agua en la Plaza.
+      npc('tala_spring', 3.6, 6.4, 'tala', 'tala_spring_ask', { puzzle: 'tala_lantern', afterDialogue: 'tala_spring_after', mini: true }),
+      npc('marin_spring', -3.2, 6, 'marin', 'marin_spring_ask', { puzzle: 'marin_cart', afterDialogue: 'marin_spring_after', mini: true, optional: true }),
       lore('spring_levels', -6.5, -5, 'Cuarenta marcas de agua', 'spring_levels'),
       secret('spring_bottle', 10, 6, 'Una botella sellada', 'spring_bottle'),
     ],
@@ -835,7 +870,11 @@ export function evaluateWorld(state) {
 }
 
 // Optional benches: their own arrival and closing, outside the count of lights on the main road.
-export const SIDE_BENCHES = { drawer: { arrival: 'drawer_arrival', complete: 'drawer_complete' } };
+export const SIDE_BENCHES = { drawer: { arrival: 'drawer_arrival', complete: 'drawer_complete' },
+  // Minijuegos (ciclo 29). Tala's opens the pump's bench; Marín's and Edda's are optional.
+  tala_lantern: { arrival: 'tala_spring_ask', complete: 'tala_lantern_complete', mini: true },
+  marin_cart: { arrival: 'marin_spring_ask', complete: 'marin_cart_complete', mini: true },
+  edda_contact: { arrival: 'edda_contact_ask', complete: 'edda_contact_complete', mini: true } };
 export const PUZZLE_STORY = Object.fromEntries([
   ['awaken', 'awaken_arrival', 'awaken_complete'],
   ['workshop', 'workshop_arrival_puzzle', 'workshop_complete'],
@@ -928,6 +967,7 @@ const objectives = [
   ['workshop', { title: 'El oficio de preguntar', detail: 'Visitá a Lumen en su taller y mirá la lámpara que no enciende.', area: 'workshop', object: 'workbench' }],
   ['bridge_ready', { title: 'El otro lado de la puerta', detail: 'Encontrá a Edda en la Calzada. Las balizas no responden: hay cierres en los dos postes y un puente de cobre que no figura en el dibujo.', area: 'road', object: 'road_bypass' }, 'gate'],
   ['gate', { title: 'El otro lado de la puerta', detail: 'Las balizas responden. Falta el cerrojo: su regulador está junto a la puerta.', area: 'road', object: 'gate_panel' }],
+  ['tala_lantern', { title: 'Donde empieza el agua', detail: 'Tala vino al Manantial con su farol y una pregunta: ¿dónde está su fuerza?', area: 'spring', object: 'tala_spring' }, 'pump'],
   ['pump', { title: 'Donde empieza el agua', detail: 'Hablá con Vega en el Manantial y ayudala a mirar la bomba.', area: 'spring', object: 'pump_panel' }],
   ['distribution', { title: 'Una red que se puede comprender', detail: 'En el Castillo, buscá con la Consejera una forma de recuperar servicios sin poner en riesgo a sus vecinos.', area: 'castle', object: 'distribution_panel' }],
   ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],

@@ -205,10 +205,66 @@ PUZZLES.drawer = {
     { text: 'Le dijiste a Lumen cuánto frena la piedra roja, roja, marrón, y la pesaste', met: (r, s) => weighedStones(s).includes(RIDDLE_STONE) },
   ],
   // Done is what was weighed, not a working montage: the stones are weighed with the bench off.
-  done: s => weighedStones(s).filter(v => v !== RIDDLE_STONE).length >= 3 && weighedStones(s).includes(RIDDLE_STONE),
+  done: s => weighedStones(s).filter(v => v !== RIDDLE_STONE).length >= 3 && weighedStones(s).includes(RIDDLE_STONE), weighs: true,
+  doneText: 'Devolví las piedras al cajón de Lumen, cada una con su peso anotado.',
   solve: s => { s.weighed = [10, 12, 100, RIDDLE_STONE]; s.values.tray = RIDDLE_STONE; s.estimate = { choice: 'doscientos', settled: true, measured: 217 }; },
   lesson: 'Los anillos escriben un número: dos cifras y cuántos ceros. El anillo dorado dice que el valor real puede correrse un 5 %: el instrumento lo confirma.',
   observation: 'Lumen tiene un cajón de piedras de freno, cada una con anillos pintados. Las elige «por temperamento».',
+};
+
+// ── Minijuegos (ciclo 29): un concepto por vez, de un vecino, antes del banco grande de su zona ──
+// Each one is a small bench with the same engine. «mini» marks them; the first of a zone is on the
+// main road (its flag opens the zone's big bench), the others are «optional». «readings» is a proof
+// made of several measurements, each seen once: what the neighbour wants to see, in order.
+const readingsDone = p => s => p.readings.every(r => s.proofs?.[r.id] === true);
+PUZZLES.tala_lantern = {
+  title: 'El farol de Tala', place: 'MANANTIAL · EL FAROL DE TALA', subtitle: 'Un farol, un cordón largo y una pila. Tala quiere saber dónde está la fuerza.', voltage: 6, protection: 1.2, mini: true,
+  brief: 'Tala pregunta dónde está la fuerza de su farol. Con «Comparar dos puntos», mirá cuánto empuje hay entre los dos extremos del farol y entre los dos extremos del cordón.',
+  ports: [...sourcePorts, port('cordA', 'Cordón · A', 300, 150), port('cordB', 'Cordón · B', 560, 150), port('lampIn', 'Farol +', 640, 345), port('lampOut', 'Farol −', 860, 345)],
+  boardLabels: { cordA: 'A', cordB: 'B', lampIn: '+', lampOut: '−' },
+  components: [component('cord', 'Cordón del farol', 'cordA', 'cordB', .25, { kind: 'cloth' }), component('lantern', 'Farol de Tala', 'lampIn', 'lampOut', 12, { kind: 'lamp', goal: goal(5.5, 6.1, .44, .52) })],
+  initialWires: [['positive', 'cordA'], ['cordB', 'lampIn'], ['lampOut', 'negative']],
+  sealed: [['positive', 'cordA'], ['cordB', 'lampIn'], ['lampOut', 'negative']], cables: 0,
+  readings: [
+    { id: 'lanternForce', across: ['lampIn', 'lampOut'], min: 5, who: 'Tala', recorded: 'Entre los dos extremos del farol, casi todo el empuje de la pila: ahí trabaja la fuerza.' },
+    { id: 'cordForce', across: ['cordA', 'cordB'], max: .3, who: 'Tala', recorded: 'Entre los dos extremos del cordón, casi nada, aunque por él pasa la misma corriente: el cobre sano casi no se queda con fuerza.' },
+  ],
+  criteria: [{ text: 'Tala vio cuánta fuerza toma el farol', met: (r, s) => s.proofs?.lanternForce === true }, { text: 'Tala vio cuánta se queda el cordón', met: (r, s) => s.proofs?.cordForce === true }],
+  solve: s => { s.proofs = { ...s.proofs, lanternForce: true, cordForce: true }; },
+  doneText: 'Le devolví el farol a Tala, con sus dos lecturas anotadas.',
+  lesson: 'La tensión se mide entre dos puntos. Entre los extremos de lo que trabaja (el farol) hay casi todo el empuje; entre los extremos de un buen conductor, casi nada, aunque por él pase la misma corriente.',
+  observation: 'Tala sostiene su farol con las dos manos. El cordón es largo: dio la vuelta a una piedra para llegar a la pila.',
+};
+PUZZLES.tala_lantern.done = readingsDone(PUZZLES.tala_lantern);
+PUZZLES.marin_cart = {
+  title: 'La cuenta del carro', place: 'MANANTIAL · EL CARRO DE MARÍN', subtitle: 'Dos faroles en fila y una batería de 12 V. El de atrás brilla más.', voltage: 12, protection: 1.5, mini: true, optional: true,
+  brief: 'Los dos faroles del carro están en fila. Compará los extremos de cada uno: Marín suma lo que toma cada farol y lo compara con lo que empuja la batería.',
+  ports: [...sourcePorts, port('frontIn', 'Delantero +', 300, 200), port('frontOut', 'Delantero −', 520, 200), port('rearIn', 'Trasero +', 640, 340), port('rearOut', 'Trasero −', 860, 340)],
+  boardLabels: { frontIn: '+', frontOut: '−', rearIn: '+', rearOut: '−' },
+  components: [component('front', 'Farol delantero · 8 Ω', 'frontIn', 'frontOut', 8, { kind: 'lamp' }), component('rear', 'Farol trasero · 16 Ω', 'rearIn', 'rearOut', 16, { kind: 'lamp' })],
+  initialWires: [['positive', 'frontIn'], ['frontOut', 'rearIn'], ['rearOut', 'negative']],
+  sealed: [['positive', 'frontIn'], ['frontOut', 'rearIn'], ['rearOut', 'negative']], cables: 0,
+  tally: { id: 'cart', kind: 'voltage', who: 'Marín', title: 'La cuenta del carro', parts: ['front', 'rear'], request: 'Marín quiere sumar: compará los extremos de cada farol y él anota.' },
+  criteria: [{ text: 'La cuenta de Marín cierra con la batería', met: (r, s) => s.tally?.closed === true }],
+  done: s => s.tally?.closed === true,
+  solve: s => { s.tally = { closed: true, readings: {} }; },
+  doneText: 'Le devolví el carro a Marín con la cuenta escrita en la tapa.',
+  lesson: 'En una sola vuelta, el empuje de la fuente se reparte entre las piezas en fila: el que más frena se queda con más. Sumadas, dan lo que empuja la fuente.',
+  observation: 'El carro de Marín tiene dos faroles: el de atrás brilla bastante más que el de adelante.',
+};
+PUZZLES.edda_contact = {
+  title: 'El contacto que roba', place: 'CALZADA · LA BALIZA DEL COSTADO', subtitle: 'La baliza del costado brilla a medias desde siempre.', voltage: 6, protection: 1.4, mini: true, optional: true,
+  brief: 'La baliza brilla a medias. Con la baliza encendida, compará los extremos de cada pieza: Edda quiere ver dónde se queda la fuerza. Después, tenés un cable para devolvérsela.',
+  ports: [...sourcePorts, port('postA', 'Contacto · A', 300, 150), port('postB', 'Contacto · B', 560, 150), port('beaconIn', 'Baliza +', 640, 345), port('beaconOut', 'Baliza −', 860, 345)],
+  boardLabels: { postA: 'A', postB: 'B', beaconIn: '+', beaconOut: '−' },
+  components: [component('contact', 'Contacto del poste', 'postA', 'postB', 6, { kind: 'joint' }), component('beacon', 'Baliza del costado', 'beaconIn', 'beaconOut', 6, { kind: 'lamp', goal: goal(5.5, 6.1, .88, 1.02) })],
+  initialWires: [['positive', 'postA'], ['postB', 'beaconIn'], ['beaconOut', 'negative']],
+  sealed: [['positive', 'postA'], ['postB', 'beaconIn'], ['beaconOut', 'negative']], cables: 1,
+  proof: { id: 'foundRobber', who: 'Edda', voltageAcross: ['postA', 'postB'], minVoltage: 2, request: 'Edda quiere ver, con la baliza encendida, la comparación de los dos extremos del contacto.', recorded: 'Con la baliza encendida comparé los extremos del contacto: se queda con casi la mitad del empuje.' },
+  criteria: [{ text: 'Edda vio dónde se queda la fuerza', met: r => r.proven }, { text: 'La baliza brilla a pleno', met: r => r.operating.beacon }],
+  solve: s => { s.wires.push(['postA', 'postB']); s.proofs = { ...s.proofs, foundRobber: true }; },
+  lesson: 'Un contacto puede dejar pasar la corriente y aun así quedarse con parte del empuje. Comparando sus extremos con la carga encendida se ve; un puente de cobre se lo devuelve a la carga.',
+  observation: 'La baliza del costado brilla a medias. El contacto del poste está tibio.',
 };
 
 const samePair = (a, b) => (a[0] === b[0] && a[1] === b[1]) || (a[0] === b[1] && a[1] === b[0]);
@@ -232,7 +288,7 @@ export function terracesAgreement(state) {
 export function initialPuzzleSnapshot(id) {
   const p = PUZZLES[id];
   if (!p) throw new Error(`Unknown puzzle: ${id}`);
-  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, tally: null, ...(p.done ? { weighed: [] } : {}), completed: false };
+  return { version: 1, id, proofs: {}, trace: Object.fromEntries((p.knobs ?? []).map(k => [k.key, { min: k.initial, max: k.initial }])), wires: p.initialWires.map(w => [...w]), switches: Object.fromEntries((p.switches ?? []).map(s => [s.key, s.initial])), values: Object.fromEntries((p.knobs ?? []).map(k => [k.key, k.initial])), sourceOn: true, tripped: false, meter: { mode: 'voltage', a: null, b: null, branch: null }, hints: 0, evidence: [], conjuro: false, estimate: null, tally: null, ...(p.weighs ? { weighed: [] } : {}), completed: false };
 }
 
 export function normalizePuzzleSnapshot(id, saved) {
@@ -264,12 +320,12 @@ export function normalizePuzzleSnapshot(id, saved) {
     normalized.tally = { closed: saved.tally?.closed === true || saved.completed === true, readings, ...(typeof saved.tally?.signature === 'string' ? { signature: saved.tally.signature.slice(0, 2000) } : {}) };
   }
   // The stones weighed on an optional tray: only stones the tray has, each once.
-  if (p.done) { const tray = p.knobs.flatMap(k => knobChoices(k)); normalized.weighed = weighedStones(saved).filter((v, i, all) => tray.includes(v) && all.indexOf(v) === i); }
+  if (p.weighs) { const tray = p.knobs.flatMap(k => knobChoices(k)); normalized.weighed = weighedStones(saved).filter((v, i, all) => tray.includes(v) && all.indexOf(v) === i); }
   // The mark written in the keepers' book before measuring («skip» if measured without one), and what was read.
   normalized.estimate = saved.estimate && typeof saved.estimate.choice === 'string' && /^[a-z]{1,12}$/.test(saved.estimate.choice)
     ? { choice: saved.estimate.choice, settled: saved.estimate.settled === true, ...(Number.isFinite(saved.estimate.measured) ? { measured: saved.estimate.measured } : {}) } : null;
   // A proof counts once seen. Installations commissioned before a proof was required keep it.
-  normalized.proofs = !p.proof ? {} : Object.fromEntries([p.proof.id, ...(p.proof.parts ?? [])].filter(k => saved.proofs?.[k] === true).map(k => [k, true]));
+  normalized.proofs = Object.fromEntries([...(p.proof ? [p.proof.id, ...(p.proof.parts ?? [])] : []), ...(p.readings ?? []).map(r => r.id)].filter(k => saved.proofs?.[k] === true).map(k => [k, true]));
   if (p.proof && saved.completed === true) normalized.proofs[p.proof.id] = true;
   // Saves from before the trace existed stay unknown (null): nothing may be claimed about them.
   normalized.trace = saved.trace && typeof saved.trace === 'object' ? Object.fromEntries((p.knobs ?? []).map(k => { const t = saved.trace[k.key], v = normalized.values[k.key];

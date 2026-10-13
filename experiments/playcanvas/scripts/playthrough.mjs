@@ -447,6 +447,8 @@ async function solvePanel(objectId, id) {
     assert.equal((await inspect()).puzzle.state.tally?.closed, true, 'Vega closed the count of the loop');
     log('proof', { id, proof: 'foundLoss' });
   }
+  // Edda's beacon (minijuego, ciclo 29): where the push stays, seen before the bridge.
+  if (id === 'edda_contact') { await measure('voltage', 'postA', 'postB'); assert.equal((await inspect()).puzzle.state.proofs.foundRobber, true, 'Edda saw the contact keep the push'); }
   if (id === 'awaken') assert.equal(await page.locator('[data-action="mode"]:not([data-mode="wire"])').count(), 0, 'The first encounter offers cables only, no instrument');
   if (id === 'workshop') {
     // Section by section: two have a path, one does not.
@@ -477,6 +479,10 @@ async function solvePanel(objectId, id) {
       }
       await knob('brake', 10); break;
     case 'pump': await wire('e2a', 'e2b'); break;
+    // Minijuegos (ciclo 29): Tala's two readings, Marín's sum, Edda's bridge.
+    case 'tala_lantern': await measure('voltage', 'lampIn', 'lampOut'); await measure('voltage', 'cordA', 'cordB'); break;
+    case 'marin_cart': await measure('voltage', 'frontIn', 'frontOut'); await measure('voltage', 'rearIn', 'rearOut'); break;
+    case 'edda_contact': await wire('postA', 'postB'); break;
     case 'distribution':
       assert.equal((await inspect()).puzzle.state.switches.archive,false,'The archive was isolated in the courtyard');
       await removeWire('clinicOut', 'kitchenIn');
@@ -591,8 +597,16 @@ try {
   assert.ok(report.dialogue.some(line => line.includes('la piedra justa en el zócalo')), 'The gate closing line reports the stone that was placed');
   assert.ok(!report.dialogue.some(line => line.includes('La rueda quedó como estaba')), 'No line claims an untouched brake');
   await interact('road_nest');
+  // Edda's beacon on the Calzada is optional: the main route takes it, the adversarial one leaves it.
+  if (!adversarial) await solvePanel('edda_post', 'edda_contact');
   await travel('road_to_spring', 'spring');
   await operate('spring_sluice', true); await operate('spring_coupling', true);
+  // The pump's box waits for Tala's question (the first minijuego of the Manantial is on the road).
+  await interact('pump_panel');
+  assert.notEqual((await inspect()).mode, 'puzzle', "The pump's box waits for Tala");
+  assert.equal(Boolean((await inspect()).flags.tala_lantern), false);
+  await solvePanel('tala_spring', 'tala_lantern');
+  if (!adversarial) await solvePanel('marin_spring', 'marin_cart');
   await solvePanel('pump_panel', 'pump');
   await interact('spring_bottle');
   await travel('spring_to_castle', 'castle');

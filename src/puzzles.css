@@ -351,7 +351,8 @@
 .wb-say-face.wb-face{background-color:#24372e;background-repeat:no-repeat;background-size:300% 100%;background-position:var(--col,0%) 20%;color:transparent}
 .wb-face-edda,.wb-face-lumen,.wb-face-nereo{background-image:url('/assets/art-polish/portraits-main.webp')}
 .wb-face-vega,.wb-face-consejera{background-image:url('/assets/art-polish/portraits-north.webp')}
-.wb-face-yesca{background-image:url('/assets/art-polish/portraits-village.webp')}
+.wb-face-yesca,.wb-face-marin,.wb-face-tala{background-image:url('/assets/art-polish/portraits-village.webp')}
+.wb-face-marin{--col:50%}.wb-face-tala{--col:100%}
 .wb-face-ohm{background-image:url('/assets/art-polish/portrait-ohm.webp');background-size:cover;background-position:center}
 .wb-face-edda,.wb-face-yesca{--col:0%}.wb-face-lumen,.wb-face-vega{--col:50%}.wb-face-nereo,.wb-face-consejera{--col:100%}
 
@@ -569,3 +570,5 @@ html[data-estilo="xy"] .wb-rotate-hint{background:#eef5fb;color:#1f6fb0;border-r
 html[data-estilo="xy"] .wb-rotate-hint span{color:#2f8fd6}
 html[data-estilo="xy"] .wb-piece-list li{background:#fff;border:2px solid #e3eaf0;border-radius:14px;color:#25313b;font-family:inherit;font-weight:700}
 html[data-estilo="xy"] .wb-piece-list .wb-plate-name{color:#25313b}
+/* Apaisado, la cuenta en curso va después de lo que dice quien la pide. */
+@media (orientation:landscape) and (max-height:540px){html .workbench-overlay .wb-tally{order:1}}

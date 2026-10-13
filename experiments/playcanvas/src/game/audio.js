@@ -242,6 +242,10 @@ export class AudioDirector {
       case 'beacon_lens': this.finale();break;
       // Lumen's drawer: ceramic stones knocking on wood, then a small bright note.
       case 'drawer': for (let i = 0; i < 4; i++) { noise(i * .14, .05, .07, 2400);tone(880 + i * 110, i * .14, .12, .02); } tone(1320, .7, .9, .03);break;
+      // Minijuegos (ciclo 29): Tala's lantern brightens, Marín's two lanterns ring, Edda's beacon steadies.
+      case 'tala_lantern': tone(660, 0, .5, .03);tone(990, .18, .9, .025);break;
+      case 'marin_cart': tone(523, 0, .4, .03);tone(659, .2, .4, .03);tone(784, .4, .9, .03);break;
+      case 'edda_contact': noise(0, .06, .06, 900);tone(392, .08, .25, .03);tone(392, .4, 1.1, .035);break;
       default: return false;
     }
     return true;

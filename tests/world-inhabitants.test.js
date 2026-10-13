@@ -8,7 +8,9 @@ import {isSegmentClear} from '../src/collision.js';
 import {renderWorldMap} from '../src/world-map.js';
 
 const restored={awaken:true,workshop:true,gate:true,pump:true,distribution:true,irrigation:true,beacon_link:true,beacon_supply:true,beacon_network:true,beacon_lens:true};
-for(const [stage,flags] of Object.entries({arrival:{},restored,epilogue:{...restored,epilogue_shared:true}})){
+// «water-out»: the gate is open and the pump not yet: Tala and Marín wait at the Manantial (ciclo 29).
+const waterOut={awaken:true,workshop:true,bridge_ready:true,gate:true};
+for(const [stage,flags] of Object.entries({arrival:{},'water-out':waterOut,'lantern-answered':{...waterOut,tala_lantern:true},restored,epilogue:{...restored,epilogue_shared:true}})){
   test(`${stage}: every expected resident is visible, responsive and follows solid-safe errands`,()=>{
     for(const area of Object.values(AREAS)){
       const world=buildCollisionWorld(area.id,{flags});

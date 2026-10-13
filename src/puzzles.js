@@ -10,7 +10,7 @@ import './puzzles.css';
 // reach it («how»), and the instrument it needs, if any. Hints go one step further when asked.
 // A bench offers a single instrument: the one its story asks for.
 // Who speaks at a bench wears their own portrait in the dock.
-const SAY_FACES = { OHM: 'ohm', EDDA: 'edda', LUMEN: 'lumen', VEGA: 'vega', IVARA: 'consejera', YESCA: 'yesca', NEREO: 'nereo' };
+const SAY_FACES = { OHM: 'ohm', EDDA: 'edda', LUMEN: 'lumen', VEGA: 'vega', IVARA: 'consejera', YESCA: 'yesca', NEREO: 'nereo', TALA: 'tala', MARIN: 'marin', 'MARÍN': 'marin' };
 export const BENCH_GUIDANCE = {
   awaken: { goal: 'Despertá al pequeño de bronce: cerrá el camino de su corazón.', learned: 'Hizo falta una vuelta completa: salir de la celda, atravesar al pequeño y volver a ella. Con una sola conexión, nada se movía.', pulseLoose: true,
     steps: [{ how: 'Tenés un cable: se tiende tocando dos bornes redondos. Un camino ya sale de la celda y llega al pequeño. ¿Por dónde podría volver?' }],
@@ -36,6 +36,16 @@ export const BENCH_GUIDANCE = {
   beacon_network: { goal: 'Que luz, giro y campana tengan cada una su propio camino.', learned: 'En paralelo, cada voz recibe la misma tensión y toma la corriente que necesita.',
     steps: [...[0, 1, 2].map(() => ({ how: 'Que ninguna voz tenga que atravesar a otra para volver al mar. Como en el Castillo, pero con tres. Tocá un cable para retirarlo.', tool: 'wire' })), { how: 'Nereo quiere anotar la regla de los nudos: con “Medir un camino”, medí cada voz y también lo que sale de la fuente.', tool: 'current' }],
     tools: ['current'], voice: 'OHM', hints: ['Seguí los caminos: la corriente de la campana atraviesa la luz y el giro antes de volver.', 'En el Castillo, cada luz tuvo su propio camino. Acá son tres.', 'Cada voz necesita ida desde «Fuente +» y vuelta a «Retorno −», sin pasar por las otras.', 'Un paso para probar: retirá los dos cables que pasan de un receptor al siguiente. Con tus cuatro cables uní «Óptica −» y «Giro −» con «Retorno −», y «Fuente +» con «Giro +» y con «Señales +».'] },
+  // Minijuegos del Manantial (ciclo 29): one concept each, asked by a neighbour.
+  tala_lantern: { goal: 'Mostrale a Tala dónde está la fuerza de su farol.', learned: 'La fuerza se mide entre dos puntos. Entre los extremos del farol, que trabaja, queda casi toda; entre los del cordón, que sólo conduce, casi nada.',
+    steps: [{ how: 'Elegí “Comparar dos puntos” y apoyá las puntas en «Farol +» y «Farol −». ¿Cuánto empuje hay entre los dos extremos del farol?', tool: 'voltage' }, { how: 'Ahora en los dos extremos del cordón, «Cordón · A» y «Cordón · B». Por el cordón pasa la misma corriente: ¿cuánto se queda?', tool: 'voltage' }],
+    tools: ['voltage'], voice: 'TALA', hints: ['La fuerza no está en un punto: es una diferencia entre dos lugares. Por eso el instrumento tiene dos puntas.', 'El farol trabaja: da luz. El cordón sólo lleva la corriente de un lado al otro.', 'Por el cordón y por el farol pasa la misma corriente, porque están en la misma vuelta. Lo que cambia es cuánto empuje se queda cada uno.', 'Un paso para probar: con “Comparar dos puntos”, apoyá las puntas en «Farol +» y «Farol −». Después, en «Cordón · A» y «Cordón · B».'] },
+  marin_cart: { goal: 'Ayudá a Marín a sumar lo que toma cada farol.', learned: 'En una sola vuelta, el empuje se reparte: el farol que más frena se queda con más, y entre los dos suman lo que empuja la batería.',
+    steps: [{ how: 'Con “Comparar dos puntos”, compará «Delantero +» con «Delantero −», y «Trasero +» con «Trasero −». Marín va sumando.', tool: 'voltage' }],
+    tools: ['voltage'], voice: 'MARIN', hints: ['Los dos faroles están en fila: la misma corriente atraviesa uno y después el otro.', 'Lo que se reparten es el empuje de la batería. ¿Cuánto se queda cada uno?', 'El de atrás frena el doble que el de adelante. ¿Se quedará con el doble?', 'Un paso para probar: apoyá las puntas en «Delantero +» y «Delantero −», y después en «Trasero +» y «Trasero −».'] },
+  edda_contact: { goal: 'Encontrá dónde se queda la fuerza de la baliza y devolvésela.', learned: 'El contacto dejaba pasar la corriente, pero se quedaba con la mitad del empuje. Comparando sus extremos con la baliza encendida se vio; el puente se la devolvió.',
+    steps: [{ how: 'Con la baliza encendida, compará los extremos del contacto y los de la baliza. ¿Quién se queda con la fuerza?', tool: 'voltage' }, { how: 'Ya sabés dónde se queda. ¿Cómo le devolvés la fuerza a la baliza con un solo cable?', tool: 'wire' }],
+    tools: ['voltage'], voice: 'EDDA', hints: ['El contacto deja pasar: la baliza prende. Pero prende a medias.', 'Con la baliza encendida, lo que se queda cada pieza se ve comparando sus dos extremos.', 'Si el contacto se queda con una parte grande, a la baliza le llega menos. Un cable entre sus dos extremos lo saltea.', 'Un paso para probar: compará «Contacto · A» con «Contacto · B». Después volvé a “Cables” y tendé tu cable entre «Contacto · A» y «Contacto · B».'] },
   drawer: { goal: 'Pesá las piedras de Lumen y resolvé su acertijo.', learned: 'Los anillos no dicen el temperamento: escriben un número, con dos cifras y cuántos ceros. Y la piedra dorada miente un poco, nunca más de un 5 %.',
     steps: [{ how: 'Elegí una piedra de la bandeja para el zócalo. Después tomá “Pesar el freno” y apoyá las puntas en «Zócalo · A» y «Zócalo · B».', tool: 'weigh' }, { how: 'Lumen te da la séptima piedra, roja, roja, marrón. Decile cuánto frena antes de pesarla.', tool: 'weigh' }],
     tools: ['weigh'], voice: 'OHM', hints: ['La lámpara de prueba ya dice algo: con unas piedras brilla más que con otras. El instrumento lo dice en números.', 'El instrumento usa su propia pila: con la mesa apagada, mide cuánto frena lo que está entre las dos puntas.', 'Compará los anillos de dos piedras cuyo número se parezca. ¿Qué anillo cambia cuando el número suma un cero?', 'Un paso para probar: poné la piedra marrón, negro, negro, pesala apoyando las puntas en «Zócalo · A» y «Zócalo · B», y después probá con la marrón, negro, marrón.'] },
@@ -233,7 +243,7 @@ export class PuzzleWorkbench {
     if (this.practice) this.endPractice();
     if (notify && commission && !this.state.completed && evaluatePuzzle(this.id, this.state).commissionable) {
       this.state.completed = true;
-      appendBenchEvidence(this.state, { kind: 'result', text: this.puzzle.done ? 'Devolví las piedras al cajón de Lumen, cada una con su peso anotado.' : 'Dejé la instalación funcionando con este montaje.' });
+      appendBenchEvidence(this.state, { kind: 'result', text: this.puzzle.doneText ?? 'Dejé la instalación funcionando con este montaje.' });
       this.callbacks.onSound?.('solve');
       this.callbacks.onSolve?.(this.id, { snapshot: copy(this.state), voltage: this.result.voltage, current: this.result.current, power: this.result.power, lesson: this.puzzle.lesson });
       this.callbacks.onChange?.(this.id, copy(this.state));
@@ -465,6 +475,17 @@ export class PuzzleWorkbench {
   // or a single reading across the faulty part (no path with the bench off; a drop under load).
   recordProofMeasurement(reading) {
     const asked = this.puzzle.proof, m = this.state.meter;
+    // A minijuego's readings: each measurement the neighbour wants to see, seen once, in any order.
+    const wanted = this.puzzle.readings;
+    if (wanted) {
+      if (this.practice || this.mode !== 'voltage' || !m.a || !m.b || !this.state.sourceOn || this.state.tripped || this.result.overloaded) return;
+      const { nodeOf } = wireNodes(this.id, this.state), probe = [nodeOf[m.a], nodeOf[m.b]], volts = Math.abs(measureVoltage(this.result.solution, m.a, m.b) ?? 0);
+      const seen = wanted.find(w => { const ends = w.across.map(n => nodeOf[n]); return !this.state.proofs?.[w.id] && ends[0] !== ends[1] && probe.includes(ends[0]) && probe.includes(ends[1]) && this.result.current > .05 && volts >= (w.min ?? -Infinity) && volts <= (w.max ?? Infinity); });
+      if (!seen) return;
+      (this.state.proofs ??= {})[seen.id] = true; appendBenchEvidence(this.state, { kind: 'result', text: seen.recorded });
+      this.feedback = `${seen.recorded} ${seen.who} lo anota.`; this.callbacks.onSound?.('success'); this.result = evaluatePuzzle(this.id, this.state); this.settleConjuro();
+      return;
+    }
     if (asked && !this.practice && !this.state.proofs?.[asked.id] && m.a && m.b && (asked.continuityOpen || asked.voltageAcross)) {
       const { nodeOf } = wireNodes(this.id, this.state), ends = (asked.continuityOpen ?? asked.voltageAcross).map(n => nodeOf[n]), probe = [nodeOf[m.a], nodeOf[m.b]];
       const across = ends[0] !== ends[1] && probe.includes(ends[0]) && probe.includes(ends[1]), powered = this.state.sourceOn && !this.state.tripped;

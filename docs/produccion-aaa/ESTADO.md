@@ -655,8 +655,10 @@ Ver [ESTILO-XY.md](ESTILO-XY.md).
   muestra en lugar de «Cruzar el Portal»: ahora toca el botón de enviar. `qa-touch.mjs` deja un
   margen inferior acorde a la cámara cercana. En el teléfono apaisado, el pedestal quedaba en la
   franja que el guion descartaba. El guion guarda una captura cuando no llega a destino.
-- **Minijuegos por concepto.** Propuesta y piloto sugerido en [MINIJUEGOS.md](MINIJUEGOS.md), a
-  decidir con el usuario.
+- **Minijuegos por concepto: piloto en el Manantial.** El usuario decidió que sean vecinos en el
+  camino, con el primero de cada zona obligatorio y los demás opcionales. Hechos: el farol de Tala
+  (obligatorio, la caja de la bomba lo espera), el carro de Marín y la baliza de Edda en la Calzada
+  (opcionales). Detalle y preguntas para después de jugarlo en [MINIJUEGOS.md](MINIJUEGOS.md).
 
 ## Backlog priorizado (orden del encargo)
 
@@ -711,8 +713,8 @@ Pendientes fuera del alcance de este equipo:
 - medir el rendimiento con el equipo tranquilo.
 
 Para decidir con el usuario:
-- **Minijuegos por concepto:** cómo aparecen en el mundo, si son obligatorios y el piloto
-  ([MINIJUEGOS.md](MINIJUEGOS.md)).
+- **Minijuegos por concepto:** jugar el piloto del Manantial y decidir si se extiende a las demás
+  zonas ([MINIJUEGOS.md](MINIJUEGOS.md#para-decidir-después-de-jugarlo)).
 - **Arco II:** las 6 preguntas abiertas de [ARCO-2-LA-MAREA.md](ARCO-2-LA-MAREA.md#para-decidir).
 - **Escenas oscuras:** la llegada al Faro de noche, el Lago al crepúsculo y el taller a oscuras.
   El canon las pide así.

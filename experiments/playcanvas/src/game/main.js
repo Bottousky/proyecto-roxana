@@ -339,7 +339,9 @@ function interact(obj=nearby){
   sound('interact');held.clear();
   if(obj.door){useDoor(obj.door.leave?{leave:true,label:AREAS[state.area].name}:obj.door);return;}
   if(!hasRequirements(state,obj.requires)){
-    if(obj.lockedDialogue)speak(obj.lockedDialogue);else bubble('Todavía hay algo que observar antes de seguir.');return;
+    // A bench locked for more than one reason says the one that is missing (the Manantial: levers, then Tala).
+    const missing=(obj.requires??[]).find(f=>!hasRequirements(state,[f])),locked=obj.lockedBy?.[missing]??obj.lockedDialogue;
+    if(locked)speak(locked);else bubble('Todavía hay algo que observar antes de seguir.');return;
   }
   if(obj.target){if(world.followPassage(obj))return;enterArea(obj.target,obj.spawn);return;}
   if(obj.secret){
@@ -365,6 +367,8 @@ function interact(obj=nearby){
   }
   if(obj.puzzle){
     const open=()=>openPuzzle(obj.puzzle);
+    // A neighbour whose minijuego is done just talks; a bench reopens for a look.
+    if(state.flags[obj.puzzle]&&obj.kind==='npc'){speak(obj.afterDialogue||obj.dialogue,null,obj.id);return;}
     if(state.flags[obj.puzzle]){const after=obj.afterDialogue||PUZZLE_STORY[obj.puzzle]?.complete;if(after&&!state.seen.includes(after))speak(after,open);else open();return;}
     const arrival=obj.dialogue||PUZZLE_STORY[obj.puzzle]?.arrival;
     if(arrival&&!state.seen.includes(arrival))speak(arrival,open);else open();return;

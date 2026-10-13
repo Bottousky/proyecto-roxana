@@ -52,6 +52,15 @@ function pavingNetwork(world,start){
   return {interactions,hasPoint:connectedNear,paved};
 }
 
+// The minijuegos' neighbours stand where the paving reaches them (ciclo 29).
+for(const id of ['road','spring'])test(`${id}: the minijuegos are approached from the connected paving while the water is out`,()=>{
+  const world=buildCollisionWorld(id,{flags:{awaken:true,workshop:true,bridge_ready:true,gate:true}});
+  try{
+    const network=pavingNetwork(world,AREAS[id].spawn);
+    for(const object of AREAS[id].objects.filter(o=>o.mini))assert.ok(network.interactions.has(object.id),`${object.id} (${object.x},${object.z}) has no approach from the connected paving`);
+  }finally{world.dispose();}
+});
+
 for(const area of Object.values(AREAS)){
   test(`${area.id}: visible paths connect arrivals, interactions and every building entrance`,()=>{
     const world=buildCollisionWorld(area.id,{flags:restored});
