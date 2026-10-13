@@ -20,6 +20,6 @@ export async function nameTraveller(page, name = 'Ensayo') {
   const field = page.locator('#player-name');
   if (!await field.waitFor({ state: 'visible', timeout: 4000 }).then(() => true, () => false)) return false;
   await field.fill(name);
-  await page.locator('#name-form button').first().click();
+  await page.locator('#name-form button[type="submit"]').click();
   return true;
 }

@@ -450,7 +450,7 @@ export class PlayCanvasWorld {
       // until the figure is there, whatever the screen and panel sizes.
       if(this.portrait){const tall=this.canvas.clientWidth<this.canvas.clientHeight,aim=this.portraitAim||{x:.5,y:.6},at=this.getScreenPosition({x:p.x,z:p.z,ground:true}),shift=this.portraitShift??={x:0,z:0};
         if(at&&Number.isFinite(at.x)){shift.x=Math.max(-7,Math.min(7,shift.x+(at.x/this.canvas.clientWidth-aim.x)*dt*30));shift.z=Math.max(-7,Math.min(7,shift.z+(at.y/this.canvas.clientHeight-aim.y)*dt*30));}
-        wanted.set(p.x+ox+shift.x,p.y+.9,p.z+oz+shift.z);rest.zoom=tall?1.7:2.3;}
+        wanted.set(p.x+ox+shift.x,p.y+.9,p.z+oz+shift.z);rest.zoom=this.portraitZoom||(tall?1.7:2.3);}
       else this.portraitShift=null;
       // Conversations keep the camera where the interaction began: the portrait says who speaks.
       this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect&&!this.portrait?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}

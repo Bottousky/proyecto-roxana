@@ -55,6 +55,21 @@ print('malla', len(body.data.polygons), 'caras · caja', tuple(round(v, 3) for v
 bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT')
 bpy.ops.uv.smart_project(angle_limit=math.radians(60), island_margin=.004)
 bpy.ops.object.mode_set(mode='OBJECT')
+# The face is what a close camera looks at (ciclo 29): the front of the head gets CARA_ESCALA times
+# more texture on each side (2.2 by default), the rest of the head a little more, then all islands
+# are packed again at the same size.
+face_scale = float(os.environ.get('CARA_ESCALA', 2.2))
+if face_scale != 1:
+    head_z = .9 if os.environ.get('ROBOT') else json.loads(os.environ.get('ESQUELETO') or '{}').get('axila', 1.37) + .13
+    bm_uv = bmesh.new(); bm_uv.from_mesh(body.data); uv_layer = bm_uv.loops.layers.uv.active
+    for f in bm_uv.faces:
+        if (body.matrix_world @ f.calc_center_median()).z > head_z:
+            k = face_scale if f.normal.y < -.25 else face_scale ** .45
+            for l in f.loops: l[uv_layer].uv *= k
+    bm_uv.to_mesh(body.data); bm_uv.free()
+    bpy.ops.object.mode_set(mode='EDIT'); bpy.ops.mesh.select_all(action='SELECT'); bpy.ops.uv.select_all(action='SELECT')
+    bpy.ops.uv.pack_islands(rotate=True, margin=.004); bpy.ops.object.mode_set(mode='OBJECT')
+    print('cara', face_scale, 'veces desde', round(head_z, 2))
 
 # Which vertices each camera really sees: a ray from the vertex toward the camera that hits
 # nothing else. Stored per view in a colour attribute the projection reads (a view never paints
@@ -243,6 +258,7 @@ if os.environ.get('ROBOT'):
         else: groups['cuerpo'].add([v.index], 1.0, 'REPLACE')
     mod = body.modifiers.new('esqueleto', 'ARMATURE'); mod.object = rig; body.parent = rig
     print('esqueleto de robot, pies hasta', feet_top)
+    for a in list(body.data.color_attributes): body.data.color_attributes.remove(a)
     bpy.ops.object.select_all(action='SELECT')
     bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_yup=True, export_skins=True, export_animations=False, use_selection=True)
     print('exportado', out); sys.exit(0)
@@ -255,6 +271,9 @@ except Exception as e:
 empty_groups = [g.name for g in body.vertex_groups if not any(g.index in [x.group for x in v.groups] for v in body.data.vertices)]
 print('grupos sin vértices', empty_groups)
 
+# The working colour layers (what each camera saw, the regions) stay out of the game file: six
+# of them weighed three times the texture.
+for a in list(body.data.color_attributes): body.data.color_attributes.remove(a)
 bpy.ops.object.select_all(action='SELECT')
 bpy.ops.export_scene.gltf(filepath=out, export_format='GLB', export_yup=True, export_skins=True, export_animations=False, use_selection=True)
 print('exportado', out)

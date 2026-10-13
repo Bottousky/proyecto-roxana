@@ -638,6 +638,26 @@ en la partida, para el futuro informe del docente. Detalle en [BANCOS-UX.md](BAN
   cada banco con la interfaz anterior. Hasta actualizarlos, la cadena de aceptación no puede
   correr sobre la punta de la rama. La última aceptación completa sigue siendo la de `6a71019`.
 
+## Ciclos 27 y 28 · Estilo X e Y y los diez personajes en 3D (12–13 oct 2026)
+
+Ver [ESTILO-XY.md](ESTILO-XY.md).
+
+## Ciclo 29 · X e Y como estilo del reino, bancos en el teléfono, apariencia, caras y peso (13 oct 2026)
+
+- **Estilo.** Por decisión del usuario, X e Y con personajes en 3D es el estilo por defecto.
+  `?estilo=hd2d` y `?gente=sprites` quedan como opciones. La pausa, las ventanas, el mapa, la
+  observación de Ohm y los controles táctiles pasaron al mismo estilo.
+- **Bancos en el teléfono** (lo pendiente del ciclo 26). `qa-bench-load.mjs` da lo principal a la
+  vista en **9/9 a 844×390 y 9/9 a 390×844** (antes 6/9 y 5/9), y en 7/9 a 740×360. Detalle en
+  [BANCOS-UX.md](BANCOS-UX.md#teléfono-ciclo-29).
+- **Apariencia del viajero, caras y peso de los modelos.** Detalle en [ESTILO-XY.md](ESTILO-XY.md#ciclo-29--estilo-definitivo-apariencia-caras-y-peso-13-oct-2026).
+- **Pruebas de navegador.** Al sumar los colores al registro, `nameTraveller` tocaba la primera
+  muestra en lugar de «Cruzar el Portal»: ahora toca el botón de enviar. `qa-touch.mjs` deja un
+  margen inferior acorde a la cámara cercana. En el teléfono apaisado, el pedestal quedaba en la
+  franja que el guion descartaba. El guion guarda una captura cuando no llega a destino.
+- **Minijuegos por concepto.** Propuesta y piloto sugerido en [MINIJUEGOS.md](MINIJUEGOS.md), a
+  decidir con el usuario.
+
 ## Backlog priorizado (orden del encargo)
 
 | # | Categoría | Problema observado | Estado |
@@ -691,6 +711,8 @@ Pendientes fuera del alcance de este equipo:
 - medir el rendimiento con el equipo tranquilo.
 
 Para decidir con el usuario:
+- **Minijuegos por concepto:** cómo aparecen en el mundo, si son obligatorios y el piloto
+  ([MINIJUEGOS.md](MINIJUEGOS.md)).
 - **Arco II:** las 6 preguntas abiertas de [ARCO-2-LA-MAREA.md](ARCO-2-LA-MAREA.md#para-decidir).
 - **Escenas oscuras:** la llegada al Faro de noche, el Lago al crepúsculo y el taller a oscuras.
   El canon las pide así.

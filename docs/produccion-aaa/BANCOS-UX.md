@@ -109,12 +109,35 @@ no se gastan.
 - Código en `src/bench-diagnosis.js`, puro y probado aparte. Probado en el juego: en el Taller,
   con las puntas sobre el mismo cobre, Ohm responde a eso en lugar de la primera pista fija.
 
+## Teléfono (ciclo 29)
+
+Después del rediseño de los ciclos 21 a 25, varios bancos no entraban en el teléfono. Ahora:
+
+| Tamaño | Lo principal a la vista | Antes |
+|---|---|---|
+| 844×390 apaisado | 9/9 | 6/9 |
+| 390×844 vertical | 9/9 | 5/9 |
+| 740×360 apaisado chico | 7/9 (en el Taller y la Bomba, la frase de Ohm empieza apenas debajo) | — |
+| 1440×900 | 9/9, sin desplazar | 9/9 |
+
+- **Vertical.** El encargo muestra sólo el paso de ahora; los demás quedan como números. El conjuro
+  y la explicación del instrumento caben en dos renglones.
+- **Apaisado.** Deshacer y empezar de nuevo van antes del instrumento. Con las puntas sin apoyar,
+  el instrumento muestra sólo el visor, porque la explicación ya la da Ohm. El conjuro va después
+  de lo que dice Ohm. La meta ocupa dos renglones como mucho, y los demás pasos quedan como
+  puntitos en el mismo renglón.
+- **Si alguien pregunta** (la marca esperada de Nereo o de Vega), la pregunta y sus respuestas van
+  primero, en dos columnas. Mientras tanto, el encargo deja sólo la meta. `qa-bench-load.mjs`
+  cuenta entonces la pregunta entera como lo principal, en lugar de los botones.
+- Lo que sigue apretado (los nombres de las piezas en 390 px de ancho, los bancos de muchas piezas)
+  es lo que resolvería partir los bancos en minijuegos ([MINIJUEGOS.md](MINIJUEGOS.md)).
+
 ## Pendiente o NO VERIFICADO
 
 - **Prueba con personas: NO VERIFICADA.** La investigación recomienda partidas grabadas con
   jugadores nuevos que narren en voz alta. Nada de lo medido acá sustituye eso.
 - **Teléfono real: NO VERIFICADO.** Sólo con emulación táctil: apaisado 844×390 y 740×360, y
-  vertical 390×844.
+  vertical 390×844 (ciclo 29: ver arriba).
 - Hecho en el ciclo 25: pistas que responden al error del jugador (arriba). La predicción en los
   bancos clave quedó hecha en el ciclo 21. Sigue sin hacer: señalar en el tablero dónde se corta un
   camino abierto.

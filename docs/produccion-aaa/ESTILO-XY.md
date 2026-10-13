@@ -8,10 +8,11 @@ emulador con shaders. Decidió:
 
 ## Cómo verlo
 
-`npm run dev` y abrir:
-- `http://127.0.0.1:4190/?estilo=xy`: mundo X e Y, personajes con sus sprites.
-- `http://127.0.0.1:4190/?estilo=xy&gente=3d`: además, el viajero en 3D.
-- `?estilo=hd2d`: vuelve al estilo actual. La elección se recuerda en el navegador.
+**Desde el ciclo 29 (13 oct 2026), X e Y con personajes en 3D es el estilo del reino**, por decisión
+del usuario. `npm run dev` y abrir `http://127.0.0.1:4190/`. Opciones:
+- `?estilo=hd2d`: el estilo anterior. La elección se recuerda en el navegador.
+- `?gente=sprites`: X e Y con los sprites de antes; `?gente=dibujo`: el viajero redibujado.
+- `?pelo=rubio&piel=4&ropa=granate&bufanda=roja`: una apariencia, sin pasar por el registro.
 
 Capturas de comparación en [estilo-xy/](estilo-xy/). `scripts/qa-style.mjs` saca el mismo lugar y el mismo punto en los tres modos, en plano general y de
 cerca.
@@ -81,7 +82,7 @@ Pendientes del 3D:
 - una mancha marrón donde la correa cruza el pecho;
 - falta una caminata más rica: la bufanda no flamea.
 
-## Pelo y piel editables (para más adelante)
+## Pelo y piel editables (hecho en el ciclo 29; el plan original, abajo)
 
 Conviene prepararlo ahora y construirlo más adelante. Al hornear la textura del 3D se saca también
 una máscara de pelo y de piel, y un shader cambia el tono dentro de la máscara y conserva la luz
@@ -187,3 +188,28 @@ Lo nuevo con Edda:
 - las caras de cerca, que dependen de la textura proyectada;
 - simplificar la geometría de los personajes;
 - decidir si el estilo X e Y pasa a ser el estilo por defecto.
+
+## Ciclo 29 · Estilo definitivo, apariencia, caras y peso (13 oct 2026)
+
+- **Estilo por defecto.** X e Y con personajes en 3D (`src/style.js`). Se pasaron al estilo la
+  pausa y las demás ventanas, el mapa (carteles blancos, reino a color y brújula), la observación
+  de Ohm en el mundo y los controles táctiles (`src/xy-ui.css`).
+- **Elegir la apariencia.** Pelo, piel, abrigo y bufanda, 6 colores cada uno. Se elige al dar el
+  nombre, con un dibujo que responde al instante, y después desde Opciones. En Opciones, la cámara
+  se acerca al viajero, que cambia en vivo y queda a la vista al costado o debajo del panel.
+  Se guarda en el registro del Instituto (`roxana.escuela.v1`, `apariencia`) junto al nombre.
+  `scripts/qa-look.mjs` lo prueba en 1440×900, 844×390 y 390×844. Capturas:
+  [desde Opciones](estilo-xy/apariencia-opciones.png) y [en el registro, teléfono apaisado](estilo-xy/apariencia-registro-telefono.png).
+- **Partida completa** con todo esto y sin parámetros en la dirección (13 oct): 9 lugares, 9 bancos,
+  9 secretos, el final y la recarga, sin errores. Pasan también el flujo de bancos y las pruebas
+  táctiles vertical y apaisada.
+- **Caras.** El frente de la cabeza ocupa 2,2 veces más textura por lado, y el resto de la cabeza
+  un poco más (`CARA_ESCALA` en `scripts/blender/viajero-3d.py`). Comparado de cerca con
+  `scripts/qa-caras.mjs`: los ojos, las cejas y la boca se ven más definidos. Lo que limita ahora
+  es la resolución de las imágenes de referencia: para ir más lejos habría que generar una
+  referencia de la cara de cerca y proyectarla aparte. Capturas:
+  [antes](estilo-xy/cara-viajero-antes.png) y [después](estilo-xy/cara-viajero-despues.png).
+- **Peso.** Cada modelo arrastraba seis capas de color por vértice del proceso: lo que veía cada
+  cámara y las regiones. Pesaban unas tres veces lo que la textura. Ya no se exportan
+  (`viajero-3d.py` y `comprimir.py`). Los diez personajes bajaron de 22 MB a 12,7 MB, entre
+  1,2 y 1,45 MB cada uno. Se rehicieron desde su forma, con sus regiones de color.
