@@ -101,6 +101,11 @@ Capturas: [el Manantial con Tala y Marín](minijuegos/manantial-con-tala-y-marin
 [el carro de Marín resuelto](minijuegos/carro-de-marin-resuelto.png) y
 [la baliza de Edda](minijuegos/baliza-de-edda.png).
 
+**Para probarlo sin jugar desde el principio:** en el título, Opciones → importar la bitácora
+[partida-antes-del-manantial.json](minijuegos/partida-antes-del-manantial.json). Empieza en la
+Calzada con la Puerta abierta: la baliza de Edda está a la izquierda del camino, y el Manantial al
+norte.
+
 ### Para decidir después de jugarlo
 
 - ¿Se entiende como «vecinos con un problema chico»? ¿Molesta que la bomba espere a Tala?

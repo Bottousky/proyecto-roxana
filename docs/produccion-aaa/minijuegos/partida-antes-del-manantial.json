@@ -1,0 +1,53 @@
+{
+ "version": 1,
+ "area": "road",
+ "position": null,
+ "flags": {
+  "awaken": true,
+  "workshop": true,
+  "bridge_ready": true,
+  "road_send": true,
+  "road_return": true,
+  "gate": true
+ },
+ "seen": [
+  "road_arrival",
+  "road_edda"
+ ],
+ "secrets": [],
+ "visited": [
+  "portal",
+  "plaza",
+  "workshop",
+  "road"
+ ],
+ "puzzles": {},
+ "fieldNotes": [],
+ "personalNotes": {},
+ "known": [
+  "edda",
+  "ohm",
+  "lumen",
+  "marin",
+  "tala"
+ ],
+ "playerName": "",
+ "journeyTime": {
+  "phase": 0
+ },
+ "activeDialogue": null,
+ "activeCinematic": null,
+ "endingPending": false,
+ "playtime": 0,
+ "createdAt": 1791900263131,
+ "savedAt": 1791900263131,
+ "settings": {
+  "volume": 0.55,
+  "muted": false,
+  "reducedMotion": false,
+  "quality": "high",
+  "textSpeed": 36,
+  "clickToWalk": false,
+  "lumenMarks": false
+ }
+}
