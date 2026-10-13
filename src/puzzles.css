@@ -497,3 +497,75 @@ html[data-estilo="xy"] .wb-primary:hover{background:#46c877}
 html[data-estilo="xy"] .wb-piece-list li,html[data-estilo="xy"] .wb-rotate-hint{color:#25313b}
 html[data-estilo="xy"] .wb-terminal-drawer>summary{color:#1f4e78}
 html[data-estilo="xy"] .wb-marks button{font:700 14px/1.2 ui-rounded,'SF Pro Rounded','Arial Rounded MT Bold',sans-serif}
+
+/* Teléfono (ciclo 29): lo principal entra sin desplazar. En vertical, el encargo muestra sólo el paso
+   de ahora, el conjuro y la explicación del instrumento caben en dos renglones; apaisado, los
+   botones de deshacer van antes del instrumento y su explicación también cabe en dos renglones. */
+@media (max-width:530px){
+  html .workbench-overlay .wb-header{padding:8px 10px;gap:6px 8px}
+  html .workbench-overlay .wb-header h1{font-size:17px;line-height:1.2}
+  html .workbench-overlay .wb-goal{padding:6px 10px}
+  html .workbench-overlay .wb-goal-line{font-size:14px;margin-bottom:4px}
+  .wb-checks{flex-direction:row;flex-wrap:wrap;gap:4px 5px}
+  .wb-checks li:not(.current){font-size:0;gap:0}
+  .wb-checks li:not(.current) small{display:none}
+  .wb-checks li.current{order:-1;flex-basis:100%;font-size:13px}
+  html .workbench-overlay .wb-stage{padding:8px 8px 2px}
+  .wb-rotate-hint{margin-top:6px;padding:4px 10px}
+  html .workbench-overlay .wb-conjuro{font-size:13px;line-height:1.3;padding:4px 10px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  html .workbench-overlay .wb-conjuro small{display:none}
+  html .workbench-overlay .wb-dock{gap:6px;padding:6px 8px 10px}
+  html .workbench-overlay .wb-say{padding:6px 8px;gap:8px}
+  html .workbench-overlay .wb-say-face{width:28px;height:28px}
+  html .workbench-overlay .wb-say p{font-size:13.5px;line-height:1.35}
+  html .workbench-overlay .wb-probe p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:11.5px}
+}
+@media (orientation:landscape) and (max-height:540px){
+  .wb-tools button{order:0}.wb-history button{order:1}html .workbench-overlay .wb-probe{order:2;padding:4px 8px}
+  html .workbench-overlay .wb-probe p{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:11px;line-height:1.3}
+  html .workbench-overlay .wb-goal{padding:5px 8px}
+}
+/* Si alguien hace una pregunta (marca esperada) o pide una prueba, eso va primero: es lo que toca hacer. */
+@media (orientation:landscape) and (max-height:540px){html .workbench-overlay .wb-say.is-estimate,html .workbench-overlay .wb-say.wb-proof{order:-2}}
+@media (max-width:530px){html .workbench-overlay .wb-say.is-estimate .wb-marks button{min-height:40px;padding:6px 12px}}
+@media (orientation:landscape) and (max-height:540px){
+  html .workbench-overlay .wb-say .wb-marks{display:grid;grid-template-columns:1fr 1fr;gap:4px;flex-basis:100%;padding-left:0}
+  html .workbench-overlay .wb-say .wb-marks button{min-height:34px;padding:4px 6px;font-size:12px}
+  html .workbench-overlay .wb-say .wb-marks .wb-marks-skip{grid-column:1/-1;min-height:30px}
+  html .workbench-overlay .wb-meter-readout{padding:2px 8px}
+  html .workbench-overlay .wb-meter-readout strong{font-size:16px}
+  html .workbench-overlay .wb-numbers{min-height:32px;padding:3px 8px}
+  .wb-history button{min-height:38px}
+}
+/* Apaisado, el encargo en poco alto: la meta en dos renglones como mucho; el paso de ahora con su
+   número y los demás como puntitos al final del mismo renglón. */
+@media (orientation:landscape) and (max-height:540px){
+  html .workbench-overlay .wb-goal-line{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin-bottom:2px}
+  html .workbench-overlay .wb-checks{flex-wrap:nowrap;align-items:center}
+  html .workbench-overlay .wb-checks li.current{order:0;flex:1 1 auto;min-width:0}
+  html .workbench-overlay .wb-checks li:not(.current){flex:none}
+  html .workbench-overlay .wb-checks li:not(.current) .wb-check-mark{width:9px;height:9px;font-size:0;border-width:1.5px}
+  html .workbench-overlay .wb-header{padding-bottom:6px}
+}
+/* Apaisado, el conjuro va después de lo que dice Ohm, en dos renglones como mucho. */
+@media (orientation:landscape) and (max-height:540px){
+  html .workbench-overlay .wb-conjuro{order:1;font-size:12px;line-height:1.3;padding:3px 8px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+  html .workbench-overlay .wb-conjuro small{display:none}
+}
+/* Apaisado y con las puntas sin apoyar, la explicación del instrumento la da Ohm: sólo el visor. */
+@media (orientation:landscape) and (max-height:540px){
+  html .workbench-overlay .wb-probe.is-empty p{display:none}
+  html .workbench-overlay .wb-say.is-estimate p{font-size:12px;line-height:1.32}
+  html .workbench-overlay .wb-say .wb-marks button{min-height:32px}
+  html .workbench-overlay .wb-say .wb-marks .wb-marks-skip{min-height:26px;padding:0}
+}
+/* Apaisado, mientras alguien pregunta, el encargo cede lugar: queda sólo la meta, sin título ni pasos. */
+@media (orientation:landscape) and (max-height:540px){
+  html .workbench-overlay .wb-asking .wb-heading,html .workbench-overlay .wb-asking .wb-checks{display:none}
+  html .workbench-overlay .wb-asking .wb-goal{grid-row:1;grid-column:1}
+}
+@media (orientation:landscape) and (max-height:540px){html .workbench-overlay .wb-probe-name{display:none}}
+html[data-estilo="xy"] .wb-rotate-hint{background:#eef5fb;color:#1f6fb0;border-radius:999px;font-weight:700}
+html[data-estilo="xy"] .wb-rotate-hint span{color:#2f8fd6}
+html[data-estilo="xy"] .wb-piece-list li{background:#fff;border:2px solid #e3eaf0;border-radius:14px;color:#25313b;font-family:inherit;font-weight:700}
+html[data-estilo="xy"] .wb-piece-list .wb-plate-name{color:#25313b}

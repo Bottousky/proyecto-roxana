@@ -35,17 +35,19 @@ for (const id of ids) {
     const caseBox = root.querySelector('.wb-case').getBoundingClientRect(), limit = Math.min(innerHeight, caseBox.bottom);
     // Goal, board and tools must be whole; Ohm's sentence must at least begin on screen (in a
     // landscape phone it follows the buttons and scrolls in its column).
-    const primary = ['.wb-goal', '.wb-board', '.wb-toolbar', '.wb-plate'].map(s => [...root.querySelectorAll(s)].find(vis)).filter(Boolean);
-    const say = root.querySelector('.wb-say');
-    const hidden = [...primary.filter(e => e.getBoundingClientRect().bottom > limit + 1), ...(say && say.getBoundingClientRect().top > limit - 36 ? [say] : [])].map(e => e.className.split(' ')[0]);
-    return { overlaps, hidden, scroll: scroller ? scroller.scrollHeight - scroller.clientHeight : 0, boardFits: board.bottom <= innerHeight && board.top >= 0, asideBottom: aside ? Math.round(aside.bottom - innerHeight) : 0, texts: texts.length, controls: controls.length, crossed: [...crossed] };
+    // When someone asks a question first (the expected mark), what must be whole is the question
+    // and its answers; the tools come after it.
+    const say = root.querySelector('.wb-say'), asking = !!say?.querySelector('.wb-marks');
+    const primary = ['.wb-goal', '.wb-board', asking ? '.wb-say' : '.wb-toolbar', '.wb-plate'].map(s => [...root.querySelectorAll(s)].find(vis)).filter(Boolean);
+    const hidden = [...primary.filter(e => e.getBoundingClientRect().bottom > limit + 1), ...(say && !asking && say.getBoundingClientRect().top > limit - 36 ? [say] : [])].map(e => e.className.split(' ')[0]);
+    return { asking, overlaps, hidden, scroll: scroller ? scroller.scrollHeight - scroller.clientHeight : 0, boardFits: board.bottom <= innerHeight && board.top >= 0, asideBottom: aside ? Math.round(aside.bottom - innerHeight) : 0, texts: texts.length, controls: controls.length, crossed: [...crossed] };
   });
   if (shots) await page.screenshot({ path: `${shots}/${width}x${height}-${id}.png` });
   rows.push({ id, ...m });
   await page.evaluate(() => { window.__ohmdal.workbench.close?.(false); document.querySelector('#workbench').classList.add('hidden'); });
 }
 console.log(`${width}×${height}`);
-for (const r of rows) console.log(`${r.id.padEnd(15)} principal ${r.hidden.length ? 'CORTADO: ' + r.hidden.join(', ') : 'a la vista'} · desplaza ${String(r.scroll).padStart(4)} px · tablero ${r.boardFits ? 'entero' : 'cortado'} · textos ${String(r.texts).padStart(2)} · controles ${String(r.controls).padStart(2)} · placas encimadas ${r.overlaps} · nombres pisados ${r.crossed.length}${r.crossed.length ? ' (' + r.crossed.join(', ') + ')' : ''}`);
+for (const r of rows) console.log(`${r.id.padEnd(15)} principal${r.asking ? ' (pregunta)' : ''} ${r.hidden.length ? 'CORTADO: ' + r.hidden.join(', ') : 'a la vista'} · desplaza ${String(r.scroll).padStart(4)} px · tablero ${r.boardFits ? 'entero' : 'cortado'} · textos ${String(r.texts).padStart(2)} · controles ${String(r.controls).padStart(2)} · placas encimadas ${r.overlaps} · nombres pisados ${r.crossed.length}${r.crossed.length ? ' (' + r.crossed.join(', ') + ')' : ''}`);
 const sum = k => rows.reduce((a, r) => a + (typeof r[k] === 'number' ? r[k] : r[k].length), 0);
 console.log(`bancos con lo principal a la vista ${rows.filter(r => !r.hidden.length).length}/9 · total · textos ${sum('texts')} · controles ${sum('controls')} · nombres pisados ${sum('crossed')} · bancos que desplazan ${rows.filter(r => r.scroll > 0).length}/9`);
 await browser.close();

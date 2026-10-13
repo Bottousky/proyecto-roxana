@@ -3,13 +3,13 @@ import {ShaderChunks,SHADERLANGUAGE_GLSL,StandardMaterial,Quat,Vec3,Texture,PIXE
 // Two looks for the same kingdom. «hd2d» is the original: pixel-art surfaces, a long lens and a
 // miniature blur. «xy» follows Pokémon X and Y as an upscaled emulator shows them: a closer camera,
 // smooth painted surfaces, soft two-tone (cel) light, ink outlines and a clean, saturated palette.
-// Chosen with ?estilo=xy (or ?estilo=hd2d), remembered in this browser.
+// «xy» is the kingdom's look; ?estilo=hd2d brings back the original, remembered in this browser.
 const KEY='ohmdal.estilo';
 export const STYLE=(()=>{
   const asked=new URLSearchParams(globalThis.location?.search||'').get('estilo');
   try{if(asked==='xy'||asked==='hd2d')globalThis.localStorage?.setItem(KEY,asked);}catch{}
   let kept=null;try{kept=globalThis.localStorage?.getItem(KEY);}catch{}
-  return (asked||kept)==='xy'?'xy':'hd2d';
+  return (asked||kept)==='hd2d'?'hd2d':'xy';
 })();
 export const XY=STYLE==='xy';
 globalThis.document?.documentElement?.setAttribute('data-estilo',STYLE);
@@ -95,10 +95,11 @@ export const XY_SURFACES=new Set(['meadow','cobble','roof','stone','wood','plast
 // ── People in 3D ───────────────────────────────────────────────────────────────────────────
 // A chunky 3D figure (scripts/blender/chibi.py) replaces a sprite: it hangs from the sprite's entity,
 // undoing its tilt toward the camera, turns toward where it walks and swings legs and arms with the
-// walk phase the game already keeps. ?gente=3d turns it on in the X and Y look (the prototype).
-export const PEOPLE_3D=XY&&new URLSearchParams(globalThis.location?.search||'').get('gente')==='3d';
+// walk phase the game already keeps. On in the X and Y look; ?gente=sprites brings back the sprites.
+const PEOPLE=new URLSearchParams(globalThis.location?.search||'').get('gente');
+export const PEOPLE_3D=XY&&PEOPLE!=='sprites'&&PEOPLE!=='dibujo';
 /** ?gente=dibujo: the traveller's sprite sheet redrawn in the X and Y style (option 2 of the prototype). */
-export const DRAWN_PLAYER=XY&&new URLSearchParams(globalThis.location?.search||'').get('gente')==='dibujo';
+export const DRAWN_PLAYER=XY&&PEOPLE==='dibujo';
 const PARTS=['cadera','cuerpo','cabeza','pierna-izq','pierna-der','brazo-izq','brazo-der'];
 // A skinned figure (scripts/blender/viajero-3d.py) swings its bones about the model's own axes:
 // each bone keeps its rest rotation and turns by a delta around the model's X (forward swing) or Z

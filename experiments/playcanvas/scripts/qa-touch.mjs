@@ -31,7 +31,9 @@ const read = async () => { for (let i = 0; i < 200; i++) { const g = await game(
 const aim = id => page.evaluate(id => {
   const w = window.__ohmdal.world, o = w.getInteractions().find(i => i.id === id), r = w.canvas.getBoundingClientRect(), [px, pz] = w.getPlayerPosition();
   // The open ground: away from the edges and from whatever the interface draws over the world.
-  const top = Math.min(190, r.height * .24), bottom = Math.min(230, r.height * .3);
+  // The closer X and Y camera leaves things just below the traveller near the bottom edge: only a
+  // thin margin is kept there, the touch controls are left out by free().
+  const top = Math.min(190, r.height * .24), bottom = Math.min(230, r.height * .1);
   const free = p => { const hit = document.elementFromPoint(p.x + r.left, p.y + r.top); return !hit || hit === w.canvas || hit.closest?.('#world') && !hit.closest('button,a,.hud-top,.hud-tools,#touch-controls,.objective,.interaction'); };
   const inside = p => p.visible && p.x > 30 && p.x < r.width - 30 && p.y > top && p.y < r.height - bottom && free(p);
   const own = w.getScreenPosition(o); if (inside(own)) return { x: own.x + r.left, y: own.y + r.top, direct: true };
@@ -51,7 +53,8 @@ async function reach(id, { until = g => g.near === id || g.mode !== 'world', tri
     await page.waitForTimeout(300);
     for (let k = 0; k < 40 && await page.evaluate(() => { const w = window.__ohmdal.world; return !!(w.target || w.route?.length); }); k++) await page.waitForTimeout(150);
   }
-  throw new Error(`No se llegó a ${id}: ${JSON.stringify(await game())}`);
+  await capture(`no-llego-${id}`);
+  throw new Error(`No se llegó a ${id}: ${JSON.stringify(await game())} · último toque ${JSON.stringify(await aim(id))}`);
 }
 
 await page.goto(process.env.GAME_URL || 'http://127.0.0.1:4190/', { waitUntil: 'networkidle' });

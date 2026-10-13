@@ -49,3 +49,66 @@ html[data-estilo="xy"] .arrival .eyebrow{color:#fff!important;text-shadow:0 2px 
 html[data-estilo="xy"] .arrival-line{display:none}
 html[data-estilo="xy"] .title-shade{background:linear-gradient(0deg,#0d2a4455,transparent 30%)!important}
 html[data-estilo="xy"] .title-art{background-position:60% center!important}
+
+/* Ciclo 29: el resto de la interfaz en el estilo X e Y, que pasa a ser el del reino. */
+html[data-estilo="xy"]{--xy-line:#d5dde5}
+/* Ventanas (pausa, guía, nombre): tarjeta blanca redondeada con borde azul. */
+html[data-estilo="xy"] .modal-layer{background:#0b2a4466;backdrop-filter:blur(3px)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map){background:#fff;border:4px solid var(--xy-blue);border-radius:26px;box-shadow:0 6px 0 var(--xy-blue-deep),0 24px 70px #0b2a4466;color:var(--xy-ink)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) :is(h2,h3){color:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800;letter-spacing:0}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) .eyebrow{color:var(--xy-blue)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) :is(p,li,label,span,small,.modal-intro,.setting-note){color:var(--xy-soft)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) label>span:first-child{color:var(--xy-ink);font-weight:700}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) .options-list label{border-color:#e3eaf0}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) :is(input[type=text],#player-name-option,select),html[data-estilo="xy"] .name-form input{background:#f2f8fd;border:2px solid var(--xy-line);border-radius:14px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:700}
+html[data-estilo="xy"] .modal :is(input[type=range],input[type=checkbox]){accent-color:var(--xy-blue)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) button:not(.modal-close){background:#fff;border:2px solid var(--xy-line);border-radius:999px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:700;box-shadow:0 3px 0 #c9d3dc}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) button.primary{background:var(--xy-blue);border-color:var(--xy-blue);color:#fff;box-shadow:0 3px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] .modal .modal-close{background:#fff!important;border:0!important;border-radius:999px;color:var(--xy-blue-deep)!important;box-shadow:0 3px 0 #c9d3dc}
+html[data-estilo="xy"] .modal.journal-modal>.modal-close{box-shadow:0 3px 0 #8a6a43}
+/* La observación de Ohm en el mundo. */
+html[data-estilo="xy"] .field-meter{background:#fff;border:3px solid var(--xy-blue);border-radius:22px;box-shadow:0 5px 0 var(--xy-blue-deep),0 14px 34px #0b2a4440;color:var(--xy-ink)}
+html[data-estilo="xy"] .field-meter:after{display:none}
+html[data-estilo="xy"] .field-meter :is(h3){color:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] .field-meter :is(p,.field-guide,li,dd,dt,span:not(.eyebrow)){color:var(--xy-ink)}
+html[data-estilo="xy"] .field-meter .eyebrow{color:var(--xy-blue)}
+html[data-estilo="xy"] .field-meter summary{color:var(--xy-blue-deep);font-weight:700}
+html[data-estilo="xy"] .field-meter summary:before{color:var(--xy-blue)}
+html[data-estilo="xy"] .field-meter #close-field-meter{color:var(--xy-blue-deep);background:none;border:0;border-radius:999px;top:6px;right:6px}
+html[data-estilo="xy"] .field-meter :is(h3,p){padding-right:30px}
+html[data-estilo="xy"] .kmap-player .kmap-label{background:var(--xy-blue);border:2px solid #fff;color:#fff;font-family:var(--xy-font);font-weight:800;box-shadow:0 2px 0 var(--xy-blue-deep);text-shadow:none}
+/* Controles táctiles: botones blancos redondeados, el de interactuar como las píldoras del mundo. */
+html[data-estilo="xy"] .dpad button{background:#ffffffe6;border:3px solid var(--xy-blue);border-radius:16px;color:var(--xy-blue-deep);font-weight:800;box-shadow:0 4px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] #touch-interact{background:#fff;border:3px solid #f2b33a;border-radius:999px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:800;box-shadow:0 4px 0 #c98a12;text-shadow:none}
+html[data-estilo="xy"] #touch-interact:disabled{background:#ffffffb3;border-color:#d5dde5;color:var(--xy-soft);box-shadow:0 3px 0 #c9d3dc}
+/* El mapa: el reino a todo color, con carteles blancos como un mapa de pueblo. */
+html[data-estilo="xy"] .modal-layer .modal.kingdom-map{background:#7cc0ea}
+html[data-estilo="xy"] .kmap-viewport{background:radial-gradient(ellipse at 50% 40%,#9bd3f3,#5aa6dc 80%),#5aa6dc}
+html[data-estilo="xy"] .kmap-world{box-shadow:0 0 0 6px #fff,0 0 0 10px var(--xy-blue),0 24px 60px #0b2a4466}
+html[data-estilo="xy"] .kmap-world::after{box-shadow:inset 0 0 40px 10px #ffffff88}
+html[data-estilo="xy"] .kmap-aged{filter:grayscale(.35) brightness(1.12) contrast(.86)}
+html[data-estilo="xy"] .kmap-frame{box-shadow:inset 0 0 90px 10px #0b2a4440}
+html[data-estilo="xy"] .kmap-label{color:var(--xy-ink);font-family:var(--xy-font);font-weight:800;text-shadow:0 0 3px #fff,0 0 6px #fff,0 1px 0 #fff}
+html[data-estilo="xy"] .kmap-region{color:#fff;font-family:var(--xy-font);font-style:normal;font-weight:800;letter-spacing:.2em;text-shadow:0 0 3px var(--xy-blue-deep),0 0 8px var(--xy-blue-deep),0 2px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] .kmap-place{font:800 18px/1 var(--xy-font);letter-spacing:0;color:var(--xy-blue-deep);background:#fff;border:3px solid var(--xy-blue);border-radius:999px;padding:5px 14px 6px;box-shadow:0 3px 0 var(--xy-blue-deep);text-shadow:none}
+html[data-estilo="xy"] .kmap-place.unknown{color:var(--xy-soft);background:#ffffffcc;border-color:#d5dde5;box-shadow:0 3px 0 #c9d3dc;font-style:normal}
+html[data-estilo="xy"] .kmap-place.current{color:#fff;background:var(--xy-blue);border-color:#fff}
+html[data-estilo="xy"] .kmap-landmark-name{font-family:var(--xy-font)!important;font-weight:800;color:var(--xy-blue-deep)!important;background:#fff!important;border:3px solid var(--xy-blue)!important;border-radius:999px!important;box-shadow:0 3px 0 var(--xy-blue-deep)!important;text-shadow:none!important}
+html[data-estilo="xy"] :is(.kmap-title,.kmap-quest,.kmap-travel,.kmap-legend,.kmap-popover){background:#fff;border:3px solid #fff;border-radius:20px;box-shadow:0 4px 0 #c9d3dc,0 10px 26px #0b2a4433;color:var(--xy-ink)}
+html[data-estilo="xy"] .kmap-title h2{font-family:var(--xy-font);font-weight:800;color:var(--xy-blue-deep)}
+html[data-estilo="xy"] .kmap-title .eyebrow{color:var(--xy-blue)}
+html[data-estilo="xy"] :is(.kmap-title p,.kmap-quest p,.kmap-legend){color:var(--xy-soft)}
+html[data-estilo="xy"] :is(.kmap-quest strong,.kmap-popover strong){color:var(--xy-ink);font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] .kmap-quest{border-left:3px solid #fff}
+html[data-estilo="xy"] :is(.kmap-quest button,.kmap-travel .map-destination,.kmap-popover .kmap-dismiss){background:#f2f8fd;border:2px solid var(--xy-line);border-radius:14px;color:var(--xy-ink);font-weight:700}
+html[data-estilo="xy"] .kmap-travel summary{color:var(--xy-blue-deep);font-weight:800}
+html[data-estilo="xy"] .kmap-travel .map-destination small{color:var(--xy-soft)}
+html[data-estilo="xy"] .kmap-popover .kmap-go{background:var(--xy-blue);border:0;border-radius:999px;color:#fff;box-shadow:0 3px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] :is(.kmap-controls button,.modal.kingdom-map .modal-close){background:#fff!important;border:0!important;color:var(--xy-blue-deep)!important;box-shadow:0 3px 0 #c9d3dc,0 6px 14px #0b2a4433!important}
+html[data-estilo="xy"] .kmap-scale i{border-color:var(--xy-ink);box-shadow:0 1px 0 #fff}
+html[data-estilo="xy"] .kmap-scale span{color:var(--xy-ink);font-weight:700;text-shadow:0 0 3px #fff,0 0 6px #fff}
+html[data-estilo="xy"] .kmap-compass{filter:drop-shadow(0 3px 0 #c9d3dc)}
+html[data-estilo="xy"] .kmap-compass .ring{fill:#fff;stroke:var(--xy-blue)}
+html[data-estilo="xy"] .kmap-compass .needle-n{fill:#e8503a;stroke:#fff}
+html[data-estilo="xy"] .kmap-compass .needle-s{fill:#fff;stroke:var(--xy-soft)}
+html[data-estilo="xy"] .kmap-compass text{fill:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800}
