@@ -1,0 +1,47 @@
+{
+ "personaje": "Nereo",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "gorro",
+   "caras": 28689,
+   "archivo": "pieza-gorro.stl"
+  },
+  {
+   "pieza": "abrigo",
+   "caras": 183577,
+   "archivo": "pieza-abrigo.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 98185,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "camisa",
+   "caras": 3355,
+   "archivo": "pieza-camisa.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 38726,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "pantalon",
+   "caras": 69987,
+   "archivo": "pieza-pantalon.stl"
+  },
+  {
+   "pieza": "bufanda",
+   "caras": 28884,
+   "archivo": "pieza-bufanda.stl"
+  },
+  {
+   "pieza": "pelo",
+   "caras": 8715,
+   "archivo": "pieza-pelo.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

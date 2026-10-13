@@ -1,0 +1,12 @@
+{
+  "nombre": "Ohm",
+  "nota": "Robot de bronce: un cuerpo y dos pies. Sin pelo ni piel.",
+  "robot": true,
+  "pies": 0.35,
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "bronce", "muestra": "#d6a73a", "colores": ["#d9a83c", "#b8862a", "#f1cf6a", "#8f6a20"] },
+    { "nombre": "franja", "muestra": "#2f6e6a", "colores": ["#2f6e6a", "#1f4f4c", "#3f8a84"], "z": [0.3, 1.15] },
+    { "nombre": "ojo", "muestra": "#3fc4e0", "colores": ["#3fc4e0", "#1b6f86", "#bff0fb", "#0d2a33"], "z": [0.9, 1.75] }
+  ]
+}

@@ -1,0 +1,34 @@
+{
+ "regiones": [
+  {
+   "nombre": "piel",
+   "muestra": "#eeb47c",
+   "tenible": "piel"
+  },
+  {
+   "nombre": "pelo",
+   "muestra": "#a59a92",
+   "tenible": "pelo"
+  },
+  {
+   "nombre": "vestido",
+   "muestra": "#9a9a58",
+   "tenible": "ropa"
+  },
+  {
+   "nombre": "delantal",
+   "muestra": "#4f6362",
+   "tenible": "ropa2"
+  },
+  {
+   "nombre": "punos",
+   "muestra": "#ece0c2",
+   "tenible": null
+  },
+  {
+   "nombre": "cuero",
+   "muestra": "#6b4a2f",
+   "tenible": null
+  }
+ ]
+}

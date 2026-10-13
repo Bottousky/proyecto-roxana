@@ -1,0 +1,105 @@
+{
+ "nombre": "Lumen",
+ "nota": "Bajo y robusto, con mucho pelo y barba blancos: el esqueleto baja hombros, entrepierna y rodillas. Delantal y botas comparten el cuero; se separan por altura.",
+ "esqueleto": {
+  "axila": 1.17,
+  "entrepierna": 0.6,
+  "rodilla": 0.34
+ },
+ "suavizado": 8,
+ "regiones": [
+  {
+   "nombre": "piel",
+   "tenible": "piel",
+   "muestra": "#f2b07a",
+   "colores": [
+    "#f4ae6c"
+   ],
+   "z": [
+    0.7,
+    1.72
+   ]
+  },
+  {
+   "nombre": "pelo",
+   "tenible": "pelo",
+   "muestra": "#f6ead0",
+   "colores": [
+    "#fbedcb",
+    "#edd0a7",
+    "#caaa86"
+   ],
+   "z": [
+    1.25,
+    2.0
+   ]
+  },
+  {
+   "nombre": "anteojos",
+   "muestra": "#2f8a8a",
+   "colores": [
+    "#2f797a",
+    "#3a8e8c"
+   ],
+   "z": [
+    1.66,
+    1.9
+   ]
+  },
+  {
+   "nombre": "camisa",
+   "tenible": "ropa",
+   "muestra": "#7a2f44",
+   "colores": [
+    "#772e3c"
+   ],
+   "z": [
+    0.95,
+    1.5
+   ]
+  },
+  {
+   "nombre": "delantal",
+   "tenible": "ropa2",
+   "muestra": "#a5612c",
+   "colores": [
+    "#9c5c2a",
+    "#7c4620",
+    "#bd7337",
+    "#542e16",
+    "#371915"
+   ],
+   "z": [
+    0.55,
+    1.45
+   ]
+  },
+  {
+   "nombre": "pantalon",
+   "muestra": "#4a4038",
+   "colores": [
+    "#483f36",
+    "#181513"
+   ],
+   "z": [
+    0.25,
+    0.8
+   ]
+  },
+  {
+   "nombre": "botas",
+   "muestra": "#8a5124",
+   "colores": [
+    "#9c5c2a",
+    "#7c4620",
+    "#bd7337",
+    "#542e16",
+    "#181513"
+   ],
+   "z": [
+    0.0,
+    0.44
+   ]
+  }
+ ]
+}

@@ -1,0 +1,37 @@
+{
+ "personaje": "Vega",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "pelo",
+   "caras": 58975,
+   "archivo": "pieza-pelo.stl"
+  },
+  {
+   "pieza": "vestido",
+   "caras": 157631,
+   "archivo": "pieza-vestido.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 84495,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 30604,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "delantal",
+   "caras": 64951,
+   "archivo": "pieza-delantal.stl"
+  },
+  {
+   "pieza": "punos",
+   "caras": 7750,
+   "archivo": "pieza-punos.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}
