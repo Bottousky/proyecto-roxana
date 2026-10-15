@@ -411,6 +411,10 @@ export const DIALOGUES = {
     ['player', '¿Podemos mirar el tablero ahora?'],
     ['consejera', 'Con ese sector aislado, sí. Yo me quedo.']),
   distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada. El otro seccionador conecta el troncal de servicio. Las placas identifican ambos.']),
+  // What is still missing, said plainly (ciclo 30).
+  distribution_locked_both: d(['consejera', 'Dos seccionadores, uno a cada lado del patio. El de la izquierda separa el archivo oeste, que está dañado; el de la derecha conecta el troncal de servicio. Hagan las dos cosas y abro el tablero.']),
+  distribution_locked_archive: d(['consejera', 'El troncal ya está conectado. Falta separar el archivo oeste: su seccionador está a la izquierda del patio.']),
+  distribution_locked_trunk: d(['consejera', 'El archivo ya está separado. Falta conectar el troncal de servicio: su seccionador está a la derecha del patio.']),
   distribution_arrival: d(
     ['consejera', 'El indicador confirma que el archivo quedó separado en el patio. Debe seguir así durante la prueba.'],
     ['consejera', 'Y una cosa más. Algún día alguien va a tener que reparar la cocina. Ese día, la enfermería no se puede apagar.'],
@@ -1009,6 +1013,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'consejera_before' && f.castle_ready) context = 'castle_ready';
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
   if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';
+  if (id === 'distribution_locked') context = f.castle_branch_closed !== false && !f.castle_service ? 'distribution_locked_both' : f.castle_branch_closed !== false ? 'distribution_locked_archive' : !f.castle_service ? 'distribution_locked_trunk' : id;
   if (id === 'gate_locked' && f.workshop) context = f.road_bypass ? 'gate_locked_bridge' : !f.road_send ? 'gate_locked_west' : !f.road_return ? 'gate_locked_east' : id;
   if (id === 'workshop_locked' && !f.workshop_feed && f.workshop_return) context = 'workshop_locked_left';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';
