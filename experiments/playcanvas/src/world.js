@@ -273,6 +273,8 @@ export class PlayCanvasWorld {
     for(const a of [.2,.4,.6])for(const side of [1,-1]){const [vx,vz]=turn(a*side);if(!paved(p.x+vx*.9,p.z+vz*.9))continue;const alt=walk(vx,vz);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.5)return alt;}
     return next;
   }
+  /** The nearest point within 2.5 m where the traveller can stand with room to walk on (a step clear around). */
+  openGroundNear(x,z){for(let r=.35;r<=2.51;r+=.25)for(let i=0;i<16;i++){const a=i*Math.PI/8,q=[x+Math.cos(a)*r,z+Math.sin(a)*r];if(this.canStand(...q,.45)&&[0,1,2,3].filter(k=>this.canStand(q[0]+Math.cos(k*Math.PI/2)*.4,q[1]+Math.sin(k*Math.PI/2)*.4)).length>=3)return q;}return null;}
   canStand(x,z,radius=.34){return isPositionClear([x,z],this.bounds,this.obstacles,{radius,isWalkable:(x,z)=>this.walkableLand(x,z)});}
   nearestWalkable(p,radius=.34){if(this.canStand(...p,radius))return [...p];for(let d=.15;d<15;d+=.15)for(let i=0;i<32;i++){const x=p[0]+Math.cos(i*Math.PI/16)*d,z=p[1]+Math.sin(i*Math.PI/16)*d;if(this.canStand(x,z,radius))return [x,z];}return [...this.area.spawn];}
   groundHeight(x,z){if(this.area.id==='lake'&&Math.abs(x-9.2)<4.5&&Math.abs(z-3)<2.25)return .24;let height=.08;for(const s of this.data.areas[this.area.id].walkSurfaces||[]){if(s.r!=null?Math.hypot(x-s.x,z-s.z)<=s.r:Math.abs(x-s.x)<=s.w/2&&Math.abs(z-s.z)<=s.d/2)height=Math.max(height,s.y+.02);}return height;}
@@ -445,6 +447,12 @@ export class PlayCanvasWorld {
         find:for(const o of [.15,.3,.45])for(const side of [1,-1]){const sx=p.x-uz*side*o,sz=p.z+ux*side*o;if(this.canStand(sx,sz)&&this.canStand(sx+ux*.35,sz+uz*.35)){const alt=walk(-uz*side,ux*side);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.3)next=alt;break find;}}}
       if(!this.target)next=this.followPaths(p,dx,dz,step,next,walk);
       p.set(next[0],this.groundHeight(...next),next[1]);}
+    // Stuck (ciclo 30: players got wedged between a bush and a fence and even a reload left them
+    // there): asked to move for more than a second without moving, the traveller steps to the
+    // nearest open ground around.
+    {const asked=!paused&&((dx||dz)||!!this.target);this.stuckFor=asked&&Math.hypot(p.x-old[0],p.z-old[1])<.002?(this.stuckFor||0)+dt:0;
+      // Pushing against a wall is not being stuck: only when no direction around is free.
+      if(this.stuckFor>1.1){this.stuckFor=0;const boxed=!this.canStand(p.x,p.z)&&[0,1,2,3,4,5,6,7].every(k=>!this.canStand(p.x+Math.cos(k*Math.PI/4)*.3,p.z+Math.sin(k*Math.PI/4)*.3,.2));const open=boxed&&this.openGroundNear(p.x,p.z);if(open){p.x=open[0];p.z=open[1];p.y=this.groundHeight(open[0],open[1]);this.target=null;this.route=[];}}}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.walking){const l=Math.hypot(p.x-old[0],p.z-old[1]);this.lastStep=[(p.x-old[0])/l,(p.z-old[1])/l];}if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
