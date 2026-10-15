@@ -233,7 +233,9 @@ export class PuzzleWorkbench {
     if (this.state.meter?.a && !this.state.meter.b) this.state.meter.a = null;
     if (!this.state.evidence.length) this.recordObservation('observation');
     this.render();
-    this.shell.querySelector('[data-action="close"]')?.focus({ preventScroll: true });
+    // The bench itself takes the focus, not «Volver»: a first player pressed Enter and the bench
+    // closed under them (ciclo 30). Tab reaches every control from here.
+    this.shell.tabIndex = -1; this.shell.focus?.({ preventScroll: true });
     this.callbacks.onChange?.(id, copy(this.state));
     this.callbacks.onSound?.('open');
   }

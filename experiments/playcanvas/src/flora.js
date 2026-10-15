@@ -14,6 +14,7 @@ import {quietMountKeepsClear} from './game/quiet-mount.js';
 import {AREA_LAYOUTS,backdropYards} from './game/world-layout.js';
 import {surface} from './art.ts';
 import {makeLiving,setDry} from './living.js';
+import {makeSeeThrough} from './see-through.js';
 import grid from './data/relief.json';
 
 // Pasto, flores, matas y juncos pixel art (art-src/plants → scripts/plants.py) sembrados
@@ -159,7 +160,7 @@ export async function sowFlora(world){
   for(let t=0;t<6;t++){const f=forest[t];if(!f.indices.length)continue;
     const mesh=new Mesh(app.graphicsDevice);mesh.setPositions(f.positions);mesh.setUvs(0,f.uvs);mesh.setColors(f.colors);mesh.setNormals(new Array(f.positions.length/3).fill(0).flatMap(()=>[0,1,0]));mesh.setIndices(f.indices);mesh.update();
     const map=await surface(app,'tree'+t),m=new StandardMaterial();m.name='bosque-'+t;m.diffuseMap=map;m.opacityMap=map;m.opacityMapChannel='a';m.alphaTest=.35;m.cull=CULLFACE_NONE;m.diffuseVertexColor=true;m.useMetalness=true;m.metalness=0;m.gloss=.1;m.update();makeLiving(m);setDry(m,1-WILDS);
-    makeWind(m,'tree');(world.windy??=[]).push(m);
+    makeWind(m,'tree');(world.windy??=[]).push(m);makeSeeThrough(m); // a crown in front of the traveller opens, like walls and eaves (ciclo 30)
     const e=new Entity('Bosque · '+t),mi=new MeshInstance(mesh,m);mi.castShadow=true;mi.receiveShadow=true;e.addComponent('render',{meshInstances:[mi]});root.addChild(e);}
 
   for(const [key,b] of Object.entries(batches)){
@@ -167,7 +168,7 @@ export async function sowFlora(world){
     const mesh=new Mesh(app.graphicsDevice);mesh.setPositions(b.positions);mesh.setUvs(0,b.uvs);mesh.setColors(b.colors);
     const normals=new Array(b.positions.length/3).fill(0).flatMap(()=>[0,1,0]);mesh.setNormals(normals);mesh.setIndices(b.indices);mesh.update();
     const m=new StandardMaterial();m.name='flora-'+key;m.diffuseMap=sheets[key].texture;m.opacityMap=sheets[key].texture;m.opacityMapChannel='a';m.alphaTest=.5;m.cull=CULLFACE_NONE;m.diffuseVertexColor=true;m.useMetalness=true;m.metalness=0;m.gloss=.1;m.update();makeLiving(m,{lifeInAlpha:true});
-    makeWind(m,'plant');(world.windy??=[]).push(m);
+    makeWind(m,'plant');(world.windy??=[]).push(m);if(key==='b')makeSeeThrough(m);
     const e=new Entity('Flora · '+key),mi=new MeshInstance(mesh,m);mi.castShadow=key==='b';mi.receiveShadow=true;e.addComponent('render',{meshInstances:[mi]});root.addChild(e);
     (world.floraLife??={ids:exteriors.map(a=>a.id),meshes:[]}).meshes.push({mesh,base:Float32Array.from(b.colors),places:Int8Array.from(b.places),colors:new Float32Array(b.colors.length)});
   }

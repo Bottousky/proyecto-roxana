@@ -105,7 +105,7 @@ function openLook(){
 }
 function askName(next){
   modal(`<div class="eyebrow">REGISTRO DEL INSTITUTO ROXANA</div><h2>¿Cómo te llamás?</h2><p class="modal-intro">Así te van a conocer en Ohmdal. Es el mismo nombre de tu registro en la escuela; podés cambiarlo después desde Opciones.</p><form id="name-form" class="name-form"><input id="player-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre" aria-label="Tu nombre" required/>${PEOPLE_3D?`<p class="look-ask">¿Cómo te ves?</p>${lookChooser()}`:''}<button class="primary" type="submit">Cruzar el Portal ${svg('arrow')}</button></form>`,'options-modal name-modal');
-  const input=$('#player-name');setTimeout(()=>input.focus(),0);bindLookChooser($('#name-form [data-look-root]'));
+  const input=$('#player-name');input.value=schoolName();setTimeout(()=>input.focus(),0);bindLookChooser($('#name-form [data-look-root]'));
   $('#name-form').onsubmit=event=>{event.preventDefault();const name=input.value.trim().slice(0,40);if(!name){input.focus();return;}storeSchoolName(name);closeModal();next(name);};
 }
 function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);document.documentElement.classList.toggle('lumen-marks',!!settings.lumenMarks);}
@@ -509,9 +509,10 @@ function showEnding(){
 }
 
 $('#new-game').onclick=()=>{
-  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Podés exportar una copia desde Opciones antes de comenzar.</p><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');$('#confirm-new').onclick=()=>{closeModal();if(!schoolName())askName(()=>startGame(false));else startGame(false);};$('#cancel-new').onclick=closeModal;}
-  else if(!schoolName())askName(()=>startGame(false));
-  else startGame(false);
+  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Podés exportar una copia desde Opciones antes de comenzar.</p><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');$('#confirm-new').onclick=()=>{closeModal();askName(()=>startGame(false));};$('#cancel-new').onclick=closeModal;}
+  // Every new journey opens the register (ciclo 30): the name comes filled in from the school, and
+  // the look can be chosen again; a player whose name was already known never saw the chooser.
+  else askName(()=>startGame(false));
 };
 $('#continue').onclick=()=>{if(!schoolName()&&!loadState().state?.playerName)askName(()=>startGame(true));else startGame(true);};$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
 $('#ohm-button').onclick=()=>talkToOhm();$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;

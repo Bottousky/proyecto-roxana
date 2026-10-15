@@ -1,4 +1,4 @@
-import {AREAS} from './content.js';
+import {AREAS,WORLD_SYSTEMS} from './content.js';
 
 // Metres in a shared, north-up territory. Workshops are interiors of real buildings.
 export const KINGDOM = Object.freeze({
@@ -74,11 +74,25 @@ export function nextPassage(from,to){
     for(const exit of AREAS[id]?.exits||[])if(!seen.has(exit.target)){seen.add(exit.target);queue.push([exit.target,[...path,exit]]);}}
   return null;
 }
-/** Where the next step is in this place: the passage toward the objective's place, or its object here. */
+/** Where the next step is in this place: the passage toward the objective's place, or its object here.
+ * When that object still waits for something (a bench that cannot work until two closures are joined),
+ * the step is the lever that is missing, followed through the world's systems (ciclo 30: a player
+ * stood by Lumen's bench without seeing that the closures on the floor were the way). */
 export function guideTarget(state,objective){
   const exit=nextPassage(state.area,objective?.area);
-  const target=exit||AREAS[state.area]?.objects.find(o=>o.id===objective?.object);
-  return target?{x:target.x,z:target.z}:null;
+  if(exit)return {x:exit.x,z:exit.z};
+  const objects=AREAS[state.area]?.objects||[],flags=state.flags||{};
+  const missingLever=(needs,seen=new Set())=>{
+    for(const flag of needs||[]){
+      if(flags[flag]||seen.has(flag))continue;seen.add(flag);
+      const lever=objects.find(o=>o.kind==='lever'&&o.flag===flag&&(!o.requires||o.requires.every(f=>flags[f])));if(lever)return lever;
+      const system=WORLD_SYSTEMS.find(w=>w.flag===flag&&w.area===state.area);const deeper=system&&missingLever(system.requires,seen);if(deeper)return deeper;
+    }
+    return null;
+  };
+  const target=objects.find(o=>o.id===objective?.object);
+  const step=target&&missingLever(target.requires)||target;
+  return step?{x:step.x,z:step.z}:null;
 }
 export function travelBearing(state,position,objective){
   const exit=nextPassage(state.area,objective?.area);

@@ -217,7 +217,8 @@ export const DIALOGUES = {
   workshop_ready: d(
     ['narrator', 'La mesa recupera un zumbido bajo. La lámpara sigue oscura.'],
     ['lumen', 'Escuchá. Ese ruido sí lo conozco. Ahora podemos mirar el banco.']),
-  workshop_locked: d(['lumen', 'Los dos cierres de la mesa siguen sueltos. Uno a cada costado, al final de los cables del piso.']),
+  workshop_locked: d(['lumen', 'Los dos cierres de la mesa están separados. Uno a cada costado, al final de los cables del piso: acercate a cada uno y unilo.']),
+  workshop_locked_left: d(['lumen', 'El derecho ya está unido. Falta el izquierdo, al final del otro cable del piso. Acercate y unilo.']),
   workshop_locked_right: d(['lumen', 'El izquierdo ya está. Falta el derecho, al final del cable del piso. Que Ohm lo mida antes y después de unirlo.']),
   workshop_arrival_puzzle: d(
     ['lumen', 'La cubierta está entera. La lámpara, recién cambiada. Y sin embargo…'],
@@ -700,8 +701,8 @@ for (const [id, [speaker, text]] of Object.entries(repeatConversations)) DIALOGU
 const npc = (id, x, z, character, dialogue, extra = {}) => ({ id, kind: 'npc', x, z, label: CHARACTERS[character].name, character, dialogue, ...extra });
 const panel = (id, x, z, label, puzzle, requires, lockedDialogue, afterDialogue) => ({ id, kind: 'panel', x, z, label, puzzle, flag: puzzle, requires, lockedDialogue, afterDialogue });
 const reverseLabels = {
-  workshop_feed: 'Soltar el cierre izquierdo', workshop_return: 'Soltar el cierre derecho',
-  road_send: 'Soltar el cierre del poste oeste', road_return: 'Soltar el cierre del poste este',
+  workshop_feed: 'Separar el cierre izquierdo', workshop_return: 'Separar el cierre derecho',
+  road_send: 'Separar el cierre del poste oeste', road_return: 'Separar el cierre del poste este',
   spring_sluice: 'Desviar el agua fuera de la rueda', spring_coupling: 'Separar el generador de la rueda',
   castle_service: 'Desconectar el troncal sano', forge_limited: 'Devolver el horno a su palanca propia',
   irrigation_open: 'Cerrar el canal de los bancales', lake_cable: 'Abrir el suministro del muelle',
@@ -746,8 +747,8 @@ export const AREAS = {
     id: 'workshop', name: 'El taller de Lumen', subtitle: 'Una receta aprende a explicar sus motivos', theme: 'workshop', bounds: [24, 24], spawn: [0, 8], entryDialogue: 'workshop_arrival',
     objects: [
       npc('lumen', -3.5, 1.5, 'lumen', 'lumen_before', { flag: 'workshop', afterDialogue: 'lumen_after' }),
-      lever('workshop_feed', -.9, -.5, 'Ajustar el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo encaja con un clic.', 'El cierre izquierdo queda separado.'),
-      lever('workshop_return', 6.9, -.5, 'Ajustar el cierre derecho', 'workshop_return', 'El cierre derecho encaja con un clic.', 'El cierre derecho queda separado.'),
+      lever('workshop_feed', -.9, -.5, 'Unir el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo queda unido con un clic.', 'El cierre izquierdo queda separado.'),
+      lever('workshop_return', 6.9, -.5, 'Unir el cierre derecho', 'workshop_return', 'El cierre derecho queda unido con un clic.', 'El cierre derecho queda separado.'),
       panel('workbench', 3, -3, 'La lámpara del banco', 'workshop', ['bench_ready'], 'workshop_locked', 'workshop_bench_after'),
       { ...panel('stone_drawer', -8.2, -7.1, 'El cajón de las piedras', 'drawer', ['workshop'], 'drawer_locked', 'drawer_after'), dialogue: 'drawer_arrival', optional: true },
       lore('workshop_note', -7, -4.5, 'Cuatro manos sobre un esquema', 'workshop_note'),
@@ -759,8 +760,8 @@ export const AREAS = {
     id: 'road', name: 'La Calzada', subtitle: 'El otro extremo de un camino', theme: 'road', bounds: [34, 32], spawn: [0, 11], entryDialogue: 'road_arrival', initialFlags: { road_bypass: true },
     objects: [
       npc('edda_road', -4.5, 5, 'edda', 'road_edda', { flag: 'gate', afterDialogue: 'road_after' }),
-      lever('road_send', -8, 1, 'Ajustar el cierre del poste oeste', 'road_send', 'El contacto del poste oeste queda unido.', 'El contacto del poste oeste queda separado.'),
-      lever('road_return', 8, 1, 'Ajustar el cierre bajo las hojas', 'road_return', 'El contacto del poste este queda unido.', 'El contacto del poste este queda separado.'),
+      lever('road_send', -8, 1, 'Unir el cierre del poste oeste', 'road_send', 'El contacto del poste oeste queda unido.', 'El contacto del poste oeste queda separado.'),
+      lever('road_return', 8, 1, 'Unir el cierre bajo las hojas', 'road_return', 'El contacto del poste este queda unido.', 'El contacto del poste este queda separado.'),
       { id: 'road_bypass', kind: 'lever', x: 0, z: 3.5, label: 'El puente de cobre del centro', flag: 'road_bypass', action: { type: 'toggle', flag: 'road_bypass', onLabel: 'Cerrar el puente de cobre', offLabel: 'Abrir el puente de cobre', onText: 'La pieza de cobre une las dos líneas. Las balizas quedan oscuras.', offText: 'La pieza se levanta y deja separados sus dos contactos.' } },
       panel('gate_panel', 4.5, -6, 'Regulador de la Puerta de Ohm', 'gate', ['bridge_ready'], 'gate_locked', 'road_after'),
       { ...panel('edda_post', -9.4, 3.4, 'La baliza del costado', 'edda_contact', ['gate'], 'edda_contact_locked', 'edda_contact_after'), dialogue: 'edda_contact_ask', mini: true, optional: true },
@@ -1009,6 +1010,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'consejera_before' && f.castle_ready) context = 'castle_ready';
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
   if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';
+  if (id === 'workshop_locked' && !f.workshop_feed && f.workshop_return) context = 'workshop_locked_left';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';
   if (id === 'nereo_lake' && f.beacon_link) context = 'nereo_lake_linked';
   if (id === 'nereo_tower') context = f.beacon_network ? 'nereo_tower_network' : f.beacon_supply ? 'nereo_tower_source' : id;
