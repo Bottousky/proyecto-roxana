@@ -49,3 +49,16 @@ Nada de esto lo revisó un abogado. Antes de vender algo, hay que leer las licen
 **Resultado.** La forma de TripoSG está a la par de la de Hunyuan, y de cerca la cara se ve más
 definida: ojos, cejas y sonrisa. Queda algo más delgada de perfil, porque lee una sola imagen y no
 las tres. Las puntas del pelo salen más marcadas.
+
+**Segunda prueba: Edda** (capa, trenza y pantalones anchos). TripoSG también está a la par: capa,
+cinturón, bolsas y botas en su lugar. Las formas en arcilla, Hunyuan arriba y TripoSG abajo:
+
+![Edda: Hunyuan (arriba) y TripoSG (abajo)](alternativas-3d/edda-hunyuan-triposg.png)
+
+## Recomendación
+
+Pasar los diez personajes a TripoSG con el mismo proceso. Son unos 13 minutos de máquina por
+forma, más unos minutos de Blender: entre dos horas y media y tres en total. También hay que rehacer
+los kits de impresión, que salen de las mismas mallas. Así el juego publicado y las figuras
+impresas no dependen de Tencent. Los modelos de Hunyuan quedan guardados en
+`~/code/ohmdal-3d/<personaje>/` y en la historia del repositorio.
