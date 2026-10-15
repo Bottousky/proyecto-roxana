@@ -469,7 +469,7 @@ function playPendingCinematic(){
   persist();
   if(!world.startCinematic(pending.id,{reducedMotion:settings.reducedMotion})){finishCinematic();return;}
   $('#cinematic-caption').textContent=world.getCinematicState()?.caption||'';
-  $('#skip-cinematic').disabled=false;$('#skip-cinematic').innerHTML='Saltar escena <kbd>Esc</kbd>';
+  $('#skip-cinematic').disabled=false;$('#skip-cinematic').innerHTML='Saltar escena <kbd>Enter</kbd>';
   show('#cinematic');$('#skip-cinematic').focus({preventScroll:true});
 }
 function skipCinematic(){
@@ -564,7 +564,9 @@ window.addEventListener('keydown',event=>{
   }
   if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
-  if(['e','E','Enter',' '].includes(event.key)){if(performance.now()<interactAfter&&nearby&&nearby.id===interactAfterId)interactAfter=performance.now()+450;else if(!event.repeat)interact();return;}
+  // Just after a conversation, the same key does not use anything (a player re-opened a closure by
+  // pressing Enter once too often, ciclo 30): E and Enter wait a moment for every object.
+  if(['e','E','Enter',' '].includes(event.key)){if(performance.now()<interactAfter&&nearby)interactAfter=performance.now()+450;else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}

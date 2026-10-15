@@ -1,0 +1,14 @@
+# Pruebas con jugadores sin contexto (ciclo 30, 15 oct 2026)
+
+Agentes nuevos, sin acceso al código ni al estado interno, jugaron desde cero en el navegador y
+anotaron lo que les pasaba. **No reemplazan una prueba con personas** (sigue NO VERIFICADA), pero
+encuentran trabas de primera vez.
+
+| Jugador | Hasta dónde llegó | Dónde se trabó | Qué se cambió después |
+|---|---|---|---|
+| 1 | Primer banco y la Plaza | Caminar (el clic estaba apagado; un toque de tecla no movía) y encontrar el taller | Clic para caminar por defecto, un toque da un paso, flecha dorada del siguiente paso, Edda indica bien, J/M/H cierran su ventana, primer banco sin la respuesta en la consigna, Guía legible, nombres bajo los botones, título y carga en estilo X e Y |
+| 2 | El taller de Lumen | Los dos cierres del piso (40 min): «Ajustar» no decía qué hacer | La flecha señala el cierre que falta; «Unir»/«Separar»; Lumen dice cuál falta; Enter ya no cierra la mesa; el registro aparece en cada partida nueva; las copas se abren delante del viajero |
+| 3 | Los dos bancos del taller (pasó el bloqueo del 2) | La costura invisible (35 min): no sabía si tocar un borne tendía un cable o medía; las primeras pistas no decían qué hacer | Cartel «En la mano: …» en el tablero; pistas 1 y 2 concretas; Enter no usa nada justo después de un diálogo; la escena dice «Saltar escena · Enter» |
+
+Pendiente de estos informes: caminar todavía se traba contra cercas y la mesa; diálogos largos al
+principio; el panel de observación de Ohm tapa la escena; el tablero se reacomoda al tender cables.

@@ -572,3 +572,10 @@ html[data-estilo="xy"] .wb-piece-list li{background:#fff;border:2px solid #e3eaf
 html[data-estilo="xy"] .wb-piece-list .wb-plate-name{color:#25313b}
 /* Apaisado, la cuenta en curso va después de lo que dice quien la pide. */
 @media (orientation:landscape) and (max-height:540px){html .workbench-overlay .wb-tally{order:1}}
+
+/* Qué hay en la mano (ciclo 30: un jugador no sabía si tocar un borne tendía un cable o medía). */
+.wb-mode-tag{position:absolute;z-index:7;left:50%;top:6px;transform:translateX(-50%);margin:0;padding:3px 12px;border-radius:999px;background:#12201ae6;border:1px solid #d9bd7f88;color:#f3e3b8;font:700 12px/1.4 Inter,system-ui,sans-serif;white-space:nowrap;pointer-events:none}
+.wb-mode-tag:not(.is-wire){border-color:#8fd0e0;color:#d6f3fa}
+html[data-estilo="xy"] .wb-mode-tag{background:#fff;border:2px solid var(--xy-line,#d5dde5);color:#1f6fb0;box-shadow:0 2px 0 #c9d3dc}
+html[data-estilo="xy"] .wb-mode-tag:not(.is-wire){background:#2f8fd6;border-color:#2f8fd6;color:#fff;box-shadow:0 2px 0 #1f6fb0}
+@media (max-width:530px),(orientation:landscape) and (max-height:540px){.wb-mode-tag{font-size:10px;padding:2px 8px;top:3px}}
