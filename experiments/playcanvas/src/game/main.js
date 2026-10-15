@@ -567,7 +567,9 @@ window.addEventListener('keydown',event=>{
   if(mode!=='world')return;
   // Just after a conversation, the same key does not use anything (a player re-opened a closure by
   // pressing Enter once too often, ciclo 30): E and Enter wait a moment for every object.
-  if(['e','E','Enter',' '].includes(event.key)){if(performance.now()<interactAfter&&nearby)interactAfter=performance.now()+450;else if(!event.repeat)interact();return;}
+  // Enter is how conversations advance: in the world it uses things only a while after the last one
+  // ended (a player kept pressing Enter at the pump's box and heard Vega's line again and again).
+  if(['e','E','Enter',' '].includes(event.key)){const wait=event.key==='Enter'?1400:450;if(performance.now()<interactAfter+(wait-450)&&nearby){if(event.key!=='Enter')interactAfter=performance.now()+450;}else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}

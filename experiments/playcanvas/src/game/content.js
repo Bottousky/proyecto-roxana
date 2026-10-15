@@ -330,7 +330,7 @@ export const DIALOGUES = {
   unjoin_tower_return: d(['nereo', 'Ese retorno lo uní yo. Sin vuelta, el núcleo no puede devolver lo que recibe: se queda callado. Cerralo cuando termines de mirar.']),
   unjoin_tower_shutter: d(['nereo', 'El obturador lo abrí yo. Cerrado, la luz se queda adentro de la torre.']),
   unjoin_tower_lens_free: d(['nereo', 'El freno de la lente lo solté yo. Si lo volvés a poner, la lente no gira con la corona.']),
-  pump_locked: d(['vega', 'Todavía falta transmitir el movimiento. Abrí el canal hacia la rueda y conectá el acople del generador. Son las dos manivelas.']),
+  pump_locked: d(['vega', 'Todavía falta transmitir el movimiento. Son dos manivelas: una junto al canal, a la izquierda del camino, devuelve el agua a la rueda; la otra, a la derecha, junto a la rueda, une su eje con el generador. Primero el agua.']),
   pump_arrival: d(
     ['vega', 'Esa unión junto al agua se entibia cuando la bomba intenta arrancar. Antes no lo hacía.'],
     ['vega', 'Y sin embargo deja pasar. Las viejas decían «por donde pasa el agua, pasa la Luz». Unión que deja pasar, no roba.'],
