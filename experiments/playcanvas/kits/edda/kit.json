@@ -4,42 +4,42 @@
  "piezas": [
   {
    "pieza": "ojos",
-   "caras": 1841,
+   "caras": 3952,
    "archivo": "pieza-ojos.stl"
   },
   {
    "pieza": "cuero",
-   "caras": 111813,
+   "caras": 253304,
    "archivo": "pieza-cuero.stl"
   },
   {
-   "pieza": "bombachos",
-   "caras": 60928,
-   "archivo": "pieza-bombachos.stl"
-  },
-  {
    "pieza": "capa",
-   "caras": 101049,
+   "caras": 248167,
    "archivo": "pieza-capa.stl"
   },
   {
    "pieza": "camisa",
-   "caras": 28022,
+   "caras": 75295,
    "archivo": "pieza-camisa.stl"
   },
   {
+   "pieza": "bombachos",
+   "caras": 156010,
+   "archivo": "pieza-bombachos.stl"
+  },
+  {
    "pieza": "piel",
-   "caras": 23682,
+   "caras": 55450,
    "archivo": "pieza-piel.stl"
   },
   {
    "pieza": "metal",
-   "caras": 703,
+   "caras": 3323,
    "archivo": "pieza-metal.stl"
   },
   {
    "pieza": "pelo",
-   "caras": 56416,
+   "caras": 134263,
    "archivo": "pieza-pelo.stl"
   }
  ],

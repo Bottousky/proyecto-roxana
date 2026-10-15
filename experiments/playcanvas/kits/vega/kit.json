@@ -3,34 +3,34 @@
  "alto_mm": 90.0,
  "piezas": [
   {
-   "pieza": "pelo",
-   "caras": 58975,
-   "archivo": "pieza-pelo.stl"
+   "pieza": "punos",
+   "caras": 19375,
+   "archivo": "pieza-punos.stl"
+  },
+  {
+   "pieza": "delantal",
+   "caras": 288872,
+   "archivo": "pieza-delantal.stl"
   },
   {
    "pieza": "vestido",
-   "caras": 157631,
+   "caras": 522243,
    "archivo": "pieza-vestido.stl"
   },
   {
    "pieza": "cuero",
-   "caras": 84495,
+   "caras": 179769,
    "archivo": "pieza-cuero.stl"
   },
   {
    "pieza": "piel",
-   "caras": 30604,
+   "caras": 80683,
    "archivo": "pieza-piel.stl"
   },
   {
-   "pieza": "delantal",
-   "caras": 64951,
-   "archivo": "pieza-delantal.stl"
-  },
-  {
-   "pieza": "punos",
-   "caras": 7750,
-   "archivo": "pieza-punos.stl"
+   "pieza": "pelo",
+   "caras": 135796,
+   "archivo": "pieza-pelo.stl"
   }
  ],
  "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."

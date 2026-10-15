@@ -62,3 +62,25 @@ forma, más unos minutos de Blender: entre dos horas y media y tres en total. Ta
 los kits de impresión, que salen de las mismas mallas. Así el juego publicado y las figuras
 impresas no dependen de Tencent. Los modelos de Hunyuan quedan guardados en
 `~/code/ohmdal-3d/<personaje>/` y en la historia del repositorio.
+
+## Hecho: los diez personajes con TripoSG (14 oct 2026)
+
+`scripts/ia3d/personaje.sh` usa TripoSG por defecto (`FUENTE=hunyuan` vuelve al anterior), y
+`scripts/ia3d/todos-triposg.sh` corre los diez. Cada uno pasó por forma, modelo, regiones, kit y
+compresión. Las formas tardaron entre 12 y 14 minutos (Ohm, 24), y en total fueron unas dos horas
+y diez. Los modelos del juego pesan entre 1,0 y 1,5 MB.
+
+- En `public/` ya no queda nada hecho con Hunyuan3D. El viajero pasó a llamarse `viajero-3d.glb`,
+  como los demás. Lo anterior sigue en la historia del repositorio y en `~/code/ohmdal-3d/<personaje>/`.
+- Los kits de impresión (`kits/*/kit.json`) se rehicieron desde las mallas nuevas.
+- En el juego: los tamaños son coherentes, la apariencia se puede cambiar (`qa-look.mjs`) y las
+  capturas de seis lugares no dan errores.
+
+Elenco con TripoSG (arriba; la escala de esta galería no es la del juego) y con Hunyuan (abajo):
+
+![Elenco TripoSG](alternativas-3d/elenco-triposg.png)
+![Elenco Hunyuan](alternativas-3d/elenco-hunyuan.png)
+![Las Terrazas con TripoSG](alternativas-3d/terrazas-triposg.png)
+
+Pendiente: algunos mechones de pelo salen en punta y, vistos desde arriba, parecen cuernitos (el
+viajero). Se pueden suavizar en Blender si molestan.

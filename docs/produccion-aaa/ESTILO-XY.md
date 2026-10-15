@@ -54,7 +54,7 @@ El usuario pidió más calidad que el primer muñeco hecho con piezas geométric
 
 1. **Referencias** (`art-src/xy/viajero/generate.sh`, image_gen de Codex con la hoja HD-2D adjunta):
    el viajero de frente en pose A y una hoja de giro con frente, perfil y espalda.
-2. **Forma** (`scripts/ia3d/forma.py`): Hunyuan3D-2mv, de Tencent, a partir de las tres vistas, en la
+2. **Forma.** Desde el ciclo 30, con **TripoSG (MIT)**: `scripts/ia3d/forma_triposg.py`; ver [ALTERNATIVAS-3D.md](ALTERNATIVAS-3D.md). Antes: `scripts/ia3d/forma.py`, Hunyuan3D-2mv, de Tencent, a partir de las tres vistas, en la
    GPU de la Mac (MPS). Tarda unos 17 minutos y da 305 mil caras. El entorno vive fuera del
    repositorio, en `~/code/ohmdal-3d`, con Python 3.11, PyTorch, `transformers` 4.46.3 y `diffusers`
    0.31.0 (las versiones nuevas rompen la carga). **Licencia:** Tencent Hunyuan Community; no vale en
@@ -131,7 +131,7 @@ Lo que falta para producir:
 - espesor mínimo (dedos, flecos y rulos de al menos 1,5–2 mm);
 - piezas sólidas en vez de superficies;
 - formato 3MF multicolor;
-- revisar la licencia de Hunyuan antes de vender.
+- revisar las licencias antes de vender (desde el ciclo 30 la forma sale de TripoSG, MIT).
 
 En el juego falta la pantalla para elegir la apariencia y guardarla en el registro del Instituto.
 

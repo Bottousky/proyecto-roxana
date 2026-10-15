@@ -4,32 +4,32 @@
  "piezas": [
   {
    "pieza": "pantalon",
-   "caras": 49542,
+   "caras": 98711,
    "archivo": "pieza-pantalon.stl"
   },
   {
    "pieza": "piel",
-   "caras": 48279,
+   "caras": 113116,
    "archivo": "pieza-piel.stl"
   },
   {
    "pieza": "tunica",
-   "caras": 60221,
+   "caras": 162889,
    "archivo": "pieza-tunica.stl"
   },
   {
    "pieza": "cuero",
-   "caras": 94061,
+   "caras": 192964,
    "archivo": "pieza-cuero.stl"
   },
   {
    "pieza": "chaleco",
-   "caras": 12302,
+   "caras": 40313,
    "archivo": "pieza-chaleco.stl"
   },
   {
    "pieza": "pelo",
-   "caras": 90881,
+   "caras": 238495,
    "archivo": "pieza-pelo.stl"
   }
  ],

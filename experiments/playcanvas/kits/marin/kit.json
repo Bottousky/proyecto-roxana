@@ -4,37 +4,37 @@
  "piezas": [
   {
    "pieza": "pelo",
-   "caras": 68710,
+   "caras": 158996,
    "archivo": "pieza-pelo.stl"
   },
   {
-   "pieza": "cuero",
-   "caras": 78411,
-   "archivo": "pieza-cuero.stl"
-  },
-  {
    "pieza": "piel",
-   "caras": 44165,
+   "caras": 108576,
    "archivo": "pieza-piel.stl"
   },
   {
+   "pieza": "cuero",
+   "caras": 181205,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
    "pieza": "delantal",
-   "caras": 154381,
+   "caras": 254439,
    "archivo": "pieza-delantal.stl"
   },
   {
    "pieza": "pantalon",
-   "caras": 52605,
+   "caras": 114419,
    "archivo": "pieza-pantalon.stl"
   },
   {
    "pieza": "camisa",
-   "caras": 30613,
+   "caras": 80623,
    "archivo": "pieza-camisa.stl"
   },
   {
    "pieza": "chaleco",
-   "caras": 37829,
+   "caras": 79234,
    "archivo": "pieza-chaleco.stl"
   }
  ],
