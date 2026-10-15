@@ -295,7 +295,14 @@ export class PlayCanvasWorld {
   getCompanion(){return this.area?companionInteraction(this):null;}
   getNearby(){const rank=o=>(o.interactionPriority||0)-(o.action&&this.isLatched?.(o.action.flag)?2:0);return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>rank(b)-rank(a)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
   getScreenPosition(o){if(this.disposed||!this.camera.camera)return {x:0,y:0,visible:false};const [ox,oz]=this.data.areas[this.area.id].offset,p=this.camera.camera.worldToScreen(new Vec3(o.x+ox,o.ground?0:o.target?.35:o.character?2.5:1.6,o.z+oz)),r=this.canvas.getBoundingClientRect();return {x:p.x,y:p.y,visible:p.x>0&&p.x<r.width&&p.y>0&&p.y<r.height};}
-  pick(x,y){const r=this.canvas.getBoundingClientRect(),a=this.camera.camera.screenToWorld(x-r.left,y-r.top,0),b=this.camera.camera.screenToWorld(x-r.left,y-r.top,200),t=-a.y/(b.y-a.y),[ox,oz]=this.data.areas[this.area.id].offset;return [a.x+(b.x-a.x)*t-ox,a.z+(b.z-a.z)*t-oz];}
+  pick(x,y){const r=this.canvas.getBoundingClientRect(),a=this.camera.camera.screenToWorld(x-r.left,y-r.top,0),b=this.camera.camera.screenToWorld(x-r.left,y-r.top,200),[ox,oz]=this.data.areas[this.area.id].offset;
+    const at=h=>{const t=(h-a.y)/(b.y-a.y);return [a.x+(b.x-a.x)*t-ox,a.z+(b.z-a.z)*t-oz];};
+    // A click on a wall, a fence or a roof lands on the ground behind it, where nobody can stand.
+    // The ray is followed back up toward the camera until it meets ground in front of what was
+    // clicked (ciclo 30: first players clicked houses and got stuck behind them).
+    const ground=at(0);if(this.canStand?.(...ground))return ground;
+    for(let h=.25;h<=4.01;h+=.25){const p=at(h);if(this.canStand(...p))return p;}
+    return ground;}
   pickInteraction(x,y){const r=this.canvas.getBoundingClientRect();return this.getInteractions().map(o=>({o,p:this.getScreenPosition(o)})).filter(({o,p})=>p.visible&&Math.hypot(p.x-(x-r.left),p.y-(y-r.top))<(o.character?24:20)).sort((a,b)=>Math.hypot(a.p.x-x+r.left,a.p.y-y+r.top)-Math.hypot(b.p.x-x+r.left,b.p.y-y+r.top))[0]?.o||null;}
   followPassage(exit){const p=passageGeometry(this.area.id,exit.target);if(!p)return false;this.travelIntent=exit.target;this.setTarget(fromKingdom(this.area.id,[p.mid[0],p.mid[1]+Math.sign(p.b[1]-p.a[1])*.7]));return true;}
   getTravelEvent(){if(!isExterior(this.area.id)||!this.walking)return null;const global=toKingdom(this.area.id,this.getPlayerPosition());for(const exit of passagesFor(this.area.id)){const p=passageGeometry(this.area.id,exit.target),direction=Math.sign(p.b[1]-p.a[1]);if(!(exit.requires||[]).every(f=>this.state.flags[f])){const threshold=KINGDOM[this.area.id].z+exit.z;if((global[1]-threshold)*direction>0&&Math.abs(global[0]-KINGDOM[this.area.id].x-exit.x)<3){this.setPlayerPosition([exit.x,exit.z-direction*.6]);return {locked:exit};}}else if((global[1]-p.mid[1])*direction>.02)return {target:exit.target};}return null;}
