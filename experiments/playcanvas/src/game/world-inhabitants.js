@@ -20,7 +20,7 @@ export function inhabitantPlan(area, object, state = {}) {
     case 'edda_road':
       plan.present = !f.pump;
       set(f.gate ? 'toward-the-castle' : f.bridge_ready ? 'watching-the-latch' : 'comparing-the-posts',
-        f.gate ? [[-2.3, -7.5], [-.9, -9]] : f.bridge_ready ? [[-4.5, -3.5], [-3.4, -4.4]] : [[-4.5, 5], [-4.2, 2.4]], f.gate ? [0, -14] : [0, 3.5]); break;
+        f.gate ? [[-2.3, -7.5], [-.9, -9]] : f.bridge_ready ? [[-4.5, -3.5], [-3.4, -4.4]] : [[-2.2, 7.6], [-1.4, 6.6]], f.gate ? [0, -14] : [0, 3.5]); break; // clear of the west post while it is still to be joined
     case 'edda_castle':
       plan.present = !f.irrigation;
       set(f.distribution ? 'copying-the-public-plan' : 'comparing-the-archive', f.distribution ? [[-4.8, -3], [-6.1, -3.5]] : [[-9.2, -3.6], [-8.4, -2.4]], [-11, -6]); break;

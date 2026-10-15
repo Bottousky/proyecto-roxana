@@ -293,7 +293,9 @@ export class PlayCanvasWorld {
   planInteraction(o){return approachInteraction(this,o);}
   approachInteraction(o){const path=approachInteraction(this,o);if(path===null)return false;this.route=path;this.target=this.route.shift()||null;return true;}
   getCompanion(){return this.area?companionInteraction(this):null;}
-  getNearby(){const rank=o=>(o.interactionPriority||0)-(o.action&&this.isLatched?.(o.action.flag)?2:0);return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>rank(b)-rank(a)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
+  // What the golden arrow marks wins over a person standing beside it (ciclo 30: a player at the
+  // Calzada's west post kept talking to Edda instead of joining the closure).
+  getNearby(){const g=this.guide,rank=o=>(o.interactionPriority||0)-(o.action&&this.isLatched?.(o.action.flag)?2:0)+(g&&!o.character&&Math.abs(o.x-g.x)<.01&&Math.abs(o.z-g.z)<.01?1:0);return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>rank(b)-rank(a)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
   getScreenPosition(o){if(this.disposed||!this.camera.camera)return {x:0,y:0,visible:false};const [ox,oz]=this.data.areas[this.area.id].offset,p=this.camera.camera.worldToScreen(new Vec3(o.x+ox,o.ground?0:o.target?.35:o.character?2.5:1.6,o.z+oz)),r=this.canvas.getBoundingClientRect();return {x:p.x,y:p.y,visible:p.x>0&&p.x<r.width&&p.y>0&&p.y<r.height};}
   pick(x,y){const r=this.canvas.getBoundingClientRect(),a=this.camera.camera.screenToWorld(x-r.left,y-r.top,0),b=this.camera.camera.screenToWorld(x-r.left,y-r.top,200),[ox,oz]=this.data.areas[this.area.id].offset;
     const at=h=>{const t=(h-a.y)/(b.y-a.y);return [a.x+(b.x-a.x)*t-ox,a.z+(b.z-a.z)*t-oz];};

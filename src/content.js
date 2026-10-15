@@ -760,7 +760,7 @@ export const AREAS = {
   road: {
     id: 'road', name: 'La Calzada', subtitle: 'El otro extremo de un camino', theme: 'road', bounds: [34, 32], spawn: [0, 11], entryDialogue: 'road_arrival', initialFlags: { road_bypass: true },
     objects: [
-      npc('edda_road', -4.5, 5, 'edda', 'road_edda', { flag: 'gate', afterDialogue: 'road_after' }),
+      npc('edda_road', -2.2, 7.6, 'edda', 'road_edda', { flag: 'gate', afterDialogue: 'road_after' }),
       lever('road_send', -8, 1, 'Unir el cierre del poste oeste', 'road_send', 'El contacto del poste oeste queda unido.', 'El contacto del poste oeste queda separado.'),
       lever('road_return', 8, 1, 'Unir el cierre bajo las hojas', 'road_return', 'El contacto del poste este queda unido.', 'El contacto del poste este queda separado.'),
       { id: 'road_bypass', kind: 'lever', x: 0, z: 3.5, label: 'El puente de cobre del centro', flag: 'road_bypass', action: { type: 'toggle', flag: 'road_bypass', onLabel: 'Cerrar el puente de cobre', offLabel: 'Abrir el puente de cobre', onText: 'La pieza de cobre une las dos líneas. Las balizas quedan oscuras.', offText: 'La pieza se levanta y deja separados sus dos contactos.' } },
