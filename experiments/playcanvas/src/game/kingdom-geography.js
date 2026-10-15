@@ -91,6 +91,15 @@ export function guideTarget(state,objective){
     return null;
   };
   const target=objects.find(o=>o.id===objective?.object);
+  // An objective that points at one lever of a larger installation (the Calzada's copper bridge):
+  // the step is whichever lever of that installation is still wrong, a short to open first.
+  if(target?.kind==='lever'){
+    const system=WORLD_SYSTEMS.find(w=>w.area===state.area&&[...(w.requires||[]),...(w.off||[])].includes(target.flag));
+    if(system&&!flags[system.flag]){
+      const wrong=(system.off||[]).find(f=>flags[f])??(system.requires||[]).find(f=>!flags[f]&&objects.some(o=>o.kind==='lever'&&o.flag===f));
+      const lever=objects.find(o=>o.kind==='lever'&&o.flag===wrong);if(lever)return {x:lever.x,z:lever.z};
+    }
+  }
   const step=target&&missingLever(target.requires)||target;
   return step?{x:step.x,z:step.z}:null;
 }

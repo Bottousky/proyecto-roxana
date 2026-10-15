@@ -279,6 +279,10 @@ export const DIALOGUES = {
     ['narrator', 'Las balizas de la Calzada se encienden una tras otra. Dentro de la puerta, algo responde con un golpe lento.'],
     ['edda', 'Llegó. Pero el cerrojo no levanta. Su regulador está junto a la puerta: abrilo y mirá su mesa.']),
   gate_locked: d(['edda', 'Todavía no responden las balizas. Hay cierres en los dos postes y un puente en el centro. El dibujo viejo no tiene ese puente.']),
+  // What is still missing, said plainly (ciclo 30: players stood at the regulator not knowing why).
+  gate_locked_bridge: d(['edda', 'El puente de cobre del centro sigue unido: con él, la corriente vuelve antes de llegar a la puerta. Probá levantarlo.']),
+  gate_locked_west: d(['edda', 'El puente ya no está. Falta unir el cierre del poste oeste, a la izquierda del camino: por ahí llega la ida.']),
+  gate_locked_east: d(['edda', 'El puente ya no está. Falta unir el cierre bajo las hojas, en el poste este, a la derecha del camino: por ahí vuelve la corriente.']),
   gate_arrival: d(
     ['edda', 'El cerrojo hace fuerza… pero para abajo. ¿No tendría que levantar?'],
     ['edda', 'Mi abuela decía que los guardianes de la Calzada le hablaban a la Puerta: «Cede a quien te da toda la Luz». Alguien les hizo caso: por eso ese puente.'],
@@ -1007,6 +1011,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'consejera_before' && f.castle_ready) context = 'castle_ready';
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
   if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';
+  if (id === 'gate_locked' && f.workshop) context = f.road_bypass ? 'gate_locked_bridge' : !f.road_send ? 'gate_locked_west' : !f.road_return ? 'gate_locked_east' : id;
   if (id === 'workshop_locked' && !f.workshop_feed && f.workshop_return) context = 'workshop_locked_left';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';
   if (id === 'nereo_lake' && f.beacon_link) context = 'nereo_lake_linked';

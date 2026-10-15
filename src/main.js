@@ -489,7 +489,7 @@ window.addEventListener('keydown',event=>{
   }
   if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
-  if(['e','E','Enter',' '].includes(event.key)){const wait=event.key==='Enter'?1400:450;if(performance.now()<interactAfter+(wait-450)&&nearby){if(event.key!=='Enter')interactAfter=performance.now()+450;}else if(!event.repeat)interact();return;}
+  if(['e','E','Enter',' '].includes(event.key)){const now=performance.now();if(event.key==='Enter'?now<interactAfter+950&&nearby:now<interactAfter&&nearby&&nearby.id===interactAfterId){if(event.key!=='Enter')interactAfter=now+450;}else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}

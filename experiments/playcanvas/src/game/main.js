@@ -105,8 +105,9 @@ function openLook(){
 }
 function askName(next){
   modal(`<div class="eyebrow">REGISTRO DEL INSTITUTO ROXANA</div><h2>¿Cómo te llamás?</h2><p class="modal-intro">Así te van a conocer en Ohmdal. Es el mismo nombre de tu registro en la escuela; podés cambiarlo después desde Opciones.</p><form id="name-form" class="name-form"><input id="player-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre" aria-label="Tu nombre" required/>${PEOPLE_3D?`<p class="look-ask">¿Cómo te ves?</p>${lookChooser()}`:''}<button class="primary" type="submit">Cruzar el Portal ${svg('arrow')}</button></form>`,'options-modal name-modal');
-  const input=$('#player-name');input.value=schoolName();setTimeout(()=>{input.focus();input.select();},0); // typing replaces a name already knownbindLookChooser($('#name-form [data-look-root]'));
-  $('#name-form').onsubmit=event=>{event.preventDefault();const name=input.value.trim().slice(0,40);if(!name){input.focus();return;}storeSchoolName(name);closeModal();next(name);};
+  // A name already known is offered as the placeholder, not as text: typing never lands beside it (ciclo 30).
+  const input=$('#player-name'),known=schoolName();if(known){input.placeholder=known;input.required=false;}setTimeout(()=>input.focus(),0);bindLookChooser($('#name-form [data-look-root]'));
+  $('#name-form').onsubmit=event=>{event.preventDefault();const name=(input.value.trim()||schoolName()).slice(0,40);if(!name){input.focus();return;}storeSchoolName(name);closeModal();next(name);};
 }
 function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);document.documentElement.classList.toggle('lumen-marks',!!settings.lumenMarks);}
 storeSettings();
@@ -569,7 +570,7 @@ window.addEventListener('keydown',event=>{
   // pressing Enter once too often, ciclo 30): E and Enter wait a moment for every object.
   // Enter is how conversations advance: in the world it uses things only a while after the last one
   // ended (a player kept pressing Enter at the pump's box and heard Vega's line again and again).
-  if(['e','E','Enter',' '].includes(event.key)){const wait=event.key==='Enter'?1400:450;if(performance.now()<interactAfter+(wait-450)&&nearby){if(event.key!=='Enter')interactAfter=performance.now()+450;}else if(!event.repeat)interact();return;}
+  if(['e','E','Enter',' '].includes(event.key)){const now=performance.now();if(event.key==='Enter'?now<interactAfter+950&&nearby:now<interactAfter&&nearby&&nearby.id===interactAfterId){if(event.key!=='Enter')interactAfter=now+450;}else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}
