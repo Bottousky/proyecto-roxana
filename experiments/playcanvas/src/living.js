@@ -23,7 +23,10 @@ void getAlbedo() {
 	float lum = dot(dAlbedo, vec3(0.3, 0.59, 0.11));
 	#ifdef XY_LOOK
 		// X and Y: no grey. A forgotten place turns autumn gold and keeps its colour.
-		dAlbedo = mix(dAlbedo, vec3(lum * 1.42, lum * 1.12, lum * 0.42), dry * 0.62);
+		// Ciclo 30: only a hint of autumn (a whole yellow wood shouted over everything), and the same
+		// calmer green as the lawn.
+		dAlbedo = mix(dAlbedo, vec3(lum * 1.3, lum * 1.12, lum * 0.55), dry * 0.32);
+		{float l2 = dot(dAlbedo, vec3(0.3, 0.59, 0.11)); dAlbedo = mix(vec3(l2), dAlbedo, 0.88) * vec3(0.86, 0.94, 0.86);}
 	#else
 		dAlbedo = mix(dAlbedo, vec3(lum), 0.2);
 		dAlbedo = mix(dAlbedo, vec3(lum * 1.2, lum * 1.0, lum * 0.6), dry * 0.8) * (1.0 - 0.14 * dry);
