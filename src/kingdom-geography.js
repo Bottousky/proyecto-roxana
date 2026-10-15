@@ -1,4 +1,4 @@
-import {AREAS,WORLD_SYSTEMS} from './content.js';
+import {AREAS,WORLD_SYSTEMS,DIALOGUE_EFFECTS} from './content.js';
 
 // Metres in a shared, north-up territory. Workshops are interiors of real buildings.
 export const KINGDOM = Object.freeze({
@@ -85,6 +85,8 @@ export function guideTarget(state,objective){
   const missingLever=(needs,seen=new Set())=>{
     for(const flag of needs||[]){
       if(flags[flag]||seen.has(flag))continue;seen.add(flag);
+      // A join someone does for the player after talking (Nereo at the Faro's base): the step is that person.
+      const by=Object.entries(DIALOGUE_EFFECTS).find(([,e])=>e.flags?.includes(flag))?.[0],person=by&&objects.find(o=>o.kind==='npc'&&o.dialogue===by);if(person)return person;
       const lever=objects.find(o=>o.kind==='lever'&&o.flag===flag&&(!o.requires||o.requires.every(f=>flags[f])));if(lever)return lever;
       const system=WORLD_SYSTEMS.find(w=>w.flag===flag&&w.area===state.area);const deeper=system&&missingLever(system.requires,seen);if(deeper)return deeper;
     }
