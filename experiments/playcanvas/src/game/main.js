@@ -105,7 +105,7 @@ function openLook(){
 }
 function askName(next){
   modal(`<div class="eyebrow">REGISTRO DEL INSTITUTO ROXANA</div><h2>¿Cómo te llamás?</h2><p class="modal-intro">Así te van a conocer en Ohmdal. Es el mismo nombre de tu registro en la escuela; podés cambiarlo después desde Opciones.</p><form id="name-form" class="name-form"><input id="player-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre" aria-label="Tu nombre" required/>${PEOPLE_3D?`<p class="look-ask">¿Cómo te ves?</p>${lookChooser()}`:''}<button class="primary" type="submit">Cruzar el Portal ${svg('arrow')}</button></form>`,'options-modal name-modal');
-  const input=$('#player-name');input.value=schoolName();setTimeout(()=>input.focus(),0);bindLookChooser($('#name-form [data-look-root]'));
+  const input=$('#player-name');input.value=schoolName();setTimeout(()=>{input.focus();input.select();},0); // typing replaces a name already knownbindLookChooser($('#name-form [data-look-root]'));
   $('#name-form').onsubmit=event=>{event.preventDefault();const name=input.value.trim().slice(0,40);if(!name){input.focus();return;}storeSchoolName(name);closeModal();next(name);};
 }
 function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);document.documentElement.classList.toggle('lumen-marks',!!settings.lumenMarks);}
@@ -509,7 +509,8 @@ function showEnding(){
 }
 
 $('#new-game').onclick=()=>{
-  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Podés exportar una copia desde Opciones antes de comenzar.</p><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');$('#confirm-new').onclick=()=>{closeModal();askName(()=>startGame(false));};$('#cancel-new').onclick=closeModal;}
+  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Si querés conservarla, guardá una copia antes.</p><button class="quiet" id="export-before-new">Guardar una copia de mi bitácora</button><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');
+    $('#export-before-new').onclick=()=>{const saved=loadState().state;if(!saved)return;const blob=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Bitácora guardada.');};$('#confirm-new').onclick=()=>{closeModal();askName(()=>startGame(false));};$('#cancel-new').onclick=closeModal;}
   // Every new journey opens the register (ciclo 30): the name comes filled in from the school, and
   // the look can be chosen again; a player whose name was already known never saw the chooser.
   else askName(()=>startGame(false));
@@ -618,6 +619,8 @@ function loop(now){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
         let label=personLabel(nearby,state)||'Observar';
         if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
+        // A bench says it opens (ciclo 30: a player measured the gate's regulator without knowing E opened it).
+        else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
         $('#interaction-label').textContent=label;
         const candidate=state.area+nearby.id+JSON.stringify(state.flags);if(candidate!==lastMeasurementCandidate){lastMeasurementCandidate=candidate;measurementAvailable=Boolean(state.flags.awaken&&measureWorld(state.area,state,nearby.id));}show('#field-measure',measurementAvailable);
         const pos=world.getScreenPosition(nearby),prompt=$('#interaction');

@@ -277,7 +277,7 @@ export const DIALOGUES = {
     ['edda', 'Eso pensé. Después seguí el dibujo y ya no estoy tan segura. Probá algo; yo miro las balizas.']),
   road_ready: d(
     ['narrator', 'Las balizas de la Calzada se encienden una tras otra. Dentro de la puerta, algo responde con un golpe lento.'],
-    ['edda', 'Llegó. Pero el cerrojo no levanta. Hay que mirar su regulador.']),
+    ['edda', 'Llegó. Pero el cerrojo no levanta. Su regulador está junto a la puerta: abrilo y mirá su mesa.']),
   gate_locked: d(['edda', 'Todavía no responden las balizas. Hay cierres en los dos postes y un puente en el centro. El dibujo viejo no tiene ese puente.']),
   gate_arrival: d(
     ['edda', 'El cerrojo hace fuerza… pero para abajo. ¿No tendría que levantar?'],
