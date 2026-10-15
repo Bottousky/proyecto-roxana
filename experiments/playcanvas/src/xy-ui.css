@@ -163,3 +163,8 @@ html[data-estilo="xy"] .title-screen :is(.title-foot,.title-foot *){color:#e8f1f
 /* La pantalla de carga, en el mismo cielo que el juego. */
 html[data-estilo="xy"] #transition{background:radial-gradient(ellipse at 50% 40%,#5fb0e6,#2f7fc0 80%)!important}
 html[data-estilo="xy"] #transition :is(*){color:#fff!important;font-family:var(--xy-font)!important;font-weight:800}
+/* La salida de un interior, que queda detrás de la cámara (ciclo 30). */
+.exit-hint{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);z-index:6;padding:6px 16px;border-radius:999px;border:2px solid #f2b33a;background:#fff8e6;color:#7a4f0f;font:800 14px/1.2 ui-rounded,'Arial Rounded MT Bold',sans-serif;box-shadow:0 3px 0 #c98a12;cursor:pointer;pointer-events:auto}
+.exit-hint span{color:#c98a12}
+.exit-hint[hidden]{display:none}
+@media (pointer:coarse){.exit-hint{bottom:auto;top:max(10px,env(safe-area-inset-top));}}

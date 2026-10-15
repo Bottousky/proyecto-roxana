@@ -14,7 +14,7 @@ import './journal.css';
 import '../xy-ui.css';
 import {APPEARANCE,APPEARANCE_DEFAULT,PEOPLE_3D,savedAppearance,chosenAppearance} from '../style.js';
 import {renderJourneyGuide} from './journey-guide.js';
-import {guideTarget} from './kingdom-geography.js';
+import {guideTarget,isExterior} from './kingdom-geography.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
 import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
@@ -602,7 +602,12 @@ function loop(now){
     }
     if(world.walking&&mode==='world')sound(`step:${world.groundKind?.()||'stone'}${held.has('Shift')?':run':''}`);
     if(mode==='world'){
-      if(now-travelTick>250){travelTick=now;const objective=getObjective(state);updateTravelInstrument(document,state,world.getPlayerPosition(),objective);world.setGuide?.(guideTarget(state,objective));}
+      if(now-travelTick>250){
+        // Inside, the door is behind the camera: a chip at the bottom edge says where the way out is.
+        const way=!isExterior(state.area)&&!world.home?AREAS[state.area]?.exits?.[0]:null;let chip=$('#exit-hint');
+        if(way&&!chip){chip=document.createElement('button');chip.id='exit-hint';chip.className='exit-hint';chip.type='button';chip.onclick=()=>{const o=world.getInteractions().find(i=>i.id===way.id);if(o&&!world.canInteractWith(o))world.approachInteraction(o);intendedInteraction=way.id;};$('#hud').append(chip);}
+        if(chip){chip.hidden=!way||nearby?.id===way?.id;if(way)chip.innerHTML=`<span aria-hidden="true">↓</span> Salida: ${esc(way.label)}`;}
+        travelTick=now;const objective=getObjective(state);updateTravelInstrument(document,state,world.getPlayerPosition(),objective);world.setGuide?.(guideTarget(state,objective));}
       const crossing=world.getTravelEvent();
       if(crossing?.locked)interact(crossing.locked);
       else if(crossing?.target)enterArea(crossing.target,null,{continuous:true});

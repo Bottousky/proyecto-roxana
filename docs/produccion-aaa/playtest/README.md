@@ -13,6 +13,7 @@ encuentran trabas de primera vez.
 | 5 | El Manantial: cinco mesas resueltas, con el farol de Tala | Las dos manivelas de la rueda (25 min): Vega no decía dónde estaban; Enter repetido volvía a abrir su línea | Vega dice dónde está cada manivela y en qué orden; Enter no vuelve a usar nada hasta 1,4 s después de un diálogo; «separado» en lugar de «abierto» en las lecturas de los postes |
 | 6 | La Calzada (35 min) | La flecha señalaba el puente aunque ya estuviera levantado, nunca los postes que faltaban; Edda no decía qué faltaba | La flecha señala la palanca de la instalación que todavía está mal (primero el atajo, después los postes); Edda dice qué falta en cada caso; el nombre conocido va como sugerencia, no como texto |
 | 7 | La Calzada: unió el poste este y levantó el puente | Edda estaba parada junto al poste oeste: E y el clic la elegían a ella en lugar del cierre | Edda espera lejos de los postes; lo que marca la flecha gana a una persona al lado; Esc guarda primero el instrumento de Ohm |
+| 8 | La Calzada (sin intentar las balizas) | Salir del taller (15 min): la puerta queda detrás de la cámara; caminar entre árboles y cercas | Cartel «↓ Salida: Volver a la Plaza» en interiores, que además lleva hasta la puerta; llegada al Portal más corta; el tablero cuenta los cables en la mano |
 
 Pendiente de estos informes: caminar todavía se traba contra cercas y la mesa; diálogos largos al
 principio; el panel de observación de Ohm tapa la escena; el tablero se reacomoda al tender cables.
