@@ -15,6 +15,7 @@ encuentran trabas de primera vez.
 | 7 | La Calzada: unió el poste este y levantó el puente | Edda estaba parada junto al poste oeste: E y el clic la elegían a ella en lugar del cierre | Edda espera lejos de los postes; lo que marca la flecha gana a una persona al lado; Esc guarda primero el instrumento de Ohm |
 | 8 | La Calzada (sin intentar las balizas) | Salir del taller (15 min): la puerta queda detrás de la cámara; caminar entre árboles y cercas | Cartel «↓ Salida: Volver a la Plaza» en interiores, que además lleva hasta la puerta; llegada al Portal más corta; el tablero cuenta los cables en la mano |
 | 9 | **El Castillo, con 5 mesas y las balizas en unos 40 min** (el más lejos hasta ahora) | El tablero de Ivara: no encontró los dos seccionadores del patio | La flecha también señala una palanca que hay que abrir (el archivo dañado); Ivara dice cuál falta y de qué lado |
+| 10 | La Plaza (40 min sin entrar al taller) | Las teclas dejaban de responder después de cerrar la Bitácora, el mapa o la Guía; desde el porche la puerta no respondía | Al cerrar una ventana el foco vuelve al mundo; la puerta del taller responde desde los escalones del porche |
 
 Pendiente de estos informes: caminar todavía se traba contra cercas y la mesa; diálogos largos al
 principio; el panel de observación de Ohm tapa la escena; el tablero se reacomoda al tender cables.

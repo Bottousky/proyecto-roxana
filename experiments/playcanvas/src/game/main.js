@@ -380,7 +380,7 @@ function interact(obj=nearby){
 }
 function openPuzzle(id){mode='puzzle';held.clear();show('#hud',false);show('#arrival',false);world.setInspection(true);show('#workbench');workbench.open(id,state.puzzles[id]);}
 
-function closeModal(){if(world)world.portrait=false;for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
+function closeModal(){if(world)world.portrait=false;for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(mode!=='world'&&modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
 function modal(html,kind='standard'){
   if(mode!=='modal'){modalReturn=mode;modalFocus=document.activeElement;}
   mode='modal';held.clear();show('#interaction',false);for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=true;

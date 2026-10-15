@@ -742,7 +742,7 @@ export const AREAS = {
     ],
     exits: [
       exit('plaza_to_portal', 0, 14, 'portal', 'Portal Ω', [], null, [6.4, -8]),
-      exit('plaza_to_workshop', -13.25, 7.9, 'workshop', 'Taller de Lumen'),
+      { ...exit('plaza_to_workshop', -13.25, 7.9, 'workshop', 'Taller de Lumen'), radius: 3.6 }, // answers from the porch steps too (ciclo 30)
       exit('plaza_to_road', 0, -14, 'road', 'La Calzada', ['workshop'], 'plaza_road_locked'),
     ],
   },
