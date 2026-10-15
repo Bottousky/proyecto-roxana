@@ -74,6 +74,12 @@ export function nextPassage(from,to){
     for(const exit of AREAS[id]?.exits||[])if(!seen.has(exit.target)){seen.add(exit.target);queue.push([exit.target,[...path,exit]]);}}
   return null;
 }
+/** Where the next step is in this place: the passage toward the objective's place, or its object here. */
+export function guideTarget(state,objective){
+  const exit=nextPassage(state.area,objective?.area);
+  const target=exit||AREAS[state.area]?.objects.find(o=>o.id===objective?.object);
+  return target?{x:target.x,z:target.z}:null;
+}
 export function travelBearing(state,position,objective){
   const exit=nextPassage(state.area,objective?.area);
   const target=exit||AREAS[state.area]?.objects.find(o=>o.id===objective?.object);

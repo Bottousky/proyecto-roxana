@@ -14,6 +14,7 @@ import './journal.css';
 import '../xy-ui.css';
 import {APPEARANCE,APPEARANCE_DEFAULT,PEOPLE_3D,savedAppearance,chosenAppearance} from '../style.js';
 import {renderJourneyGuide} from './journey-guide.js';
+import {guideTarget} from './kingdom-geography.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
 import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
@@ -446,9 +447,9 @@ function openOptions(){
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
   $('#lumen-marks').onchange=e=>{settings.lumenMarks=e.target.checked;storeSettings();};
-  $('#click-walk').onchange=e=>{settings.clickToWalk=e.target.checked;storeSettings();};
+  $('#click-walk').onchange=e=>{settings.clickToWalk=e.target.checked;settings.clickWalkChosen=true;storeSettings();};
   $('#quality').onchange=e=>{settings.quality=e.target.value;storeSettings();world?.resize();};
-  $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:36;storeSettings();};
+  $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:60;storeSettings();};
   $('#resume-option').onclick=closeModal;
   $('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{toast('Podés usar F11 para ampliar la ventana.');}};
   $('#export-save')?.addEventListener('click',()=>{persist();const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Bitácora exportada.');});
@@ -542,6 +543,11 @@ window.addEventListener('keydown',event=>{
   if(mode==='puzzle')return;
   if(mode==='modal'){
     if(event.key==='Escape'){event.preventDefault();if(!event.repeat)closeModal();return;}
+    // The key that opened a window closes it again (J, M, H), unless someone is writing in it.
+    if(!event.repeat&&!['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName)&&!event.target.isContentEditable){
+      const k=event.key.toLowerCase();
+      if((k==='j'&&$('.journal-modal'))||(k==='m'&&$('.kingdom-map'))||((k==='h'||k==='?')&&$('.guide-modal'))){event.preventDefault();closeModal();return;}
+    }
     if(event.key==='Tab'){
       const controls=[...$('#modal-layer').querySelectorAll('button,input,select,textarea,summary,a[href],[tabindex]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length);
       if(controls.length){const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
@@ -563,9 +569,11 @@ window.addEventListener('keydown',event=>{
   if(['m','M'].includes(event.key)){openMap();return;}
   if(['q','Q'].includes(event.key)){fieldMeasure();return;}
   if(['o','O'].includes(event.key)&&!event.repeat){talkToOhm();return;}
-  held.add(event.key);
+  held.add(event.key);if(!event.repeat)pressedAt.set(event.key,performance.now());
 });
-window.addEventListener('keyup',event=>held.delete(event.key));
+// A short tap still takes a short step (ciclo 30): the key counts as held for at least 180 ms.
+const pressedAt=new Map();
+window.addEventListener('keyup',event=>{const since=performance.now()-(pressedAt.get(event.key)??-1e9),key=event.key;pressedAt.delete(key);if(since>=180)held.delete(key);else setTimeout(()=>{if(!pressedAt.has(key))held.delete(key);},180-since);});
 window.addEventListener('blur',()=>{held.clear();persist();});
 document.addEventListener('visibilitychange',()=>{held.clear();persist();audio.setMuted(document.hidden||settings.muted);});
 window.addEventListener('beforeunload',persist);
@@ -586,7 +594,7 @@ function loop(now){
     }
     if(world.walking&&mode==='world')sound(`step:${world.groundKind?.()||'stone'}${held.has('Shift')?':run':''}`);
     if(mode==='world'){
-      if(now-travelTick>250){travelTick=now;updateTravelInstrument(document,state,world.getPlayerPosition(),getObjective(state));}
+      if(now-travelTick>250){travelTick=now;const objective=getObjective(state);updateTravelInstrument(document,state,world.getPlayerPosition(),objective);world.setGuide?.(guideTarget(state,objective));}
       const crossing=world.getTravelEvent();
       if(crossing?.locked)interact(crossing.locked);
       else if(crossing?.target)enterArea(crossing.target,null,{continuous:true});

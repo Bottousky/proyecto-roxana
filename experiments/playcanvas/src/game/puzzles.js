@@ -12,8 +12,10 @@ import './puzzles.css';
 // Who speaks at a bench wears their own portrait in the dock.
 const SAY_FACES = { OHM: 'ohm', EDDA: 'edda', LUMEN: 'lumen', VEGA: 'vega', IVARA: 'consejera', YESCA: 'yesca', NEREO: 'nereo', TALA: 'tala', MARIN: 'marin', 'MARÍN': 'marin' };
 export const BENCH_GUIDANCE = {
-  awaken: { goal: 'Despertá al pequeño de bronce: cerrá el camino de su corazón.', learned: 'Hizo falta una vuelta completa: salir de la celda, atravesar al pequeño y volver a ella. Con una sola conexión, nada se movía.', pulseLoose: true,
-    steps: [{ how: 'Tenés un cable: se tiende tocando dos bornes redondos. Un camino ya sale de la celda y llega al pequeño. ¿Por dónde podría volver?' }],
+  awaken: { goal: 'Despertá al pequeño de bronce.', learned: 'Hizo falta una vuelta completa: salir de la celda, atravesar al pequeño y volver a ella. Con una sola conexión, nada se movía.', pulseLoose: true,
+    // A first player found the old wording gave the answer away (ciclo 30): the step invites a try;
+    // the way back is what the hints are for.
+    steps: [{ how: 'Tenés un cable: se tiende tocando dos bornes redondos. Probá dónde ponerlo y mirá qué hace el pequeño.' }],
     tools: [], voice: 'EDDA', hints: ['Ese cable sale de la celda y llega al pequeño. ¿Y después? Para volver a la celda hace falta otro camino.', 'Tiene dos piezas redondas de cada lado: una ya está ocupada. La otra quedó sola.', 'Si unís las dos piezas de la celda entre sí, se oye un clic: el camino no pasa por él. No se rompe nada.', 'Un paso para probar: tocá «Bronce −» y después «Celda −»: ese es el camino de vuelta.'] },
   workshop: { goal: 'Encontrá el tramo cortado y puentealo con tu cable.', learned: 'Por fuera los tramos se ven iguales: la prueba de camino encuentra el corte que el ojo no ve.',
     steps: [{ how: 'Por fuera, los tres tramos son iguales. ¿Cuál no deja pasar? “Comprobar el camino” se lo puede preguntar al cobre.', tool: 'continuity' }, { how: 'Ya sabés dónde falta camino. ¿Cómo se lo devolvés con un solo cable?', tool: 'wire' }],

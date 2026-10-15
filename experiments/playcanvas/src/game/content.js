@@ -158,7 +158,7 @@ export const DIALOGUES = {
     ['ohm', 'No. Vuelven a la celda. Lo que me dejan al pasar es energía: con eso late esto.'],
     ['edda', 'Una cadena que da vueltas… Eso sí lo puedo dibujar.'],
     ['ohm', 'Lo que no dispongo es de una explicación para haber pasado tanto tiempo mirando musgo.'],
-    ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza, siguiendo el canal.'],
+    ['edda', 'Lumen va a querer conocerte. Su taller está en la Plaza: subí por el camino del norte.'],
     ['edda', 'Mi abuela llevaba a los visitantes en bote por el canal hasta el pueblo. El bote sigue atado; ahora junta hojas. Vamos a pie: canal arriba, remar cansa el doble.']),
   ohm_pedestal_after: d(
     ['narrator', 'El asiento de bronce conserva la huella de Ohm. Dos caminos de cobre unen el cristal con el lugar donde descansaba.'],
@@ -168,7 +168,7 @@ export const DIALOGUES = {
   plaza_arrival: d(
     ['narrator', 'La Plaza de Ohm conserva guirnaldas para una fiesta que nadie ha cancelado del todo. Entre las últimas casas, la Calzada sigue el agua hacia la Puerta de Ohm.'],
     ['ohm', 'Reconozco esta plaza. No recuerdo de cuándo. Es una sensación poco calibrada.'],
-    ['edda', 'El taller de Lumen está al oeste. Si algo zumba, huele a aceite y tiene demasiadas tazas, es ahí.']),
+    ['edda', 'El taller de Lumen está a la izquierda apenas entrás a la Plaza, del lado oeste. Si algo zumba, huele a aceite y tiene demasiadas tazas, es ahí.']),
   edda_plaza: d(
     ['edda', 'Cada noche, Nereo sube al Faro y hace girar la manivela. Desde acá no se ve ninguna señal. Igual vuelve a subir.'],
     ['edda', 'Voy a revisar la Calzada. Si averiguo algo, te guardo la parte interesante. La parte peligrosa la discutimos.']),

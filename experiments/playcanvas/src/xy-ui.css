@@ -143,3 +143,23 @@ body:has(.look-modal) #touch-controls{display:none}
 /* El rumbo bajo el instrumento: texto chico en su propio renglón, sin sombra, sobre la tarjeta. */
 html[data-estilo="xy"] #hud #travel-instrument #travel-bearing{position:relative;z-index:3;color:var(--xy-soft);text-shadow:none;font-weight:700;font-family:var(--xy-font);padding:6px 0 2px 23px}
 html[data-estilo="xy"] #hud #travel-instrument #travel-bearing::before{color:var(--xy-blue)}
+
+/* Ciclo 30, lo que encontró un primer jugador. */
+/* La Guía: la tarjeta «Ahora» clara, con el paso siguiente legible. */
+html[data-estilo="xy"] .guide-current{background:#eef6fc;border:2px solid #cfe3f3;border-left:5px solid #f2b33a;border-radius:18px}
+html[data-estilo="xy"] .guide-current :is(p,span,small,.guide-direction){color:var(--xy-ink)!important}
+html[data-estilo="xy"] .guide-current .guide-direction{font-weight:700}
+html[data-estilo="xy"] .guide-current .eyebrow{color:var(--xy-blue-deep)!important}
+html[data-estilo="xy"] .modal kbd{background:var(--xy-blue);color:#fff;border:0;border-radius:6px;padding:1px 6px}
+/* Los botones de arriba dicen qué son: el nombre debajo de cada uno, en una pastilla. */
+html[data-estilo="xy"] #hud .hud-tools{gap:12px;padding-bottom:20px}
+html[data-estilo="xy"] #hud .hud-tools .icon-button{position:relative;overflow:visible}
+html[data-estilo="xy"] #hud .hud-tools .icon-button .tool-label{position:absolute;left:50%;top:calc(100% + 5px);width:auto;height:auto;clip:auto;overflow:visible;transform:translateX(-50%);white-space:nowrap;padding:1px 7px;border-radius:999px;background:#ffffffe6;color:var(--xy-blue-deep)!important;font:800 10px/1.5 var(--xy-font);box-shadow:0 1px 0 #c9d3dc}
+html[data-estilo="xy"] #hud .hud-tools .icon-button kbd{display:none}
+@media (max-width:640px),(max-height:540px){html[data-estilo="xy"] #hud .hud-tools .icon-button .tool-label{display:none}html[data-estilo="xy"] #hud .hud-tools{padding-bottom:0}}
+/* El título: una sombra más firme a la izquierda, para que el nombre y los botones se lean. */
+html[data-estilo="xy"] .title-art{background-image:linear-gradient(90deg,#0d2a44f2 0%,#0d2a44d9 30%,#0d2a4466 46%,#0d2a4400 58%),url('/assets/xy/portada.webp')!important}
+html[data-estilo="xy"] .title-screen :is(.title-foot,.title-foot *){color:#e8f1f8!important;opacity:1!important;text-shadow:0 1px 3px #0b2a44}
+/* La pantalla de carga, en el mismo cielo que el juego. */
+html[data-estilo="xy"] #transition{background:radial-gradient(ellipse at 50% 40%,#5fb0e6,#2f7fc0 80%)!important}
+html[data-estilo="xy"] #transition :is(*){color:#fff!important;font-family:var(--xy-font)!important;font-weight:800}

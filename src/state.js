@@ -5,7 +5,7 @@ import {normalizeJourneyTime} from './story-time.js';
 export const SAVE_KEY = 'ohmdal.la-luz.v1';
 export const SETTINGS_KEY = 'ohmdal.settings.v1';
 export const AREA_IDS = ['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse'];
-export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:36, clickToWalk:false, lumenMarks:false};
+export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:60, clickToWalk:true, lumenMarks:false};
 
 export function freshState(settings = {}) {
   return {version:1,area:'portal',position:null,flags:{},seen:[],secrets:[],visited:[],puzzles:{},fieldNotes:[],personalNotes:{},known:[],playerName:'',journeyTime:{phase:0},activeDialogue:null,activeCinematic:null,endingPending:false,playtime:0,createdAt:Date.now(),savedAt:Date.now(),settings:{...DEFAULT_SETTINGS,...settings}};
@@ -15,9 +15,13 @@ function settingsFrom(value) {
   const result={...DEFAULT_SETTINGS};
   if(!record(value))return result;
   if(Number.isFinite(value.volume))result.volume=Math.max(0,Math.min(1,value.volume));
-  for(const key of ['muted','reducedMotion','clickToWalk','lumenMarks'])if(typeof value[key]==='boolean')result[key]=value[key];
+  for(const key of ['muted','reducedMotion','lumenMarks'])if(typeof value[key]==='boolean')result[key]=value[key];
+  // Walking with a click is on by default since ciclo 30 (a first player clicked the ground and nothing
+  // happened). Only a choice made in the options, marked as such, keeps it off.
+  if(value.clickWalkChosen===true&&typeof value.clickToWalk==='boolean'){result.clickToWalk=value.clickToWalk;result.clickWalkChosen=true;}
   if(['high','low'].includes(value.quality))result.quality=value.quality;
-  if(Number.isFinite(value.textSpeed)&&value.textSpeed>0)result.textSpeed=Math.min(9999,value.textSpeed);
+  // The old default pace (36) gives way to the new one; a pace chosen otherwise stays.
+  if(Number.isFinite(value.textSpeed)&&value.textSpeed>0&&value.textSpeed!==36)result.textSpeed=Math.min(9999,value.textSpeed);
   return result;
 }
 export function validateState(data) {

@@ -441,7 +441,7 @@ export class PlayCanvasWorld {
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.updateAwakening(dt,reduced);this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.updateAwakening(dt,reduced);this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateGuide(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
     else{const rest=this.restPose(p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
       // Choosing a look: the camera comes close to the traveller, who stands clear of the panel
@@ -507,6 +507,31 @@ export class PlayCanvasWorld {
       const e=new Entity('Donde llega el haz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setLocalPosition(80,-16.6,0);e.setLocalScale(160,1,22);this.beacon.addChild(e);this.beaconPool=m;}
   }
   // A soft golden ring on the ground under the object the player can use right now.
+  // The next step marked in the world (ciclo 30, a first player got lost in the Plaza): a golden
+  // diamond over the door, exit or thing the objective points to, like the gold mark on the map.
+  // It fades when the traveller is within reach (the focus ring takes over) and inside houses.
+  setGuide(target){this.guide=target&&Number.isFinite(target.x)?target:null;}
+  updateGuide(dt,paused,reduced){
+    if(!this.guideMarker){
+      // A golden arrow pointing down, white rim and a soft glow, drawn once on a canvas.
+      const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+      const glow=g.createRadialGradient(64,58,10,64,58,62);glow.addColorStop(0,'#ffd76a88');glow.addColorStop(1,'#ffd76a00');g.fillStyle=glow;g.fillRect(0,0,128,128);
+      g.beginPath();g.moveTo(64,112);g.lineTo(26,58);g.quadraticCurveTo(22,20,64,16);g.quadraticCurveTo(106,20,102,58);g.closePath();
+      g.lineJoin='round';g.lineWidth=12;g.strokeStyle='#ffffff';g.stroke();g.lineWidth=4;g.strokeStyle='#c98a12';g.stroke();
+      const fill=g.createLinearGradient(0,16,0,112);fill.addColorStop(0,'#ffe27a');fill.addColorStop(1,'#f2a51e');g.fillStyle=fill;g.fill();
+      g.beginPath();g.arc(64,48,13,0,Math.PI*2);g.fillStyle='#ffffff';g.fill();
+      const tex=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});tex.setSource(c);
+      const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffffff');m.emissiveMap=tex;m.opacityMap=tex;m.opacityMapChannel='a';m.blendType=BLEND_NORMAL;m.useLighting=false;m.depthTest=false;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update(); // drawn last, seen through roofs and porches
+      const e=new Entity('Marca del siguiente paso');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.enabled=false;this.app.root.addChild(e);this.guideMarker=e;this.guideLevel=0;
+    }
+    const t=this.guide,p=this.player?.position;
+    const want=!!t&&!!p&&!this.home&&!this.cinematic&&Math.hypot(t.x-p.x,t.z-p.z)>2.6?1:0;
+    this.guideLevel+=(want-this.guideLevel)*Math.min(1,dt*4);
+    const e=this.guideMarker;e.enabled=this.guideLevel>.03&&!!t;if(!e.enabled)return;
+    const [ox,oz]=this.data.areas[this.area.id].offset,bob=reduced?0:Math.sin(this.clock*2.6)*.16,s=1.4*this.guideLevel;
+    // Facing the camera, gently bobbing.
+    e.setPosition(t.x+ox,this.groundHeight(t.x,t.z)+3+bob,t.z+oz);e.setLocalScale(s,s,s);e.setRotation(this.camera.getRotation());e.rotateLocal(90,0,0);
+  }
   buildFocusRing(){
     const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,34,64,64,62);
     g.addColorStop(0,'#ffe2a000');g.addColorStop(.35,'#ffe2a0ff');g.addColorStop(.55,'#ffe2a0aa');g.addColorStop(1,'#ffe2a000');x.fillStyle=g;x.fillRect(0,0,128,128);
