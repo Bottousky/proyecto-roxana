@@ -105,7 +105,8 @@ const PARTS=['cadera','cuerpo','cabeza','pierna-izq','pierna-der','brazo-izq','b
 // each bone keeps its rest rotation and turns by a delta around the model's X (forward swing) or Z
 // (arms toward the body), expressed in the bone's rest frame.
 const SKIN_BONES=['cadera','cuerpo','cuello','cabeza','brazo-izq','brazo-der','antebrazo-izq','antebrazo-der','pierna-izq','pierna-der','canilla-izq','canilla-der','pie-izq','pie-der'];
-export const FIGURE_URL=new URLSearchParams(globalThis.location?.search||'').get('figura')==='bloques'?'./assets/xy/viajero.glb':'./assets/xy/viajero-hy.glb';
+// ?figura=tsg: the traveller's shape made with TripoSG (MIT) instead of Hunyuan3D, to compare (ciclo 30).
+export const FIGURE_URL={bloques:'./assets/xy/viajero.glb',tsg:'./assets/xy/viajero-tsg.glb'}[new URLSearchParams(globalThis.location?.search||'').get('figura')]??'./assets/xy/viajero-hy.glb';
 /** The people that already have a 3D figure (public/assets/xy), by sprite name. */
 // size: the figure's height relative to a person (Ohm is a small robot).
 export const FIGURES={edda:{url:'./assets/xy/edda-3d.glb'},lumen:{url:'./assets/xy/lumen-3d.glb',size:.92},marin:{url:'./assets/xy/marin-3d.glb'},vega:{url:'./assets/xy/vega-3d.glb'},nereo:{url:'./assets/xy/nereo-3d.glb',size:.95},tala:{url:'./assets/xy/tala-3d.glb',size:.9},yesca:{url:'./assets/xy/yesca-3d.glb'},consejera:{url:'./assets/xy/consejera-3d.glb'},ohm:{url:'./assets/xy/ohm-3d.glb',size:.42}};
