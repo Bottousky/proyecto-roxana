@@ -576,9 +576,10 @@ window.addEventListener('keydown',event=>{
   if(mode!=='world')return;
   // Just after a conversation, the same key does not use anything (a player re-opened a closure by
   // pressing Enter once too often, ciclo 30): E and Enter wait a moment for every object.
-  // Enter is how conversations advance: in the world it uses things only a while after the last one
+  // Enter is how conversations advance: in the world it never moves a lever (jugador 26 undid two
+  // with an Enter too many) and uses other things only a while after the last one
   // ended (a player kept pressing Enter at the pump's box and heard Vega's line again and again).
-  if(['e','E','Enter',' '].includes(event.key)){const now=performance.now();if(event.key==='Enter'?now<interactAfter+950&&nearby:now<interactAfter&&nearby&&nearby.id===interactAfterId){if(event.key!=='Enter')interactAfter=now+450;}else if(!event.repeat)interact();return;}
+  if(['e','E','Enter',' '].includes(event.key)){const now=performance.now();if(event.key==='Enter'?now<interactAfter+950&&nearby:now<interactAfter&&nearby&&nearby.id===interactAfterId){if(event.key!=='Enter')interactAfter=now+450;}else if(event.key==='Enter'&&nearby?.action?.type==='toggle'){if(!event.repeat)bubble('Las manivelas se mueven con E.');}else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}

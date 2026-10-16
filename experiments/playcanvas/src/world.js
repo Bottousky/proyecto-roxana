@@ -453,6 +453,13 @@ export class PlayCanvasWorld {
     {const asked=!paused&&((dx||dz)||!!this.target);this.stuckFor=asked&&Math.hypot(p.x-old[0],p.z-old[1])<.002?(this.stuckFor||0)+dt:0;
       // Pushing against a wall is not being stuck: only when no direction around is free.
       if(this.stuckFor>1.1){this.stuckFor=0;const boxed=!this.canStand(p.x,p.z)&&[0,1,2,3,4,5,6,7].every(k=>!this.canStand(p.x+Math.cos(k*Math.PI/4)*.3,p.z+Math.sin(k*Math.PI/4)*.3,.2));const open=boxed&&this.openGroundNear(p.x,p.z);if(open){p.x=open[0];p.z=open[1];p.y=this.groundHeight(open[0],open[1]);this.target=null;this.route=[];}}}
+    // Left standing on the way between two places (jugador 26 stopped a crossing with a click and
+    // stood outside the Castle's wall, the arrow hidden behind it): after a moment the traveller
+    // goes on to the place that way leads to.
+    {const [bx,bz]=this.area.bounds||[Infinity,Infinity],outside=!this.home&&(Math.abs(p.x)>bx/2+.4||Math.abs(p.z)>bz/2+.4);
+      this.outsideFor=outside&&!paused&&!dx&&!dz&&!this.target?(this.outsideFor||0)+dt:0;
+      if(this.outsideFor>1.5){this.outsideFor=0;const exits=(this.area.exits||[]).filter(e=>e.target&&passageGeometry(this.area.id,e.target));
+        const exit=exits.find(e=>e.target===this.travelIntent)||exits.sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];if(exit)this.followPassage(exit);}}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.walking){const l=Math.hypot(p.x-old[0],p.z-old[1]);this.lastStep=[(p.x-old[0])/l,(p.z-old[1])/l];}if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
