@@ -528,6 +528,9 @@ export class PlayCanvasWorld {
   // diamond over the door, exit or thing the objective points to, like the gold mark on the map.
   // It fades when the traveller is within reach (the focus ring takes over) and inside houses.
   setGuide(target){this.guide=target&&Number.isFinite(target.x)?target:null;}
+  /** The thing under the golden arrow, when a click lands on the arrow (or the thing itself). */
+  guidePick(x,y){const t=this.guide;if(!t||!this.guideMarker?.enabled||this.disposed)return null;const r=this.canvas.getBoundingClientRect(),p=this.guideMarker.getPosition(),q=this.camera.camera.worldToScreen(p);
+    if(Math.hypot(q.x-(x-r.left),q.y-(y-r.top))>70)return null;return this.getInteractions().find(o=>Math.abs(o.x-t.x)<.01&&Math.abs(o.z-t.z)<.01)||null;}
   updateGuide(dt,paused,reduced){
     if(!this.guideMarker){
       // A golden arrow pointing down, white rim and a soft glow, drawn once on a canvas.

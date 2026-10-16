@@ -527,7 +527,9 @@ $('#dialogue-text').onclick=nextLine;
 $('#skip-cinematic').onclick=skipCinematic;
 $('#world').addEventListener('pointerdown',event=>{
   if(mode!=='world'||event.button!==0)return;
-  const object=world.pickInteraction(event.clientX,event.clientY);
+  // A click on the golden arrow goes to what it marks (ciclo 30: players clicked the arrow and the
+  // ground under it lay inside a planter, so nobody moved).
+  const object=world.guidePick?.(event.clientX,event.clientY)||world.pickInteraction(event.clientX,event.clientY);
   intendedInteraction=null;
   // With a mouse the keyboard walks; a click only uses what is within reach. Touch keeps tap-to-go.
   const walk=event.pointerType!=='mouse'||settings.clickToWalk;

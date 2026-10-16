@@ -455,7 +455,7 @@ $('#dialogue-text').onclick=nextLine;
 $('#skip-cinematic').onclick=skipCinematic;
 $('#world').addEventListener('pointerdown',event=>{
   if(mode!=='world'||event.button!==0)return;
-  const object=world.pickInteraction(event.clientX,event.clientY);
+  const object=world.guidePick?.(event.clientX,event.clientY)||world.pickInteraction(event.clientX,event.clientY);
   intendedInteraction=null;
   if(object){if(world.canInteractWith(object))interact(object);else if(world.approachInteraction(object))intendedInteraction=object.id;return;}
   const point=world.pick(event.clientX,event.clientY);if(point)world.setTarget(point);activePointer={x:event.clientX,y:event.clientY};
