@@ -192,7 +192,7 @@ async function walkTo(id) {
   // Progress is what is left of the route, not the straight distance: a detour around a railing
   // first takes the walker away from the goal, and that is not being stuck.
   const remaining = position => { let left = distance(position, path[waypoint]); for (let i = waypoint + 1; i < path.length; i++) left += distance(path[i - 1], path[i]); return left; };
-  let waypoint = 0, best = remaining(info.position), replans = 0;
+  let waypoint = 0, best = remaining(info.position), replans = 0, clicked = false;
   const started = Date.now(), clock0 = info.clock;
   let lastProgress = clock0;
   while (info.clock - clock0 < 65 && Date.now() - started < 65000 * 5) {
@@ -200,6 +200,8 @@ async function walkTo(id) {
     assert.equal(info.area, startingArea, `Walking toward ${id} must remain in its authored area`);
     if (info.mode !== 'world') { await releaseKeys(); await settle({ stable: 180 }); continue; }
     if (info.nearby === id || await page.evaluate(id => {const w=window.__ohmdal.world;return w.canInteractWith(w.getInteractions().find(o=>o.id===id));},id)) { await releaseKeys(); return geometry.object; }
+    // After a click on the thing (below), the traveller walks there alone: keys would cancel it.
+    if (clicked && info.target) { await page.waitForTimeout(100); continue; }
     while (waypoint < path.length - 1 && distance(info.position, path[waypoint]) < 0.6) waypoint++;
     if (remaining(info.position) < best - 0.12) { best = remaining(info.position); lastProgress = info.clock; }
     const target = path[waypoint];
@@ -213,6 +215,9 @@ async function walkTo(id) {
       for (let i = 0; i < 3; i++) await keyboardNudge(info.position, [info.position[0] - dz * side, info.position[1] + dx * side]);
       const fresh = await worldGeometry(id); path = fresh.path?.length ? fresh.path : [goal]; goal = path.at(-1); waypoint = 0; lastProgress = (await inspect()).clock; best = remaining((await inspect()).position);
       log('navigation-replan', { id, position: info.position });
+      // Twice stuck with the keys (the lake's pier railing), a player clicks the thing itself and lets
+      // the traveller find the way round.
+      if (replans >= 2 && !clicked) { clicked = await page.evaluate(id => { const w = window.__ohmdal.world; return w.approachInteraction(w.getInteractions().find(o => o.id === id)); }, id); lastProgress = (await inspect()).clock; log('navigation-click', { id, clicked }); }
     }
     await page.waitForTimeout(60);
   }

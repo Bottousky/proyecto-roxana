@@ -27,9 +27,11 @@ export function inhabitantPlan(area, object, state = {}) {
     case 'edda_lake':
       plan.present = !f.beacon_supply;
       set(f.beacon_link ? 'toward-the-tower' : 'watching-the-markers', f.beacon_link ? [[-3.8, .8], [-2.8, -1]] : [[-5, 6], [-5.8, 3.8]], [8, -3]); break;
+    // In the Faro, Edda and Nereo wait beside the walk between each pair of levers, never on it
+    // (jugador 30 could not get past Edda to the motor's lever).
     case 'edda_tower':
       set(final ? 'teaching' : f.beacon_network ? 'observing-the-lens' : f.beacon_supply ? 'comparing-services' : 'sketching-the-base',
-        final ? [[-4, -10], [-4.2, -9.3]] : f.beacon_network ? [[-3.8, -7], [-4.4, -6.4]] : f.beacon_supply ? [[-3.8, 1], [-4.3, 1.8]] : [[-4, 12], [-3.8, 10.7]], final ? [-4, -12.5] : [0, f.beacon_network ? -12 : f.beacon_supply ? -4 : 4], 7); break;
+        final ? [[-4, -10], [-4.2, -9.3]] : f.beacon_network ? [[-6.4, -3.2], [-6.9, -2.6]] : f.beacon_supply ? [[-5, 3.4], [-5.6, 4.2]] : [[-4, 12], [-3.8, 10.7]], final ? [-4, -12.5] : [0, f.beacon_network ? -12 : f.beacon_supply ? -4 : 4], 7); break;
     // While the Plaza has no water (gate open, pump not yet), Marín and Tala are at the Manantial.
     case 'marin':
       plan.present = !(f.gate && !f.pump);
@@ -60,7 +62,7 @@ export function inhabitantPlan(area, object, state = {}) {
         final ? [[8.2, 3.4], [10.6, 2.8]] : f.beacon_link ? [[2.3, -10], [-.5, -11.5]] : [[9.5, 3.2], [11.2, 3.4]], final ? [16, 3] : f.beacon_link ? [0, -15] : [16, 2], 8); break;
     case 'nereo_tower':
       set(final ? 'recognizing-the-signal' : f.beacon_network ? 'listening-to-the-crown' : f.beacon_supply ? 'checking-the-gallery' : 'listening-to-the-base',
-        final ? [[3.6, -10.4], [3.8, -9.2]] : f.beacon_network ? [[3.4, -7], [3.8, -6.2]] : f.beacon_supply ? [[3.4, 1], [3.8, 2]] : [[3.5, 11], [3.6, 9.7]], [0, final ? -12 : f.beacon_network ? -4 : 4], 8); break;
+        final ? [[3.6, -10.4], [3.8, -9.2]] : f.beacon_network ? [[6.4, -3.2], [6.9, -2.6]] : f.beacon_supply ? [[5, 3.4], [5.6, 4.2]] : [[3.5, 11], [3.6, 9.7]], [0, final ? -12 : f.beacon_network ? -4 : 4], 8); break;
     case 'lumen_epilogue': set('sharing-an-old-lamp', [[-5.5, -11], [-5.1, -10.4]], [-4, -12.5], 8); break;
     case 'tala_epilogue': set(f.epilogue_shared ? 'trying-the-lamp' : 'examining-the-old-repair', [[-4, -12.5], [-3.5, -12.7]], [-4, -10], 8); break;
   }
