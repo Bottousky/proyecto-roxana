@@ -297,7 +297,7 @@ export class PlayCanvasWorld {
   getCompanion(){return this.area?companionInteraction(this):null;}
   // What the golden arrow marks wins over a person standing beside it (ciclo 30: a player at the
   // Calzada's west post kept talking to Edda instead of joining the closure).
-  getNearby(){const g=this.guide,rank=o=>(o.interactionPriority||0)-(o.action&&this.isLatched?.(o.action.flag)?2:0)+(g&&!o.character&&Math.abs(o.x-g.x)<.01&&Math.abs(o.z-g.z)<.01?1:0)+(o.kind==='panel'||o.kind==='beacon'?.5:0); /* a bench beside a person: E opens the bench (people answer a click) */return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>rank(b)-rank(a)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
+  getNearby(){const g=this.guide,rank=o=>(o.interactionPriority||0)-(o.action&&this.isLatched?.(o.action.flag)?2:0)+(g&&!o.character&&Math.abs(o.x-g.x)<.01&&Math.abs(o.z-g.z)<.01?1:0)+(o.kind==='panel'||o.kind==='beacon'?.5:0)-(o.kind==='door'?.5:0); /* a bench beside a person: E opens the bench (people answer a click); a house door yields to a lever beside it (jugador 21) */return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>rank(b)-rank(a)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
   getScreenPosition(o){if(this.disposed||!this.camera.camera)return {x:0,y:0,visible:false};const [ox,oz]=this.data.areas[this.area.id].offset,p=this.camera.camera.worldToScreen(new Vec3(o.x+ox,o.ground?0:o.target?.35:o.character?2.5:1.6,o.z+oz)),r=this.canvas.getBoundingClientRect();return {x:p.x,y:p.y,visible:p.x>0&&p.x<r.width&&p.y>0&&p.y<r.height};}
   pick(x,y){const r=this.canvas.getBoundingClientRect(),a=this.camera.camera.screenToWorld(x-r.left,y-r.top,0),b=this.camera.camera.screenToWorld(x-r.left,y-r.top,200),[ox,oz]=this.data.areas[this.area.id].offset;
     const at=h=>{const t=(h-a.y)/(b.y-a.y);return [a.x+(b.x-a.x)*t-ox,a.z+(b.z-a.z)*t-oz];};
@@ -529,7 +529,7 @@ export class PlayCanvasWorld {
   // It fades when the traveller is within reach (the focus ring takes over) and inside houses.
   setGuide(target){this.guide=target&&Number.isFinite(target.x)?target:null;}
   /** The thing under the golden arrow, when a click lands on the arrow (or the thing itself). */
-  guidePick(x,y){const t=this.guide;if(!t||!this.guideMarker?.enabled||this.disposed)return null;const r=this.canvas.getBoundingClientRect(),p=this.guideMarker.getPosition(),q=this.camera.camera.worldToScreen(p);
+  guidePick(x,y){const t=this.guide;if(!t||!this.guideMarker?.enabled||this.disposed||(this.travelIntent&&this.target))return null;const r=this.canvas.getBoundingClientRect(),p=this.guideMarker.getPosition(),q=this.camera.camera.worldToScreen(p);
     if(Math.hypot(q.x-(x-r.left),q.y-(y-r.top))>70)return null;return this.getInteractions().find(o=>Math.abs(o.x-t.x)<.01&&Math.abs(o.z-t.z)<.01)||null;}
   updateGuide(dt,paused,reduced){
     if(!this.guideMarker){
@@ -546,7 +546,8 @@ export class PlayCanvasWorld {
     }
     this.updateUsableRings();
     const t=this.guide,p=this.player?.position;
-    const want=!!t&&!!p&&!this.home&&!this.cinematic&&Math.hypot(t.x-p.x,t.z-p.z)>2.6?1:0;
+    // On the way through a passage the arrow has done its job: a click on it would turn the walk back.
+    const want=!!t&&!!p&&!this.home&&!this.cinematic&&!(this.travelIntent&&this.target)&&Math.hypot(t.x-p.x,t.z-p.z)>2.6?1:0;
     this.guideLevel+=(want-this.guideLevel)*Math.min(1,dt*4);
     const e=this.guideMarker;e.enabled=this.guideLevel>.03&&!!t;if(!e.enabled)return;
     const [ox,oz]=this.data.areas[this.area.id].offset,bob=reduced?0:Math.sin(this.clock*2.6)*.16,s=1.4*this.guideLevel;

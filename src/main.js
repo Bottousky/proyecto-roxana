@@ -134,7 +134,9 @@ function renderFieldMeasurement(){
   const reading=measureWorld(state.area,state,activeMeasurement.id);
   if(!reading){activeMeasurement=null;show('#field-meter',false);return;}
   const fmt=v=>v===null?'— —':Number(v).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  $('#field-title').textContent=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id)?.label||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
+  const measured=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);
+  // A lever's label is what E will do next; the observation names the thing itself (jugador 21).
+  $('#field-title').textContent=(measured?.kind==='lever'?reading.title:measured?.label)||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
   $('#field-reference').textContent=reading.reference;$('#field-observation').textContent=reading.notice;
   $('#field-meter').classList.toggle('fault',Boolean(reading.overloaded));
 }

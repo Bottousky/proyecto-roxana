@@ -171,7 +171,9 @@ function renderFieldMeasurement(){
   const reading=measureWorld(state.area,state,activeMeasurement.id);
   if(!reading){activeMeasurement=null;show('#field-meter',false);return;}
   const fmt=v=>v===null?'— —':Number(v).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  $('#field-title').textContent=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id)?.label||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
+  const measured=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);
+  // A lever's label is what E will do next; the observation names the thing itself (jugador 21).
+  $('#field-title').textContent=(measured?.kind==='lever'?reading.title:measured?.label)||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
   $('#field-reference').textContent=reading.reference;$('#field-observation').textContent=reading.notice;
   $('#field-meter').classList.toggle('fault',Boolean(reading.overloaded));
 }
@@ -637,6 +639,8 @@ function loop(now){
         if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
         // A bench says it opens (ciclo 30: a player measured the gate's regulator without knowing E opened it).
         else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
+        // A way to another place says so (jugador 21 read «El Lago de las Señales» as a signpost).
+        else if(nearby.target&&AREAS[nearby.target]&&!/^Volver/.test(nearby.label))label=`Camino a: ${nearby.label}`;
         $('#interaction-label').textContent=label;
         const candidate=state.area+nearby.id+JSON.stringify(state.flags);if(candidate!==lastMeasurementCandidate){lastMeasurementCandidate=candidate;measurementAvailable=Boolean(state.flags.awaken&&measureWorld(state.area,state,nearby.id));}show('#field-measure',measurementAvailable);
         const pos=world.getScreenPosition(nearby),prompt=$('#interaction');
