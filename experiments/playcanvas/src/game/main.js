@@ -340,6 +340,9 @@ async function useDoor(door){
   await wait(settings.reducedMotion?0:120);show('#transition',false);transitioning=false;mode='world';persist();
 }
 function talkToOhm(){if(mode!=='world')return;const ohm=world?.getCompanion?.();if(ohm)interact(ohm);}
+/** Whether a lever already sits as its installation needs it: joined, or apart for the Calzada's bridge and the wet archive. */
+const leverDone=action=>{const on=!!state.flags[action.flag];return WORLD_SYSTEMS.some(w=>(w.off||[]).includes(action.flag))?!on:on;};
+let undoAsked=null;
 function interact(obj=nearby){
   if(mode!=='world'||!obj)return;
   intendedInteraction=null;
@@ -361,6 +364,9 @@ function interact(obj=nearby){
     if(action.type==='toggle'){
       const latched=isLatched(action.flag);
       if(latched){bubble('Los mandos quedaron asegurados al poner esta instalación en servicio.');return;}
+      // Undoing a lever that is already right asks twice (players undid finished steps with one E too many).
+      if(leverDone(action)&&!(undoAsked?.id===obj.id&&performance.now()<undoAsked.until)){undoAsked={id:obj.id,until:performance.now()+4000};bubble('Esto ya está como corresponde. Para deshacerlo, usalo otra vez.');return;}
+      undoAsked=null;
       Object.assign(state.flags,toggleMemory(action.flag,state.flags));state.flags[action.flag]=!state.flags[action.flag];sound('switch');
       toast(state.flags[action.flag]?(action.onText||'Contacto cerrado'):(action.offText||'Contacto abierto'));
       refreshWorldSystems();persist();const undone=unjoinDialogue(action.flag,state)||joinWarning(action.flag,state);if(undone)speak(undone);return;
@@ -645,9 +651,7 @@ function loop(now){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
         let label=personLabel(nearby,state)||'Observar';
         // A lever already set says so first: «Reconectar…» alone read as «still to do» (jugador 22).
-        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(()=>{const a=nearby.action,on=!!state.flags[a.flag],next=on?a.offLabel:a.onLabel;
-          // Done is the state the installation needs: joined, or apart for the Calzada's bridge and the wet archive.
-          const done=WORLD_SYSTEMS.some(w=>(w.off||[]).includes(a.flag))?!on:on;return done&&next?`✓ Hecho · deshacer: ${next[0].toLowerCase()}${next.slice(1)}`:next;})()||label;
+        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(()=>{const a=nearby.action,next=state.flags[a.flag]?a.offLabel:a.onLabel,done=leverDone(a);return done&&next?`✓ Hecho · deshacer: ${next[0].toLowerCase()}${next.slice(1)}`:next;})()||label;
         // A bench says it opens (ciclo 30: a player measured the gate's regulator without knowing E opened it).
         else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
         // A way to another place says so (jugador 21 read «El Lago de las Señales» as a signpost).
