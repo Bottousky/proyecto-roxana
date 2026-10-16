@@ -2,7 +2,9 @@ import {validatePendingCinematic} from './cinematic-progress.js';
 import {normalizeJournalData} from './field-notes.js';
 import {normalizeJourneyTime} from './story-time.js';
 
-export const SAVE_KEY = 'ohmdal.la-luz.v1';
+// ?tramo=<lugar> (sólo para pruebas): una partida aparte que empieza en ese lugar, sin tocar la del jugador.
+const TRAMO = (() => { try { return new URLSearchParams(globalThis.location?.search || '').get('tramo') || ''; } catch { return ''; } })().replace(/[^a-z]/g, '');
+export const SAVE_KEY = 'ohmdal.la-luz.v1' + (TRAMO ? `.tramo-${TRAMO}` : '');
 export const SETTINGS_KEY = 'ohmdal.settings.v1';
 export const AREA_IDS = ['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse'];
 export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:60, clickToWalk:true, lumenMarks:false};
