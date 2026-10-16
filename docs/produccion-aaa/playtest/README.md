@@ -20,6 +20,7 @@ encuentran trabas de primera vez.
 | 12 (tres a la vez) | Lago → Faro: llegó al Faro | Buscó «el primer panel» 15 min: Nereo no había unido la base porque no le volvió a hablar | Nereo une la base al llegar y dice dónde está la primera mesa; objetivo del Faro más claro. Los otros dos se pisaron la partida en el mismo navegador: los jugadores van de a uno |
 | 13 | Faro (tramo): primera mesa | Tocar cerca de un borne retiraba un cable sin aviso; no sabía hacia dónde mover el regulador | Sólo la × retira un cable, con aviso de qué se retiró; los pasos del Faro dicen qué botón del regulador y cuándo; la frase de Nereo sin ambigüedad. A 1280×800 los 9 bancos entran enteros: lo «cortado» de las capturas de los agentes es de su herramienta |
 | 14 | Faro: resolvió la mesa I | Mesa II cerrada: no encontró la manivela del motor | Nereo dice qué manivela falta y de qué lado (mesa II y linterna); mensaje claro para un cable soldado |
+| 15 | Faro: no abrió la primera mesa | La mesa de la fuente respondía sólo desde una franja de un metro frente a su base | Las tres máquinas del Faro responden desde todo su alrededor (alcance 3,6 m); auditoría del alcance de cada objeto: el cajón de Lumen también se amplió |
 
 Pendiente de estos informes: caminar todavía se traba contra cercas y la mesa; diálogos largos al
 principio; el panel de observación de Ohm tapa la escena; el tablero se reacomoda al tender cables.
