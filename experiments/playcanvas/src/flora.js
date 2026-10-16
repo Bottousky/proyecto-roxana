@@ -106,10 +106,10 @@ export async function sowFlora(world){
       let pool;
       if(shoreline)pool=REEDS;
       else if(clear==='low'){if(r>.18)continue;pool=SHORT;}
-      else if(garden){if(r>.35)continue;pool=GARDEN;}
-      else if(edge){if(r>(XY?.18:.3))continue;pool=EDGE;}
+      else if(garden){if(r>(XY?.24:.35))continue;pool=GARDEN;}
+      else if(edge){if(r>(XY?.09:.3))continue;pool=EDGE;} // ciclo 30: X and Y paths run between clean lawns
       else if(!inside){if(r>(.1+patch*.55)*(XY?.4:1))continue;pool=WILD;}
-      else{if(r>patch*.3-.06)continue;pool=LOW;}
+      else{if(r>patch*(XY?.14:.3)-.06)continue;pool=LOW;}
       let [sheet,row,height]=pick(pool,hash(gx,gz,4));
       if(clear==='bloom'&&FLOWERS.has(sheet+row))[sheet,row,height]=['a',0,.4];
       const col=Math.floor(hash(gx,gz,5)*4),cell=plants[sheet][row*4+col];if(!cell)continue;
