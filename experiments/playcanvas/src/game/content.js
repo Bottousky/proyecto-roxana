@@ -398,7 +398,13 @@ export const DIALOGUES = {
     ['consejera', 'El agua entró por la rama del archivo oeste. Cerramos toda la red. La enfermería y la cocina quedaron a oscuras.'],
     ['consejera', 'El Consejo lo dice desde la fundación: «La Luz es una sola: lo que se le da a una casa, se le quita a otra». Si una enferma, se sella todo.'],
     ['player', '¿Ese sector puede separarse de los otros?'],
-    ['consejera', 'Las placas identifican los cierres. Quiero que me muestren qué queda aislado antes de reabrir servicios.']),
+    ['consejera', 'Las placas identifican los cierres. Quiero que me muestren qué queda aislado antes de reabrir servicios.'],
+    ['consejera', 'En el patio hay dos manivelas. Primero la de la izquierda: separa el archivo oeste. Recién después, la de la derecha: une enfermería y cocina. Y al final, mi tablero.']),
+  // Joining the services with the wet archive still on trips the protection (jugador 24 kept
+  // toggling it): who explains it, and that separating the archive is all that is missing.
+  castle_service_trip: d(
+    ['ohm', 'Saltó la protección. El archivo oeste, el que se mojó, sigue unido a la red: así se pedía demasiado.'],
+    ['consejera', 'Por eso cerramos todo. No hace falta desunir los servicios: separen el archivo, con la manivela de la izquierda del patio.']),
   castle_edda: d(
     ['edda', 'Encontré planos debajo del decreto de clausura. El sello tapaba justo el punto donde el circuito se divide.'],
     ['player', 'Si separamos el camino al archivo, ¿podrían seguir los demás?'],
@@ -943,6 +949,12 @@ export const JOINED_BY = {
   tower_lens_free: { by: 'beacon_network_complete', say: 'unjoin_tower_lens_free' },
 };
 /** The line an inhabitant says when the player opens what they had just joined, or null. */
+/** A lever joined while something it depends on is still wrong: who says so. */
+export function joinWarning(flag, state) {
+  const f = state.flags ?? {};
+  return flag === 'castle_service' && f.castle_service && f.castle_branch_closed !== false ? 'castle_service_trip' : null;
+}
+
 export function unjoinDialogue(flag, state) {
   const j = JOINED_BY[flag];
   return j && !state.flags?.[flag] && (state.seen ?? []).includes(j.by) ? j.say : null;

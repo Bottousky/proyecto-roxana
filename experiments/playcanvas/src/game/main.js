@@ -17,7 +17,7 @@ import {renderJourneyGuide} from './journey-guide.js';
 import {guideTarget,isExterior} from './kingdom-geography.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,joinWarning,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,SAVE_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -363,7 +363,7 @@ function interact(obj=nearby){
       if(latched){bubble('Los mandos quedaron asegurados al poner esta instalación en servicio.');return;}
       Object.assign(state.flags,toggleMemory(action.flag,state.flags));state.flags[action.flag]=!state.flags[action.flag];sound('switch');
       toast(state.flags[action.flag]?(action.onText||'Contacto cerrado'):(action.offText||'Contacto abierto'));
-      refreshWorldSystems();persist();const undone=unjoinDialogue(action.flag,state);if(undone)speak(undone);return;
+      refreshWorldSystems();persist();const undone=unjoinDialogue(action.flag,state)||joinWarning(action.flag,state);if(undone)speak(undone);return;
     }
     if(action.type==='inspect'){
       const first=!state.flags[action.flag];state.flags[action.flag]=true;refreshWorldSystems();persist();
