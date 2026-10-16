@@ -5,6 +5,7 @@ import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { appendBenchEvidence, getBenchEvidence, normalizeBenchEvidence } from '../src/bench-evidence.js';
 import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle, isSealed } from '../src/puzzle-model.js';
+import { ESTIMATES } from '../src/understanding.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
@@ -139,6 +140,8 @@ for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still pe
   const { bench, click, solved } = controller(id), target = canonical(id), proof = PUZZLES[id].proof;
   // The instrument is taken up and put down with its own button, as on screen.
   const probe = (mode, a, b) => { click({ action: 'mode', mode }); bench.touchPort(a); bench.touchPort(b); click({ action: 'mode', mode: 'wire' }); };
+  // The farero's book asks for a mark before the board changes; a novice may answer «No sé todavía».
+  if (ESTIMATES[id] && !ESTIMATES[id].when) click({ action: 'estimate', choice: 'skip' });
   // The pump's loss only shows while it works: Vega sees it before the joint is bridged.
   if (proof?.voltageAcross) probe('voltage', ...proof.voltageAcross);
   // Lumen's break only shows with the bench off (the probe switches it off), before the bridge closes it.
@@ -273,4 +276,19 @@ test('Vega asks for her sum with the old joint in place: a bridge put first has 
   for (const [a, b] of [['e1a', 'e1b'], ['e2a', 'e2b'], ['e3a', 'e3b'], ['pumpIn', 'pumpOut']]) probe(a, b);
   assert.equal(bench.state.tally.closed, true);
   assert.ok(bench.state.tally.readings.joint2 > 6, 'the old joint kept most of the push');
+});
+
+// Jugadores 27 y 31: the farero's question vanished with the first wire. Now the board waits for a
+// mark (or «No sé todavía») and then changes as asked.
+test('beacon_network: the farero asks for a mark before the first wire changes', () => {
+  const { bench, click } = controller('beacon_network'), before = JSON.stringify(bench.state.wires);
+  const loose = bench.state.wires.findIndex(w => !isSealed('beacon_network', w));
+  click({ wire: String(loose) });
+  assert.equal(JSON.stringify(bench.state.wires), before, 'The first wire waits for the mark');
+  assert.equal(bench.message().kind, 'estimate');
+  assert.match(bench.message().text, /^Antes de tocar el tablero/);
+  assert.ok(bench.message().options.some(o => o.id === 'skip'), '«No sé todavía» is an answer');
+  click({ action: 'estimate', choice: 'skip' });
+  click({ wire: String(loose) });
+  assert.notEqual(JSON.stringify(bench.state.wires), before, 'Then the board changes');
 });

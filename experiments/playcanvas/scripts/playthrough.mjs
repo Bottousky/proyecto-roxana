@@ -443,6 +443,9 @@ async function solvePanel(objectId, id) {
   assert.equal(info.puzzle.id, id);
   assert.equal(info.puzzle.result.solved, false, `${id} begins with an actual fault`);
   await screenshot(`${id}-inspection`);
+  // The farero's book asks for a mark before the board can change: a player writes one.
+  const mark = page.locator('.wb-say [data-action="estimate"]').first();
+  if (await mark.count()) { const choice = await mark.getAttribute('data-choice'); await mark.click(); log('estimate', { id, choice }); }
 
   if (id === 'gate') {
     const reading = await measure('voltage', 'latchIn', 'latchOut');

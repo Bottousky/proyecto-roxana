@@ -395,6 +395,10 @@ export class PuzzleWorkbench {
   }
 
   change(mutate, { history = true, sound = 'click' } = {}) {
+    // The farero's book asks before the board changes: the mark is written first, then measured
+    // (jugadores 27 and 31 saw the question vanish with their first wire). «No sé todavía» is an answer.
+    if (history && ESTIMATES[this.id] && !ESTIMATES[this.id].when && !this.state.estimate && !this.state.completed && !this.practice) { this.estimateNote = ''; this.feedback = ''; this.askFirst = true; this.callbacks.onSound?.('locked'); this.render(); return; }
+    this.askFirst = false;
     const before = copy(this.state);
     if (history) { this.history.push(copy(this.state)); if (this.history.length > 40) this.history.shift(); }
     this.hintShown = false; this.slipShown = null; this.estimateNote = ''; this.tallyNote = '';
@@ -402,7 +406,6 @@ export class PuzzleWorkbench {
     const brakeBefore = this.id === 'gate' ? { value: this.state.values.brake, current: Math.abs(this.result?.solution.branches.latch?.current ?? 0) } : null;
     if (history) this.probeMarks = null;
     mutate(this.state);
-    if (history && ESTIMATES[this.id] && !ESTIMATES[this.id].when && !this.state.estimate && !this.state.completed) this.state.estimate = { choice: 'skip', settled: false };
     this.powerForMode(history);
     this.callbacks.onSound?.(sound);
     this.evaluate();
@@ -984,7 +987,7 @@ export class PuzzleWorkbench {
     if (this.tallyNote) return { kind: s.tally?.closed ? 'tally' : 'note', who: this.puzzle.tally.who.toLocaleUpperCase('es'), tag: this.puzzle.tally.title, text: this.tallyNote };
     const book = ESTIMATES[this.id];
     if (this.estimateNote) return { kind: 'estimate', who: book.who, tag: book.book, text: this.estimateNote };
-    if (book && !s.estimate && !s.completed && !this.practice && !r.solved && (!book.when || book.when(s))) return { kind: 'estimate', who: book.who, tag: `${book.book} · Marca esperada`, text: book.ask, options: book.options };
+    if (book && !s.estimate && !s.completed && !this.practice && !r.solved && (!book.when || book.when(s))) return { kind: 'estimate', who: book.who, tag: `${book.book} · Marca esperada`, text: `${this.askFirst ? 'Antes de tocar el tablero, anotemos qué esperás. ' : ''}${book.ask}`, options: book.when ? book.options : [...book.options, { id: 'skip', text: 'No sé todavía' }] };
     if (this.slipShown) return { kind: 'hint', who: voice, tag: 'Mirando tu montaje', text: this.slipShown.text };
     if (this.hintShown && s.hints) return { kind: 'hint', who: voice, tag: `Pista ${s.hints} de ${guidance.hints.length}`, text: guidance.hints[s.hints - 1] };
     if (this.feedback) return { kind: s.tripped ? 'warning' : 'note', who: voice, text: this.feedback };
