@@ -277,8 +277,11 @@ async function travel(id, target) {
   await settle({stable:1400});
   assert.equal((await inspect()).area, target, `The ${id} passage enters ${target}`);
   await screenshot(`${target}-arrival`);
+  // TRAMOS_DIR: the save at the first arrival to each place, for playtests that start there (ciclo 30).
+  if (process.env.TRAMOS_DIR && !tramosSaved.has(target)) { tramosSaved.add(target); const save = await page.evaluate(() => localStorage.getItem('ohmdal.playcanvas.arc1.v1')); if (save) await writeFile(resolve(process.env.TRAMOS_DIR, `${target}.json`), save); }
   if (adversarial) await talkToEveryone(`arrival:${target}`);
 }
+const tramosSaved = new Set();
 
 async function setMode(mode) {
   if ((await inspect()).puzzle.mode === mode) return;
