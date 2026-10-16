@@ -841,7 +841,7 @@ export class PuzzleWorkbench {
     const members = wireNodes(this.id, this.state).members[node] ?? [node];
     const caption = this.shell.querySelector('.wb-node-caption');
     if (caption) caption.textContent = members.length > 1
-      ? `Unidos por cobre: ${members.map(id => this.portLabel(id)).join(' · ')}`
+      ? `Bajo el puntero: ${this.portLabel(node)} está unido por cable con ${members.filter(id => id !== node).map(id => this.portLabel(id)).join(', ')}.`
       : `${this.portLabel(node)}: ningún cable lo une a otro borne.`;
   }
 

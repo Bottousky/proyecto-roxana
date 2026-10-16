@@ -588,7 +588,8 @@ window.addEventListener('keydown',event=>{
 });
 // A short tap still takes a short step (ciclo 30): the key counts as held for at least 180 ms.
 const pressedAt=new Map();
-window.addEventListener('keyup',event=>{const since=performance.now()-(pressedAt.get(event.key)??-1e9),key=event.key;pressedAt.delete(key);if(since>=180)held.delete(key);else setTimeout(()=>{if(!pressedAt.has(key))held.delete(key);},180-since);});
+window.addEventListener('keyup',event=>{const since=performance.now()-(pressedAt.get(event.key)??-1e9),key=event.key;pressedAt.delete(key);if(since>=180)held.delete(key);else tapRelease.set(key,performance.now()+180-since);});
+const tapRelease=new Map();
 window.addEventListener('blur',()=>{held.clear();persist();});
 document.addEventListener('visibilitychange',()=>{held.clear();persist();audio.setMuted(document.hidden||settings.muted);});
 window.addEventListener('beforeunload',persist);
@@ -597,12 +598,18 @@ window.addEventListener('resize',()=>world?.resize());
 function loop(now){
   // A slow frame (a weak phone, a throttled window) is caught up in steps of at most 50 ms, up to a
   // quarter second: walking keeps its pace instead of slowing down with the frame rate (ciclo 30).
+  // The journey's clock is the real one (a bench or a conversation is travel too; jugador 23 saw
+  // «4 min de viaje» after two hours in a throttled window), at most 5 s per frame.
+  const wall=document.hidden?0:Math.min((now-lastTime)/1000,5);
   const elapsed=document.hidden?0:Math.min((now-lastTime)/1000,0.25),steps=Math.max(1,Math.ceil(elapsed/0.05)),dt=elapsed/steps;lastTime=now;
   if(world && !world.disposed && started && mode!=='title'&&!document.hidden&&!world.preparingJourney){
     const x=mode==='world'?Number(held.has('d')||held.has('D')||held.has('ArrowRight'))-Number(held.has('a')||held.has('A')||held.has('ArrowLeft')):0;
     const z=mode==='world'?Number(held.has('s')||held.has('S')||held.has('ArrowDown'))-Number(held.has('w')||held.has('W')||held.has('ArrowUp')):0;
     if(x||z||mode!=='world')intendedInteraction=null;
     for(let i=0;i<steps;i++)world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
+    // A short tap is let go only after a frame has used it: at one frame a second it still gives a step.
+    for(const [key,at] of tapRelease)if(performance.now()>=at){tapRelease.delete(key);if(!pressedAt.has(key))held.delete(key);}
+    state.playtime+=wall;
     if(world.getAudioScene)audio.updateWorld?.(world.getAudioScene());
     if(mode==='cinematic'){
       const scene=world.getCinematicState();
@@ -626,7 +633,7 @@ function loop(now){
       if(dialogueQueue.length&&dialogueQueue[0].due<=now&&world.isInsidePlace())speak(dialogueQueue.shift().id);
     }
     if(mode==='world'){
-      state.playtime+=elapsed;autosave+=elapsed;
+      autosave+=elapsed;
       {const door=world.getDoorEvent?.();if(door){useDoor(door.leave?{leave:true,label:AREAS[state.area].name}:door);}}
       nearby=world.getNearby();$('#ohm-button').hidden=!world.getCompanion();
       $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
