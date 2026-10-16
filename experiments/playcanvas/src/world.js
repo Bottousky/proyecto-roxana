@@ -458,8 +458,10 @@ export class PlayCanvasWorld {
     // goes on to the place that way leads to.
     {const [bx,bz]=this.area.bounds||[Infinity,Infinity],outside=!this.home&&(Math.abs(p.x)>bx/2+.4||Math.abs(p.z)>bz/2+.4);
       this.outsideFor=outside&&!paused&&!dx&&!dz&&!this.target?(this.outsideFor||0)+dt:0;
-      if(this.outsideFor>1.5){this.outsideFor=0;const exits=(this.area.exits||[]).filter(e=>e.target&&passageGeometry(this.area.id,e.target));
-        const exit=exits.find(e=>e.target===this.travelIntent)||exits.sort((a,b)=>Math.hypot(a.x-p.x,a.z-p.z)-Math.hypot(b.x-p.x,b.z-p.z))[0];if(exit)this.followPassage(exit);}}
+      // On the way out (a crossing was started) it goes on; otherwise it walks into this place: just
+      // arrived, the nearest way is the one it came by (jugador 32 was taken back to the Plaza).
+      if(this.outsideFor>1.5){this.outsideFor=0;const exit=(this.area.exits||[]).find(e=>e.target&&e.target===this.travelIntent&&passageGeometry(this.area.id,e.target));
+        if(exit)this.followPassage(exit);else this.setTarget(this.area.spawn);}}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.walking){const l=Math.hypot(p.x-old[0],p.z-old[1]);this.lastStep=[(p.x-old[0])/l,(p.z-old[1])/l];}if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
     this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
