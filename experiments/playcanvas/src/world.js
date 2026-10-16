@@ -1,7 +1,7 @@
 import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
 import {XY,XY_LENS,XY_GRADES,XY_SKIES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,FIGURE_URL,FIGURES,chosenAppearance} from './style.js';
 import {surface,actorArt} from './art.ts';
-import {AREAS} from './game/content.js';
+import {AREAS,WORLD_SYSTEMS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
 import {lakeShoreX,AREA_LAYOUTS,pointOnPaving} from './game/world-layout.js';
 import {findPath} from './game/navigation.js';
@@ -541,6 +541,7 @@ export class PlayCanvasWorld {
       const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffffff');m.emissiveMap=tex;m.opacityMap=tex;m.opacityMapChannel='a';m.blendType=BLEND_NORMAL;m.useLighting=false;m.depthTest=false;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update(); // drawn last, seen through roofs and porches
       const e=new Entity('Marca del siguiente paso');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.enabled=false;this.app.root.addChild(e);this.guideMarker=e;this.guideLevel=0;
     }
+    this.updateUsableRings();
     const t=this.guide,p=this.player?.position;
     const want=!!t&&!!p&&!this.home&&!this.cinematic&&Math.hypot(t.x-p.x,t.z-p.z)>2.6?1:0;
     this.guideLevel+=(want-this.guideLevel)*Math.min(1,dt*4);
@@ -548,6 +549,30 @@ export class PlayCanvasWorld {
     const [ox,oz]=this.data.areas[this.area.id].offset,bob=reduced?0:Math.sin(this.clock*2.6)*.16,s=1.4*this.guideLevel;
     // Facing the camera, gently bobbing.
     e.setPosition(t.x+ox,this.groundHeight(t.x,t.z)+3+bob,t.z+oz);e.setLocalScale(s,s,s);e.setRotation(this.camera.getRotation());e.rotateLocal(90,0,0);
+  }
+  // Ciclo 30, «que se distinga lo que se usa»: in X and Y, a soft disc on the ground under every
+  // lever and bench of this place, coloured by its state (amber: still to do, green: joined/working,
+  // blue: a bench). Players took the closures for signposts and lamps.
+  updateUsableRings(){
+    if(!XY||!this.area)return;
+    const key=this.home?null:this.area.id;
+    if(this.usableArea!==key){
+      for(const r of this.usableRings??[])r.entity.destroy();this.usableRings=[];this.usableArea=key;if(!key)return;
+      if(!this.usableTexture){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+        const grad=g.createRadialGradient(64,64,30,64,64,62);grad.addColorStop(0,'#ffffff30');grad.addColorStop(.72,'#ffffff70');grad.addColorStop(.8,'#ffffffff');grad.addColorStop(.9,'#ffffffaa');grad.addColorStop(1,'#ffffff00');g.fillStyle=grad;g.fillRect(0,0,128,128);
+        this.usableTexture=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});this.usableTexture.setSource(c);}
+      const [ox,oz]=this.data.areas[key].offset;
+      for(const o of this.area.objects.filter(o=>['lever','panel','beacon'].includes(o.kind)&&!o.hidden)){
+        const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffffff');m.emissiveMap=this.usableTexture;m.opacityMap=this.usableTexture;m.opacityMapChannel='a';m.blendType=BLEND_NORMAL;m.useLighting=false;m.depthWrite=false;m.update();
+        const e=new Entity('Se puede usar');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;const size=o.kind==='lever'?1.9:2.6;e.setPosition(o.x+ox,this.groundHeight(o.x,o.z)+.17,o.z+oz);e.setLocalScale(size,1,size);this.app.root.addChild(e);
+        this.usableRings.push({entity:e,material:m,object:o,shown:''});
+      }
+    }
+    for(const r of this.usableRings??[]){
+      // A lever is green when it is as its installation needs it: joined, or open for a short (the Calzada's bridge).
+      const o=r.object,flag=o.action?.flag,f=this.state?.flags||{},wantsOff=WORLD_SYSTEMS.some(w=>(w.off||[]).includes(flag)),state=o.kind==='lever'?((wantsOff?!f[flag]:!!f[flag])?'on':'off'):(f[o.puzzle]?'on':'bench');
+      if(state===r.shown)continue;r.shown=state;r.material.emissive=color(state==='on'?'#7fd88f':state==='off'?'#ffb23a':'#5fb4ee');r.material.update();
+    }
   }
   buildFocusRing(){
     const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,34,64,64,62);

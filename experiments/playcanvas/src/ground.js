@@ -33,6 +33,9 @@ void getAlbedo(){
   float broad=gNoise(p*0.045)*0.65+gNoise(p*0.11+7.3)*0.35,fine=gNoise(p*0.6+3.1);
   #ifdef XY_LOOK
     grass*=mix(vec3(0.9,1.0,0.9),vec3(1.05,1.08,0.9),smoothstep(0.25,0.8,broad))*(0.96+0.08*fine);
+    // Ciclo 30, «menos saturado»: a calm, slightly cool lawn green like X and Y's, not lime, so
+    // paths, people and the things one can use read against it.
+    {float gl=dot(grass,vec3(0.3,0.59,0.11));grass=mix(vec3(gl),grass,0.82)*vec3(0.74,0.88,0.74);}
   #else
     grass*=mix(vec3(0.84,0.95,0.86),vec3(1.12,1.05,0.8),smoothstep(0.25,0.8,broad))*(0.93+0.14*fine);
   #endif
@@ -43,7 +46,7 @@ void getAlbedo(){
   float lum=dot(grass,vec3(0.3,0.59,0.11));
   #ifdef XY_LOOK
     // X and Y: a forgotten lawn turns autumn gold, never grey.
-    grass=mix(grass,vec3(lum*1.4,lum*1.12,lum*0.45),dry*0.58);
+    grass=mix(grass,vec3(lum*1.3,lum*1.12,lum*0.55),dry*0.34);
   #else
     grass=mix(grass,vec3(lum),0.2);
     grass=mix(grass,vec3(lum*1.16,lum*1.0,lum*0.66),dry*0.72)*(1.0-0.1*dry);
@@ -69,6 +72,11 @@ void getAlbedo(){
   vec3 stone=texture2D(uCobble,p/5.0).rgb*tint;
   // Loose, sunken stones where the paving gives way to earth.
   stone*=mix(0.8,1.0,smoothstep(0.5,0.8,cover+(edge-0.5)*0.2));
+  #ifdef XY_LOOK
+    // X and Y paths have a clean rim: a darker trim where the stones meet the lawn.
+    float rim=smoothstep(0.42,0.5,cover+(edge-0.5)*0.12)*(1.0-smoothstep(0.52,0.62,cover+(edge-0.5)*0.12));
+    stone*=1.0-0.32*rim;
+  #endif
   dAlbedo=mix(grass,stone,paved)*shade;
 }`;
 
