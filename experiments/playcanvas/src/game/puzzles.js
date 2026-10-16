@@ -672,7 +672,7 @@ export class PuzzleWorkbench {
       if (!this.selected) { this.selected = id; this.feedback = ''; this.hintShown = false; this.slipShown = null; this.callbacks.onSound?.('connect'); this.render(); return; }
       if (this.selected === id) { this.selected = null; this.feedback = ''; this.render(); return; }
       const a = this.selected; this.selected = null;
-      if (this.state.wires.some(w => w.includes(a) && w.includes(id))) { this.feedback = 'Esos bornes ya están unidos. Tocá su cable para retirarlo.'; this.render(); return; }
+      { const joined = this.state.wires.find(w => w.includes(a) && w.includes(id)); if (joined) { this.feedback = isSealed(this.id, joined) ? 'Esos bornes ya están unidos por un cable soldado de la instalación: ese no se retira.' : 'Esos bornes ya están unidos. Para retirar ese cable, tocá su ×.'; this.render(); return; } }
       if (!canJoin(this.id, a, id)) { this.feedback = 'Un cable de mano no llega tan lejos: esos bornes están en extremos distintos del tendido.'; this.callbacks.onSound?.('error'); this.render(); return; }
       if (cablesInHand(this.id, this.state) <= 0) { this.feedback = 'No te quedan cables en la mano. Retirá uno de los que tendiste para usarlo en otro lugar.'; this.callbacks.onSound?.('error'); this.render(); return; }
       this.feedback = '';

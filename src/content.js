@@ -547,6 +547,13 @@ export const DIALOGUES = {
     ['narrator', 'El viejo puente queda aislado y el embrague cierra. Los engranajes esperan junto a una galería de lámparas oscuras.'],
     ['nereo', 'Los dientes ya están juntos. Falta oírlos girar. El segundo tablero espera.']),
   beacon_network_locked: d(['nereo', 'Primero tiene que sostenerse la base. Después, las manivelas del medio apartan el puente gastado y acoplan el motor.']),
+  // What is still missing, said plainly (ciclo 30).
+  beacon_network_locked_both: d(['nereo', 'Antes de la segunda mesa, dos manivelas en el medio de la torre: la de la izquierda aparta el puente gastado, la de la derecha acopla el motor de la corona.']),
+  beacon_network_locked_motor: d(['nereo', 'El puente gastado ya está aparte. Falta acoplar el motor: su manivela está a la derecha, a la misma altura.']),
+  beacon_network_locked_bridge: d(['nereo', 'El motor ya está acoplado. Falta apartar el puente gastado: su manivela está a la izquierda, a la misma altura.']),
+  beacon_lens_locked_both: d(['nereo', 'Para la linterna, dos manivelas arriba: la de la izquierda abre el obturador de bronce, la de la derecha suelta el freno de la lente.']),
+  beacon_lens_locked_free: d(['nereo', 'El obturador ya está abierto. Falta soltar el freno de la lente: la manivela de la derecha, arriba.']),
+  beacon_lens_locked_shutter: d(['nereo', 'El freno de la lente ya está suelto. Falta abrir el obturador: la manivela de la izquierda, arriba.']),
   beacon_network_arrival: d(
     ['nereo', 'Cuando una lámpara fallaba, nos quedábamos sin giro y sin galería. Yo hacía dos trabajos a oscuras.'],
     ['nereo', 'Quiero que si una se apaga, las otras sigan. Una noche sin giro es una noche sin faro.'],
@@ -1017,6 +1024,8 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'yesca_before' && f.forge_limited) context = 'yesca_limited';
   if (id === 'workshop_locked' && f.workshop_feed && !f.workshop_return) context = 'workshop_locked_right';
   if (id === 'distribution_locked') context = f.castle_branch_closed !== false && !f.castle_service ? 'distribution_locked_both' : f.castle_branch_closed !== false ? 'distribution_locked_archive' : !f.castle_service ? 'distribution_locked_trunk' : id;
+  if (id === 'beacon_network_locked' && f.beacon_supply) context = !f.tower_isolated && !f.tower_motor ? 'beacon_network_locked_both' : !f.tower_motor ? 'beacon_network_locked_motor' : !f.tower_isolated ? 'beacon_network_locked_bridge' : id;
+  if (id === 'beacon_lens_locked' && f.beacon_network) context = !f.tower_shutter && !f.tower_lens_free ? 'beacon_lens_locked_both' : !f.tower_lens_free ? 'beacon_lens_locked_free' : !f.tower_shutter ? 'beacon_lens_locked_shutter' : id;
   if (id === 'gate_locked' && f.workshop) context = f.road_bypass ? 'gate_locked_bridge' : !f.road_send ? 'gate_locked_west' : !f.road_return ? 'gate_locked_east' : id;
   if (id === 'workshop_locked' && !f.workshop_feed && f.workshop_return) context = 'workshop_locked_left';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';
