@@ -399,7 +399,7 @@ export const DIALOGUES = {
     ['consejera', 'El Consejo lo dice desde la fundación: «La Luz es una sola: lo que se le da a una casa, se le quita a otra». Si una enferma, se sella todo.'],
     ['player', '¿Ese sector puede separarse de los otros?'],
     ['consejera', 'Las placas identifican los cierres. Quiero que me muestren qué queda aislado antes de reabrir servicios.'],
-    ['consejera', 'En el patio hay dos manivelas. Primero la de la izquierda: separa el archivo oeste. Recién después, la de la derecha: une enfermería y cocina. Y al final, mi tablero.']),
+    ['consejera', 'En el piso del patio hay dos cajas de manivela, con un disco ámbar. Primero la de la izquierda: separa el archivo oeste. Recién después, la de la derecha: une enfermería y cocina. Y al final, mi tablero.']),
   // Joining the services with the wet archive still on trips the protection (jugador 24 kept
   // toggling it): who explains it, and that separating the archive is all that is missing.
   castle_service_trip: d(
@@ -416,11 +416,11 @@ export const DIALOGUES = {
     ['consejera', 'Puedo seguir el cierre hasta el archivo. La enfermería y la cocina quedan de este lado.'],
     ['player', '¿Podemos mirar el tablero ahora?'],
     ['consejera', 'Con ese sector aislado, sí. Yo me quedo.']),
-  distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada. El otro seccionador conecta el troncal de servicio. Las placas identifican ambos.']),
+  distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada, con la caja de manivela de la izquierda del patio. La de la derecha conecta el troncal de servicio.']),
   // What is still missing, said plainly (ciclo 30).
-  distribution_locked_both: d(['consejera', 'Dos seccionadores, uno a cada lado del patio. Primero el de la izquierda: separa el archivo oeste, que está dañado. Después el de la derecha, que conecta el troncal de servicio. En ese orden; al revés, la protección salta.']),
-  distribution_locked_archive: d(['consejera', 'El troncal ya está conectado. Falta separar el archivo oeste: su seccionador está a la izquierda del patio.']),
-  distribution_locked_trunk: d(['consejera', 'El archivo ya está separado. Falta conectar el troncal de servicio: su seccionador está a la derecha del patio.']),
+  distribution_locked_both: d(['consejera', 'Dos cajas de manivela en el piso del patio, una a cada lado, con su disco ámbar. Primero la de la izquierda: separa el archivo oeste, que está dañado. Después la de la derecha, que conecta el troncal de servicio. Los engranajes del portón no: esos son del portón.']),
+  distribution_locked_archive: d(['consejera', 'El troncal ya está conectado. Falta separar el archivo oeste: su caja de manivela está en el piso, a la izquierda del patio.']),
+  distribution_locked_trunk: d(['consejera', 'El archivo ya está separado. Falta conectar el troncal de servicio: su caja de manivela está en el piso, a la derecha del patio.']),
   distribution_arrival: d(
     ['consejera', 'El indicador confirma que el archivo quedó separado en el patio. Debe seguir así durante la prueba.'],
     ['consejera', 'Y una cosa más. Algún día alguien va a tener que reparar la cocina. Ese día, la enfermería no se puede apagar.'],
