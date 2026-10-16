@@ -33,7 +33,7 @@ export const BENCH_GUIDANCE = {
     steps: [{ how: 'Girá el freno del calor de a una posición y mirá las raíces.' }, { how: 'Girá el freno del agua hasta que el riego salga parejo.' }, { how: 'El horno necesita fuerza para que Yesca pueda forjar.' }, { how: 'Si el cable de la ladera sigue caliente, alguien tiene que ceder. ¿Quién toma más? El instrumento puede decirlo.', tool: 'current' }],
     tools: ['current'], voice: 'OHM', hints: ['Cada freno cuida una sola cosa. El cable de la ladera, en cambio, lo sienten los tres.', 'Podés dejar las raíces y el riego en su punto primero; el encargo te marca cuándo lo están.', 'Si el cable sigue caliente con raíces y riego en su punto, el que tiene que ceder es el horno.', 'Un paso para probar: llevá el freno del calor y el del agua a la posición 3. Después frená el horno hasta que el cable deje de calentarse: posición 2 deja a Yesca fuerte; la 3, más suave. Las dos sirven.'] },
   beacon_supply: { goal: 'Dale fuerza al núcleo sin recalentar los tendidos.', learned: 'Dos tendidos lado a lado se reparten la corriente: cada uno lleva la mitad y se calienta mucho menos.',
-    steps: [{ how: 'Aflojá el regulador del generador para darle fuerza al núcleo, y mirá qué le pasa al tendido norte.' }, { how: 'Un solo tendido no alcanza. Con tus dos cables sumá el tendido sur: uno junto al generador y otro junto al núcleo.', tool: 'wire' }],
+    steps: [{ how: 'Aflojá el regulador del generador (el botón −) para darle fuerza al núcleo, y mirá qué le pasa al tendido norte.' }, { how: 'Un solo tendido no alcanza. Con tus dos cables sumá el tendido sur, uno junto al generador y otro junto al núcleo; después aflojá el regulador hasta que el núcleo sostenga su pulso.', tool: 'wire' }],
     tools: ['voltage'], voice: 'OHM', hints: ['Aflojar el regulador le da fuerza al núcleo, pero toda esa corriente pasa por el tendido norte.', 'Con un solo tendido no hay posición buena: o el núcleo queda débil o el cobre se calienta.', 'Dos tendidos lado a lado se reparten la corriente: cada uno lleva la mitad.', 'Un paso para probar: junto al generador, uní «Fuente +» con «Tendido sur · A»; junto al núcleo, «Tendido sur · B» con «Regulador A». Después aflojá el regulador hasta que el núcleo sostenga su pulso.'] },
   beacon_network: { goal: 'Que luz, giro y campana tengan cada una su propio camino.', learned: 'En paralelo, cada voz recibe la misma tensión y toma la corriente que necesita.',
     steps: [...[0, 1, 2].map(() => ({ how: 'Que ninguna voz tenga que atravesar a otra para volver al mar. Como en el Castillo, pero con tres. Tocá un cable para retirarlo.', tool: 'wire' })), { how: 'Nereo quiere anotar la regla de los nudos: con “Medir un camino”, medí cada voz y también lo que sale de la fuente.', tool: 'current' }],
@@ -579,7 +579,11 @@ export class PuzzleWorkbench {
       const i = Number(el.dataset.wire);
       if (this.mode !== 'wire' && el.tagName.toLowerCase() !== 'button') return;
       if (isSealed(this.id, this.state.wires[i])) { this.feedback = 'Ese cable está soldado: es parte de la instalación. Trabajá con los cables que tenés en la mano.'; this.callbacks.onSound?.('error'); this.render(); return; }
-      this.feedback = ''; this.selected = null;
+      // Only the × retires a cable (ciclo 30: a tap near a terminal landed on the copper and lifted
+      // a cable without the player noticing); a tap on the copper itself says how.
+      const w = this.state.wires[i], chip = el.tagName.toLowerCase() === 'button' || !this.shell?.querySelector?.('.wb-wire-chip');
+      if (!chip) { this.feedback = `Para retirar el cable de ${this.portLabel(w[0])} a ${this.portLabel(w[1])}, tocá su ×.`; this.render(); return; }
+      this.feedback = `Retiraste el cable de ${this.portLabel(w[0])} a ${this.portLabel(w[1])}. Lo tenés otra vez en la mano.`; this.selected = null;
       return this.change(s => { s.wires.splice(i, 1); }, { sound: 'disconnect' });
     }
     if (el.dataset.branch) {

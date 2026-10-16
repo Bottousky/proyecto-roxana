@@ -521,7 +521,7 @@ export const DIALOGUES = {
     ['nereo', 'Apoyá un pie junto a la base. Antes vibraba. Más adelante se oía la corona; en la linterna pasaba la luz.'],
     ['player', 'Tres cosas que podemos mirar por separado.'],
     ['edda', 'Una pregunta por vez. La torre no se va a ofender.'],
-    ['nereo', 'Yo llevo cuarenta años ofendiéndola y no pasó nada. Las dos manivelas de abajo ya las uno yo. Vos abrí la primera mesa, la de la fuente, al pie de la torre.']),
+    ['nereo', 'Yo llevo cuarenta años ofendiéndola y no pasó nada. Las dos manivelas de abajo ya las uno yo. Lo tuyo es la primera mesa, la de la fuente, al pie de la torre: andá y abrila.']),
   nereo_tower: d(
     ['player', '¿Cómo sabés cuándo corregir el ritmo?'],
     ['nereo', 'Escucho el lago.'],
