@@ -636,7 +636,8 @@ function loop(now){
       if(nearby&&mode==='world'){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
         let label=personLabel(nearby,state)||'Observar';
-        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
+        // A lever already set says so first: «Reconectar…» alone read as «still to do» (jugador 22).
+        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(state.flags[nearby.action.flag]?nearby.action.offLabel&&`✓ Hecho · deshacer: ${nearby.action.offLabel[0].toLowerCase()}${nearby.action.offLabel.slice(1)}`:nearby.action.onLabel)||label;
         // A bench says it opens (ciclo 30: a player measured the gate's regulator without knowing E opened it).
         else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
         // A way to another place says so (jugador 21 read «El Lago de las Señales» as a signpost).
