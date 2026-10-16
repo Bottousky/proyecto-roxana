@@ -591,12 +591,14 @@ window.addEventListener('beforeunload',persist);
 window.addEventListener('resize',()=>world?.resize());
 
 function loop(now){
-  const dt=document.hidden?0:Math.min((now-lastTime)/1000,0.05);lastTime=now;
+  // A slow frame (a weak phone, a throttled window) is caught up in steps of at most 50 ms, up to a
+  // quarter second: walking keeps its pace instead of slowing down with the frame rate (ciclo 30).
+  const elapsed=document.hidden?0:Math.min((now-lastTime)/1000,0.25),steps=Math.max(1,Math.ceil(elapsed/0.05)),dt=elapsed/steps;lastTime=now;
   if(world && !world.disposed && started && mode!=='title'&&!document.hidden&&!world.preparingJourney){
     const x=mode==='world'?Number(held.has('d')||held.has('D')||held.has('ArrowRight'))-Number(held.has('a')||held.has('A')||held.has('ArrowLeft')):0;
     const z=mode==='world'?Number(held.has('s')||held.has('S')||held.has('ArrowDown'))-Number(held.has('w')||held.has('W')||held.has('ArrowUp')):0;
     if(x||z||mode!=='world')intendedInteraction=null;
-    world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
+    for(let i=0;i<steps;i++)world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
     if(world.getAudioScene)audio.updateWorld?.(world.getAudioScene());
     if(mode==='cinematic'){
       const scene=world.getCinematicState();
@@ -620,7 +622,7 @@ function loop(now){
       if(dialogueQueue.length&&dialogueQueue[0].due<=now&&world.isInsidePlace())speak(dialogueQueue.shift().id);
     }
     if(mode==='world'){
-      state.playtime+=dt;autosave+=dt;
+      state.playtime+=elapsed;autosave+=elapsed;
       {const door=world.getDoorEvent?.();if(door){useDoor(door.leave?{leave:true,label:AREAS[state.area].name}:door);}}
       nearby=world.getNearby();$('#ohm-button').hidden=!world.getCompanion();
       $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
@@ -649,7 +651,7 @@ function loop(now){
       }
       if(activeMeasurement){const position=world.getPlayerPosition();const inReach=Math.hypot(position[0]-activeMeasurement.x,position[1]-activeMeasurement.z)<4;show('#field-meter',inReach);const flags=JSON.stringify(state.flags);if(flags!==lastMeasuredFlags){lastMeasuredFlags=flags;renderFieldMeasurement();if(inReach){const object=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);if(recordFieldObservation(state,object,measureWorld(state.area,state,activeMeasurement.id)))show('#journal-dot');}}}
       if(autosave>5){autosave=0;persist();}
-      chatterClock+=dt;
+      chatterClock+=elapsed;
       if(state.flags.awaken&&chatterClock>38&&$('#field-meter').classList.contains('hidden')){
         chatterClock=0;
         const line=(OHM_CHATTER[state.area]||[]).find(c=>!state.seen.includes(c.id)&&hasRequirements(state,c.requires)&&!(c.unless||[]).some(f=>state.flags[f]));
@@ -658,7 +660,7 @@ function loop(now){
     }else {show('#interaction',false);show('#field-meter',false);}
   }
   if(mode==='dialogue'&&dialogue){
-    const line=dialogue.lines[dialogue.index];typing+=dt*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
+    const line=dialogue.lines[dialogue.index];typing+=elapsed*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
     if(amount>typed){typed=amount;$('#dialogue-text').textContent=line.text.slice(0,typed);if(nameReveal&&typed>=nameReveal.at)revealName();}
   }
   if(now>bubbleUntil)show('#ohm-bubble',false);
