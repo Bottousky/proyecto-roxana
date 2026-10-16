@@ -22,6 +22,7 @@ encuentran trabas de primera vez.
 | 14 | Faro: resolvió la mesa I | Mesa II cerrada: no encontró la manivela del motor | Nereo dice qué manivela falta y de qué lado (mesa II y linterna); mensaje claro para un cable soldado |
 | 15 | Faro: no abrió la primera mesa | La mesa de la fuente respondía sólo desde una franja de un metro frente a su base | Las tres máquinas del Faro responden desde todo su alrededor (alcance 3,6 m); auditoría del alcance de cada objeto: el cajón de Lumen también se amplió |
 | 16 | Faro: no llegó a la primera mesa | Caminar lentísimo: con el panel del navegador oculto el juego corre a pocos cuadros por segundo, y cada cuadro sólo avanzaba 50 ms; E cerca de Nereo le hablaba a él | Un cuadro lento se recupera en pasos de 50 ms hasta un cuarto de segundo (sirve también para teléfonos lentos); junto a una persona, E abre la mesa |
+| 17 | **Faro completo: las tres mesas y el final «ARCO I · COMPLETO»** (35 min) | Regulador poco intuitivo sin pista; «aflojar» y «frenar menos» mezclados; el cartel de la mano tapaba nombres | Siempre «frenar menos/más»; el cartel de la mano va abajo del tablero; el medidor de corriente dice que la pieza se elige en su menú; retirar un cable dice que vuelve a los disponibles |
 
 Pendiente de estos informes: el recorrido automático falla de vez en cuando al acercarse a la palanca del retorno en el Lago (pasa al repetirlo); caminar todavía se traba contra cercas y la mesa; diálogos largos al
 principio; el panel de observación de Ohm tapa la escena; el tablero se reacomoda al tender cables.
