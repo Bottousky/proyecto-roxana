@@ -317,7 +317,8 @@
 .modal.journal-modal .dj-heading .dj-print-button:hover{background:linear-gradient(#f7ead0,#e2cc9d)}
 /* ── On paper: the downloadable PDF (journal-pdf.js). Sheets are built off screen, photographed and bound. ── */
 .modal.journal-modal .dj-heading p{flex:1 1 220px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.modal.journal-modal .dj-heading .dj-download{margin-left:auto;display:flex;align-items:center;gap:8px;align-self:center;flex:none}
+/* Well clear of the close button: players aiming at × hit «Versión libro A5» (jugadores 12 y 27). */
+.modal.journal-modal .dj-heading .dj-download{margin-left:auto;margin-right:120px;display:flex;align-items:center;gap:8px;align-self:center;flex:none}
 .modal.journal-modal .dj-heading .dj-download .dj-print-button{font-size:17px;padding:4px 12px;min-height:36px}
 @media (max-width:820px){.modal.journal-modal .dj-heading p{white-space:normal}.modal.journal-modal .dj-heading .dj-download-book{display:none}}
 .modal.journal-modal .dj-heading .dj-print-button{margin-left:0}
