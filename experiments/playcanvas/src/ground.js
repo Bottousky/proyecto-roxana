@@ -74,8 +74,8 @@ void getAlbedo(){
   stone*=mix(0.8,1.0,smoothstep(0.5,0.8,cover+(edge-0.5)*0.2));
   #ifdef XY_LOOK
     // X and Y paths have a clean rim: a darker trim where the stones meet the lawn.
-    float rim=smoothstep(0.42,0.5,cover+(edge-0.5)*0.12)*(1.0-smoothstep(0.52,0.62,cover+(edge-0.5)*0.12));
-    stone*=1.0-0.32*rim;
+    float rim=1.0-abs(paved*2.0-1.0);
+    dAlbedo=mix(grass,stone,paved)*(1.0-0.38*rim*rim)*shade;return;
   #endif
   dAlbedo=mix(grass,stone,paved)*shade;
 }`;

@@ -20,7 +20,7 @@ import {renderJournal,recordFieldObservation} from './journal.js';
 import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
-import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
+import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,SAVE_KEY,hasRequirements,minutes,validateState} from './state.js';
 import {prepareCinematic,recordCinematicComplete,recordEndingDismissed} from './cinematic-progress.js';
 import {placeInteractionPrompt} from './interaction-prompt.js';
 
@@ -123,6 +123,9 @@ function refreshTitle(){
   $('#save-description').textContent=loaded.state?describe(loaded.state):loaded.error||'Sin prisa. Sin combate. Con curiosidad.';
 }
 refreshTitle();
+// Pruebas por tramos (ciclo 30, sólo en desarrollo): ?tramo=castle abre una partida guardada al llegar
+// a ese lugar (dev-tramos/, del recorrido automático), aparte de la del jugador. «Continuar» la abre.
+if(import.meta.env.DEV){const tramo=new URLSearchParams(location.search).get('tramo');if(tramo&&!loadState().state)fetch(`./dev-tramos/${tramo.replace(/[^a-z]/g,'')}.json`).then(r=>r.ok?r.text():null).then(text=>{if(!text)return;try{localStorage.setItem(SAVE_KEY,text);}catch{}refreshTitle();}).catch(()=>{});}
 
 function persist(){
   if(!started)return;
