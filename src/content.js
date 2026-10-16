@@ -412,7 +412,7 @@ export const DIALOGUES = {
     ['consejera', 'Con ese sector aislado, sí. Yo me quedo.']),
   distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada. El otro seccionador conecta el troncal de servicio. Las placas identifican ambos.']),
   // What is still missing, said plainly (ciclo 30).
-  distribution_locked_both: d(['consejera', 'Dos seccionadores, uno a cada lado del patio. El de la izquierda separa el archivo oeste, que está dañado; el de la derecha conecta el troncal de servicio. Hagan las dos cosas y abro el tablero.']),
+  distribution_locked_both: d(['consejera', 'Dos seccionadores, uno a cada lado del patio. Primero el de la izquierda: separa el archivo oeste, que está dañado. Después el de la derecha, que conecta el troncal de servicio. En ese orden; al revés, la protección salta.']),
   distribution_locked_archive: d(['consejera', 'El troncal ya está conectado. Falta separar el archivo oeste: su seccionador está a la izquierda del patio.']),
   distribution_locked_trunk: d(['consejera', 'El archivo ya está separado. Falta conectar el troncal de servicio: su seccionador está a la derecha del patio.']),
   distribution_arrival: d(
@@ -462,6 +462,10 @@ export const DIALOGUES = {
     ['narrator', 'El horno queda en el tablero compartido. La compuerta abre el camino a los bancales.'],
     ['yesca', 'Lo que me toque, que alcance. Ahora repartamos el cable, sin malgastarlo.']),
   irrigation_locked: d(['vega', 'Primero, todo a la misma mesa: el horno de Yesca pasa al tablero compartido y el canal se abre. Las dos manivelas están junto a nuestros puestos.']),
+  // What is still missing, said plainly (ciclo 30).
+  irrigation_locked_both: d(['vega', 'Antes de abrir el tablero, dos manivelas al fondo de las Terrazas: a la izquierda, junto a la forja de Yesca, la que pasa el horno a la mesa compartida; a la derecha, junto a mi casa, la que abre el canal.']),
+  irrigation_locked_forge: d(['vega', 'El canal ya está abierto. Falta pasar el horno a la mesa compartida: la manivela del fondo a la izquierda, junto a la forja de Yesca.']),
+  irrigation_locked_channel: d(['vega', 'El horno ya está en la mesa compartida. Falta abrir el canal: la manivela del fondo a la derecha, junto a mi casa.']),
   irrigation_arrival: d(
     ['vega', 'El agua sale con demasiada fuerza y el lecho está demasiado caliente. Y el horno de Yesca tira del mismo cable.'],
     ['yesca', 'La ladera da una sola Luz: el fuego que yo suelto, se lo bebe el agua. Lo sabe cualquier forjadora.'],
@@ -1026,6 +1030,7 @@ export function resolveDialogueId(id, state = {}) {
   if (id === 'distribution_locked') context = f.castle_branch_closed !== false && !f.castle_service ? 'distribution_locked_both' : f.castle_branch_closed !== false ? 'distribution_locked_archive' : !f.castle_service ? 'distribution_locked_trunk' : id;
   if (id === 'beacon_network_locked' && f.beacon_supply) context = !f.tower_isolated && !f.tower_motor ? 'beacon_network_locked_both' : !f.tower_motor ? 'beacon_network_locked_motor' : !f.tower_isolated ? 'beacon_network_locked_bridge' : id;
   if (id === 'beacon_lens_locked' && f.beacon_network) context = !f.tower_shutter && !f.tower_lens_free ? 'beacon_lens_locked_both' : !f.tower_lens_free ? 'beacon_lens_locked_free' : !f.tower_shutter ? 'beacon_lens_locked_shutter' : id;
+  if (id === 'irrigation_locked' && f.distribution) context = !f.forge_limited && !f.irrigation_open ? 'irrigation_locked_both' : !f.forge_limited ? 'irrigation_locked_forge' : !f.irrigation_open ? 'irrigation_locked_channel' : id;
   if (id === 'gate_locked' && f.workshop) context = f.road_bypass ? 'gate_locked_bridge' : !f.road_send ? 'gate_locked_west' : !f.road_return ? 'gate_locked_east' : id;
   if (id === 'workshop_locked' && !f.workshop_feed && f.workshop_return) context = 'workshop_locked_left';
   if (id === 'vega_terraces' && f.irrigation_open) context = 'vega_channel_open';

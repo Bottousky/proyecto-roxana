@@ -88,9 +88,11 @@ export function guideTarget(state,objective){
       // A join someone does for the player after talking (Nereo at the Faro's base): the step is that person.
       const by=Object.entries(DIALOGUE_EFFECTS).find(([,e])=>e.flags?.includes(flag))?.[0],person=by&&objects.find(o=>o.kind==='npc'&&o.dialogue===by);if(person)return person;
       const lever=objects.find(o=>o.kind==='lever'&&o.flag===flag&&(!o.requires||o.requires.every(f=>flags[f])));if(lever)return lever;
-      const system=WORLD_SYSTEMS.find(w=>w.flag===flag&&w.area===state.area);const deeper=system&&missingLever(system.requires,seen);if(deeper)return deeper;
-      // A lever that has to be opened (a damaged branch to isolate, a short to lift).
+      const system=WORLD_SYSTEMS.find(w=>w.flag===flag&&w.area===state.area);
+      // A lever that has to be opened comes first (a damaged branch to isolate, a short to lift):
+      // joining the healthy line before it would trip the protection.
       const open=system&&(system.off||[]).find(f=>flags[f]),opener=open&&objects.find(o=>o.kind==='lever'&&o.flag===open);if(opener)return opener;
+      const deeper=system&&missingLever(system.requires,seen);if(deeper)return deeper;
     }
     return null;
   };
