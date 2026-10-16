@@ -125,7 +125,7 @@ function refreshTitle(){
 refreshTitle();
 // Pruebas por tramos (ciclo 30, sólo en desarrollo): ?tramo=castle abre una partida guardada al llegar
 // a ese lugar (dev-tramos/, del recorrido automático), aparte de la del jugador. «Continuar» la abre.
-if(import.meta.env.DEV){const tramo=new URLSearchParams(location.search).get('tramo');if(tramo&&!loadState().state)fetch(`./dev-tramos/${tramo.replace(/[^a-z]/g,'')}.json`).then(r=>r.ok?r.text():null).then(text=>{if(!text)return;try{localStorage.setItem(SAVE_KEY,text);}catch{}refreshTitle();}).catch(()=>{});}
+if(import.meta.env.DEV){const tramo=new URLSearchParams(location.search).get('tramo');if(tramo&&!loadState().state)fetch(`./dev-tramos/${tramo.replace(/[^a-z]/g,'')}.json`).then(r=>r.ok?r.text():null).then(text=>{if(!text)return;try{JSON.parse(text);localStorage.setItem(SAVE_KEY,text);}catch{} /* a missing file comes back as the page itself */refreshTitle();}).catch(()=>{});}
 
 function persist(){
   if(!started)return;
