@@ -513,7 +513,7 @@ function showEnding(){
 }
 
 $('#new-game').onclick=()=>{
-  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Si querés conservarla, guardá una copia antes.</p><button class="quiet" id="export-before-new">Guardar una copia de mi bitácora</button><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');
+  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">Un viaje nuevo empieza desde el Portal y reemplaza tu viaje guardado en este navegador (con su cuaderno, la Bitácora). Si querés conservarlo, guardá una copia antes.</p><button class="quiet" id="export-before-new">Guardar una copia de mi bitácora</button><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');
     $('#export-before-new').onclick=()=>{const saved=loadState().state;if(!saved)return;const blob=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Bitácora guardada.');};$('#confirm-new').onclick=()=>{closeModal();askName(()=>startGame(false));};$('#cancel-new').onclick=closeModal;}
   // Every new journey opens the register (ciclo 30): the name comes filled in from the school, and
   // the look can be chosen again; a player whose name was already known never saw the chooser.

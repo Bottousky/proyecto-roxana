@@ -521,7 +521,7 @@ export const DIALOGUES = {
     ['nereo', 'Apoyá un pie junto a la base. Antes vibraba. Más adelante se oía la corona; en la linterna pasaba la luz.'],
     ['player', 'Tres cosas que podemos mirar por separado.'],
     ['edda', 'Una pregunta por vez. La torre no se va a ofender.'],
-    ['nereo', 'Yo llevo cuarenta años ofendiéndola y no pasó nada. Empezamos con las dos manivelas de abajo.']),
+    ['nereo', 'Yo llevo cuarenta años ofendiéndola y no pasó nada. Las dos manivelas de abajo ya las uno yo. Vos abrí la primera mesa, la de la fuente, al pie de la torre.']),
   nereo_tower: d(
     ['player', '¿Cómo sabés cuándo corregir el ritmo?'],
     ['nereo', 'Escucho el lago.'],
@@ -948,6 +948,9 @@ export const DIALOGUE_EFFECTS = {
   // In the Faro Nereo does the routine joins and the mechanical preparation; the player keeps
   // the decisions (isolating the worn bridge, coupling the motor) and the three benches.
   nereo_tower: { flags: ['tower_feed', 'tower_return'] },
+  // Ciclo 30: Nereo joins the base when the travellers arrive; a player who never spoke to him again
+  // looked for «the first panel» for a quarter of an hour.
+  lighthouse_arrival: { flags: ['tower_feed', 'tower_return'] },
   beacon_network_complete: { flags: ['tower_shutter', 'tower_lens_free'] },
 };
 
@@ -977,7 +980,7 @@ const objectives = [
   ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],
   ['lake_cable', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }, 'beacon_link'],
   ['beacon_link', { title: 'La orilla de la señal', detail: 'Nereo fijó la bornera. El retorno, entre las cañas, es tuyo: cerralo y mirá las balizas.', area: 'lake', object: 'lake_return' }],
-  ['beacon_supply', { title: 'El Faro · I / III', detail: 'Hablá con Nereo junto a la base y verificá la fuente en el primer panel.', area: 'lighthouse', object: 'beacon_supply_panel' }],
+  ['beacon_supply', { title: 'El Faro · I / III', detail: 'Abrí la Fuente del Faro, la primera mesa, al pie de la torre: el núcleo tiene que sostener su pulso.', area: 'lighthouse', object: 'beacon_supply_panel' }],
   ['beacon_network', { title: 'El Faro · II / III', detail: 'Con Nereo, buscá el giro y las luces que faltan en la galería del medio.', area: 'lighthouse', object: 'beacon_network_panel' }],
   ['beacon_lens', { title: 'El Faro · III / III', detail: 'Con el obturador abierto, ajustá la linterna hasta sostener la señal.', area: 'lighthouse', object: 'beacon_lens_panel' }],
 ];

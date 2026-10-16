@@ -17,6 +17,7 @@ encuentran trabas de primera vez.
 | 9 | **El Castillo, con 5 mesas y las balizas en unos 40 min** (el más lejos hasta ahora) | El tablero de Ivara: no encontró los dos seccionadores del patio | La flecha también señala una palanca que hay que abrir (el archivo dañado); Ivara dice cuál falta y de qué lado |
 | 10 | La Plaza (40 min sin entrar al taller) | Las teclas dejaban de responder después de cerrar la Bitácora, el mapa o la Guía; desde el porche la puerta no respondía | Al cerrar una ventana el foco vuelve al mundo; la puerta del taller responde desde los escalones del porche |
 | 11 | La Calzada (unas 5 h de reloj, más de la mitad caminando) | Quedó encajado entre un arbusto y una cerca, y una recarga lo dejó ahí | Si el viajero queda encajado dentro de un obstáculo y no puede moverse, pasa solo al suelo libre más cercano |
+| 12 (tres a la vez) | Lago → Faro: llegó al Faro | Buscó «el primer panel» 15 min: Nereo no había unido la base porque no le volvió a hablar | Nereo une la base al llegar y dice dónde está la primera mesa; objetivo del Faro más claro. Los otros dos se pisaron la partida en el mismo navegador: los jugadores van de a uno |
 
 Pendiente de estos informes: caminar todavía se traba contra cercas y la mesa; diálogos largos al
 principio; el panel de observación de Ohm tapa la escena; el tablero se reacomoda al tender cables.
