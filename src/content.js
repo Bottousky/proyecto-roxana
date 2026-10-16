@@ -1004,7 +1004,7 @@ const objectives = [
   ['lake_cable', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }, 'beacon_link'],
   ['beacon_link', { title: 'La orilla de la señal', detail: 'Nereo fijó la bornera. El retorno, entre las cañas, es tuyo: cerralo y mirá las balizas.', area: 'lake', object: 'lake_return' }],
   ['beacon_supply', { title: 'El Faro · I / III', detail: 'Abrí la Fuente del Faro, la primera mesa, al pie de la torre: el núcleo tiene que sostener su pulso.', area: 'lighthouse', object: 'beacon_supply_panel' }],
-  ['beacon_network', { title: 'El Faro · II / III', detail: 'Entre la mesa I y la mesa II hay dos manivelas: la izquierda aparta el puente gastado; la derecha acopla el motor. Después abrí la mesa II.', area: 'lighthouse', object: 'beacon_network_panel' }],
+  ['beacon_network', { title: 'El Faro · II / III', detail: 'Entre la mesa I y la mesa II hay dos manivelas: la izquierda aísla el puente de servicio gastado; la derecha acopla el motor de la corona. Después abrí la mesa II.', area: 'lighthouse', object: 'beacon_network_panel' }],
   ['beacon_lens', { title: 'El Faro · III / III', detail: 'Entre la mesa II y la linterna hay dos manivelas: la izquierda abre el obturador; la derecha suelta el freno de la lente. Después abrí la mesa III.', area: 'lighthouse', object: 'beacon_lens_panel' }],
 ];
 
