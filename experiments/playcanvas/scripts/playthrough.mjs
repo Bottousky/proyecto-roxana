@@ -284,6 +284,10 @@ async function travel(id, target) {
   await screenshot(`${target}-arrival`);
   // TRAMOS_DIR: the save at the first arrival to each place, for playtests that start there (ciclo 30).
   if (process.env.TRAMOS_DIR && !tramosSaved.has(target)) { tramosSaved.add(target); const save = await page.evaluate(() => localStorage.getItem('ohmdal.playcanvas.arc1.v1')); if (save) await writeFile(resolve(process.env.TRAMOS_DIR, `${target}.json`), save); }
+  // The keepers operate their installations in the arrival scene, which starts a moment after the
+  // crossing: wait for it as a player would, and read it.
+  const scene = await page.evaluate(target => window.__ohmdal.areaEntryDialogue?.(target) ?? null, target);
+  if (scene) { await page.waitForFunction(scene => window.__ohmdal.state.seen.includes(scene), scene, { timeout: 25000 }); await settle({ stable: 900 }); }
   if (adversarial) await talkToEveryone(`arrival:${target}`);
 }
 const tramosSaved = new Set();
@@ -598,16 +602,17 @@ try {
   await interact('plaza_bell');
   await travel('plaza_to_workshop', 'workshop');
   await interact('lumen');
-  assert.equal((await inspect()).flags.workshop_feed, true, 'Lumen closes his own left latch'); await fieldToggle('workshop_return', true);
+  // The keepers operate their own installations (menos ayudas): Lumen's bench is joined when he talks.
+  assert.ok((await inspect()).flags.workshop_feed && (await inspect()).flags.workshop_return, 'Lumen joins his own bench');
   await solvePanel('workbench', 'workshop');
   await interact('workshop_cup');
   await travel('workshop_to_plaza', 'plaza');
   await travel('plaza_to_road', 'road');
   await interact('edda_road');
-  await operate('road_send', true); await operate('road_return', true);
+  assert.ok((await inspect()).flags.road_send && (await inspect()).flags.road_return, 'Edda joined both posts, as in the drawing');
   assert.equal((await inspect()).flags.bridge_ready, false, 'All-on world controls do not solve the bypass');
   await screenshot('road-bypass-inhibits');
-  await operate('road_bypass', false);
+  await fieldToggle('road_bypass', false);
   await solvePanel('gate_panel', 'gate');
   // The closing line may only claim what the bench trace shows: here a stone was put in the socket.
   assert.ok(report.dialogue.some(line => line.includes('la piedra justa en el zócalo')), 'The gate closing line reports the stone that was placed');
@@ -616,7 +621,7 @@ try {
   // Edda's beacon on the Calzada is optional: the main route takes it, the adversarial one leaves it.
   if (!adversarial) await solvePanel('edda_post', 'edda_contact');
   await travel('road_to_spring', 'spring');
-  await operate('spring_sluice', true); await operate('spring_coupling', true);
+  assert.ok((await inspect()).flags.spring_sluice && (await inspect()).flags.spring_coupling, 'Vega gives the wheel its water and its axle');
   // The pump's box waits for Tala's question (the first minijuego of the Manantial is on the road).
   await interact('pump_panel');
   assert.notEqual((await inspect()).mode, 'puzzle', "The pump's box waits for Tala");
@@ -626,7 +631,7 @@ try {
   await solvePanel('pump_panel', 'pump');
   await interact('spring_bottle');
   await travel('spring_to_castle', 'castle');
-  await operate('castle_service', true);
+  assert.ok((await inspect()).flags.castle_service, 'Ivara keeps the services joined: the protection trips');
   assert.equal((await inspect()).flags.castle_ready, false, 'Healthy service does not bypass isolation');
   await operate('castle_isolated', false);
   await solvePanel('distribution_panel', 'distribution');
@@ -634,7 +639,9 @@ try {
   if (adversarial) await walkBackAndForth();
   await travel('castle_to_terraces', 'terraces');
   await interact('yesca');
-  await operate('forge_limited', true); await operate('irrigation_open', true);
+  assert.ok((await inspect()).flags.forge_limited, 'Yesca brings her furnace to the shared bench');
+  await interact('vega_terraces');
+  assert.ok((await inspect()).flags.irrigation_open, 'Vega opens the channel');
   await solvePanel('irrigation_panel', 'irrigation');
   await interact('terraces_secret');
   await travel('terraces_to_lake', 'lake');
@@ -649,12 +656,10 @@ try {
   await travel('lake_to_lighthouse', 'lighthouse');
   await interact('nereo_tower');
   assert.ok((await inspect()).flags.tower_feed && (await inspect()).flags.tower_return, 'Nereo joins the base cranks himself');
-  await operate('tower_feed', true); await operate('tower_return', true);
   await solvePanel('beacon_supply_panel', 'beacon_supply');
-  await operate('tower_isolated', true); await operate('tower_motor', true);
+  assert.ok((await inspect()).flags.tower_isolated && (await inspect()).flags.tower_motor, 'Nereo isolates the worn bridge and couples the motor');
   await solvePanel('beacon_network_panel', 'beacon_network');
   assert.ok((await inspect()).flags.tower_shutter && (await inspect()).flags.tower_lens_free, 'Nereo opens the shutter and frees the lens after the crown turns');
-  await operate('tower_shutter', true); await operate('tower_lens_free', true);
   await solvePanel('beacon_lens_panel', 'beacon_lens');
   assert.equal(finishModalSeen, true, 'The full audiovisual finale reached its ending card');
   await interact('lighthouse_ohm_note');

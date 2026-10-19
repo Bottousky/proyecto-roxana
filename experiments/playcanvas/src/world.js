@@ -290,7 +290,7 @@ export class PlayCanvasWorld {
   setPlayerAppearance(look){this.playerActor?.figure?.setAppearance?.(look);}
   setPlayerPosition(p){const q=this.nearestWalkable(p);this.player.position.set(q[0],this.groundHeight(...q),q[1]);const o=this.nearestWalkable([q[0]-1,q[1]+.7]);this.ohm.position.set(o[0],this.groundHeight(...o),o[1]);this.route=[];this.target=null;this.companionRoute=[];}
   setTarget(p){this.route=findPath(this.getPlayerPosition(),p,this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});this.target=this.route.shift()||null;}
-  getInteractions(){if(!this.area)return [];return [...this.area.objects.filter(o=>!o.character&&o.kind!=='npc'),...this.area.exits,...this.doorInteractions(),...(this.home?[]:getInhabitantInteractions(this))].filter(o=>!o.hidden&&(!o.requiresFlag||this.state.flags[o.requiresFlag]));}
+  getInteractions(){if(!this.area)return [];return [...this.area.objects.filter(o=>!o.character&&o.kind!=='npc'&&!o.story),...this.area.exits,...this.doorInteractions(),...(this.home?[]:getInhabitantInteractions(this))].filter(o=>!o.hidden&&(!o.requiresFlag||this.state.flags[o.requiresFlag]));}
   canInteractWith(o){return !!o&&inInteractionReach(this,o);}
   planInteraction(o){return approachInteraction(this,o);}
   approachInteraction(o){const path=approachInteraction(this,o);if(path===null)return false;this.route=path;this.target=this.route.shift()||null;return true;}
@@ -575,9 +575,9 @@ export class PlayCanvasWorld {
         const grad=g.createRadialGradient(64,64,30,64,64,62);grad.addColorStop(0,'#ffffff30');grad.addColorStop(.72,'#ffffff70');grad.addColorStop(.8,'#ffffffff');grad.addColorStop(.9,'#ffffffaa');grad.addColorStop(1,'#ffffff00');g.fillStyle=grad;g.fillRect(0,0,128,128);
         this.usableTexture=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});this.usableTexture.setSource(c);}
       const [ox,oz]=this.data.areas[key].offset;
-      for(const o of this.area.objects.filter(o=>['lever','panel','beacon'].includes(o.kind)&&!o.hidden)){
+      for(const o of this.area.objects.filter(o=>['lever','panel','beacon'].includes(o.kind)&&!o.hidden&&!o.story)){ // a lever its keeper operates is scenery
         const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffffff');m.emissiveMap=this.usableTexture;m.opacityMap=this.usableTexture;m.opacityMapChannel='a';m.blendType=BLEND_NORMAL;m.useLighting=false;m.depthWrite=false;m.update();
-        const e=new Entity('Se puede usar');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;const size=o.kind==='lever'?1.9:2.6;e.setPosition(o.x+ox,this.groundHeight(o.x,o.z)+.17,o.z+oz);e.setLocalScale(size,1,size);this.app.root.addChild(e);
+        const e=new Entity('Se puede usar');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;const size=o.kind==='lever'?2.9:2.6; /* under a lever half as big again */e.setPosition(o.x+ox,this.groundHeight(o.x,o.z)+.17,o.z+oz);e.setLocalScale(size,1,size);this.app.root.addChild(e);
         this.usableRings.push({entity:e,material:m,object:o,shown:''});
       }
     }

@@ -199,7 +199,7 @@ export const DIALOGUES = {
     ['lumen', 'Estabas por tocarlo. Todos ponen esa cara. Lumen, reparador. «Maese Lumen» para los que me deben una lámpara.'],
     ['lumen', 'Pasá: si vas a curiosear, te consigo un lugar en el banco.'],
     ['ohm', 'Su voz se parece a otra que recuerdo.'],
-    ['lumen', 'Mi padre, seguramente. Tenía mejor oído y peores modales. Los dos cierres de la mesa están sueltos; se ajustan desde los costados.']),
+    ['lumen', 'Mi padre, seguramente. Tenía mejor oído y peores modales. La mesa está unida, la lámpara es nueva, y no enciende. Tercera lámpara este mes.']),
   lumen_before: d(
     ['lumen', 'Paño seco. Tres vueltas al contacto. Lámpara nueva. «La Luz vuelve a quien la atiende».'],
     ['player', '¿Eso es una receta o un conjuro?'],
@@ -208,13 +208,13 @@ export const DIALOGUES = {
     ['lumen', 'Mi padre hacía tres. Yo también. Hasta ayer alcanzaba.'],
     ['player', '¿Y si la lámpara no era lo que fallaba?'],
     ['lumen', 'Hacía años que nadie venía a molestarme con una pregunta de ésas. Acercá el instrumento.'],
-    ['narrator', 'Lumen encaja el cierre izquierdo de la mesa con un clic seco, sin mirarlo. El derecho queda para vos.']),
+    ['narrator', 'Lumen golpea los dos cierres de la mesa con el nudillo, por costumbre. Están unidos. La lámpara sigue oscura.']),
   workshop_ready: d(
     ['narrator', 'La mesa recupera un zumbido bajo. La lámpara sigue oscura.'],
     ['lumen', 'Escuchá. Ese ruido sí lo conozco. Ahora podemos mirar el banco.']),
-  workshop_locked: d(['lumen', 'Los dos cierres de la mesa están separados. Uno a cada costado, al final de los cables del piso: acercate a cada uno y unilo.']),
-  workshop_locked_left: d(['lumen', 'El derecho ya está unido. Falta el izquierdo, al final del otro cable del piso. Acercate y unilo.']),
-  workshop_locked_right: d(['lumen', 'El izquierdo ya está. Falta el derecho, al final del cable del piso. Que Ohm lo mida antes y después de unirlo.']),
+  workshop_locked: d(['lumen', 'Esperá, que todavía no le di corriente a la mesa.']),
+  workshop_locked_left: d(['lumen', 'Esperá, que todavía no le di corriente a la mesa.']),
+  workshop_locked_right: d(['lumen', 'Esperá, que todavía no le di corriente a la mesa.']),
   workshop_arrival_puzzle: d(
     ['lumen', 'La cubierta está entera. La lámpara, recién cambiada. Y sin embargo…'],
     ['player', '¿Podemos mirar lo de adentro sin romperlo?'],
@@ -268,19 +268,19 @@ export const DIALOGUES = {
     ['player', 'Yo ayudé a encender el taller.'],
     ['edda', 'No estamos compitiendo.'],
     ['player', 'Vos empezaste contando.'],
-    ['edda', 'Cuatro cosas raras. Mirá ese puente de cobre en el medio: no aparece en el dibujo de la puerta.']),
+    ['edda', 'Cuatro cosas raras. Uní los dos postes como dice el dibujo de la puerta, y las balizas, nada. Y ese puente de cobre del medio no aparece en el dibujo.']),
   road_edda: d(
-    ['edda', 'Un cable viene del poste oeste. Otro se pierde bajo las hojas al este. Y alguien unió los dos en el medio.'],
+    ['edda', 'Un cable viene del poste oeste. Otro se pierde bajo las hojas al este. Los dos están unidos, los revisé. Y alguien los juntó además en el medio.'],
     ['player', '¿Para ayudar a la puerta?'],
     ['edda', 'Eso pensé. Después seguí el dibujo y ya no estoy tan segura. Probá algo; yo miro las balizas.']),
   road_ready: d(
     ['narrator', 'Las balizas de la Calzada se encienden una tras otra. Dentro de la puerta, algo responde con un golpe lento.'],
     ['edda', 'Llegó. Pero el cerrojo no levanta. Su regulador está junto a la puerta: abrilo y mirá su mesa.']),
-  gate_locked: d(['edda', 'Todavía no responden las balizas. Hay cierres en los dos postes y un puente en el centro. El dibujo viejo no tiene ese puente.']),
+  gate_locked: d(['edda', 'Todavía no responden las balizas. Los postes están unidos; lo único que el dibujo viejo no tiene es ese puente del medio.']),
   // What is still missing, said plainly (ciclo 30: players stood at the regulator not knowing why).
-  gate_locked_bridge: d(['edda', 'El puente de cobre del centro sigue unido: con él, la corriente vuelve antes de llegar a la puerta. Probá levantarlo.']),
-  gate_locked_west: d(['edda', 'El puente ya no está. Falta unir el cierre del poste oeste, a la izquierda del camino: por ahí llega la ida.']),
-  gate_locked_east: d(['edda', 'El puente ya no está. Falta unir el cierre bajo las hojas, en el poste este, a la derecha del camino: por ahí vuelve la corriente.']),
+  gate_locked_bridge: d(['edda', 'Todavía no responden las balizas. Los postes están unidos; lo único que el dibujo viejo no tiene es ese puente del medio.']),
+  gate_locked_west: d(['edda', 'El puente ya no está, pero algún poste quedó suelto. Sin ida o sin vuelta, la puerta no se entera.']),
+  gate_locked_east: d(['edda', 'El puente ya no está, pero algún poste quedó suelto. Sin ida o sin vuelta, la puerta no se entera.']),
   gate_arrival: d(
     ['edda', 'El cerrojo hace fuerza… pero para abajo. ¿No tendría que levantar?'],
     ['edda', 'Mi abuela decía que los guardianes de la Calzada le hablaban a la Puerta: «Cede a quien te da toda la Luz». Alguien les hizo caso: por eso ese puente.'],
@@ -310,12 +310,13 @@ export const DIALOGUES = {
     ['vega', 'Cuidado con el borde. La piedra verde resbala incluso cuando una cree que ya aprendió.'],
     ['vega', 'Soy Vega; cuido el agua desde acá hasta las Terrazas. Ustedes abrieron la Puerta: el golpe se oyó hasta la compuerta.'],
     ['player', '¿Vos apartaste el agua de la rueda?'],
-    ['vega', 'Después de la avería. La Plaza se quedó sin fuente, pero el canal dejó de desbordar. Cada decisión moja algún patio.']),
+    ['vega', 'Después de la avería. La Plaza se quedó sin fuente, pero el canal dejó de desbordar. Cada decisión moja algún patio.'],
+    ['vega', 'Ya que vinieron, probemos otra vez. «Primero el agua, después el eje»: así lo cantábamos las operadoras.'],
+    ['narrator', 'Vega baja la manivela del canal y después la del eje, sin apuro. El agua vuelve a los álabes.']),
   vega_spring: d(
-    ['vega', 'La manivela izquierda devuelve agua a la rueda. La derecha une su eje con esa máquina. Siempre se hacía en ese orden.'],
-    ['vega', 'Las operadoras lo cantábamos: «Primero el agua, después el eje; al revés, la rueda se ofende». Nunca supe si la rueda se ofendía. Nadie quiso averiguarlo.'],
-    ['player', '¿Podemos probar?'],
-    ['vega', 'Podemos. Voy a mirar el nivel de abajo. Querer nunca fue el problema.']),
+    ['vega', '«Al revés, la rueda se ofende», decía la canción. Nunca supe si se ofendía. Nadie quiso averiguarlo.'],
+    ['player', 'La rueda gira. ¿Y la bomba?'],
+    ['vega', 'Ésa es la pregunta. Gira, el indicador se enciende, y el agua no sube a la Plaza. Querer nunca fue el problema.']),
   spring_ready: d(
     ['narrator', 'La corriente de agua alcanza los álabes. El acople vibra, toma el movimiento y un indicador eléctrico cobra vida.'],
     ['player', 'La rueda se mueve y el indicador encendió. Pero la bomba sigue quieta.'],
@@ -332,7 +333,7 @@ export const DIALOGUES = {
   unjoin_tower_return: d(['nereo', 'Ese retorno lo uní yo. Sin vuelta, el núcleo no puede devolver lo que recibe: se queda callado. Cerralo cuando termines de mirar.']),
   unjoin_tower_shutter: d(['nereo', 'El obturador lo abrí yo. Cerrado, la luz se queda adentro de la torre.']),
   unjoin_tower_lens_free: d(['nereo', 'El freno de la lente lo solté yo. Si lo volvés a poner, la lente no gira con la corona.']),
-  pump_locked: d(['vega', 'Todavía falta transmitir el movimiento. Son dos manivelas: una junto al canal, a la izquierda del camino, devuelve el agua a la rueda; la otra, a la derecha, junto a la rueda, une su eje con el generador. Primero el agua.']),
+  pump_locked: d(['vega', 'Todavía no: la rueda tiene que girar antes de pedirle nada a la bomba.']),
   pump_arrival: d(
     ['vega', 'Esa unión junto al agua se entibia cuando la bomba intenta arrancar. Antes no lo hacía.'],
     ['vega', 'Y sin embargo deja pasar. Las viejas decían «por donde pasa el agua, pasa la Luz». Unión que deja pasar, no roba.'],
@@ -398,8 +399,7 @@ export const DIALOGUES = {
     ['consejera', 'El agua entró por la rama del archivo oeste. Cerramos toda la red. La enfermería y la cocina quedaron a oscuras.'],
     ['consejera', 'El Consejo lo dice desde la fundación: «La Luz es una sola: lo que se le da a una casa, se le quita a otra». Si una enferma, se sella todo.'],
     ['player', '¿Ese sector puede separarse de los otros?'],
-    ['consejera', 'Las placas identifican los cierres. Quiero que me muestren qué queda aislado antes de reabrir servicios.'],
-    ['consejera', 'En el piso del patio hay dos cajas de manivela, con un disco ámbar. Primero la de la izquierda: separa el archivo oeste. Recién después, la de la derecha: une enfermería y cocina. Y al final, mi tablero.']),
+    ['consejera', 'Cada vez que reunimos enfermería y cocina, la protección salta. Quiero que me muestren qué queda aislado antes de reabrir servicios.']),
   // Joining the services with the wet archive still on trips the protection (jugador 24 kept
   // toggling it): who explains it, and that separating the archive is all that is missing.
   castle_service_trip: d(
@@ -416,11 +416,11 @@ export const DIALOGUES = {
     ['consejera', 'Puedo seguir el cierre hasta el archivo. La enfermería y la cocina quedan de este lado.'],
     ['player', '¿Podemos mirar el tablero ahora?'],
     ['consejera', 'Con ese sector aislado, sí. Yo me quedo.']),
-  distribution_locked: d(['consejera', 'Aíslen primero la rama oeste dañada, con la caja de manivela de la izquierda del patio. La de la derecha conecta el troncal de servicio.']),
+  distribution_locked: d(['consejera', 'Mientras el archivo mojado siga unido a la red, la protección va a saltar. Mi tablero no se abre así.']),
   // What is still missing, said plainly (ciclo 30).
-  distribution_locked_both: d(['consejera', 'Dos cajas de manivela en el piso del patio, una a cada lado, con su disco ámbar. Primero la de la izquierda: separa el archivo oeste, que está dañado. Después la de la derecha, que conecta el troncal de servicio. Los engranajes del portón no: esos son del portón.']),
-  distribution_locked_archive: d(['consejera', 'El troncal ya está conectado. Falta separar el archivo oeste: su caja de manivela está en el piso, a la izquierda del patio.']),
-  distribution_locked_trunk: d(['consejera', 'El archivo ya está separado. Falta conectar el troncal de servicio: su caja de manivela está en el piso, a la derecha del patio.']),
+  distribution_locked_both: d(['consejera', 'Mientras el archivo mojado siga unido a la red, la protección va a saltar. Mi tablero no se abre así.']),
+  distribution_locked_archive: d(['consejera', 'Mientras el archivo mojado siga unido a la red, la protección va a saltar. Mi tablero no se abre así.']),
+  distribution_locked_trunk: d(['consejera', 'Mientras el archivo mojado siga unido a la red, la protección va a saltar. Mi tablero no se abre así.']),
   distribution_arrival: d(
     ['consejera', 'El indicador confirma que el archivo quedó separado en el patio. Debe seguir así durante la prueba.'],
     ['consejera', 'Y una cosa más. Algún día alguien va a tener que reparar la cocina. Ese día, la enfermería no se puede apagar.'],
@@ -459,19 +459,21 @@ export const DIALOGUES = {
   yesca_before: d(
     ['yesca', 'Necesitaba más calor. Subí la palanca hasta que el horno cantó. Así se le pide.'],
     ['player', '¿Y ese cable ennegrecido?'],
-    ['yesca', 'Funcionó primero. Si el horno tiene que compartir el cable con el riego, que sea en la mesa de Vega, donde se ve lo que toma cada uno. Quiero diez azadas terminadas, no once empezadas.']),
+    ['yesca', 'Funcionó primero. Si el horno tiene que compartir el cable con el riego, que sea en la mesa de Vega, donde se ve lo que toma cada uno. Quiero diez azadas terminadas, no once empezadas.'],
+    ['narrator', 'Yesca baja la palanca de su horno y lo pasa a la mesa compartida.']),
   vega_terraces: d(
     ['vega', '¿Ves la parcela del fondo? Antes recibía agua primero. Ahora la de arriba bebe de más y la última espera.'],
     ['player', 'Podemos abrir el canal y mirar hasta dónde llega.'],
-    ['vega', 'La rueda está junto a mi puesto. Después miramos el tablero. Quiero saber quién paga cada cambio que hacemos acá arriba.']),
+    ['narrator', 'Vega gira la rueda de la compuerta. El agua entra en el canal de los bancales.'],
+    ['vega', 'Ahora el tablero. Quiero saber quién paga cada cambio que hacemos acá arriba.']),
   water_ready: d(
     ['narrator', 'El horno queda en el tablero compartido. La compuerta abre el camino a los bancales.'],
     ['yesca', 'Lo que me toque, que alcance. Ahora repartamos el cable, sin malgastarlo.']),
-  irrigation_locked: d(['vega', 'Primero, todo a la misma mesa: el horno de Yesca pasa al tablero compartido y el canal se abre. Las dos manivelas están junto a nuestros puestos.']),
+  irrigation_locked: d(['vega', 'Antes del tablero, el acuerdo: Yesca tiene que traer su horno a esta mesa, y yo tengo que abrir el canal. Hablá con las dos.']),
   // What is still missing, said plainly (ciclo 30).
-  irrigation_locked_both: d(['vega', 'Antes de abrir el tablero, dos manivelas al fondo de las Terrazas: a la izquierda, junto a la forja de Yesca, la que pasa el horno a la mesa compartida; a la derecha, junto a mi casa, la que abre el canal.']),
-  irrigation_locked_forge: d(['vega', 'El canal ya está abierto. Falta pasar el horno a la mesa compartida: la manivela del fondo a la izquierda, junto a la forja de Yesca.']),
-  irrigation_locked_channel: d(['vega', 'El horno ya está en la mesa compartida. Falta abrir el canal: la manivela del fondo a la derecha, junto a mi casa.']),
+  irrigation_locked_both: d(['vega', 'Antes del tablero, el acuerdo: Yesca tiene que traer su horno a esta mesa, y yo tengo que abrir el canal. Hablá con las dos.']),
+  irrigation_locked_forge: d(['vega', 'Falta Yesca. Si su horno no viene a la mesa compartida, no hay nada que repartir.']),
+  irrigation_locked_channel: d(['vega', 'Yesca aceptó. Me falta abrir el canal: hablemos un momento.']),
   irrigation_arrival: d(
     ['vega', 'El agua sale con demasiada fuerza y el lecho está demasiado caliente. Y el horno de Yesca tira del mismo cable.'],
     ['yesca', 'La ladera da una sola Luz: el fuego que yo suelto, se lo bebe el agua. Lo sabe cualquier forjadora.'],
@@ -531,18 +533,18 @@ export const DIALOGUES = {
     ['nereo', 'Apoyá un pie junto a la base. Antes vibraba. Más adelante se oía la corona; en la linterna pasaba la luz.'],
     ['player', 'Tres cosas que podemos mirar por separado.'],
     ['edda', 'Una pregunta por vez. La torre no se va a ofender.'],
-    ['nereo', 'Yo llevo cuarenta años ofendiéndola y no pasó nada. Las dos manivelas de abajo ya las uno yo. Lo tuyo es la primera mesa, la de la fuente, al pie de la torre: andá y abrila.']),
+    ['nereo', 'Yo llevo cuarenta años ofendiéndola y no pasó nada. La base la uno yo, como siempre. Lo que no sé es por qué el núcleo se calla o se recalienta: eso es la primera mesa, la de la fuente.']),
   nereo_tower: d(
     ['player', '¿Cómo sabés cuándo corregir el ritmo?'],
     ['nereo', 'Escucho el lago.'],
     ['player', '¿No el mecanismo?'],
     ['nereo', 'También. Uno aprende a adornar las respuestas cuando envejece. La manivela conservó el movimiento; para guiar un barco nos faltaba la luz.'],
     ['nereo', 'Los fareros no escribimos el ritmo en números. Dicen que el Faro se olvida de quien lo cuenta. Yo lo canto mientras subo.'],
-    ['nereo', 'Las dos manivelas de la base las uno yo, como en el muelle. Lo que no sé es si la fuente va a aguantar lo que le pidamos.']),
+    ['nereo', 'La base la uno yo, como en el muelle. Lo que no sé es si la fuente va a aguantar lo que le pidamos.']),
   beacon_supply_ready: d(
     ['narrator', 'El anillo inferior se ilumina. El sonido de la fuente sube por el suelo, grave y regular.'],
     ['nereo', 'El suelo. ¿Lo sentís? Ya tiene algo para contar. Miremos el panel inferior.']),
-  beacon_supply_locked: d(['nereo', 'Las dos manivelas de la base unen la torre con la línea del lago. Vení a contarme qué vieron en el muelle y las uno.']),
+  beacon_supply_locked: d(['nereo', 'La base todavía no está unida con la línea del lago. Vení a contarme qué vieron en el muelle.']),
   beacon_supply_arrival: d(
     ['nereo', 'El núcleo debería sostener aquel sonido grave. A veces conseguía un susurro. Si apuraba la rueda, empezaba el olor a cobre caliente.'],
     ['nereo', 'Los fareros decimos «cobre que se queja, cobre que descansa». Un tendido por vez; el otro, dormido. Así me lo dejaron y así lo dejé.'],
@@ -551,19 +553,19 @@ export const DIALOGUES = {
   beacon_supply_complete: d(
     ['narrator', 'La base responde con un acorde profundo. Un ascenso de luz dibuja el contorno de la segunda galería.'],
     ['edda', 'Tenemos fuente. Todavía no una señal.'],
-    ['nereo', 'Ese sí es su sonido. Arriba hay un puente de servicio gastado: la manivela izquierda lo aparta. La derecha une el motor con la corona.'],
+    ['nereo', 'Ese sí es su sonido. Mientras probabas aparté el puente de servicio gastado y acoplé el motor a la corona. Y la corona sigue quieta, con la galería a oscuras.'],
     ['player', 'Seguimos hacia el ruido que falta.']),
   beacon_network_ready: d(
     ['narrator', 'El viejo puente queda aislado y el embrague cierra. Los engranajes esperan junto a una galería de lámparas oscuras.'],
     ['nereo', 'Los dientes ya están juntos. Falta oírlos girar. El segundo tablero espera.']),
-  beacon_network_locked: d(['nereo', 'Primero tiene que sostenerse la base. Después, las manivelas del medio apartan el puente gastado y acoplan el motor.']),
+  beacon_network_locked: d(['nereo', 'Primero tiene que sostenerse la base. Una pregunta por vez.']),
   // What is still missing, said plainly (ciclo 30).
-  beacon_network_locked_both: d(['nereo', 'Antes de la segunda mesa, dos manivelas en el medio de la torre: la de la izquierda aparta el puente gastado, la de la derecha acopla el motor de la corona.']),
-  beacon_network_locked_motor: d(['nereo', 'El puente gastado ya está aparte. Falta acoplar el motor: su manivela está a la derecha, a la misma altura.']),
-  beacon_network_locked_bridge: d(['nereo', 'El motor ya está acoplado. Falta apartar el puente gastado: su manivela está a la izquierda, a la misma altura.']),
-  beacon_lens_locked_both: d(['nereo', 'Para la linterna, dos manivelas arriba: la de la izquierda abre el obturador de bronce, la de la derecha suelta el freno de la lente.']),
-  beacon_lens_locked_free: d(['nereo', 'El obturador ya está abierto. Falta soltar el freno de la lente: la manivela de la derecha, arriba.']),
-  beacon_lens_locked_shutter: d(['nereo', 'El freno de la lente ya está suelto. Falta abrir el obturador: la manivela de la izquierda, arriba.']),
+  beacon_network_locked_both: d(['nereo', 'Primero tiene que sostenerse la base. Una pregunta por vez.']),
+  beacon_network_locked_motor: d(['nereo', 'Primero tiene que sostenerse la base. Una pregunta por vez.']),
+  beacon_network_locked_bridge: d(['nereo', 'Primero tiene que sostenerse la base. Una pregunta por vez.']),
+  beacon_lens_locked_both: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, miramos la linterna.']),
+  beacon_lens_locked_free: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, miramos la linterna.']),
+  beacon_lens_locked_shutter: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, miramos la linterna.']),
   beacon_network_arrival: d(
     ['nereo', 'Cuando una lámpara fallaba, nos quedábamos sin giro y sin galería. Yo hacía dos trabajos a oscuras.'],
     ['nereo', 'Quiero que si una se apaga, las otras sigan. Una noche sin giro es una noche sin faro.'],
@@ -580,7 +582,7 @@ export const DIALOGUES = {
   beacon_lens_ready: d(
     ['narrator', 'Las hojas de bronce se abren sobre el lago. El conjunto óptico gira sin freno; su lámpara arroja una luz blanca, demasiado intensa.'],
     ['nereo', 'El camino de la luz está libre. Ahora su intensidad debe sostenerse durante cada vuelta.']),
-  beacon_lens_locked: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, podemos abrir el obturador y liberar el freno de la lente.']),
+  beacon_lens_locked: d(['nereo', 'Falta el trabajo de la galería. Cuando gire la corona, miramos la linterna.']),
   beacon_lens_arrival: d(
     ['nereo', 'Una luz que encandila un segundo y se apaga no es una señal. Necesitamos que vuelva, siempre reconocible.'],
     ['nereo', 'La lente se templa una sola vez, a oscuras, antes de abrirle el ojo al lago. Así la templaban. Así la templé yo.'],
@@ -664,8 +666,8 @@ export const DIALOGUES = {
   edda_tower_network: d(['edda', 'Ese golpecito que señaló Nereo vuelve cada vuelta. Lo anoté junto a mi dibujo.'], ['player', 'Todavía falta la señal.'], ['edda', 'Sí. Voy a mirar la linterna mientras él mira el lago. Dos lugares para la misma prueba.']),
   edda_after_lesson: d(['edda', 'Tala encontró la reparación sin que yo se la señalara. Casi se la señalo igual.'], ['ohm', 'Contención registrada.'], ['edda', 'No pongas eso en letras grandes. Ahora quiero copiar las cartas del Instituto. Esa pregunta sigue abierta.']),
   vega_spring_ready: d(['vega', 'La rueda ya transmite movimiento. El indicador respondió.'], ['vega', 'Voy a mirar la bomba antes de pedirle más. Aquel empalme tibio todavía me preocupa.']),
-  yesca_limited: d(['yesca', 'Así que pasaste mi horno a la mesa de Vega. Bien: ahí se decide cuánto calor me toca, a la vista de las dos.'], ['yesca', 'Ahora miren qué pasa del lado de Vega. El almuerzo depende de que este acuerdo sirva para las dos.']),
-  vega_channel_open: d(['vega', 'El canal está abierto. Ahora quiero mirar cómo trabaja con agua, no sólo cómo quedó la manivela.'], ['vega', 'La última parcela también cuenta. Que llegue al principio no me alcanza.']),
+  yesca_limited: d(['yesca', 'Mi horno ya está en la mesa de Vega. Bien: ahí se decide cuánto calor me toca, a la vista de las dos.'], ['yesca', 'Ahora miren qué pasa del lado de Vega. El almuerzo depende de que este acuerdo sirva para las dos.']),
+  vega_channel_open: d(['vega', 'El canal está abierto. Ahora quiero mirar cómo trabaja con agua, no sólo cómo quedó la compuerta.'], ['vega', 'La última parcela también cuenta. Que llegue al principio no me alcanza.']),
   nereo_lake_linked: d(['nereo', 'Las balizas ya contestan. Tengo la llave y una excusa menos para quedarme acá.'], ['nereo', 'Los espero en la galería. Vayan mirando: yo conozco el camino demasiado bien.']),
   nereo_tower_source: d(['nereo', 'La base recuperó su voz. La corona todavía no.'], ['nereo', 'Voy a escuchar cerca del segundo tablero. A veces uno reconoce mejor lo que falta que lo que está.']),
   nereo_tower_network: d(['nereo', 'La corona volvió a tener ese pequeño golpe. No es una falla nueva; envejecimos juntos.'], ['nereo', 'Ahora miro el lago. El mecanismo puede sonar precioso y seguir sin orientar a nadie.']),
@@ -767,8 +769,8 @@ export const AREAS = {
     id: 'workshop', name: 'El taller de Lumen', subtitle: 'Una receta aprende a explicar sus motivos', theme: 'workshop', bounds: [24, 24], spawn: [0, 8], entryDialogue: 'workshop_arrival',
     objects: [
       npc('lumen', -3.5, 1.5, 'lumen', 'lumen_before', { flag: 'workshop', afterDialogue: 'lumen_after' }),
-      lever('workshop_feed', -.9, -.5, 'Unir el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo queda unido con un clic.', 'El cierre izquierdo queda separado.'),
-      lever('workshop_return', 6.9, -.5, 'Unir el cierre derecho', 'workshop_return', 'El cierre derecho queda unido con un clic.', 'El cierre derecho queda separado.'),
+      lever('workshop_feed', -.9, -.5, 'Unir el cierre izquierdo', 'workshop_feed', 'El cierre izquierdo queda unido con un clic.', 'El cierre izquierdo queda separado.', { story: true }),
+      lever('workshop_return', 6.9, -.5, 'Unir el cierre derecho', 'workshop_return', 'El cierre derecho queda unido con un clic.', 'El cierre derecho queda separado.', { story: true }),
       panel('workbench', 3, -3, 'La lámpara del banco', 'workshop', ['bench_ready'], 'workshop_locked', 'workshop_bench_after'),
       { ...panel('stone_drawer', -8.2, -7.1, 'El cajón de las piedras', 'drawer', ['workshop'], 'drawer_locked', 'drawer_after'), dialogue: 'drawer_arrival', optional: true, radius: 3.4 },
       lore('workshop_note', -7, -4.5, 'Cuatro manos sobre un esquema', 'workshop_note'),
@@ -780,8 +782,8 @@ export const AREAS = {
     id: 'road', name: 'La Calzada', subtitle: 'El otro extremo de un camino', theme: 'road', bounds: [34, 32], spawn: [0, 11], entryDialogue: 'road_arrival', initialFlags: { road_bypass: true },
     objects: [
       npc('edda_road', -2.2, 7.6, 'edda', 'road_edda', { flag: 'gate', afterDialogue: 'road_after' }),
-      lever('road_send', -8, 1, 'Unir el cierre del poste oeste', 'road_send', 'El contacto del poste oeste queda unido.', 'El contacto del poste oeste queda separado.'),
-      lever('road_return', 8, 1, 'Unir el cierre bajo las hojas', 'road_return', 'El contacto del poste este queda unido.', 'El contacto del poste este queda separado.'),
+      lever('road_send', -8, 1, 'Unir el cierre del poste oeste', 'road_send', 'El contacto del poste oeste queda unido.', 'El contacto del poste oeste queda separado.', { story: true }),
+      lever('road_return', 8, 1, 'Unir el cierre bajo las hojas', 'road_return', 'El contacto del poste este queda unido.', 'El contacto del poste este queda separado.', { story: true }),
       { id: 'road_bypass', kind: 'lever', x: 0, z: 3.5, label: 'El puente de cobre del centro', flag: 'road_bypass', action: { type: 'toggle', flag: 'road_bypass', onLabel: 'Cerrar el puente de cobre', offLabel: 'Abrir el puente de cobre', onText: 'La pieza de cobre une las dos líneas. Las balizas quedan oscuras.', offText: 'La pieza se levanta y deja separados sus dos contactos.' } },
       panel('gate_panel', 4.5, -6, 'Regulador de la Puerta de Ohm', 'gate', ['bridge_ready'], 'gate_locked', 'road_after'),
       { ...panel('edda_post', -9.4, 3.4, 'La baliza del costado', 'edda_contact', ['gate'], 'edda_contact_locked', 'edda_contact_after'), dialogue: 'edda_contact_ask', mini: true, optional: true },
@@ -794,8 +796,8 @@ export const AREAS = {
     id: 'spring', name: 'El Manantial', subtitle: 'Lo que comienza lejos de su consecuencia', theme: 'spring', bounds: [34, 30], spawn: [0, 10], entryDialogue: 'spring_arrival',
     objects: [
       npc('vega_spring', -4.2, -1.4, 'vega', 'vega_spring', { flag: 'pump', afterDialogue: 'spring_after' }),
-      lever('spring_sluice', -6.5, 2, 'Desviar el agua hacia la rueda', 'spring_sluice', 'El canal conduce el agua hacia los álabes de la rueda.', 'El agua vuelve al desvío y deja de impulsar la rueda.'),
-      lever('spring_coupling', 7.5, -1, 'Acoplar la rueda al generador', 'spring_coupling', 'El eje de la rueda queda unido al generador.', 'El generador queda separado de la rueda.'),
+      lever('spring_sluice', -6.5, 2, 'Desviar el agua hacia la rueda', 'spring_sluice', 'El canal conduce el agua hacia los álabes de la rueda.', 'El agua vuelve al desvío y deja de impulsar la rueda.', { story: true }),
+      lever('spring_coupling', 7.5, -1, 'Acoplar la rueda al generador', 'spring_coupling', 'El eje de la rueda queda unido al generador.', 'El generador queda separado de la rueda.', { story: true }),
       { ...panel('pump_panel', 2.5, -5.5, 'Caja de conexiones de la bomba', 'pump', ['spring_drive', 'tala_lantern'], 'pump_locked', 'spring_after'), lockedBy: { tala_lantern: 'pump_locked_tala' } },
       // Minijuegos: Tala (en el camino principal) y Marín (opcional), mientras falta el agua en la Plaza.
       npc('tala_spring', 3.6, 6.4, 'tala', 'tala_spring_ask', { puzzle: 'tala_lantern', afterDialogue: 'tala_spring_after', mini: true }),
@@ -811,7 +813,7 @@ export const AREAS = {
       npc('consejera', 4.2, -6.4, 'consejera', 'consejera_before', { flag: 'distribution', afterDialogue: 'consejera_after' }),
       npc('edda_castle', -9.2, -3.6, 'edda', 'castle_edda'),
       { id: 'castle_isolated', kind: 'lever', x: -8, z: -1, label: 'Conexión del archivo oeste', flag: 'castle_branch_closed', action: { type: 'toggle', flag: 'castle_branch_closed', onLabel: 'Conectar el archivo oeste', offLabel: 'Separar el archivo oeste', onText: 'El cierre une de nuevo el archivo con la red. El indicador del tablero queda oscuro.', offText: 'Los contactos del archivo quedan separados a la vista.' } },
-      lever('castle_service', 8, -1, 'Conectar los servicios del Castillo', 'castle_service', 'El cierre de enfermería y cocina queda unido.', 'El cierre de enfermería y cocina queda separado.'),
+      lever('castle_service', 8, -1, 'Conectar los servicios del Castillo', 'castle_service', 'El cierre de enfermería y cocina queda unido.', 'El cierre de enfermería y cocina queda separado.', { story: true }),
       panel('distribution_panel', 6.4, -9.5, 'Tablero de los servicios del Castillo', 'distribution', ['castle_ready'], 'distribution_locked', 'consejera_after'),
       lore('castle_archive', -11, -6, 'Cartas sin respuesta', 'castle_archive'),
       secret('castle_hidden', 11, -6.5, 'El reverso del estandarte', 'castle_hidden'),
@@ -823,8 +825,8 @@ export const AREAS = {
     objects: [
       npc('yesca', -11.4, -11.2, 'yesca', 'yesca_before', { flag: 'irrigation', afterDialogue: 'yesca_after' }),
       npc('vega_terraces', 7.6, 4.2, 'vega', 'vega_terraces', { flag: 'irrigation', afterDialogue: 'vega_after' }),
-      lever('forge_limited', -9.4, -12.3, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.'),
-      lever('irrigation_open', 9.8, -12.3, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.'),
+      lever('forge_limited', -9.4, -12.3, 'Pasar el horno a la mesa compartida', 'forge_limited', 'El horno queda en el tablero de Vega: su calor se reparte junto con el riego.', 'El horno vuelve a su palanca propia, a demanda alta.', { story: true }),
+      lever('irrigation_open', 9.8, -12.3, 'Abrir el canal de los bancales', 'irrigation_open', 'El agua puede alcanzar los bancales cuando la bomba sostenga su trabajo.', 'El canal de los bancales queda cerrado.', { story: true }),
       panel('irrigation_panel', 1, -6, 'Tablero de calor y riego', 'irrigation', ['water_routed'], 'irrigation_locked', 'vega_after'),
       lore('terraces_marker', -9, -6.5, 'Un turno para cada nombre', 'terraces_marker'),
       secret('terraces_secret', 11, 7.5, 'El octavo intento', 'terraces_secret'),
@@ -836,7 +838,7 @@ export const AREAS = {
     objects: [
       npc('nereo_lake', 9.5, 3.2, 'nereo', 'nereo_lake'),
       npc('edda_lake', -5, 6, 'edda', 'lake_edda'),
-      lever('lake_cable', -8, 0, 'Fijar el suministro del muelle', 'lake_cable', 'La línea que alimenta el Faro queda asegurada en su bornera.', 'El suministro del Faro queda abierto en el muelle.'),
+      lever('lake_cable', -8, 0, 'Fijar el suministro del muelle', 'lake_cable', 'La línea que alimenta el Faro queda asegurada en su bornera.', 'El suministro del Faro queda abierto en el muelle.', { story: true }),
       lever('lake_return', 8, -3, 'Conectar el retorno entre las cañas', 'lake_return', 'El retorno se une a la línea sumergida. Su baliza responde.', 'El retorno del Faro queda interrumpido en la orilla.'),
       lore('lake_boat', -10, -6, 'La barca de las tres maderas', 'lake_boat'),
       secret('lake_secret', 5.4, 5.2, 'Una luz hacia tierra', 'lake_secret'),
@@ -850,14 +852,14 @@ export const AREAS = {
       npc('edda_tower', -4, 12, 'edda', 'edda_tower_before', { flag: 'beacon_lens', afterDialogue: 'lighthouse_epilogue' }),
       npc('lumen_epilogue', -5.5, -11, 'lumen', 'lumen_epilogue', { requiresFlag: 'beacon_lens' }),
       npc('tala_epilogue', -4, -12.5, 'tala', 'tala_epilogue', { requiresFlag: 'beacon_lens' }),
-      lever('tower_feed', -8, 7, 'Conectar la alimentación de la base', 'tower_feed', 'El conductor de entrada queda conectado al anillo inferior.', 'El conductor de alimentación de la base queda abierto.'),
-      lever('tower_return', 8, 7, 'Cerrar el retorno de la base', 'tower_return', 'El retorno de la base queda conectado a la línea del lago.', 'El retorno del anillo inferior queda abierto.'),
+      lever('tower_feed', -8, 7, 'Conectar la alimentación de la base', 'tower_feed', 'El conductor de entrada queda conectado al anillo inferior.', 'El conductor de alimentación de la base queda abierto.', { story: true }),
+      lever('tower_return', 8, 7, 'Cerrar el retorno de la base', 'tower_return', 'El retorno de la base queda conectado a la línea del lago.', 'El retorno del anillo inferior queda abierto.', { story: true }),
       { ...panel('beacon_supply_panel', 0, 4, 'I · Fuente del Faro', 'beacon_supply', ['beacon_supply_ready'], 'beacon_supply_locked', 'beacon_supply_complete'), radius: 3.6 }, // a big machine: it answers from all around its plinth (ciclo 30)
-      lever('tower_isolated', -8, 0, 'Aislar el puente de servicio gastado', 'tower_isolated', 'El puente de mantenimiento queda fuera de la distribución.', 'El puente gastado vuelve a quedar conectado.', { requires: ['beacon_supply'], lockedDialogue: 'beacon_network_locked' }),
-      lever('tower_motor', 8, 0, 'Acoplar el motor de la corona', 'tower_motor', 'El embrague conecta el motor con la corona de engranajes.', 'El embrague separa el motor de la corona.', { requires: ['beacon_supply'], lockedDialogue: 'beacon_network_locked' }),
+      lever('tower_isolated', -8, 0, 'Aislar el puente de servicio gastado', 'tower_isolated', 'El puente de mantenimiento queda fuera de la distribución.', 'El puente gastado vuelve a quedar conectado.', { story: true, requires: ['beacon_supply'], lockedDialogue: 'beacon_network_locked' }),
+      lever('tower_motor', 8, 0, 'Acoplar el motor de la corona', 'tower_motor', 'El embrague conecta el motor con la corona de engranajes.', 'El embrague separa el motor de la corona.', { story: true, requires: ['beacon_supply'], lockedDialogue: 'beacon_network_locked' }),
       { ...panel('beacon_network_panel', 0, -4, 'II · Distribución de la corona', 'beacon_network', ['beacon_network_ready'], 'beacon_network_locked', 'beacon_network_complete'), radius: 3.6 }, // a big machine: it answers from all around its plinth (ciclo 30)
-      lever('tower_shutter', -8, -8, 'Abrir el obturador de bronce', 'tower_shutter', 'Las hojas del obturador abren un camino hacia el lago.', 'Las hojas de bronce cierran la salida del haz.', { requires: ['beacon_network'], lockedDialogue: 'beacon_lens_locked' }),
-      lever('tower_lens_free', 8, -8, 'Liberar el freno del conjunto óptico', 'tower_lens_free', 'La lente puede girar con la corona sin la sujeción de mantenimiento.', 'El freno vuelve a sujetar el conjunto óptico.', { requires: ['beacon_network'], lockedDialogue: 'beacon_lens_locked' }),
+      lever('tower_shutter', -8, -8, 'Abrir el obturador de bronce', 'tower_shutter', 'Las hojas del obturador abren un camino hacia el lago.', 'Las hojas de bronce cierran la salida del haz.', { story: true, requires: ['beacon_network'], lockedDialogue: 'beacon_lens_locked' }),
+      lever('tower_lens_free', 8, -8, 'Liberar el freno del conjunto óptico', 'tower_lens_free', 'La lente puede girar con la corona sin la sujeción de mantenimiento.', 'El freno vuelve a sujetar el conjunto óptico.', { story: true, requires: ['beacon_network'], lockedDialogue: 'beacon_lens_locked' }),
       { ...panel('beacon_lens_panel', 0, -12, 'III · La linterna', 'beacon_lens', ['beacon_lens_ready'], 'beacon_lens_locked', 'finale_world'), kind: 'beacon', radius: 3.6 },
       lore('lighthouse_window', -11, -14, 'Todo el camino, a la vista', 'lighthouse_window'),
       secret('lighthouse_ohm_note', 11, -14, 'Una nota detrás de la placa', 'lighthouse_ohm_note'),
@@ -966,7 +968,17 @@ export function toggleMemory(flag, flags) {
 }
 
 export const DIALOGUE_EFFECTS = {
-  lumen_before: { flags: ['workshop_feed'] },
+  // Most installations are operated by the people who look after them, in their own scenes: the
+  // player keeps only the actions that teach something (the Calzada's bridge, the wet archive, the
+  // lake's return) and the benches (the user: «menos ayudas», like Pokémon).
+  workshop_arrival: { flags: ['workshop_feed', 'workshop_return'] },
+  lumen_before: { flags: ['workshop_feed', 'workshop_return'] },
+  road_arrival: { flags: ['road_send', 'road_return'] },
+  spring_arrival: { flags: ['spring_sluice', 'spring_coupling'] },
+  castle_arrival: { flags: ['castle_service'] },
+  yesca_before: { flags: ['forge_limited'] },
+  vega_terraces: { flags: ['irrigation_open'] },
+  beacon_supply_complete: { flags: ['tower_isolated', 'tower_motor'] },
   nereo_lake: { flags: ['lake_cable'] },
   // In the Faro Nereo does the routine joins and the mechanical preparation; the player keeps
   // the decisions (isolating the worn bridge, coupling the motor) and the three benches.
@@ -993,19 +1005,19 @@ export const JOURNAL = [
 ];
 
 const objectives = [
-  ['awaken', { title: 'Una pequeña luz', detail: 'Mirá con Edda al pequeño de bronce sobre el pedestal.', area: 'portal', object: 'ohm_pedestal' }],
-  ['workshop', { title: 'El oficio de preguntar', detail: 'Visitá a Lumen en su taller y mirá la lámpara que no enciende.', area: 'workshop', object: 'workbench' }],
-  ['bridge_ready', { title: 'El otro lado de la puerta', detail: 'Encontrá a Edda en la Calzada. Las balizas no responden: hay cierres en los dos postes y un puente de cobre que no figura en el dibujo.', area: 'road', object: 'road_bypass' }, 'gate'],
-  ['gate', { title: 'El otro lado de la puerta', detail: 'Las balizas responden. Falta el cerrojo: su regulador está junto a la puerta.', area: 'road', object: 'gate_panel' }],
+  ['awaken', { title: 'Una pequeña luz', detail: 'Edda encontró un pequeño de bronce que no despierta. Mirá con ella qué le falta.', area: 'portal', object: 'ohm_pedestal' }],
+  ['workshop', { title: 'El oficio de preguntar', detail: 'Lumen cambió tres veces la lámpara de su mesa y sigue sin encender. Algo más está fallando.', area: 'workshop', object: 'workbench' }],
+  ['bridge_ready', { title: 'El otro lado de la puerta', detail: 'Edda unió los postes como en el dibujo viejo y las balizas de la Calzada no responden. En el medio hay un puente de cobre que el dibujo no tiene.', area: 'road', object: 'road_bypass' }, 'gate'],
+  ['gate', { title: 'El otro lado de la puerta', detail: 'Las balizas responden, pero el cerrojo de la Puerta empuja para el lado equivocado.', area: 'road', object: 'gate_panel' }],
   ['tala_lantern', { title: 'Donde empieza el agua', detail: 'Tala vino al Manantial con su farol y una pregunta: ¿dónde está su fuerza?', area: 'spring', object: 'tala_spring' }, 'pump'],
-  ['pump', { title: 'Donde empieza el agua', detail: 'Hablá con Vega en el Manantial y ayudala a mirar la bomba.', area: 'spring', object: 'pump_panel' }],
-  ['distribution', { title: 'Una red que se puede comprender', detail: 'En el Castillo, buscá con la Consejera una forma de recuperar servicios sin poner en riesgo a sus vecinos.', area: 'castle', object: 'distribution_panel' }],
-  ['irrigation', { title: 'Lo que compartimos', detail: 'Visitá las Terrazas. Yesca necesita trabajar; Vega necesita regar.', area: 'terraces', object: 'irrigation_panel' }],
-  ['lake_cable', { title: 'La orilla de la señal', detail: 'Encontrá a Nereo en el lago. Él conoce las uniones del muelle; vos mirá cómo responden las balizas.', area: 'lake', object: 'nereo_lake' }, 'beacon_link'],
-  ['beacon_link', { title: 'La orilla de la señal', detail: 'Nereo fijó la bornera. El retorno, entre las cañas, es tuyo: cerralo y mirá las balizas.', area: 'lake', object: 'lake_return' }],
-  ['beacon_supply', { title: 'El Faro · I / III', detail: 'Abrí la Fuente del Faro, la primera mesa, al pie de la torre: el núcleo tiene que sostener su pulso.', area: 'lighthouse', object: 'beacon_supply_panel' }],
-  ['beacon_network', { title: 'El Faro · II / III', detail: 'Entre la mesa I y la mesa II hay dos manivelas: la izquierda aísla el puente de servicio gastado; la derecha acopla el motor de la corona. Después abrí la mesa II.', area: 'lighthouse', object: 'beacon_network_panel' }],
-  ['beacon_lens', { title: 'El Faro · III / III', detail: 'Entre la mesa II y la linterna hay dos manivelas: la izquierda abre el obturador; la derecha suelta el freno de la lente. Después abrí la mesa III.', area: 'lighthouse', object: 'beacon_lens_panel' }],
+  ['pump', { title: 'Donde empieza el agua', detail: 'La rueda volvió a girar, pero la bomba de Vega no sube el agua a la Plaza.', area: 'spring', object: 'pump_panel' }],
+  ['distribution', { title: 'Una red que se puede comprender', detail: 'Ivara selló toda la red porque se mojó el archivo oeste. La enfermería y la cocina siguen a oscuras.', area: 'castle', object: 'distribution_panel' }],
+  ['irrigation', { title: 'Lo que compartimos', detail: 'Yesca necesita su horno y Vega su riego, y el cable de la ladera no alcanza para las dos.', area: 'terraces', object: 'irrigation_panel' }],
+  ['lake_cable', { title: 'La orilla de la señal', detail: 'Las balizas del muelle no contestan. Nereo conoce el lago: buscalo.', area: 'lake', object: 'nereo_lake' }, 'beacon_link'],
+  ['beacon_link', { title: 'La orilla de la señal', detail: 'Nereo fijó su bornera y las balizas siguen calladas. Falta la vuelta: el retorno entre las cañas.', area: 'lake', object: 'lake_return' }],
+  ['beacon_supply', { title: 'El Faro · I / III', detail: 'El Faro no sostiene su pulso: el núcleo se calla o se recalienta. Nereo te deja la primera mesa.', area: 'lighthouse', object: 'beacon_supply_panel' }],
+  ['beacon_network', { title: 'El Faro · II / III', detail: 'La corona no gira y la galería sigue oscura: el motor y las luces cuelgan del mismo camino.', area: 'lighthouse', object: 'beacon_network_panel' }],
+  ['beacon_lens', { title: 'El Faro · III / III', detail: 'La linterna no sostiene la señal: con toda la fuerza se quema; con poca, no llega al lago.', area: 'lighthouse', object: 'beacon_lens_panel' }],
 ];
 
 export function getObjective(state) {

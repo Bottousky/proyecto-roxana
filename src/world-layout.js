@@ -214,7 +214,7 @@ for (const [id, layout] of Object.entries(AREA_LAYOUTS)) {
   layout.exclusions.push(...layout.buildings.map(b => rect(`${b.id}-footprint`, b.x, b.z, b.w + .3, b.d + .3)));
   for (const object of area.objects) {
     if (object.kind === 'npc' || object.character) continue;
-    const size = object.kind === 'well' ? [4.2, 4.2] : object.kind === 'lever' ? [1.2, .9] : MACHINE_FOOTPRINTS[object.puzzle] || [1.25, .95];
+    const size = object.kind === 'well' ? [4.2, 4.2] : object.kind === 'lever' ? (object.story ? [1.2, .9] : [1.8, 1.35]) : MACHINE_FOOTPRINTS[object.puzzle] || [1.25, .95];
     layout.exclusions.push(rect(object.id, object.x, object.z, ...size));
   }
 }

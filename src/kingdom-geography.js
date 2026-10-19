@@ -86,12 +86,12 @@ export function guideTarget(state,objective){
     for(const flag of needs||[]){
       if(flags[flag]||seen.has(flag))continue;seen.add(flag);
       // A join someone does for the player after talking (Nereo at the Faro's base): the step is that person.
-      const by=Object.entries(DIALOGUE_EFFECTS).find(([,e])=>e.flags?.includes(flag))?.[0],person=by&&objects.find(o=>o.kind==='npc'&&o.dialogue===by);if(person)return person;
-      const lever=objects.find(o=>o.kind==='lever'&&o.flag===flag&&(!o.requires||o.requires.every(f=>flags[f])));if(lever)return lever;
+      const person=Object.entries(DIALOGUE_EFFECTS).filter(([,e])=>e.flags?.includes(flag)).map(([by])=>objects.find(o=>o.kind==='npc'&&o.dialogue===by)).find(Boolean);if(person)return person;
+      const lever=objects.find(o=>o.kind==='lever'&&!o.story&&o.flag===flag&&(!o.requires||o.requires.every(f=>flags[f])));if(lever)return lever;
       const system=WORLD_SYSTEMS.find(w=>w.flag===flag&&w.area===state.area);
       // A lever that has to be opened comes first (a damaged branch to isolate, a short to lift):
       // joining the healthy line before it would trip the protection.
-      const open=system&&(system.off||[]).find(f=>flags[f]),opener=open&&objects.find(o=>o.kind==='lever'&&o.flag===open);if(opener)return opener;
+      const open=system&&(system.off||[]).find(f=>flags[f]),opener=open&&objects.find(o=>o.kind==='lever'&&!o.story&&o.flag===open);if(opener)return opener;
       const deeper=system&&missingLever(system.requires,seen);if(deeper)return deeper;
     }
     return null;
@@ -102,8 +102,8 @@ export function guideTarget(state,objective){
   if(target?.kind==='lever'){
     const system=WORLD_SYSTEMS.find(w=>w.area===state.area&&[...(w.requires||[]),...(w.off||[])].includes(target.flag));
     if(system&&!flags[system.flag]){
-      const wrong=(system.off||[]).find(f=>flags[f])??(system.requires||[]).find(f=>!flags[f]&&objects.some(o=>o.kind==='lever'&&o.flag===f));
-      const lever=objects.find(o=>o.kind==='lever'&&o.flag===wrong);if(lever)return {x:lever.x,z:lever.z};
+      const wrong=(system.off||[]).find(f=>flags[f])??(system.requires||[]).find(f=>!flags[f]&&objects.some(o=>o.kind==='lever'&&!o.story&&o.flag===f));
+      const lever=objects.find(o=>o.kind==='lever'&&!o.story&&o.flag===wrong);if(lever)return {x:lever.x,z:lever.z};
     }
   }
   const step=target&&missingLever(target.requires)||target;

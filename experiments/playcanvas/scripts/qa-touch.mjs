@@ -114,22 +114,10 @@ await capture('plaza');
 await reach('plaza_to_workshop', { until: g => g.area === 'workshop', tries: 45 });
 for (let i = 0; i < 30 && (await game()).mode !== 'world'; i++) { await page.waitForTimeout(200); await read(); }
 note('taller');
-await reach('lumen', { until: g => g.flags.workshop_feed === true, tries: 40 }); await read();
-note('lumen', { feed: (await game()).flags.workshop_feed });
-// Tocar el cierre derecho lleva al viajero hasta él y lo usa; después, medir con Ohm (botón táctil).
-await reach('workshop_return', { until: g => g.flags.workshop_return === true });
-assert.equal((await game()).near, 'workshop_return', 'tocar el cierre lleva al viajero hasta él');
-await tapEl('#field-measure'); await page.waitForTimeout(300);
-assert.equal(await page.locator('#field-meter').isVisible(), true, 'el botón de medir abre el instrumento de Ohm');
-await capture('medir');
-// Lumen answers the latch a second later; while anyone speaks the instrument steps aside and
-// comes back after. Read first, then put the instrument away and check it stays away.
-await page.waitForTimeout(1300); await read();
-assert.equal(await page.locator('#field-meter').isVisible(), true, 'el instrumento vuelve después de la conversación');
-await tapEl('#close-field-meter'); await page.waitForTimeout(600);
-assert.equal(await page.locator('#field-meter').isVisible(), false, 'el instrumento de Ohm se guarda con su botón');
-await page.evaluate(() => { window.__meter = []; const m = document.querySelector('#field-meter'); new MutationObserver(() => { if (!m.classList.contains('hidden')) window.__meter.push({ t: Math.round(performance.now()), mode: window.__ohmdal.mode, near: window.__ohmdal.nearby?.id, lastTouch: window.__lastTouch }); }).observe(m, { attributes: true, attributeFilter: ['class'] }); document.querySelector('#field-measure').addEventListener('click', e => window.__meter.push({ measureClick: Math.round(performance.now()), at: [Math.round(e.clientX), Math.round(e.clientY)], mode: window.__ohmdal.mode }), true); addEventListener('keydown', e => window.__meter.push({ key: e.key, t: Math.round(performance.now()) }), true); addEventListener('pointerdown', e => { window.__lastTouch = [Math.round(e.clientX), Math.round(e.clientY), e.target.id || e.target.className, window.__ohmdal.mode]; }, true); });
-note('cierre-y-medicion', { flag: (await game()).flags.workshop_return });
+// Lumen joins his own bench (the keepers operate their installations): tocar a Lumen y hablar.
+await reach('lumen', { until: g => g.mode === 'dialogue', tries: 40 }); await read();
+note('lumen', { feed: (await game()).flags.workshop_feed, back: (await game()).flags.workshop_return });
+assert.ok((await game()).flags.workshop_feed && (await game()).flags.workshop_return, 'Lumen tiene su mesa unida');
 note('antes-del-banco', await page.evaluate(() => { const g = window.__ohmdal, w = g.world, o = w.getInteractions().find(i => i.id === 'workbench'), r = w.canvas.getBoundingClientRect(), p = w.getScreenPosition(o), hit = document.elementFromPoint(p.x + r.left, p.y + r.top); return { hit: hit?.id || hit?.className || hit?.tagName, hitText: hit?.textContent?.slice(0, 40), prompt: (() => { const b = document.querySelector('#interaction')?.getBoundingClientRect(); return b && [Math.round(b.x), Math.round(b.y), Math.round(b.width), Math.round(b.height)]; })(), p: w.getPlayerPosition(), screen: [Math.round(p.x), Math.round(p.y), p.visible], picked: w.pickInteraction(p.x + r.left, p.y + r.top)?.id, flags: { feed: g.state.flags.workshop_feed, ret: g.state.flags.workshop_return, ready: g.state.flags.bench_ready } }; }));
 await reach('workbench', { until: g => g.mode === 'puzzle' });
 g = await read(); for (let i = 0; i < 20 && g.mode !== 'puzzle'; i++) { await page.waitForTimeout(200); g = await read(); }
@@ -149,6 +137,15 @@ await tapCommission();
 for (let i = 0; i < 80; i++) { g = await game(); if (g.mode === 'cinematic') { await page.waitForTimeout(300); continue; } if (g.mode === 'dialogue') { await read(); continue; } if (g.mode === 'world') break; await page.waitForTimeout(200); }
 assert.equal((await game()).flags.workshop, true, 'el taller quedó en servicio');
 await capture('taller-encendido');
+// Junto a la mesa en servicio, medir con Ohm (botón táctil), guardarlo y comprobar que no vuelve solo.
+for (let i = 0; i < 20 && (await game()).near !== 'workbench'; i++) await page.waitForTimeout(200);
+await tapEl('#field-measure'); await page.waitForTimeout(300);
+assert.equal(await page.locator('#field-meter').isVisible(), true, 'el botón de medir abre el instrumento de Ohm');
+await capture('medir');
+await tapEl('#close-field-meter'); await page.waitForTimeout(600);
+assert.equal(await page.locator('#field-meter').isVisible(), false, 'el instrumento de Ohm se guarda con su botón');
+await page.evaluate(() => { window.__meter = []; const m = document.querySelector('#field-meter'); new MutationObserver(() => { if (!m.classList.contains('hidden')) window.__meter.push({ t: Math.round(performance.now()), mode: window.__ohmdal.mode, near: window.__ohmdal.nearby?.id, lastTouch: window.__lastTouch }); }).observe(m, { attributes: true, attributeFilter: ['class'] }); document.querySelector('#field-measure').addEventListener('click', e => window.__meter.push({ measureClick: Math.round(performance.now()), at: [Math.round(e.clientX), Math.round(e.clientY)], mode: window.__ohmdal.mode }), true); addEventListener('keydown', e => window.__meter.push({ key: e.key, t: Math.round(performance.now()) }), true); addEventListener('pointerdown', e => { window.__lastTouch = [Math.round(e.clientX), Math.round(e.clientY), e.target.id || e.target.className, window.__ohmdal.mode]; }, true); });
+await page.waitForTimeout(1500);
 const reopened = await page.evaluate(() => window.__meter.filter(e => e.mode)); assert.deepEqual(reopened, [], 'el instrumento guardado no reaparece solo');
 note('taller-en-servicio');
 

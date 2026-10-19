@@ -482,7 +482,7 @@ export class World {
       const arch=new THREE.ExtrudeGeometry(shape,{depth:3.5,bevelEnabled:false,curveSegments:16});this.localGeometries.push(arch);this.mesh(arch,this.m.stone,0,0,-d*.4-1.75).name='castle-gate-arch';
       for(let i=0;i<=8;i++){const a=Math.PI*i/8,v=this.box(Math.cos(a)*2.12,3.3+Math.sin(a)*2.12,-d*.4+1.78,.34,.5,.1,this.m.cream);v.rotation.z=a-Math.PI/2;}
       const grid=this.group(0,0,-d*.4+.6);grid.name='castle-portcullis';for(let x=-1.75;x<=1.76;x+=.5){this.box(x,4.55,0,.09,1.5,.09,this.m.metal,grid);this.mesh('cone',this.m.metal,x,3.72,0,.07,.18,.07,grid).rotation.x=Math.PI;}for(const y of [4.15,4.75])this.box(0,y,0,3.7,.08,.08,this.m.metal,grid);}
-    this.box(-2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.box(2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.gear(-3,3.2,-d*.4+1.9,.7);this.gear(3,3.2,-d*.4+1.9,.7);
+    this.box(-2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.box(2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);/* no gears beside the gate: players took them for the levers (jugador 29) */
     for(const x of [-11,11]){this.lamp(x,6,4);this.lamp(x,-4,4);this.pot(x,9,.65);}
     this.banner(-6,8,4);this.banner(6,8,4);this.cable([[-12,.17,-5],[0,.17,-5],[12,.17,-5]],this.m.brass);
   }
@@ -597,8 +597,10 @@ export class World {
     }
   }
   lever(obj){
-    this.solid(obj.x,obj.z,1.2,.9,obj.id);
-    const g=this.group(obj.x,0,obj.z);this.box(0,.16,0,1.2,.32,.9,this.m.stoneDark,g);this.box(0,.72,0,.8,.9,.6,this.m.wood,g);this.box(0,1.2,0,1.04,.12,.75,this.m.brass,g);
+    // The few levers the player works (the Calzada's bridge, the wet archive, the lake's return) are
+    // half as big again and carry a plate; the ones their keepers operate stay plain scenery.
+    const own=!obj.story;this.solid(obj.x,obj.z,own?1.8:1.2,own?1.35:.9,obj.id);
+    const g=this.group(obj.x,0,obj.z);if(own){g.scale.setScalar(1.5);this.box(.95,.55,.1,.09,1.1,.09,this.m.darkwood,g);this.box(.95,1.12,.1,.5,.34,.05,this.m.cream,g);this.box(.95,1.12,.13,.3,.07,.02,this.m.brass,g);}this.box(0,.16,0,1.2,.32,.9,this.m.stoneDark,g);this.box(0,.72,0,.8,.9,.6,this.m.wood,g);this.box(0,1.2,0,1.04,.12,.75,this.m.brass,g);
     const material=this.mat('#c3a664',null,{emissive:'#4b3a19',emissiveIntensity:.2});const indicator=this.sphere(0,.85,.34,.13,material,g);
     const waterHandle=WATER_HANDLES.has(obj.id),mechanical=isMechanicalControl(obj);
     const pivot=this.group(0,waterHandle?1.75:1.27,0,g);

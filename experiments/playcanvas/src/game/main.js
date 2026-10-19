@@ -255,6 +255,8 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   hudUntil=performance.now()+11000;objectiveUntil=performance.now()+12000;
   $('#hud').classList.remove('settled');$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');
   for(const [key,value] of Object.entries(AREAS[id].initialFlags||{}))if(!(key in state.flags))state.flags[key]=value;
+  // A save from before the keepers operated their own installations: what their scenes would have set.
+  for(const [scene,effect] of Object.entries(DIALOGUE_EFFECTS))if(state.seen.includes(scene))for(const f of effect.flags)if(!(f in state.flags))state.flags[f]=true;
   refreshWorldSystems(true);
   const first=!state.visited.includes(id);if(first)state.visited.push(id);
   advanceJourneyTime(state);
@@ -696,4 +698,4 @@ function loop(now){
 requestAnimationFrame(loop);
 // Development-only inspection of the actual game; excluded from production.
 // Read-only inspection for tests: development, or a measurement build (VITE_INSPECT=1), never the shipped one.
-if(import.meta.env.DEV||import.meta.env.VITE_INSPECT==='1')window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench}};
+if(import.meta.env.DEV||import.meta.env.VITE_INSPECT==='1')window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench},areaEntryDialogue:id=>AREAS[id]?.entryDialogue??null};

@@ -95,15 +95,17 @@ test("the word «tensión» is earned at Tala's lantern, before the pump", () =>
   assert.ok(!wordsKnown({ flags: { tala_lantern: true } }).includes('caida'), "the drop is the pump's");
 });
 
-test('the golden arrow points at what is still missing: a person who joins, a lever left wrong, then the bench (ciclo 30)', async () => {
+test('the golden arrow points at what is still missing: the keeper who operates it, the one action that teaches, then the bench', async () => {
   const { guideTarget } = await import('../src/kingdom-geography.js');
   const at = (area, flags) => { const st = { area, flags }, t = guideTarget(st, getObjective(st)); return AREAS[area].objects.find(o => o.x === t.x && o.z === t.z)?.id; };
-  assert.equal(at('workshop', { awaken: true }), 'lumen', 'Lumen joins the left closure after talking');
-  assert.equal(at('workshop', { awaken: true, workshop_feed: true }), 'workshop_return');
-  const road = { awaken: true, workshop: true };
-  assert.equal(at('road', { ...road, road_bypass: true }), 'road_bypass', 'the short first');
-  assert.equal(at('road', { ...road, road_bypass: false }), 'road_send');
-  assert.equal(at('road', { ...road, road_bypass: false, road_send: true }), 'road_return');
+  // Lumen's closures are his: the arrow points at him, never at a lever he operates (the user: «menos ayudas»).
+  assert.equal(at('workshop', { awaken: true }), 'lumen', 'Lumen joins the bench after talking');
+  assert.equal(at('workshop', { awaken: true, workshop_feed: true }), 'lumen', 'a half-joined old save: still Lumen');
+  const road = { awaken: true, workshop: true, road_send: true, road_return: true };
+  assert.equal(at('road', { ...road, road_bypass: true }), 'road_bypass', 'the short is the player\'s one action');
+  assert.equal(at('road', { ...road, road_bypass: false, bridge_ready: true }), 'gate_panel', 'then the regulator');
+  for (const [area, id] of Object.entries({ workshop: 'workshop_feed', spring: 'spring_coupling', castle: 'castle_service', terraces: 'forge_limited', lighthouse: 'tower_motor' }))
+    assert.equal(AREAS[area].objects.find(o => o.id === id).story, true, `${id} is operated by its keeper`);
   const tower = { ...road, bridge_ready: true, gate: true, tala_lantern: true, pump: true, distribution: true, irrigation: true, beacon_link: true };
   assert.equal(at('lighthouse', tower), 'nereo_tower', 'Nereo joins the base after talking');
 });
