@@ -6,7 +6,7 @@ import { chromium } from 'playwright';
 import { readFile } from 'node:fs/promises';
 import { chromePath, gpuArgs } from './chrome.mjs';
 
-const url = process.env.GAME_URL || 'http://127.0.0.1:4190/', until = process.env.HASTA || 'lake';
+const url = process.env.GAME_URL || 'http://127.0.0.1:4190/?flecha=siempre', until = process.env.HASTA || 'lake';
 const save = JSON.parse(await readFile(process.env.SAVE || 'dev-tramos/lake.json', 'utf8'));
 if (process.env.FLAGS) for (const f of process.env.FLAGS.split(',')) save.flags[f] = true;
 if (process.env.AREA) { save.area = process.env.AREA; save.position = process.env.POS ? process.env.POS.split(',').map(Number) : null; }

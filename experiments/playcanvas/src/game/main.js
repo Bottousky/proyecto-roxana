@@ -434,14 +434,18 @@ async function downloadBitacora(layout){
   setTimeout(()=>{if(journalDownload&&!journalDownload.busy){journalDownload=null;const main=document.querySelector('[data-journal-download="spreads"]');if(main)main.textContent='Descargar la Bitácora';}},6000);
 }
 
-function openGuide(){
+// The golden arrow is a hint, not a road (the user: Pokémon shows no arrow): it appears after a while
+// without progress, or as soon as the player asks for help by opening the Guide or the map.
+const GUIDE_AFTER_MS=75000,guideAlways=import.meta.env.DEV&&new URLSearchParams(location.search).get('flecha')==='siempre';
+let guideProgress='',guideSince=0,guideAsked=false;
+function openGuide(){guideAsked=true;
   if(!started||!['world','modal'].includes(mode))return;
   modal(renderJourneyGuide(state),'guide-modal');
   $('[data-guide-map]').onclick=openMap;
   $('[data-guide-journal]').onclick=openJournal;
 }
 
-function openMap(){
+function openMap(){guideAsked=true;
   if(!started||!['world','modal'].includes(mode))return;
   // The kingdom map: the world painted from above, with the journey drawn over it.
   modal(renderKingdomMap(state,{position:world.getPlayerPosition(),facing:world.lastStep,inhabitants:world.getInteractions().filter(o=>o.kind==='npc')}),'kingdom-map');
@@ -630,7 +634,9 @@ function loop(now){
         const way=!isExterior(state.area)&&!world.home?AREAS[state.area]?.exits?.[0]:null;let chip=$('#exit-hint');
         if(way&&!chip){chip=document.createElement('button');chip.id='exit-hint';chip.className='exit-hint';chip.type='button';chip.onclick=()=>{const o=world.getInteractions().find(i=>i.id===way.id);if(o&&!world.canInteractWith(o))world.approachInteraction(o);intendedInteraction=way.id;};$('#hud').append(chip);}
         if(chip){chip.hidden=!way||nearby?.id===way?.id;if(way)chip.innerHTML=`<span aria-hidden="true">↓</span> Salida: ${esc(way.label)}`;}
-        travelTick=now;const objective=getObjective(state);updateTravelInstrument(document,state,world.getPlayerPosition(),objective);world.setGuide?.(guideTarget(state,objective));}
+        travelTick=now;const objective=getObjective(state);updateTravelInstrument(document,state,world.getPlayerPosition(),objective);
+        const progress=`${state.area}|${Object.values(state.flags).filter(Boolean).length}|${Object.values(state.puzzles||{}).filter(p=>p?.completed).length}`;if(progress!==guideProgress){guideProgress=progress;guideSince=now;guideAsked=false;}
+        world.setGuide?.(guideAlways||guideAsked||now-guideSince>GUIDE_AFTER_MS?guideTarget(state,objective):null);}
       const crossing=world.getTravelEvent();
       if(crossing?.locked)interact(crossing.locked);
       else if(crossing?.target)enterArea(crossing.target,null,{continuous:true});
@@ -651,7 +657,7 @@ function loop(now){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
         let label=personLabel(nearby,state)||'Observar';
         // A lever already set says so first: «Reconectar…» alone read as «still to do» (jugador 22).
-        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(()=>{const a=nearby.action,next=state.flags[a.flag]?a.offLabel:a.onLabel,done=leverDone(a);if(!hasRequirements(state,nearby.requires))return `Todavía no · ${next}`;return done&&next?`✓ Hecho · deshacer: ${next[0].toLowerCase()}${next.slice(1)}`:next;})()||label;
+        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(()=>{const a=nearby.action,next=state.flags[a.flag]?a.offLabel:a.onLabel,done=leverDone(a);if(!hasRequirements(state,nearby.requires))return 'Todavía no';return done&&next?'✓ Hecho':next;})()||label;
         // A bench says it opens (ciclo 30: a player measured the gate's regulator without knowing E opened it).
         else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
         // A way to another place says so (jugador 21 read «El Lago de las Señales» as a signpost).
