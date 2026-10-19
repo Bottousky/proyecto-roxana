@@ -1,0 +1,382 @@
+# Home · Instituto Roxana — estado de producción
+
+Estado canónico del loop de la home (brief: `ROXANA_HOME_AAA_LOOP.md`, recibido el 2026-10-05).
+Estado: **CANDIDATO_PARA_REVISION** (2026-10-06) → [`CANDIDATE.md`](CANDIDATE.md). Sin críticos abiertos. El loop por cron está cancelado: se trabaja por pedido directo del usuario (ciclos 14–15).
+
+## Qué es la home real
+
+- Ruta: `experiments/playcanvas/escuela.html` → `src/escuela/main.js` (PlayCanvas 2.22.1, sin Three.js).
+- Rama/worktree: `claude/roxana-home-3d-upgrade-e3f8d2`, creada desde `f7984ca`
+  (= `main` = `claude/landing-escuela-visual-12802b`). Ninguna otra rama tocó `src/escuela/` desde entonces.
+- Ejecutar: `cd experiments/playcanvas && npm ci && node node_modules/vite/bin/vite.js --port 4196 --strictPort`
+  → `http://127.0.0.1:4196/escuela.html` (`.claude/launch.json` → `roxana-home`). El 4190 lo usa otro agente.
+- Capturas reproducibles (perfil aislado, nunca toca partidas): `node scripts/home-shots.mjs vista@0/tarde,electronica@3/noche [carpeta]`.
+- Guardados que lee: Ohmdal `ohmdal.playcanvas.arc1.v1` (sólo lectura). Propio: `roxana.escuela.v1` (perfil, visita, preferencias).
+- Otros mundos (otros agentes, otras ramas, **no tocar**): Arithmos `claude/arithmos-graphic-adventure-065e68`
+  (`experiments/arithmos`, guardado `roxana.arithmos.v1`), Bitland `claude/bitland-aaa-loop-496fb2`
+  (`experiments/bitland`, `bitland.partida.v1`), Physica `claude/physica-opus55-production-465980`
+  (`experiments/physica`, `physica.v2`). En desarrollo corren en puertos/orígenes distintos: **no comparten
+  localStorage con la home**. En GitHub Pages compartirían origen sólo si se publican bajo el mismo sitio.
+
+## Línea base (ciclo 0, 2026-10-05) — `evidence/c00-base/`
+
+Chrome 141 headless, ANGLE Metal, Apple M2, 1440×900 DPR1 y 390×844 DPR2 (emulación móvil, no teléfono real).
+
+- Carga fría (Vite dev): ~9 s de pantalla vacía con sólo «Levantando el Instituto»; recarga ~2,5 s. Sin identidad,
+  frase ni acción útil hasta que termina el 3D. Sin WebGL: sólo un texto de error, sin enlaces.
+- Llegada: un modal centrado tapa el campus y exige elegir antes de mirar (`llegada--manana-1440.jpg`).
+- Plano maestro: bandeja flotante entre nubes vista casi cenital desde 200 u con FOV 24°; patio gris vacío
+  dominante; cuatro talleres idénticos; ocho rótulos grandes compitiendo; de noche casi ilegible.
+- Etapa 10 de día: el haz de la linterna cruza la pantalla como una franja blanca (`vista-10-tarde-1440.jpg`).
+- Móvil: campus en una franja central; rótulos superpuestos; medidor y directorio desbordan el ancho.
+- Sin novedades editoriales, sin «Sobre Roxana» propio, sin redes. Sólo Ohmdal integra progreso; el medidor «0/40»
+  sugiere cuatro mundos medidos cuando tres no tienen integración.
+
+## Los tres problemas de mayor impacto
+
+1. **El encuadre maestro no tiene identidad**: maqueta flotante genérica, cenital y lejana, sin foco, silueta ni planos.
+2. **La primera visita depende del 3D**: carga muda, modal que intercepta, sin versión ligera ni accesos HTML
+   (Jugar/Continuar, Explorar, Novedades, Sobre Roxana).
+3. **Progreso, novedades y redes no existen como sistema**: sólo Ohmdal; sin cartelera ni fuente editorial;
+   sin configuración validada de redes; medidor que confunde mundos no integrados con progreso.
+
+## Ciclo 1 (2026-10-05) — interrumpido por límite de uso, checkpoint local
+
+Hecho (evidencia en `evidence/c01/`, mismas condiciones que la base):
+- Fin de la bandeja flotante: `src/escuela/landscape.js` (terreno polar, campos, camino pintado hasta el portón,
+  arboledas fusionadas por sprite) y borde de césped en `school.js`; niebla lineal por hora (bruma de mañana/tarde).
+- Encuadre maestro ¾ desde el sudeste (`OVERVIEW` en `rooms.js`), comparado con dos variantes (`output/home/variants*`).
+- Haz de la linterna sólo de noche (antes: franja blanca de día).
+- Portada HTML en `escuela.html`: identidad, frase, «Entrar a Ohmdal/Continuar», «Explorar el campus», Novedades,
+  Sobre Roxana, antes y sin 3D. Sin modal de bienvenida. Versión ligera si falla WebGL (`lightVersion`). Rutas `#novedades`/`#sobre`.
+- Novedades: `public/escuela/novedades.json` + `src/escuela/news.js` (validación, orden estable, vacío/carga/error,
+  ejemplo sólo en dev y rotulado). Redes: `src/escuela/social.js`, **ninguna URL confirmada** → no se publica ningún enlace.
+
+NO VERIFICADO todavía: versión ligera sin WebGL, panel de Novedades y de Sobre Roxana en el navegador, Atrás/Adelante,
+móvil del nuevo layout, teclado/foco, `npm test`, build de producción, rendimiento.
+
+Defectos conocidos: el rótulo «Taller de Física» queda bajo los botones de la portada; antetítulo con poco contraste;
+cuatro talleres siguen idénticos por fuera; noche muy oscura; la tarjeta «Cambió por tu aventura» sigue siendo bloqueante.
+
+## Ciclo 2 (2026-10-06) — verificación del ciclo 1 y artefactos protagonistas
+
+Verificado (Chrome headless, ANGLE Metal, M2; GPU compartida con la partida automatizada de otro agente, así que
+los tiempos de captura no sirven como medición):
+- `npm test`: 93 pruebas OK (10 nuevas en `tests/escuela-home.test.js`: novedades, redes, perfil, paisaje,
+  artefactos). `vite build` OK.
+- `#novedades` (ejemplo rotulado sólo en dev), `#sobre`, versión ligera sin WebGL (`--disable-3d-apis`),
+  móvil 390×844: capturas en `evidence/c02/`. 60 FPS a 1440×900 en reposo (rAF, 3 s), sin otra carga simultánea.
+
+Corregido:
+- Bruma ligada a la distancia de cámara (móvil ya no queda lavado); rótulos ocultos si caen bajo la portada o
+  salen de pantalla; controles y portada ya no se superponen en móvil; medidor oculto en pantallas angostas.
+- El haz diurno seguía visible: con mezcla aditiva la opacidad no actúa; ahora se apaga por emisivo y `enabled`.
+- Aviso de vista previa fuera del título.
+
+Salto visible — artefactos protagonistas (`src/escuela/artifacts.js`, ver `PROGRESSION.md` y `ASSETS.md`):
+- Ohmdal: Faro en miniatura con placa y tendido de cobre sobre aisladores hasta los faroles del patio.
+  La linterna se enciende sólo con `beacon_lens` real.
+- Physica: columna de vidrio donde el agua sube, una piedra flota y el plato derrama afuera, donde cae.
+- Bitland: ciudad cian sobre un chip bajo una lupa inclinada; un pulso recorre un único bucle (`LOOP / JMP 0x00`).
+- Arithmos: caballete con pizarrón: la misma cantidad cambia de representación (½, 0,5, círculo, 2/4, 50 %),
+  un punto que late y una figura de palitos.
+- Tocar un artefacto abre su taller (segunda caja de selección por sala). Árboles movidos para despejar ejes.
+
+Limitaciones: los tres mundos no integrados no cambian con progreso (sin contrato de origen); la lupa no
+magnifica; el chip de Bitland apenas asoma en el plano maestro; noche todavía oscura fuera del patio; la
+interacción insignia (respuesta al tocar un artefacto) aún es sólo navegación.
+
+## Ciclo 3 (2026-10-06) — interacción insignia y regreso no bloqueante
+
+- **Tocar un artefacto** acerca la cámara y el objeto responde a su manera (~2 s, saltable con un toque o
+  Escape; con movimiento reducido 1 s sin vuelo), con un rótulo que explica; después abre su taller.
+  Faro: según el `beacon_lens` **real** gira su haz o intenta encender y queda apagado. Columna: la piedra sube
+  y el vidrio se entibia. Chip: el pulso sale de su bucle y un anillo recorre la ciudad. Pizarrón: escribe la
+  siguiente forma y el punto se estira en un segmento. Botón «Mirar …» en cada taller (teclado).
+- **«Cambió por tu aventura»** ya no es modal: campus transformado al llegar, tarjeta lateral con lo que volvió,
+  recorrido opcional; se presenta una sola vez.
+- Bruma de los acercamientos con distancia mínima (antes lavaba la piedra cercana); poses de Física y Bitland.
+- QA de interacción reproducible: `node scripts/home-interact.mjs` → **20/20** (`evidence/c03/interaccion.log`).
+  `npm test` 93/93, build OK. Evidencias en `evidence/c03/` (fixtures etapas 3, 5 y 10).
+
+Limitaciones: la captura de la respuesta es un cuadro (un screenshot no verifica la animación: sin grabación
+disponible, NO VERIFICADO el ritmo); sonido de los gestos sólo con sonido activado, no escuchado; Bitland,
+Physica y Arithmos siguen sin progreso real (bloqueo de origen documentado en `PROGRESSION.md`).
+
+## Ciclo 4 (2026-10-06) — cartelera física y ritmo del gesto
+
+- **Cartelera de novedades** junto al camino del portón (`buildNoticeBoard`): postes, techito de pizarra, corcho
+  con papeles dibujados desde `novedades.json` (hasta cuatro, más recientes primero; vacío digno; ejemplos de
+  desarrollo marcados), placa NOVEDADES, luz tenue de noche y **farolito que sólo se enciende con novedades
+  reales sin leer**. Se reconoce en el plano maestro (rótulo «Cartelera»), está en el directorio y tocarla lleva
+  la cámara a ella y abre el panel HTML. La URL `#novedades` se restaura al recargar.
+- **Ritmo del gesto** revisado con tira de cuadros (`scripts/home-strip.mjs`, 3 s muestreados): antes el efecto
+  empezaba con la cámara en vuelo; ahora hay anticipación (0,55 s), gesto y reposo antes del taller (2,6 s).
+- QA de interacción **26/26** (`evidence/c04/interaccion.log`), incluida la secuencia no leído → leer → recargar con
+  contenido de prueba interceptado (no publicado). `npm test` 93/93.
+
+Limitaciones: la tira es por capturas (~11 fps efectivos), no video; la cartelera muestra el ejemplo sólo en dev,
+en producción hoy queda vacía porque no hay novedades confirmadas (dato externo pendiente, no un error).
+
+## Ciclo 5 (2026-10-06) — silueta propia de cada taller y noche legible
+
+- **Remates de techo** (`roofAccent` en `school.js`), dimensionados para el plano maestro y que suben con el techo
+  al abrir la sala: Electrónica, pararrayos de cobre con aisladores, bajada y una bombilla que se enciende con
+  `workshop` **real**; Física, anemómetro que gira con ráfagas; Programación, lucernario de vidrio con luz cian
+  contenida (la ciudad del chip) y un mástil — Bitland por fin se anuncia desde lejos; Matemática, un sólido de
+  tiza que rota dentro de un anillo de latón. Movimiento en reposo con movimiento reducido.
+- Rótulos de talleres elevados por encima de los remates. Luz de luna (ambiente) para leer techos y caminos.
+- Verificación: partes y proyecciones inspeccionadas en página; el anemómetro cae bajo el botón «Explorar» en modo
+  portada (visible al explorar: `evidence/c05/explorar-2-tarde-1440.jpg`). `npm test` 93/93.
+- Nueva toma `explorar` en `home-shots.mjs`. Una captura cayó por `CVDisplayLink` (pantalla en reposo); se repitió.
+
+Limitaciones: en modo portada (escritorio) el texto cubre Física y parte de Electrónica; los remates de Φ, λ, ∑
+son ambiente, no progreso (sin integración de esos mundos).
+
+## Ciclo 6 (2026-10-06) — primer pintado real, portada, medición y peso
+
+- **Primer pintado = el campus**: imagen fija renderizada desde el plano maestro (horizontal y vertical) como fondo
+  antes de cualquier JS, con velo del lado del texto y estilos críticos de los botones en línea. Es también el fondo
+  de la versión ligera sin WebGL (antes: degradado vacío). Se regenera con `home-shots.mjs poster@0/tarde`.
+- **Portada de escritorio**: título en una línea, columnas más angostas y campus más a la derecha; el patio ya no
+  queda bajo el texto (Física sigue parcialmente cubierta en 1440×900; se ve al explorar).
+- **Medición** (`PERF.md`, `scripts/home-perf.mjs`, build de producción, GPU compartida con otros agentes):
+  60 FPS con p99 16,8 ms en reposo y sala abierta a 1440; LCP 252 ms; CLS 0; interactivo en 2,0 s; entidades
+  estables. **Corregido en el ciclo 7:** a 390×844 DPR 2, tras 10 ciclos, el JSON registra 16,4 FPS (omitido por error). Draw calls 856–1233: anotado como presupuesto pendiente.
+- **Peso inicial 6,74 → 5,30 MB**: visitantes de Ohmdal se descargan al llegar a su etapa; estandarte en copia
+  reducida. Etapa 10 verificada con los visitantes en el patio. QA de interacción 26/26, `npm test` 93/93.
+- Corregido: rectángulo duro detrás del texto en la versión ligera.
+
+## Ciclo 7 (2026-10-06) — revisión independiente y corrección de bloqueos
+
+- **Revisión crítica** por un agente separado, de sólo lectura: 24 hallazgos, 2 críticos. Triage completo en
+  [`REVIEW-c07.md`](REVIEW-c07.md).
+- **Crítico 1 (reporte):** el ciclo 6 omitió un dato adverso (16,4 FPS tras ciclos a 390 DPR 2). Corregido en
+  PERF/STATE. El script medía ese «después» en un primer plano; corregido. Con carga igual, antes ≈ después.
+- **Crítico 2:** «reducir movimiento» del sistema ahora se respeta en 3D, esperas y CSS.
+- **Corregidos además:** cantidades inventadas para mundos sin integrar (medidor «n/10» de Ohmdal), regreso con
+  hash que salteaba «Cambió por tu aventura», home caída con almacenamiento bloqueado, versión ligera sin
+  directorio, historial (abrir = un paso, cerrar = volver), carreras de gesto/atajos/farolito, `inert` y foco
+  visible, rótulos anclados a su edificio, destello del portal al volver por bfcache, sonido al iniciar,
+  selector de etapas sólo con `?qa`, interiores sin dibujar con el techo cerrado (≈25 % menos draw calls),
+  perfil liviano por defecto en teléfonos táctiles.
+- QA: `npm test` 96/96 (incluye compilación de los módulos de la home, que antes no cubría ningún test: así se
+  escapó un error de sintaxis durante este ciclo); interacción 26/26; teclado e historial 14/14.
+
+NO VERIFICADO: FPS absolutos con la GPU libre; bfcache real; teléfono real; sonido escuchado; memoria de GPU.
+(Pérdida de contexto WebGL: resuelta y verificada en el ciclo 10.)
+
+## Ciclo 8 (2026-10-06) — acercamientos limpios y el mapa que recuerda
+
+- **Acercamientos** (revisión #7 y #18): en salas, gestos y recorridos los árboles del patio que quedan delante o al
+  costado del sujeto se apagaban de golpe (rectificado: desde c11 se desvanecen); la exposición baja (−26 %) y el tinte de la tarde se neutraliza al acercarse; el
+  rótulo del gesto pasa arriba con fondo propio; el aviso de exploración se oculta durante el gesto. Physica: la
+  columna interior sube continua hasta el plato y la cortina exterior cae hasta la pileta; encuadre más abierto.
+- **Mapa del Taller de Electrónica** (memoria §7): cada lugar de Ohmdal aparece con su miniatura sólo tras su
+  restauración real; los demás son huecos anónimos. También en el panel, con texto alternativo. Alfombra de Lumen y
+  lámparas colgantes que se encienden con `workshop`. Atlas y alfombra cargan al abrir el taller.
+- QA: `npm test` 97/97; interacción 26/26; teclado e historial 14/14. Evidencias en `evidence/c08/`.
+
+Limitaciones: bancos e instrumentos del taller siguen siendo cajas; los otros tres interiores sin cambios; la luz de
+las lámparas colgantes es emisiva (sin luz puntual propia); FPS sin medir con la GPU libre.
+
+## Ciclo 9 (2026-10-06) — jerarquía del plano maestro (antes/después en `evidence/c09/`)
+
+- Pantalla del Anfiteatro a media luz desde la vista general (deja de ser lo más saturado del cuadro) y telón menos
+  rojo; brilla entera con la sala abierta o un video.
+- Luz de acento cálida sobre la estatua de Roxana: de noche es el foco del patio.
+- Bruma más lejana; de mañana tira a azul, de tarde sigue beige oliva (rectificado en c11); árboles lejanos con
+  suelo debajo. Colinas acercadas, pero **siguen fuera del encuadre** (la cámara maestra mira hacia abajo y el
+  horizonte queda arriba del cuadro): no se forzó.
+- Noche: más luna y luz ambiente; en etapas bajas se leen las formas; en la etapa 10 los faroles restaurados
+  encienden el patio (la noche cuenta el progreso real). Lucernario de Trofeos con material propio y emisivo tenue:
+  ya no satura, pero sigue claro (parcial).
+- Imágenes del primer pintado regeneradas. QA: `npm test` 97/97; interacción 26/26; teclado 14/14.
+
+## Ciclo 10 (2026-10-06) — instrumentos del taller, contexto perdido y primer pintado por hora
+
+- **Bancos de Electrónica**: caja de instrumento en nogal (pantalla que vuelve con `workshop` real, perillas de latón,
+  bornes), galvanómetro con esfera graduada y aguja en reposo, bobina de cobre, soldador en su soporte, protoboard.
+  Etapa 0 vs 4 en `evidence/c10/banco-e0.jpg` / `banco-e4.jpg`.
+- **Contexto WebGL perdido** → la misma página continúa como versión ligera (panel abierto conservado, Escape,
+  Novedades, «Volver a cargar el campus 3D»). Defecto encontrado al probarlo: `canvas.hidden` no ocultaba el lienzo
+  (el CSS `display:block` ganaba) y quedaba un rectángulo blanco; corregido. Prueba en `home-interact.mjs` §5.
+- **Luz de acento sobre Roxana**: no alumbraba (apuntaba hacia arriba: los focos de PlayCanvas iluminan por −Y). Lo
+  que el ciclo 9 atribuyó a ese foco era el farol de la etapa ≥1. Corregido y verificado midiendo su dirección; de
+  noche crece con el farol real (`awaken`).
+- **Primer pintado según la hora** (mañana/tarde/noche, horizontal y vertical) elegido por un script en línea con la
+  misma regla que `hourFor`.
+- QA: `npm test` 97/97; interacción **28/28** (incluye contexto perdido); teclado e historial 14/14.
+
+## Ciclo 11 (2026-10-06) — segunda revisión independiente y correcciones
+
+- Señal táctil de los artefactos: halo tenue del color de cada mundo que respira y se apaga en los acercamientos.
+  (Dos defectos propios al hacerlo: con mezcla aditiva la opacidad no actúa, y un comentario `//` se comió el
+  `addChild`, así que el halo no existía; ambos corregidos y verificados en la página.)
+- Directorio «Sobre Roxana»; Novedades sin enlaces muertos (resto en la misma página, `href="#"` rechazado, no leído en
+  primera visita sólo con contenido real); vista previa de entrada cancelable; lucernario de Bitland en violeta.
+- **Segunda revisión independiente**: 0 críticos, 4 altos. Triage en [`REVIEW-c11.md`](REVIEW-c11.md): ALTO 1–3
+  corregidos con prueba (versión ligera sin callejón, regreso por bfcache simulado, árboles que se desvanecen), ALTO 4
+  bloqueado por el entorno (GPU ocupada por otro agente todo el ciclo). Medios y bajos corregidos salvo #10 (arte).
+- Pósters del primer pintado por hora × tramo de progreso (abandonada / media / restaurada).
+- QA: `npm test` 98/98; interacción **32/32** (nuevas: árboles, bfcache simulado, ligera, movimiento reducido);
+  teclado e historial 15/15. Evidencias en `evidence/c11/`.
+
+NO VERIFICADO: FPS con la GPU libre; bfcache real (sólo simulado); teléfono real; sonido; memoria de GPU.
+
+## Ciclo 11 · cierre
+
+Medición con la GPU libre a 1440: el perfil alto caía a 53 FPS en la vista general; con el DOF en calidad normal
+(sin diferencia visible) sostiene 60,1 FPS, p99 16,8 ms. QA final sobre `464af35`: tests 98/98, interacción 32/32,
+teclado 15/15. Paquete §14 en `CANDIDATE.md`.
+
+## Ciclo 12 (2026-10-06) — pulido de primeros planos
+
+- La «vereda dentada y sobreexpuesta» de los acercamientos era el borde pixelado de la sombra del sol y un brillo
+  especular del césped (gloss 0,25 con el sol bajo de frente). Ahora la sombra cubre 48 unidades en vez de 190 al
+  acercarse (texeles ~4× más finos) y pasto, tierra, terreno y setos son mates. Setos con 13 segmentos y normales
+  suaves en lugar de prismas de 7 caras. Antes/después: `evidence/c08/bitland-respuesta.jpg` →
+  `evidence/c12/bitland-respuesta.jpg`; vista general sin regresión `evidence/c12/explorar-10-tarde-1440.jpg`.
+- QA: tests 98/98; interacción 32/32; teclado 15/15. Medición 390: GPU ocupada por tres agentes, sin medir.
+
+## Ciclo 13 (2026-10-06) — verificación breve, sin cambios
+
+- Revisados los interiores de Física, Programación y Matemática con la cámara real (`output/home/c13/`, no versionado).
+  El triángulo claro sobre el muro norte es la luz del sol sobre su cara interior, recortada por la sombra del muro
+  vecino (no hay geometría por encima de los muros: verificado en la página). No es un defecto.
+- Sin datos externos nuevos (redes `url:null`, 0 novedades reales). GPU ocupada por Physica, Arithmos y el checkout
+  principal: medición 390 no realizada.
+- Estado: **CANDIDATO_PARA_REVISION**, con pendientes que dependen de terceros (BLOQUEADO_EXTERNO para lo que falta).
+
+## Ciclo 14 (2026-10-06) — Trofeos y Anfiteatro visibles (pedido del usuario)
+
+- Estaban en las esquinas traseras: la cámara principal veía el Anfiteatro a través de Programación y la fachada de
+  Trofeos tras Electrónica. Ahora flanquean la Dirección en la fila norte, de frente al patio: Anfiteatro al oeste
+  (bajo, se ve entero; 4 gradas), Sala de Trofeos al este (alta, separada de la Dirección). Salas, trofeos y luces
+  derivan de `BUILDINGS`/`AMPHI`. Pines de los talleres en el medallón del hastial sur (la cara que ve la cámara).
+- Prueba nueva con techos a dos aguas y la distancia real de cámara: antes Trofeos 10/15 y Anfiteatro 3/6 puntos
+  visibles; ahora 12/15 y 5/6. Antes/después en `evidence/c14/`.
+
+## Ciclo 15 (2026-10-06) — pósters con la fila norte y versión clásica (pedido del usuario)
+
+**Pósters.** Los 18 del primer pintado (hora × tramo × horizontal/vertical) regenerados con Trofeos y Anfiteatro
+en la fila norte (`public/escuela/campus-*.jpg`). Se ven en la portada y en la versión ligera (`evidence/c15/`).
+
+**Versión clásica** — `escuela-clasica.html` (pedido: «una home tradicional como alternativa»). Una página web
+convencional del mismo Instituto, no un reemplazo del campus: sirve a quien no puede o no quiere el 3D, a quien
+sólo quiere leer (familias, docentes, prensa) y a buscadores (brief §11: «explicar Roxana sin obligar a interpretar
+el canvas»). Concepto: el *prospecto* impreso de la escuela — papel y tinta de día, la noche del campus si el sistema
+la prefiere; láminas numeradas que son tomas del campus 3D real.
+- Secciones: portada (Entrar/Continuar, «Recorrer el campus en 3D», Lámina I del campus por hora × tramo), «Cambió
+  por tu aventura» (una sola vez, comparte `stageSeen` con el 3D), I Mundos (Ohmdal destacado; los otros tres
+  «en preparación», sin progreso inventado), II Tu registro (cifras, pregunta abierta, las diez restauraciones,
+  sala de trofeos de Ohmdal), III El campus (plano SVG dibujado con las medidas de `layout.js`; los números son
+  los atajos 1–9 del 3D y enlazan a cada sala), IV Novedades (mismo `novedades.json`), V Sobre Roxana.
+- Servida ya escrita: un plugin de Vite (`vite.config.js`) completa el HTML con `clasica-render.js` para una
+  primera visita; sin JS se lee entera. `clasica.js` (sin motor 3D: ≈152 KB de JS, ≈56 KB comprimidos) reescribe
+  lo que depende de la partida, que lee sin escribir. `?etapa=n`: vista previa rotulada, sin «Continuar» ni escrituras.
+- `layout.js`: las medidas del campus salieron de `school.js` a un módulo sin dependencias (lo leen el 3D, las salas
+  y el plano). Láminas en `public/escuela/clasica/` con `PLATE=1` en `home-shots.mjs`. Poses usadas:
+  Faro `{"target":[-22.6,2.8,-9.4],"yaw":68,"pitch":9,"distance":15}` (etapa 0 y 10), Physica
+  `{"target":[-22.2,2.5,22],"yaw":10,"pitch":8,"distance":22}`, Bitland `{"target":[39.6,1.7,-5.2],"yaw":12,"pitch":24,"distance":12}`,
+  Arithmos `{"target":[29.2,2,24],"yaw":30,"pitch":7,"distance":12}`, Roxana `{"target":[0,3.4,0],"yaw":10,"pitch":8,"distance":17}` (todas de tarde).
+- Desde el 3D: «Versión clásica» en la portada, en Ajustes, en la versión ligera y en `noscript`.
+- Corregido al revisar: un `<link rel="alternate">` hacía que Vite copiara `escuela.html` sin compilar a `assets/`
+  (enlace roto en producción); el Cormorant incluido sólo tiene cifras de estilo antiguo («1» parece «ı») → las
+  cifras van en Inter; la captura sin JS se colgaba (sin scripts no corren temporizadores).
+
+Verificado (Chrome 141 headless, perfil aislado; partidas de prueba = fixtures, no progreso):
+`npm test` 103/103 (4 pruebas nuevas: HTML servido completo y sin enlaces muertos, misma lámina que el 3D para
+3 horas × 11 etapas, registro/plano/láminas según la partida y sin cifras para mundos no integrados, sin motor 3D);
+`clasica-check.mjs` 44/44 (escritorio, sin JS, 390 con partida, vista previa en oscuro, 820; CLS de laboratorio
+0,002 a 1440 y 0,000 a 390 con «Cambió por tu aventura»; LCP de laboratorio ≈0,1 s en el servidor local, sólo indicio);
+`home-interact.mjs` 32/32 y `home-keys.mjs` 15/15 con los enlaces nuevos; build OK
+(`escuela-clasica.html` 25 KB, 7,3 KB comprimido). Capturas en `evidence/c15/`.
+
+NO VERIFICADO: lector de pantalla real, teléfono real, métricas de campo. Sin redirección automática a la clásica
+cuando falta WebGL (la versión ligera conserva las rutas y paneles; se puede cambiar si se prefiere).
+Abierto: el arranque 3D en headless se colgó >120 s en 2 de ~30 cargas de esta sesión (un póster y una captura
+390); al reintentar arrancó en 1,7 s. Sin causa identificada.
+
+## Ciclo 16 (2026-10-07) — revisión para mergear a `main` (pedido del usuario)
+
+**Rama frente a `main`.** `main` = `origin/main` = `f7984ca`, la base de esta rama: el merge es directo (*fast-forward*),
+sin conflictos. Simulación con las ramas de otros agentes (`git merge-tree`): Arithmos, Bitland y Physica sin
+conflictos; `codex/playcanvas-slice` (Ohmdal) choca en `experiments/playcanvas/README.md`, pero ese conflicto ya
+existe entre `main` y esa rama y esta rama no toca el README. Fuera de la home sólo toca `.claude/launch.json` y
+`experiments/playcanvas/vite.config.js` (compartido con el juego). Suma ≈25 MB, 22 de ellos de evidencia.
+
+**Corregido.**
+- `vite.config.js` importaba el render de la clásica al cargarse: un cambio futuro del juego que lo rompiera en Node
+  tiraba también el servidor y el build de Ohmdal. Ahora se carga sólo para esa página y su falla no es fatal; la
+  página sale sin escribir y `clasica.js` la completa (QA de la clásica §6).
+- Aviso de arranque lento: si a los 12 s no hay campus (GPU lenta u ocupada, o el script principal no llegó), la
+  portada ofrece la versión clásica y lo retira cuando el campus está listo. Es un temporizador en el script en
+  línea de `escuela.html` (cuenta desde la navegación y funciona sin el módulo). `scripts/home-slow.mjs`.
+
+**Arranques largos (Chrome 154 sin ventana, perfiles aislados; `scripts/home-boots.mjs`).** Servidor de desarrollo:
+1 de 30 y 2 de 60 arranques pasaron de 30 s; build de producción: 2 de 38. Mediana 1,5 s. Se detienen en puntos
+distintos (10 % texturas, 88 % personajes, 100 % ya con el campus visible y usable), sin pedidos de red pendientes,
+con temporizadores, cuadros y mensajes respondiendo al sondear, y todos terminaron solos dentro de 30 s más. Una
+vez el servidor local no respondió una navegación en 30 s. En la misma máquina corría la partida automatizada de
+otro agente. Es compatible con contención de CPU/GPU del entorno de prueba, pero **no está demostrado**: NO
+VERIFICADO en un navegador con ventana (el panel del navegador estaba oculto).
+
+Verificado: `npm test` 103/103 (incluye el aviso de 12 s), `npm run check`, build, `clasica-check.mjs` 45/45.
+`home-slow.mjs`: el aviso no aparece a los 8 s y sí a los 14 s en todas las corridas (6/6), y sin el script principal
+también; que el campus termine después de la textura demorada 20 s pasó sólo 2 de 6 veces (las otras quedaron en la
+misma espera larga de arriba).
+NO limpio: con la máquina saturada (carga 10–21; otros agentes con partidas automatizadas), `home-interact.mjs` dio
+29/32 (fallan los tres gestos de artefacto: el clic se calcula con la cámara todavía en vuelo, (-482,1805) fuera de
+pantalla) y `home-keys.mjs` se cortó por tiempo. El ciclo 15 dio 32/32 y 15/15 con la máquina libre; los cambios de
+este ciclo no tocan cámara, artefactos ni teclado, pero hay que repetirlos con la máquina libre antes de mergear.
+
+## Ciclo 17 (2026-10-07) — a `main` y a producción (pedido del usuario)
+
+**Las esperas largas eran el Mac dormido.** `pmset -g log`: a batería, el Mac entró en «Maintenance Sleep» 8–15 veces
+por hora todo el día (ventanas despiertas de ~45 s). Explica los arranques de 30–60 s, las navegaciones sin respuesta y
+el QA 3D cortado del ciclo 16. Con la corrida envuelta en `caffeinate -dims` (sólo una aserción, sin cambiar ajustes)
+no hubo ningún reposo, y sobre la copia exacta de producción: `home-interact.mjs` 32/32, `home-keys.mjs` 15/15,
+`clasica-check.mjs` (BUILT=1) 44/44, `home-boots.mjs` 30/30 sin esperas largas (mediana 1,5 s, máx. 1,6 s).
+Evidencia en `evidence/c17/`.
+
+**Producción** = GitHub Pages desde la rama `gh-pages` (`https://bottousky.github.io/proyecto-roxana/`), donde está el
+juego de Ohmdal publicado el 2026-09-13 en la raíz. Se compilaron sólo las dos páginas de la home con
+`--base=/proyecto-roxana/` (como indica el README) y se agregaron a `gh-pages`: 82 archivos nuevos, 8 idénticos
+(fuentes), **ninguno modificado**; el juego publicado queda igual. La home queda en `/proyecto-roxana/escuela.html` y
+`/proyecto-roxana/escuela-clasica.html`; la raíz sigue siendo el juego. La home lee la partida del juego publicado
+(misma clave `ohmdal.playcanvas.arc1.v1`; entre esa versión y `main` sólo cambió una preferencia, en otra clave).
+
+**Publicado** (2026-10-07): `main` = `ef64041` (fast-forward desde `f7984ca`); `gh-pages` = `59d04fc`, construido
+por GitHub Pages. En vivo, con el Mac despierto: `clasica-check.mjs` 44/44 (LCP de laboratorio 0,87 s a 1440 y
+0,32 s a 390 por la red real), 10/10 arranques del 3D (mediana 1,7 s, máx. 3,8 s), capturas en `evidence/c17/vivo/`.
+- https://bottousky.github.io/proyecto-roxana/escuela.html (campus 3D)
+- https://bottousky.github.io/proyecto-roxana/escuela-clasica.html (versión clásica)
+- La raíz https://bottousky.github.io/proyecto-roxana/ sigue siendo el juego de Ohmdal publicado el 2026-09-13.
+
+## Ciclo 18 (2026-10-07) — la escuela 3D es la raíz del sitio (pedido del usuario)
+
+- En producción: `index.html` = campus 3D, `escuela-clasica.html` = versión clásica, `escuela.html` = redirección a la
+  raíz (conserva consulta y sala), `ohmdal.html` = el juego publicado el 2026-09-13, copiado sin cambios (sólo usa la
+  dirección de la página para resolver sus recursos, en la misma carpeta). La partida se guarda por origen: mover
+  páginas no la pierde.
+- `src/escuela/links.js`: un solo lugar para los destinos «juego» y «campus». En el paquete siguen siendo
+  `./index.html` y `./escuela.html`; la publicación usa `VITE_PLAY_URL=./ohmdal.html` y `VITE_CAMPUS_URL=./`. El plugin
+  de `vite.config.js` aplica los mismos destinos a los enlaces estáticos de las dos páginas; `HOME_ONLY=1` compila sólo
+  la home. `scripts/pages-home.mjs` arma la carpeta lista para `gh-pages`. Los scripts de QA aceptan `HOME_PAGE=''`.
+- README («Verificación»): cómo publicar ahora el juego (como `ohmdal.html`) y la escuela sin pisarse.
+- Verificado sobre el árbol de producción servido en local bajo `/proyecto-roxana/`, con el Mac despierto (0 reposos):
+  redirección con `?hora=noche&etapa=4#trofeos` → raíz con Trofeos abierta; el juego arranca en `ohmdal.html` sin
+  archivos faltantes ni errores; clásica 44/44; interacción 32/32; teclado 15/15; 20/20 arranques (1,5 s).
+  En desarrollo, con los destinos por defecto: clásica 45/45 y 5/5 arranques. `npm test` 104/104 (prueba nueva:
+  con los destinos de publicación ninguna página de la home enlaza a `index.html` ni a `escuela.html`).
+- **Publicado**: `main` = `d9c7339`, `gh-pages` = `2e379d3`. En vivo (https://bottousky.github.io/proyecto-roxana/):
+  la raíz es el Instituto Roxana; redirección de `escuela.html` con sala, juego en `ohmdal.html` sin errores, clásica
+  44/44, 10/10 arranques (mediana 1,7 s). Evidencia en `evidence/c18/vivo/`.
+
+## Siguiente acción exacta
+
+1. Quien publique Ohmdal debe publicarlo como `ohmdal.html` (README); avisar al loop de Ohmdal.
+2. Pendientes de publicación que siguen abiertos: derechos de assets (estatua de Meshy, mapa y alfombra de ImageGen),
+   revisión independiente de los ciclos 12–17, teléfono real y lector de pantalla.
+3. Pendientes externos: URLs de redes, novedades reales, origen de los otros mundos.

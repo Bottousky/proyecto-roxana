@@ -47,6 +47,20 @@
         "--strictPort"
       ],
       "port": 4192
+    },
+    {
+      "name": "roxana-home",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "experiments/playcanvas/node_modules/vite/bin/vite.js",
+        "experiments/playcanvas",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "4196",
+        "--strictPort"
+      ],
+      "port": 4196
     }
   ]
 }

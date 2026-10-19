@@ -1,0 +1,80 @@
+# Mapa de progresión del campus
+
+Cuatro capas separadas (brief §7):
+
+1. **Progreso real** — sólo de los guardados de cada mundo, leídos sin escribirlos.
+2. **Disponibilidad editorial** — `WORLDS[].available` en `src/escuela/progress.js` y `public/escuela/novedades.json`.
+3. **Preferencias y visita** — `roxana.escuela.v1` (nombre, emblema, salas vistas, `stageSeen`, `newsSeen`, ajustes).
+4. **Ambiente decorativo** — hora del día, deriva de cámara, rutinas de artefactos. Nunca se presenta como logro.
+
+## Ohmdal (integrado: `ohmdal.playcanvas.arc1.v1`, mismo origen que la home)
+
+| Hito real (flag) | Transformación visible | Interacción nueva | Evidencia |
+|---|---|---|---|
+| `awaken` | farol a los pies de Roxana (y de noche la luz de acento sobre la estatua se intensifica), ventana del Taller, Ohm en el patio | — | `tests/escuela.test.js` (etapas) · capturas `?etapa=1` |
+| `workshop` | lámparas del Taller de Electrónica, humo de chimenea, **bombilla del pararrayos** (ciclo 5), pantallas de los instrumentos y lámparas colgantes (ciclos 8–10) | — | idem · `evidence/c05/explorar-2-tarde-1440.jpg` · `evidence/c10/banco-e0.jpg` vs `banco-e4.jpg` |
+| `gate` | se abre el portón, cae la cadena | — | idem |
+| `pump` | la fuente vuelve a correr | — | idem |
+| `distribution` | faroles del patio rama por rama; luciérnagas de noche | — | idem |
+| `irrigation` | canteros florecen, césped más verde | — | idem |
+| `beacon_link` | estandartes de Ohmdal en la Dirección | — | idem |
+| `beacon_network` | la campana de la torre se mueve | — | idem |
+| `beacon_lens` | linterna de la torre; **lámpara del Faro en miniatura** (ciclo 2); haz sólo de noche | tocar el Faro en miniatura: encendido gira su haz; sin `beacon_lens` intenta dos veces y dice que la lente sigue apagada (ciclo 3) | `evidence/c02/faro-1440.jpg`, `evidence/c03/ohmdal-respuesta.jpg`, `ohmdal-apagado.jpg` (fixtures 10 y 3) |
+| `epilogue_shared` | vecinos de Ohmdal visitan el patio | — | idem |
+
+Trofeos y cinemáticas del Anfiteatro también derivan de estos flags. Las capturas con `?etapa=` o `SEED=` son
+**fixtures**: verifican el render de un estado, no la integración con una partida real.
+
+## Memoria: el mapa del Taller de Electrónica (ciclo 8)
+
+Un mapa de Ohmdal colgado en la pared norte del taller (y repetido como imagen con texto alternativo en el panel)
+muestra la miniatura y el nombre de cada lugar del Arco I **sólo cuando su restauración ocurrió en la partida real**
+(`ohmdalPlaces` en `progress.js`, prueba en `tests/escuela-home.test.js`). Los lugares pendientes son huecos
+anónimos con «?», sin nombre ni imagen (sin spoiler). Correspondencia lugar → flag: portal→`awaken`,
+plaza→`pump`, workshop→`workshop`, road→`gate`, spring→`pump`, castle→`distribution`, terraces→`irrigation`,
+lake→`beacon_link`, lighthouse→`beacon_lens`. Las lámparas colgantes del taller se encienden con `workshop`.
+Evidencia (fixtures 0/4/10): `evidence/c08/mapa-e0.jpg`, `mapa-e4.jpg`, `mapa-e10.jpg`.
+
+## Physica, Bitland, Arithmos (contrato pendiente)
+
+Sus mundos viven en otras ramas y, en desarrollo, en otros orígenes: la home **no puede** leer sus guardados hoy.
+Claves reales identificadas (sólo lectura, para el adaptador):
+
+- Arithmos `roxana.arithmos.v1` → `{version:1, completed:[ids de segmento], flags, …}`
+- Bitland `bitland.partida.v1` → `{version:1, sim, flags, …}` (validado con `conservation(sim)`)
+- Physica `physica.v2` → `{notes:[{id,…}], flags, footing}`
+
+Hasta integrarlos, sus artefactos muestran sólo su **condición propia** (agua que sube, bucle de una instrucción,
+punto de tiza), que es ambiente y no recompensa. `drawChip(t, awake)` ya acepta un `awake` 0..1 que vendrá del
+progreso real de Bitland; hoy es 0. No se inventan hitos para estos mundos.
+
+## Pendiente
+
+- Adaptador `world-progress.js` con lectores defensivos por mundo y tabla hito → transformación para cada uno,
+  cuando se confirme dónde y bajo qué origen se publican.
+
+## Regresar (ciclo 3)
+
+Al volver con restauraciones nuevas el campus aparece **ya transformado**; una tarjeta lateral no bloqueante
+lista lo que volvió («Cambió por tu aventura») y ofrece «Ver qué cambió» (recorrido corto, saltable con Escape).
+`stageSeen` avanza en cuanto la tarjeta se muestra: recargar no repite la celebración. «Continuar en Ohmdal»
+queda como acción dominante de la portada. Verificado con fixture en `scripts/home-interact.mjs`.
+
+## Versión clásica (ciclo 15)
+
+`escuela-clasica.html` lee la misma partida (sólo lectura) con las mismas funciones de `progress.js`, sin 3D:
+
+| Hito real | En la versión clásica |
+|---|---|
+| Hay partida | «Continuar en Ohmdal» desde el primer pintado (script en línea), registro con cifras, «Una pregunta abierta» |
+| Etapa 0–1 / 2–6 / 7–10 | Lámina I del campus: la misma imagen fija que el primer pintado del 3D (hora × tramo) |
+| `gate` (etapa ≥ 3) | Plano: portón abierto |
+| `pump` (etapa ≥ 4) | Plano: fuente con agua |
+| `distribution` (etapa ≥ 5) | Plano: dieciséis faroles encendidos |
+| `irrigation` (etapa ≥ 6) | Plano: canteros en flor |
+| `beacon_lens` (etapa ≥ 9) | Lámina del Faro en miniatura con la lente encendida |
+| Restauraciones nuevas | «Cambió por tu aventura» en la página, una sola vez: comparte `stageSeen` con el 3D |
+| Trofeos, lugares del mapa, funciones | Cifras y sala de trofeos de Ohmdal; Physica, Bitland y Arithmos sin cifras («todavía no comparten su progreso») |
+
+`?etapa=n` es una vista previa rotulada: no ofrece «Continuar» ni escribe el registro.
+

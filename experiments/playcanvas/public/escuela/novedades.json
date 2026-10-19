@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "nota": "Novedades del Instituto Roxana. Sólo se muestran las entradas con \"published\": true y fecha real (AAAA-MM-DD). Las de \"example\": true aparecen únicamente en el servidor de desarrollo, rotuladas. No publicar anuncios, fechas o lanzamientos que no estén confirmados.",
+  "items": [
+    {
+      "id": "ejemplo-formato",
+      "example": true,
+      "published": true,
+      "date": "2026-10-05",
+      "category": "instituto",
+      "title": "Ejemplo: así se ve una novedad",
+      "summary": "Entrada de prueba para revisar el diseño de la cartelera. No describe ningún anuncio real y no se muestra fuera del entorno de desarrollo."
+    }
+  ]
+}

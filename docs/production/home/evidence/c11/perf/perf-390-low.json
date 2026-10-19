@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-06T13:14:51.367Z",
+  "url": "http://127.0.0.1:4197/escuela.html?hora=tarde",
+  "quality": "low",
+  "viewport": {
+    "width": 390,
+    "height": 844,
+    "dpr": 2
+  },
+  "ua": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) HeadlessChrome/154.0.0.0 Safari/537.36",
+  "host": {
+    "cpu": "Apple M2",
+    "cores": 8,
+    "memGB": 16
+  },
+  "web": {
+    "fcp": 112,
+    "lcp": 112,
+    "cls": 0
+  },
+  "readyMs": 1624,
+  "idle": {
+    "frames": 481,
+    "fps": 60.1,
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33": 0
+  },
+  "room": {
+    "frames": 301,
+    "fps": 60.2,
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33": 0
+  },
+  "idleAfter": {
+    "frames": 301,
+    "fps": 60.2,
+    "p50": 16.7,
+    "p95": 16.7,
+    "p99": 16.8,
+    "max": 16.8,
+    "over33": 0
+  },
+  "before": {
+    "heapMB": 50.2,
+    "textures": null,
+    "entities": 300,
+    "drawCalls": 484,
+    "triangles": 0,
+    "canvas": [
+      487,
+      1055
+    ],
+    "pixelRatio": 1.25
+  },
+  "after": {
+    "heapMB": 32.1,
+    "textures": null,
+    "entities": 300,
+    "drawCalls": 454,
+    "triangles": 0,
+    "canvas": [
+      487,
+      1055
+    ],
+    "pixelRatio": 1.25
+  },
+  "leak": {
+    "heapMB": -18.1,
+    "textures": 0,
+    "entities": 0
+  },
+  "errors": []
+}

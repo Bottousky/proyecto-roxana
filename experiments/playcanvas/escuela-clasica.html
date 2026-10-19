@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f3ecdc" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#121a18" media="(prefers-color-scheme: dark)">
+<meta name="description" content="Instituto Roxana, versión clásica: una antigua escuela técnica y sus cuatro Mundos Aplicados — Ohmdal, Physica, Bitland y Arithmos. Lo que comprendés en los mundos vuelve con vos y transforma el Instituto.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231b3935'/%3E%3Ctext x='32' y='48' text-anchor='middle' font-size='48' fill='%23d8bd80'%3EΩ%3C/text%3E%3C/svg%3E">
+<title>Instituto Roxana · versión clásica</title>
+<script>
+/* Before the first paint: the hour (same rule as hourFor in diorama.js; ?hora wins) and the stage of the student's
+   Ohmdal save (read, never written; ?etapa wins). They pick the campus still (same files and steps as the 3D home's
+   first paint, see campusImage in clasica-render.js) and whether the way in says Continuar. */
+(function(){var q=new URLSearchParams(location.search),h=new Date().getHours(),t=/^(manana|tarde|noche)$/.test(q.get('hora')||'')?q.get('hora'):(h>=7&&h<15?'manana':h>=15&&h<20?'tarde':'noche'),n=0,started=false;
+try{if(q.has('etapa'))n=Math.max(0,Math.min(10,Number(q.get('etapa'))||0));else{var s=JSON.parse(localStorage.getItem('ohmdal.playcanvas.arc1.v1')||'null'),f=(s||{}).flags||{};started=Boolean(s);
+  ['awaken','workshop','gate','pump','distribution','irrigation','beacon_link','beacon_network','beacon_lens','epilogue_shared'].every(function(k){if(f[k]){n++;return true;}return false;});}}catch(e){}
+var d=document.documentElement;d.dataset.hora=t;d.dataset.started=started?'1':'';
+window.__campus={hour:t,stage:n,src:'./escuela/campus-'+t+(n>=7?'-e10':n>=2?'-e5':'')+'.jpg'};})();
+</script>
+<link rel="preload" as="font" type="font/woff2" href="./fonts/cormorant-garamond-latin-600-normal.woff2" crossorigin>
+<link rel="stylesheet" href="/src/escuela/clasica.css">
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+<header class="masthead">
+  <a class="brand" href="./escuela-clasica.html" aria-label="Instituto Roxana, inicio de la versión clásica">
+    <span class="crest" aria-hidden="true">Ω</span><span class="brand-text"><b>Instituto Roxana</b><small id="brand-sub">Escuela de Mundos Aplicados</small></span>
+  </a>
+  <nav class="sections" aria-label="Secciones">
+    <a href="#mundos">Mundos</a><a href="#registro">Tu registro</a><a href="#campus">El campus</a><a href="#novedades" id="nav-news">Novedades</a><a href="#sobre">Sobre Roxana</a>
+  </nav>
+  <div class="masthead-actions">
+    <a class="switch" href="./escuela.html">Campus 3D</a>
+    <a class="cta small" href="./index.html" data-way><span class="if-new">Entrar a Ohmdal</span><span class="if-started">Continuar</span></a>
+  </div>
+</header>
+
+<main id="contenido">
+  <section class="hero" aria-labelledby="titulo">
+    <div class="hero-text">
+      <p class="kicker">Escuela de Mundos Aplicados</p>
+      <h1 id="titulo">Instituto Roxana</h1>
+      <p class="line" id="hero-line"><span class="if-new">El conocimiento cambia los mundos. Y también este lugar.</span><span class="if-started">Tu viaje sigue abierto. El Instituto guarda lo que trajiste.</span></p>
+      <p class="sub">Una antigua escuela técnica. Cuatro talleres guardan las entradas a sus Mundos Aplicados: lo que comprendés en ellos vuelve con vos y transforma el Instituto.</p>
+      <div class="actions">
+        <a class="cta" href="./index.html" data-way><span class="if-new">Entrar a Ohmdal</span><span class="if-started">Continuar en Ohmdal</span></a>
+        <a class="ghost" href="./escuela.html">Recorrer el campus en 3D</a>
+      </div>
+      <p class="meta" id="way-meta">Hoy está abierta la entrada a Ohmdal · La Luz: electricidad, nueve lugares.</p>
+    </div>
+    <figure class="plate hero-plate">
+      <script>(function(c){document.currentScript.insertAdjacentHTML('beforebegin','<img id="campus-still" src="'+c.src+'" width="1600" height="1000" fetchpriority="high" alt="El Instituto Roxana, visto desde el sudeste: el portón y el camino, el patio con la estatua de Roxana y su fuente, dos talleres a cada lado y, al fondo, el Anfiteatro, la Dirección con su torre y la Sala de Trofeos.">');})(window.__campus);</script>
+      <noscript><img src="./escuela/campus-tarde.jpg" width="1600" height="1000" alt="El Instituto Roxana de tarde, visto desde el sudeste: el portón y el camino, el patio con la estatua de Roxana y su fuente, dos talleres a cada lado y, al fondo, el Anfiteatro, la Dirección con su torre y la Sala de Trofeos."></noscript>
+      <figcaption id="campus-caption"><b>Lámina I.</b> El Instituto visto desde el portón, como lo muestra el campus 3D.</figcaption>
+    </figure>
+  </section>
+
+  <div id="preview-note" class="preview-note" hidden></div>
+  <div id="changes-slot"><!--clasica:changes--></div>
+
+  <section class="chapter" id="mundos" aria-labelledby="mundos-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">I</p><h2 id="mundos-title">Los Mundos Aplicados</h2>
+      <p class="chapter-lead">Cada taller del Instituto guarda la entrada a un mundo. En cada uno se aprende una disciplina haciendo: comprenderla permite cambiar lo que pasa allí.</p></header>
+    <div class="worlds" id="worlds"><!--clasica:worlds--></div>
+  </section>
+
+  <section class="chapter" id="registro" aria-labelledby="registro-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">II</p><h2 id="registro-title">Tu registro</h2>
+      <p class="chapter-lead">Lo que el Instituto sabe de tu viaje, leído de tu partida de Ohmdal en este navegador. Esta página nunca la modifica.</p></header>
+    <div class="record" id="record"><!--clasica:record--></div>
+  </section>
+
+  <section class="chapter" id="campus" aria-labelledby="campus-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">III</p><h2 id="campus-title">El campus</h2>
+      <p class="chapter-lead">Nueve lugares alrededor de un patio. Cada uno se abre también en el campus 3D.</p></header>
+    <div class="campus" id="plan"><!--clasica:plan--></div>
+  </section>
+
+  <section class="chapter" id="novedades" aria-labelledby="novedades-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">IV</p><h2 id="novedades-title">Novedades</h2>
+      <p class="chapter-lead">Lo que anuncia el Instituto, con su fecha. Es aparte de tu progreso: lo que cambió por tu aventura está en tu registro.</p></header>
+    <div class="news" id="news"><!--clasica:news--></div>
+  </section>
+
+  <section class="chapter" id="sobre" aria-labelledby="sobre-title">
+    <header class="chapter-head"><p class="numeral" aria-hidden="true">V</p><h2 id="sobre-title">Sobre Roxana</h2></header>
+    <div class="about">
+      <div class="about-text">
+        <p class="lead">Roxana es una antigua escuela técnica que enseñaba mediante los Mundos Aplicados: lugares donde comprender una disciplina permite intervenir sobre consecuencias reales.</p>
+        <p>La directora fundadora del programa permanece en la memoria de la escuela a través de esta estatua, documentos y relatos incompletos. Mira hacia el portón y sostiene un libro cerrado contra el pecho.</p>
+        <p>Quién fue Roxana, qué es realmente la Bitácora y qué relación tuvo el Instituto con cada mundo son preguntas que la escuela todavía conserva.</p>
+        <div class="stage-card" id="about-stage"><!--clasica:about--></div>
+        <!--clasica:community-->
+      </div>
+      <figure class="plate"><img src="./escuela/clasica/roxana.jpg" width="1200" height="800" loading="lazy" decoding="async" alt="La estatua de Roxana sobre la fuente del patio, con un libro cerrado contra el pecho; detrás, el pórtico de la Dirección y la pantalla del Anfiteatro."><figcaption><b>Lámina VI.</b> Roxana, en el centro del patio.</figcaption></figure>
+    </div>
+  </section>
+</main>
+
+<footer class="colophon">
+  <div class="colophon-brand"><span class="crest" aria-hidden="true">Ω</span><div><b>Instituto Roxana</b><small>Escuela de Mundos Aplicados</small></div></div>
+  <nav aria-label="Otros accesos">
+    <a href="./escuela.html">Campus 3D</a><a href="./index.html">Ohmdal · La Luz</a><a href="#novedades">Novedades</a><a href="#sobre">Sobre Roxana</a>
+  </nav>
+  <p>Versión clásica del Instituto: la misma escuela, los mismos mundos y el mismo progreso, sin 3D. Tu registro y tu partida viven en este navegador.</p>
+</footer>
+<script type="module" src="/src/escuela/clasica.js"></script>
+</body>
+</html>

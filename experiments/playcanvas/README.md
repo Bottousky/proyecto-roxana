@@ -3,7 +3,7 @@
 Arco I jugable en la rama **codex/playcanvas-slice**.
 
 - Jugar: http://127.0.0.1:4190/
-- Producción: https://bottousky.github.io/proyecto-roxana/
+- Producción: https://bottousky.github.io/proyecto-roxana/ (la escuela 3D; el juego está en `ohmdal.html`)
 - Versión anterior para comparar: http://127.0.0.1:4180/
 - Iniciar localmente: abrir **Jugar PlayCanvas.cmd**, o ejecutar npm run dev.
 - En un checkout nuevo: npm ci antes de iniciar.
@@ -24,6 +24,43 @@ para correr, E usar, Q medir con Ohm, O hablar con Ohm, J Bitácora, M mapa, H g
 En pantallas táctiles: cruceta, tocar el suelo para ir, tocar algo para acercarse y usarlo,
 y el botón **Interactuar**. Estado de producción, aceptación y límites de verificación:
 [docs/produccion-aaa](../../docs/produccion-aaa/ESTADO.md).
+
+## Instituto Roxana (landing)
+
+`escuela.html` es la escuela-diorama que recibe al estudiante: una isla flotante con el
+Instituto que se navega con clics (sin personaje). Tocar un edificio, su rótulo o el
+directorio acerca la cámara, levanta el techo, baja las paredes hacia la cámara y abre
+el panel de la sala:
+
+- **Dirección:** registro del estudiante (nombre, emblema), bitácoras (exportar,
+  importar, borrar) y preferencias. Vive en este navegador (`roxana.escuela.v1`).
+- **Cuatro talleres, uno por Mundo Aplicado y del mismo tamaño alrededor del patio:**
+  Electrónica (Ohmdal), Física (Physica), Programación (Bitland) y Matemática (Arithmos).
+  Cada uno tiene su entrada, estandartes, medallón e interior propio. Solo Ohmdal es un
+  portal (lleva al juego); a Bitland se entra con un casco de realidad virtual conectado a un
+  microcontrolador con una ciudad sobre el chip; Physica es un mundo subatómico en una pecera
+  con su consola de leyes; Arithmos, una inmersión en un pizarrón: "Ver la entrada" muestra la tiza trazando una puerta,
+  al estudiante achicándose al cruzarla y el plano infinito de ecuaciones del otro lado.
+- **Sala de Trofeos:** una grada de doce lugares por mundo, bajo su estandarte.
+- **Anfiteatro:** las cinemáticas filmadas del juego se proyectan en la pantalla 3D
+  (subtítulos incluidos) al vivirlas, agrupadas por mundo; explicaciones de YouTube y
+  animaciones se declaran en `src/escuela/videos.js`.
+
+La escuela lee la partida de Ohmdal sin modificarla. Cada restauración cambia algo del
+diorama (farol a los pies de Roxana y ventana del Taller, portón, fuente, faroles, canteros, estandartes, campana,
+linterna de la torre, visitantes); el reloj de la torre sigue detenido para Bitland. Al volver, una secuencia con letterbox recorre lo
+nuevo. Hora del día (mañana, tarde, noche), sonido procedural opcional y vista previa de
+cualquier etapa sin tocar partidas: `escuela.html?etapa=0..10&hora=manana|tarde|noche`.
+
+- `src/escuela/school.js`: arquitectura por código (receta aprobada: facetas, UV de mundo,
+  color de vértice como multiplicador). `kit.js` fusiona piezas por parte y material.
+- `public/escuela/modelos/roxana-estatua.glb`: la estatua del patio (Meshy, solo geometría);
+  `src/escuela/statue.js` le da normales, UV de mundo, mármol y oclusión en los pliegues.
+- `src/escuela/diorama.js`: render, cámara, recorte de salas, etapas, partículas, IBL.
+- `src/escuela/progress.js`: etapa, trofeos y cinemáticas desde el guardado (con pruebas).
+- `node scripts/film-cinematics.mjs` vuelve a filmar las escenas en `public/escuela/cine/`.
+- `node scripts/escuela-review.mjs vista,taller,... <etapa> <hora>` captura revisiones;
+  `escuela-news.mjs` y `escuela-welcome.mjs` recorren novedades, bienvenida y Portal.
 
 ## El viaje
 
@@ -128,10 +165,18 @@ el arco empieza en el Portal.
 
 ## Verificación
 
-GitHub Pages publica los archivos compilados desde la rama `gh-pages`,
-con `node node_modules/vite/bin/vite.js build --base=/proyecto-roxana/ --outDir dist-pages`.
-La rama `main` conserva el reinicio del canon. Los assets y el mapa admiten
-la subruta del repositorio. Publicar el contenido de `dist-pages` con `.nojekyll`.
+GitHub Pages publica los archivos compilados desde la rama `gh-pages`. Desde el 2026-10-07
+la raíz del sitio es la escuela 3D (Instituto Roxana) y el juego vive en `ohmdal.html`:
+
+- `index.html`: campus 3D · `escuela-clasica.html`: versión sin 3D · `escuela.html`: redirige a la raíz.
+- `ohmdal.html`: el juego. **No publicar el `index.html` del juego en la raíz**: pisaría la escuela.
+
+Publicar el juego: `node node_modules/vite/bin/vite.js build --base=/proyecto-roxana/ --outDir dist-pages`,
+copiar `dist-pages` sobre `gh-pages` **renombrando su `index.html` a `ohmdal.html`**.
+Publicar la escuela: `node scripts/pages-home.mjs dist-pages-home` y copiar esa carpeta sobre `gh-pages`
+(ya trae `index.html`, la versión clásica y la redirección; sus enlaces al juego apuntan a `ohmdal.html`).
+En los dos casos, con `.nojekyll`. La partida se guarda por origen, así que mover páginas no la pierde.
+La rama `main` conserva el reinicio del canon. Los assets y el mapa admiten la subruta del repositorio.
 
 - npm test: pruebas del modelo eléctrico, progresión, guardado, Bitácora,
   cinemáticas, accesibilidad de objetos y correspondencia de los caminos.
