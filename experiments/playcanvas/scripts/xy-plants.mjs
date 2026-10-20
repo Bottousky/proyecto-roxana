@@ -45,4 +45,5 @@ await writeFile(resolve(root, 'src/data/plants-xy.json'), JSON.stringify(meta, n
 const trees = await prepare('xy-trees.png', 0, 0);
 await writeFile(resolve(out, 'trees.png'), Buffer.from(trees.png.split(',')[1], 'base64'));
 console.log('trees: public/assets/xy/trees.png');
+console.log('El juego carga WebP: correr python -I scripts/texturas-webp.py (Pillow).');
 await browser.close();

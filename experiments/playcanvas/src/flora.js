@@ -66,7 +66,7 @@ const pick=(pool,r)=>{const total=pool.reduce((n,p)=>n+p[3],0);let t=r*total;for
 
 export async function sowFlora(world){
   const app=world.app,sheets={};
-  for(const key of ['a','b']){const p=await pixels(XY?`./assets/xy/plants-${key}.png`:`./assets/plants/${key}.png`);sheets[key]={texture:atlasTexture(app,'flora-'+key,p.image),size:[p.width,p.height]};}
+  for(const key of ['a','b']){const p=await pixels(XY?`./assets/xy/plants-${key}.webp`:`./assets/plants/${key}.png`);sheets[key]={texture:atlasTexture(app,'flora-'+key,p.image),size:[p.width,p.height]};}
   const map=await pixels('./assets/shore-distance.png');
   const sample=(X,Z)=>{const u=Math.floor((X-shore.x0)/shore.width*map.width),v=Math.floor((Z-shore.z0)/shore.depth*map.height);if(u<0||v<0||u>=map.width||v>=map.height)return null;const i=(v*map.width+u)*4;return {water:map.data[i]/255,paved:map.data[i+1]/255};};
   const batches={a:{positions:[],uvs:[],colors:[],indices:[],places:[]},b:{positions:[],uvs:[],colors:[],indices:[],places:[]}};

@@ -2,7 +2,6 @@ import { renderKingdomMap, bindKingdomMap } from './kingdom-map.js';
 import './style.css';
 import './interface.css';
 import './atlas.css';
-import {PlayCanvasWorld as World} from '../world.js';
 import '../fonts.css';
 import {mountTravelInstrument,updateTravelInstrument} from './travel-instrument.js';
 import {advanceJourneyTime,journeyPhase} from './story-time.js';
@@ -12,7 +11,7 @@ import './journey-ui.css';
 import './hud.css';
 import './journal.css';
 import '../xy-ui.css';
-import {APPEARANCE,APPEARANCE_DEFAULT,PEOPLE_3D,savedAppearance,chosenAppearance} from '../style.js';
+import {APPEARANCE,APPEARANCE_DEFAULT,PEOPLE_3D,savedAppearance,chosenAppearance} from '../style-config.js';
 import {renderJourneyGuide} from './journey-guide.js';
 import {guideTarget,isExterior} from './kingdom-geography.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
@@ -123,6 +122,8 @@ function refreshTitle(){
   $('#save-description').textContent=loaded.state?describe(loaded.state):loaded.error||'Sin prisa. Sin combate. Con curiosidad.';
 }
 refreshTitle();
+// Once the title is on screen, the engine downloads in the background: crossing the Portal does not wait for it.
+{const prefetch=()=>loadWorld().catch(()=>{worldModule=null;});if('requestIdleCallback' in window)requestIdleCallback(prefetch,{timeout:1500});else setTimeout(prefetch,300);}
 // Pruebas por tramos (ciclo 30, sólo en desarrollo): ?tramo=castle abre una partida guardada al llegar
 // a ese lugar (dev-tramos/, del recorrido automático), aparte de la del jugador. «Continuar» la abre.
 if(import.meta.env.DEV){const tramo=new URLSearchParams(location.search).get('tramo');if(tramo&&!loadState().state)fetch(`./dev-tramos/${tramo.replace(/[^a-z]/g,'')}.json`).then(r=>r.ok?r.text():null).then(text=>{if(!text)return;try{JSON.parse(text);localStorage.setItem(SAVE_KEY,text);}catch{} /* a missing file comes back as the page itself */refreshTitle();}).catch(()=>{});}
@@ -185,8 +186,12 @@ function fieldMeasure(){
   if(recordFieldObservation(state,nearby,reading)){show('#journal-dot');persist();}
 }
 
-function initWorld(){
+// The engine and the world arrive after the title (2026-10-19, rendimiento: the title waited for
+// 540 kB of PlayCanvas it does not use); loadWorld() starts the download as soon as the title shows.
+let worldModule=null;const loadWorld=()=>worldModule??=import('../world.js');
+async function initWorld(){
   if(world)return;
+  const {PlayCanvasWorld:World}=await loadWorld();if(world)return;
   world=new World($('#world'));world.isLatched=isLatched;
   workbench=new PuzzleWorkbench($('#workbench'),{
     onChange:(id,snapshot)=>{state.puzzles[id]=snapshot;persist();},
@@ -218,7 +223,7 @@ async function startGame(resume=false){
   else state=freshState(settings);
   {const registered=schoolName();if(registered)state.playerName=registered;}
   if(!Array.isArray(state.known))state.known=knownFromSeen(state);
-  try{initWorld();}catch(error){console.error(error);modalReturn='title';modal('<div class="eyebrow">OHMDAL</div><h2>El mundo no pudo abrirse</h2><p class="modal-intro">El navegador no pudo iniciar los gráficos. Activá la aceleración gráfica del navegador y volvé a intentar, o abrí el juego en Chrome o Edge actualizados.</p>','options-modal');return;}
+  try{await initWorld();}catch(error){console.error(error);modalReturn='title';modal('<div class="eyebrow">OHMDAL</div><h2>El mundo no pudo abrirse</h2><p class="modal-intro">El navegador no pudo iniciar los gráficos. Activá la aceleración gráfica del navegador y volvé a intentar, o abrí el juego en Chrome o Edge actualizados.</p>','options-modal');return;}
   $('#transition-name').textContent='Abriendo los caminos de Ohmdal';show('#transition');
   const art=await (assetLoadFailed?world.loadArtAssets():world.assetsReady);
   assetLoadFailed=!art.ok;
@@ -650,9 +655,11 @@ function loop(now){
     if(mode==='world'){
       autosave+=elapsed;
       {const door=world.getDoorEvent?.();if(door){useDoor(door.leave?{leave:true,label:AREAS[state.area].name}:door);}}
-      nearby=world.getNearby();$('#ohm-button').hidden=!world.getCompanion();
-      $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
-      $('#touch-interact').setAttribute('aria-label',nearby?.label||'Acercate a una persona o instalación');
+      nearby=world.getNearby();
+      // Every frame, but written only when it changes: an unchanged write still recomputes the HUD's
+      // styles (60 times a second, 2026-10-19).
+      {const ohm=$('#ohm-button'),hide=!world.getCompanion();if(ohm.hidden!==hide)ohm.hidden=hide;const touch=$('#touch-interact');if(touch.disabled!==!nearby)touch.disabled=!nearby;
+      const word=nearby?'Interactuar':'Acercate';if(touch.textContent!==word)touch.textContent=word;const said=nearby?.label||'Acercate a una persona o instalación';if(touch.getAttribute('aria-label')!==said)touch.setAttribute('aria-label',said);}
       if(intendedInteraction){const object=world.getInteractions().find(o=>o.id===intendedInteraction);if(!object)intendedInteraction=null;else if(world.canInteractWith(object)){intendedInteraction=null;world.target=null;world.route=[];interact(object);}else if(!world.target&&!world.route.length){if(!world.approachInteraction(object))intendedInteraction=null;}}
       show('#interaction',mode==='world'&&!!nearby);
       if(nearby&&mode==='world'){
@@ -664,7 +671,7 @@ function loop(now){
         else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
         // A way to another place says so (jugador 21 read «El Lago de las Señales» as a signpost).
         else if(nearby.target&&AREAS[nearby.target]&&!/^Volver/.test(nearby.label))label=`Camino a: ${nearby.label}`;
-        $('#interaction-label').textContent=label;
+        if($('#interaction-label').textContent!==label)$('#interaction-label').textContent=label;
         const candidate=state.area+nearby.id+JSON.stringify(state.flags);if(candidate!==lastMeasurementCandidate){lastMeasurementCandidate=candidate;measurementAvailable=Boolean(state.flags.awaken&&measureWorld(state.area,state,nearby.id));}show('#field-measure',measurementAvailable);
         const pos=world.getScreenPosition(nearby),prompt=$('#interaction');
         const blocked=world.area.exits.map(exit=>world.getScreenPosition({...exit,target:true})).filter(point=>point.visible).map(point=>({left:point.x-30,right:point.x+30,top:point.y-24,bottom:point.y+24}));

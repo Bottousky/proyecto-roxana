@@ -55,21 +55,27 @@ export async function raiseRelief(world){
   const r=await fetch(reliefUrl);if(!r.ok)return;const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);
   const bytes=magic[0]===31&&magic[1]===139?await new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;
   heights=new Float32Array(bytes);
-  const {cols,rows,cell,x0,z0}=grid,positions=new Float32Array(cols*rows*3),normals=new Float32Array(cols*rows*3),indices=[];
+  const {cols,rows,cell,x0,z0}=grid;
   const at=(i,j)=>heights[Math.min(rows-1,Math.max(0,j))*cols+Math.min(cols-1,Math.max(0,i))];
-  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
-    const k=(j*cols+i)*3,h=at(i,j);positions[k]=x0+i*cell;positions[k+1]=h>.03?h:-.06;positions[k+2]=z0+j*cell;
-    const nx=at(i-1,j)-at(i+1,j),nz=at(i,j-1)-at(i,j+1),ny=2*cell,l=Math.hypot(nx,ny,nz);normals[k]=nx/l;normals[k+1]=ny/l;normals[k+2]=nz/l;
+  // In tiles (2026-10-19, rendimiento): one mesh of 272 000 triangles was drawn whole every frame,
+  // twice (picture and shadows), though most of it lay outside the camera. Each tile is culled alone.
+  const TILE=48,meshes=[];
+  for(let tj=0;tj<rows-1;tj+=TILE)for(let ti=0;ti<cols-1;ti+=TILE){
+    const i1=Math.min(cols-1,ti+TILE),j1=Math.min(rows-1,tj+TILE),w=i1-ti+1,h=j1-tj+1,positions=new Float32Array(w*h*3),normals=new Float32Array(w*h*3),indices=[];
+    for(let j=tj;j<=j1;j++)for(let i=ti;i<=i1;i++){
+      const k=((j-tj)*w+(i-ti))*3,hh=at(i,j);positions[k]=x0+i*cell;positions[k+1]=hh>.03?hh:-.06;positions[k+2]=z0+j*cell;
+      const nx=at(i-1,j)-at(i+1,j),nz=at(i,j-1)-at(i,j+1),ny=2*cell,l=Math.hypot(nx,ny,nz);normals[k]=nx/l;normals[k+1]=ny/l;normals[k+2]=nz/l;
+    }
+    for(let j=tj;j<j1;j++)for(let i=ti;i<i1;i++){
+      if(Math.max(at(i,j),at(i+1,j),at(i,j+1),at(i+1,j+1))<=.03)continue;
+      const a=(j-tj)*w+(i-ti),b=a+1,c=a+w,d=c+1;indices.push(a,c,b,b,c,d);
+    }
+    if(!indices.length)continue;
+    const mesh=new Mesh(world.app.graphicsDevice);mesh.setPositions(positions);mesh.setNormals(normals);mesh.setIndices(indices);mesh.update();meshes.push(mesh);
   }
-  for(let j=0;j<rows-1;j++)for(let i=0;i<cols-1;i++){
-    const a=j*cols+i,b=a+1,c=a+cols,d=c+1;
-    if(Math.max(heights[a],heights[b],heights[c],heights[d])<=.03)continue;
-    indices.push(a,c,b,b,c,d);
-  }
-  const mesh=new Mesh(world.app.graphicsDevice);mesh.setPositions(positions);mesh.setNormals(normals);mesh.setIndices(indices);mesh.update();
   const m=new StandardMaterial();m.name='relieve';m.diffuse=new Color(.95,.97,.92);m.useMetalness=true;m.metalness=0;m.gloss=.05;
   m.shaderChunksVersion='2.22';m.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',diffusePS);
   m.setParameter('uMeadow',await surface(world.app,'ground'));m.setParameter('uRock',await surface(world.app,'rock'));m.setParameter('uMoss',await surface(world.app,'moss'));m.setParameter('uLife[0]',new Float32Array(32));m.update();(world.grounds??=[]).push(m);
-  const e=new Entity('Colinas del reino'),mi=new MeshInstance(mesh,m);mi.castShadow=true;mi.receiveShadow=true;e.addComponent('render',{meshInstances:[mi]});
+  const e=new Entity('Colinas del reino');e.addComponent('render',{meshInstances:meshes.map(mesh=>{const mi=new MeshInstance(mesh,m);mi.castShadow=true;mi.receiveShadow=true;return mi;})});
   world.regions.get('landscape').root.addChild(e);
 }

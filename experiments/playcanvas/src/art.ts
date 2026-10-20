@@ -33,8 +33,8 @@ export async function surface(app:Application,name:string){
   // Pixel-art surfaces generated for HD-2D (art-src/hd2d → scripts/hd2d-textures.py).
   const pixelArt:Record<string,string>={cobble:'cobble',stone:'stone',wood:'wood',roof:'roof',ground:'meadow',burlap:'burlap',hay:'hay',iron:'iron',plaster:'plaster',awning:'awning',endgrain:'endgrain',flagstone:'flagstone',rock:'rock',moss:'moss',timber:'timber'};
   // In the X and Y look the same surfaces are filtered smooth: painted, not pixels.
-  if(pixelArt[name]){const file=pixelArt[name];return texture(app,name,await image(XY&&XY_SURFACES.has(file)?`/assets/xy/${file}.png`:`/assets/hd2d/${file}.png`),true,false,!XY);}
-  if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image(XY?'/assets/xy/trees.png':'/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}
+  if(pixelArt[name]){const file=pixelArt[name];return texture(app,name,await image(XY&&XY_SURFACES.has(file)?`/assets/xy/${file}.webp`:`/assets/hd2d/${file}.png`),true,false,!XY);}
+  if(name.startsWith('tree')){const i=Number(name.slice(4));return texture(app,name,crop(await image(XY?'/assets/xy/trees.webp':'/assets/trees.webp'),i%3,Math.floor(i/3),3,2,true));}
   if(name.startsWith('bank'))return texture(app,name,crop(await image('/assets/art-polish/waterside-plants.webp'),Number(name.slice(4)),0,3,1));
   if(name==='water'){const c=canvas(256,256),x=c.getContext('2d')!;x.fillStyle='#356e70';x.fillRect(0,0,256,256);for(let i=0;i<40;i++){const y=(i*61)%256,xx=(i*97)%256;x.strokeStyle=i%3?'#669b922a':'#b7c9a63a';x.lineWidth=1;x.beginPath();x.moveTo(xx,y);x.quadraticCurveTo(xx+9,y-2,xx+18,y);x.stroke();}return texture(app,name,c,true);}
   const urls:Record<string,string>={workshopRug:'workshop-rug.webp',kingdomBanner:'kingdom-banner.webp'};
@@ -60,8 +60,17 @@ function outlineFigures(ctx:CanvasRenderingContext2D,w:number,h:number,radius:nu
   for(let i=0;i<w*h;i++){if(!out[i]||p[i*4+3]>110)continue;const a=p[i*4+3]/255,k=1-a;p[i*4]=Math.round(p[i*4]*a+27*k);p[i*4+1]=Math.round(p[i*4+1]*a+19*k);p[i*4+2]=Math.round(p[i*4+2]*a+14*k);p[i*4+3]=235;}
   ctx.putImageData(d,0,0);
 }
+/** A sheet with the same frames and nothing on them: with people in 3D the drawn sheet is only a
+ * fallback, so it is neither downloaded nor cut out unless a model fails (2026-10-19, rendimiento). */
+let blankSheet:Sprite|null=null;
+export function blankActorArt(app:Application){
+  if(blankSheet)return blankSheet;
+  const c=canvas(4,4),atlas=new TextureAtlas();atlas.frames={};atlas.texture=texture(app,'actor-blank',c,false,true);
+  const keys=[];for(let i=0;i<24;i++){const key=String(i);keys.push(key);atlas.setFrame(key,{rect:new Vec4(0,0,4,4),pivot:new Vec2(.5,0),border:new Vec4(0,0,0,0)});}
+  return blankSheet=new Sprite(app.graphicsDevice,{atlas,pixelsPerUnit:256,frameKeys:keys});
+}
 export async function actorArt(app:Application,name:string){
-  const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':name==='player'&&DRAWN_PLAYER?'/assets/xy/player-dibujo.png':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
+  const ohm=name==='ohm',cols=ohm?6:5,rows=4,img=await image(ohm?'/assets/ohm.webp':name==='player'&&DRAWN_PLAYER?'/assets/xy/player-dibujo.webp':`/assets/actors/${name}.webp`),tiles:HTMLCanvasElement[]=[],bounds:ReturnType<typeof opaqueBounds>[]=[];
   for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){const tile=ohm?crop(img,c,r,cols,rows,true):cropFigure(img,c,r,cols,rows);tiles.push(tile);bounds.push(opaqueBounds(tile.getContext('2d')!.getImageData(0,0,tile.width,tile.height).data,tile.width,tile.height));}
   const sheet=canvas(cols*256,rows*256),ctx=sheet.getContext('2d')!,layout=actorFrameLayout(bounds);
   tiles.forEach((tile,i)=>{const b=bounds[i],p=ohm?{x:128-b.width/2,y:244-b.height,width:b.width,height:b.height}:layout.placements[i];ctx.drawImage(tile,b.x,b.y,b.width,b.height,(i%cols)*256+p.x,Math.floor(i/cols)*256+p.y,p.width,p.height);});

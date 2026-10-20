@@ -1,6 +1,6 @@
 import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
 import {XY,XY_LENS,XY_GRADES,XY_SKIES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,FIGURE_URL,FIGURES,chosenAppearance} from './style.js';
-import {surface,actorArt} from './art.ts';
+import {surface,actorArt,blankActorArt} from './art.ts';
 import {AREAS,WORLD_SYSTEMS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
 import {lakeShoreX,AREA_LAYOUTS,pointOnPaving} from './game/world-layout.js';
@@ -79,7 +79,7 @@ export class PlayCanvasWorld {
     this.app=new Application(canvas,{graphicsDeviceOptions:{alpha:false,antialias:true}});
     this.app.setCanvasFillMode(FILLMODE_FILL_WINDOW);this.app.setCanvasResolution(RESOLUTION_AUTO);
     this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:LENS.fov?PROJECTION_PERSPECTIVE:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:LENS.fov?600:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);this.buildFrame();
-    this.sun=new Entity('Sol de Ohmdal');this.sun.addComponent('light',{type:'directional',color:color('#ffe6bc'),intensity:1.6,castShadows:true,shadowResolution:2048,shadowDistance:100,normalOffsetBias:.04,shadowBias:.2});this.sun.setEulerAngles(50,-35,0);this.app.root.addChild(this.sun);
+    this.sun=new Entity('Sol de Ohmdal');this.sun.addComponent('light',{type:'directional',color:color('#ffe6bc'),intensity:1.6,castShadows:true,shadowResolution:2048,shadowDistance:70,normalOffsetBias:.04,shadowBias:.2});this.sun.setEulerAngles(50,-35,0);this.app.root.addChild(this.sun);
     this.app.scene.ambientLight=color('#8eaaad');this.resize();this.assetsReady=this.loadArtAssets();
     this.destroy=()=>this.dispose();addEventListener('beforeunload',this.destroy,{once:true});
   }
@@ -156,20 +156,25 @@ export class PlayCanvasWorld {
     // Open sea to the horizon north of the Faro: the authored planes stop 20 m past the islet.
     {const e=new Entity('Mar abierto'),m=makeWater(new StandardMaterial());bindShore(m,shore,true,1);e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(75,-.45,-540);e.setLocalScale(760,1,530);this.regions.get('landscape').root.addChild(e);this.waters.push(m);}
     await placeDressing(this);await raiseRelief(this);await sowFlora(this);await buildHomes(this,this.kit);
+    // People in 3D load by place (2026-10-19, rendimiento): the build only notes who lives where; the
+    // place the traveller is in loads under the first curtain and its neighbours in the background
+    // (ensureFigures). Until its model is there, a person waits unseen instead of as a flat drawing.
+    this.figureJobs=new Map();this.figuresByArea=new Map();
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
-      if(PEOPLE_3D&&FIGURES[object.character])await attachFigure(this.app,a,FIGURES[object.character].url,LENS.pitch||28.37,{size:FIGURES[object.character].size}).catch(e=>console.warn('figura',object.character,e));
+      if(PEOPLE_3D&&FIGURES[object.character]){a.entity.sprite.enabled=false;(this.figureJobs.get(id)??this.figureJobs.set(id,[]).get(id)).push({actor:a,character:object.character});}
     }
-    this.playerActor=await this.makeActor('player',0,0,'player');if(PEOPLE_3D)await attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37,{chosen:chosenAppearance()});this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
-    // Ohm in 3D, awake and asleep on its pedestal, once its model exists (a missing file keeps the sprite).
-    if(PEOPLE_3D)for(const a of [this.ohmActor])await attachFigure(this.app,a,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{});
+    this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
+    // The traveller and Ohm, together (a missing Ohm model keeps the sprite).
+    if(PEOPLE_3D)await Promise.all([attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37,{chosen:chosenAppearance()}),attachFigure(this.app,this.ohmActor,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{})]);
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
     this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();
   }
   async makeActor(name,x,z,area,object){
-    if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
-    const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:this.sprites.get(name),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-(LENS.pitch||28.37),0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
+    // In 3D only Ohm asleep on his pedestal is a drawing; the others' sheets wait in case a model fails.
+    const drawn=!PEOPLE_3D||name==='ohm';if(drawn&&!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
+    const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:drawn?this.sprites.get(name):blankActorArt(this.app),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-(LENS.pitch||28.37),0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
     return {name,area,entity:e,script,phase:this.allActors.length*.71,animation:idleActor(),g:{position:new Position(x,0,z),visible:true,userData:{interaction:object}}};
   }
   animateActor(a,dx,dz,dt,{paused=false,reducedMotion=false}={}){
@@ -186,6 +191,7 @@ export class PlayCanvasWorld {
   }
   localObstacles(id){const [ox,oz]=this.data.areas[id].offset;return [...this.data.areas[id].obstacles.filter(o=>!o.gate||!this.state.flags.gate).map(o=>({...o,x:o.x-ox,z:o.z-oz})),...propObstacles(id)];}
   loadArea(area,state,spawn,{continuous=false}={}){
+    if(this.prepared)this.preloadFigures(area.id); // people of the next places, while this one is walked
     const old=this.area?.id,preserve=continuous&&old&&isExterior(old)&&isExterior(area.id),global=preserve?toKingdom(old,this.getPlayerPosition()):null,companion=preserve?toKingdom(old,[this.ohm.position.x,this.ohm.position.z]):null;
     this.area=area;this.state=state;this.coreBounds=area.bounds;this.bounds=travelBounds(area.id);this.obstacles=this.localObstacles(area.id);this.actors=[this.playerActor,...this.regions.get(area.id).actors];
     if(preserve){let p=fromKingdom(area.id,global);const o=fromKingdom(area.id,companion);
@@ -222,8 +228,17 @@ export class PlayCanvasWorld {
     for(const [id,r] of this.regions)r.root.enabled=home?id===home:inside?id==='workshop':id!=='workshop'&&!id.startsWith('home:');
     for(const a of this.allActors){if(a.area!==this.area?.id){const ctx=this.context(a.area);ctx.actors=[a];if(!a.inhabitant)initializeInhabitants(ctx);}}
   }
+  /** The people of a place in 3D, loaded once (shared models), all at the same time. */
+  ensureFigures(id){
+    if(!PEOPLE_3D||!this.figureJobs)return Promise.resolve();
+    if(!this.figuresByArea.has(id))this.figuresByArea.set(id,Promise.all((this.figureJobs.get(id)||[]).map(({actor,character})=>attachFigure(this.app,actor,FIGURES[character].url,LENS.pitch||28.37,{size:FIGURES[character].size}).catch(async e=>{console.warn('figura',character,e);if(!this.sprites.has(character))this.sprites.set(character,await actorArt(this.app,character));actor.entity.sprite.sprite=this.sprites.get(character);actor.entity.sprite.enabled=true;}))));
+    return this.figuresByArea.get(id);
+  }
+  /** This place's people now, its neighbours' next (they are what the next crossing shows). */
+  preloadFigures(id){const here=this.ensureFigures(id);here.then(()=>{for(const e of AREAS[id]?.exits||[])if(e.target)this.ensureFigures(e.target);});return here;}
   async prepareJourney(progress=()=>{}){
     if(this.prepared)return;this.preparingJourney=true;
+    await this.preloadFigures(this.area?.id);
     const prior=this.area?.id,pose=this.camera.getPosition().clone(),savedRotation=this.camera.getRotation().clone();let n=0;
     // Warm each place under the first curtain; crossings never create assets.
     for(const id of Object.keys(AREAS)){for(const [name,r] of this.regions)r.root.enabled=id==='workshop'?name==='workshop':name!=='workshop';const [x,z]=this.data.areas[id].offset;this.camera.setPosition(x,28,z+50);this.camera.lookAt(x,1,z);await waitFrame();await waitFrame();progress(++n,9);}

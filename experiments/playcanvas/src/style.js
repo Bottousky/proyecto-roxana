@@ -1,18 +1,11 @@
 import {ShaderChunks,SHADERLANGUAGE_GLSL,StandardMaterial,Quat,Vec3,Texture,PIXELFORMAT_RGBA8,FILTER_NEAREST,ADDRESS_CLAMP_TO_EDGE} from 'playcanvas';
+import {STYLE,XY,PEOPLE,PEOPLE_3D,APPEARANCE,APPEARANCE_DEFAULT,savedAppearance,appearanceColours,chosenAppearance} from './style-config.js';
+export {STYLE,XY,PEOPLE_3D,APPEARANCE,APPEARANCE_DEFAULT,savedAppearance,appearanceColours,chosenAppearance};
 
 // Two looks for the same kingdom. «hd2d» is the original: pixel-art surfaces, a long lens and a
 // miniature blur. «xy» follows Pokémon X and Y as an upscaled emulator shows them: a closer camera,
 // smooth painted surfaces, soft two-tone (cel) light, ink outlines and a clean, saturated palette.
 // «xy» is the kingdom's look; ?estilo=hd2d brings back the original, remembered in this browser.
-const KEY='ohmdal.estilo';
-export const STYLE=(()=>{
-  const asked=new URLSearchParams(globalThis.location?.search||'').get('estilo');
-  try{if(asked==='xy'||asked==='hd2d')globalThis.localStorage?.setItem(KEY,asked);}catch{}
-  let kept=null;try{kept=globalThis.localStorage?.getItem(KEY);}catch{}
-  return (asked||kept)==='hd2d'?'hd2d':'xy';
-})();
-export const XY=STYLE==='xy';
-globalThis.document?.documentElement?.setAttribute('data-estilo',STYLE);
 
 // Cel light: the sun's Lambert term in two soft bands, lit and shade, with a narrow warm terminator.
 // The shade band keeps 38 % of the light so forms stay readable and never go black.
@@ -96,8 +89,6 @@ export const XY_SURFACES=new Set(['meadow','cobble','roof','stone','wood','plast
 // A chunky 3D figure (scripts/blender/chibi.py) replaces a sprite: it hangs from the sprite's entity,
 // undoing its tilt toward the camera, turns toward where it walks and swings legs and arms with the
 // walk phase the game already keeps. On in the X and Y look; ?gente=sprites brings back the sprites.
-const PEOPLE=new URLSearchParams(globalThis.location?.search||'').get('gente');
-export const PEOPLE_3D=XY&&PEOPLE!=='sprites'&&PEOPLE!=='dibujo';
 /** ?gente=dibujo: the traveller's sprite sheet redrawn in the X and Y style (option 2 of the prototype). */
 export const DRAWN_PLAYER=XY&&PEOPLE==='dibujo';
 const PARTS=['cadera','cuerpo','cabeza','pierna-izq','pierna-der','brazo-izq','brazo-der'];
@@ -110,8 +101,12 @@ export const FIGURE_URL=new URLSearchParams(globalThis.location?.search||'').get
 /** The people that already have a 3D figure (public/assets/xy), by sprite name. */
 // size: the figure's height relative to a person (Ohm is a small robot).
 export const FIGURES={edda:{url:'./assets/xy/edda-3d.glb'},lumen:{url:'./assets/xy/lumen-3d.glb',size:.92},marin:{url:'./assets/xy/marin-3d.glb'},vega:{url:'./assets/xy/vega-3d.glb'},nereo:{url:'./assets/xy/nereo-3d.glb',size:.95},tala:{url:'./assets/xy/tala-3d.glb',size:.9},yesca:{url:'./assets/xy/yesca-3d.glb'},consejera:{url:'./assets/xy/consejera-3d.glb'},ohm:{url:'./assets/xy/ohm-3d.glb',size:.42}};
+// One download and one parse per model and per region map, however many places a person appears in
+// (Edda is in six): every appearance instantiates the same container (2026-10-19, rendimiento).
+const containers=new Map(),regionMaps=new Map();
+const loadContainer=(app,url)=>{if(!containers.has(url))containers.set(url,new Promise((resolve,reject)=>app.assets.loadFromUrl(url,'container',(error,a)=>error?reject(error):resolve(a))));return containers.get(url);};
 export async function attachFigure(app,actor,url,pitch,{chosen,size=1}={}){
-  const asset=await new Promise((resolve,reject)=>app.assets.loadFromUrl(url,'container',(error,a)=>error?reject(error):resolve(a)));
+  const asset=await loadContainer(app,url);
   const model=asset.resource.instantiateRenderEntity();model.name='figura 3D';
   actor.entity.addChild(model);actor.entity.sprite.enabled=false;
   actor.figure={seed:Math.random(),cheer:-1,talking:false,model,pitch,parts:Object.fromEntries(PARTS.map(n=>[n,model.findByName(n)])),heading:0,time:0,tilt:new Quat(),turn:new Quat(),q:new Quat()};
@@ -129,7 +124,7 @@ export async function attachFigure(app,actor,url,pitch,{chosen,size=1}={}){
   }
   // Matte painted materials, like the world's: no glossy highlight washing the colours out.
   for(const r of model.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial))continue;m.useMetalness=true;m.metalness=0;m.metalnessMap=null;m.glossInvert=false;m.glossMap=null;m.gloss=.1;m.specularityFactor=0;m.ambient.set(.42,.42,.46);m.diffuse.set(.74,.72,.72);m.update();} // its texture already carries painted light: the sky's fill and full sun would wash it
-  if(actor.figure.bones)actor.figure.setAppearance=await applyAppearance(app,model,url.replace(/\.glb$/,'')+'-regiones.json',url.replace(/\.glb$/,'')+'-regiones.png',chosen??{});
+  if(actor.figure.bones)actor.figure.setAppearance=await applyAppearance(app,model,url.replace(/\.glb$/,'')+'-regiones.json',url.replace(/\.glb$/,'')+'-regiones.webp',chosen??{});
   celShade(app);updateFigure(actor,0,0,0);
 }
 export function updateFigure(actor,dx,dz,dt){
@@ -180,19 +175,6 @@ function skinnedPose(f,a){
 // The figure carries a region map (scripts/blender/regiones.py → viajero-3d.py): one value per region.
 // A tinted region keeps the painted light (each point's brightness relative to the region's own
 // sample colour) and takes the chosen colour. Palettes are chosen by hand so every mix looks right.
-export const APPEARANCE={
-  pelo:{castaño:'#6a4532',oscuro:'#2c221e',rubio:'#d2a95a',pelirrojo:'#a9492a',ceniza:'#a49d95',azul:'#3d5d9a'},
-  piel:{'1':'#f6d9c3','2':'#f0c7a6','3':'#d9a27c','4':'#b97a52','5':'#8c5536','6':'#5e3624'},
-  ropa:{'verde azulado':'#2f6f80',granate:'#7a2f36',bosque:'#3b6a3c',azul:'#2c4e8e',mostaza:'#b4862e',grafito:'#4c5058'},
-  bufanda:{mostaza:'#e5a63d',roja:'#c7413a',blanca:'#ece6da',verde:'#5e9b4f',violeta:'#7c58a8',celeste:'#6fb4d6'},
-};
-/** What the traveller looks like at first: the colours of the model as it was painted. */
-export const APPEARANCE_DEFAULT={pelo:'castaño',piel:'2',ropa:'verde azulado',bufanda:'mostaza'};
-/** The traveller's look, by name, kept in the Instituto Roxana's register beside the name. */
-export function savedAppearance(){try{const a=JSON.parse(globalThis.localStorage?.getItem('roxana.escuela.v1')||'null')?.apariencia;return a&&typeof a==='object'?Object.fromEntries(Object.keys(APPEARANCE).filter(k=>APPEARANCE[k][a[k]]).map(k=>[k,a[k]])):{};}catch{return {};}}
-/** Names to colours. The address can still ask for one (?pelo=rubio&piel=4&ropa=granate&bufanda=roja). */
-export function appearanceColours(names){return Object.fromEntries(Object.keys(APPEARANCE).map(k=>[k,APPEARANCE[k][names?.[k]]??null]).filter(([,v])=>v));}
-export function chosenAppearance(){const q=new URLSearchParams(globalThis.location?.search||'');return appearanceColours({...savedAppearance(),...Object.fromEntries(Object.keys(APPEARANCE).filter(k=>q.get(k)).map(k=>[k,q.get(k)]))});}
 const linear=hex=>{const c=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);return c.map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);};
 const tintPS=`
 uniform vec3 material_diffuse;
@@ -216,9 +198,12 @@ void getAlbedo() {
 }
 `;
 export async function applyAppearance(app,figureModel,regionsUrl,mapUrl,chosen=chosenAppearance()){
-  const info=await fetch(regionsUrl).then(r=>r.json()).catch(()=>null);if(!info)return;
-  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=mapUrl;});
-  const map=new Texture(app.graphicsDevice,{name:'regiones',width:img.width,height:img.height,format:PIXELFORMAT_RGBA8,mipmaps:false,minFilter:FILTER_NEAREST,magFilter:FILTER_NEAREST,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE,flipY:false});map.setSource(img);
+  if(!regionMaps.has(regionsUrl))regionMaps.set(regionsUrl,(async()=>{
+    const info=await fetch(regionsUrl).then(r=>r.json()).catch(()=>null);if(!info)return null;
+    const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=mapUrl;});
+    const map=new Texture(app.graphicsDevice,{name:'regiones',width:img.width,height:img.height,format:PIXELFORMAT_RGBA8,mipmaps:false,minFilter:FILTER_NEAREST,magFilter:FILTER_NEAREST,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE,flipY:false});map.setSource(img);
+    return {info,map};})());
+  const loaded=await regionMaps.get(regionsUrl);if(!loaded)return;const {info,map}=loaded;
   const base=new Float32Array(48),tint=new Float32Array(48),materials=[];
   info.regiones.forEach((r,i)=>base.set(linear(r.muestra),i*3));
   for(const r of figureModel.findComponents('render'))for(const mi of r.meshInstances){const m=mi.material;if(!(m instanceof StandardMaterial)||!m.diffuseMap)continue;

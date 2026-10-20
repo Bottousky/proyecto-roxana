@@ -42,5 +42,6 @@ for (const name of names) {
   await writeFile(resolve(out, `${name}.png`), Buffer.from(tile.split(',')[1], 'base64'));
   await writeFile(resolve(preview, `${name}-2x2.png`), Buffer.from(sheet.split(',')[1], 'base64'));
   console.log(`${name}: public/assets/xy/${name}.png`);
+  console.log('El juego carga WebP: correr python -I scripts/texturas-webp.py (Pillow).');
 }
 await browser.close();

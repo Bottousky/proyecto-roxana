@@ -1,0 +1,104 @@
+{
+ "site": "https://bottousky.github.io/proyecto-roxana/",
+ "at": "2026-10-20T01:28:55.186Z",
+ "escuela": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 3.01,
+  "byTypeMB": {
+   "Image": 1.5,
+   "Fetch": 0.71,
+   "Script": 0.65,
+   "Font": 0.14,
+   "Stylesheet": 0.01,
+   "Document": 0
+  },
+  "fcp": 980,
+  "lcp": 980,
+  "domContentLoaded": 1965,
+  "load": 2455,
+  "longTasksMs": 840,
+  "longTasks": 8,
+  "heapMB": 109.3,
+  "networkIdleMs": 11196,
+  "scriptMs": 729,
+  "errors": []
+ },
+ "escuelaRepetida": {
+  "requests": 21,
+  "fromCache": 2,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Font": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Fetch": 0
+  }
+ },
+ "titulo": {
+  "requests": 10,
+  "fromCache": 0,
+  "bytesMB": 1.06,
+  "byTypeMB": {
+   "Script": 0.72,
+   "Image": 0.23,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "fcp": 1256,
+  "lcp": 1256,
+  "domContentLoaded": 1226,
+  "load": 2117,
+  "longTasksMs": 0,
+  "longTasks": 0,
+  "heapMB": 9,
+  "titleReadyMs": 1248,
+  "networkIdleMs": 2624,
+  "scriptMs": 14,
+  "errors": []
+ },
+ "partidaNueva": {
+  "requests": 12,
+  "fromCache": 0,
+  "bytesMB": 14.1,
+  "byTypeMB": {
+   "Fetch": 8.61,
+   "Image": 5.49
+  },
+  "worldMs": 19057,
+  "heapMB": 90.2
+ },
+ "tituloRepetido": {
+  "requests": 10,
+  "fromCache": 1,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Script": 0,
+   "Stylesheet": 0,
+   "Font": 0,
+   "Image": 0
+  }
+ },
+ "mundo": [
+  {
+   "label": "quieto (Portal)",
+   "fps": 56.9,
+   "mainThreadMsPerFrame": 3.16,
+   "scriptMsPerFrame": 1.51,
+   "layoutsPerSec": 8.5,
+   "styleRecalcsPerSec": 64.9
+  },
+  {
+   "label": "caminando (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 3.47,
+   "scriptMsPerFrame": 3.06,
+   "layoutsPerSec": 22.1,
+   "styleRecalcsPerSec": 79.5
+  }
+ ],
+ "mundoErrores": []
+}

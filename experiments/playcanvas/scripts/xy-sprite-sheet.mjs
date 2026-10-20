@@ -1,4 +1,5 @@
-// Limpia una hoja de sprites del estilo X e Y (art-src/xy/viajero/hoja-sprites.png → public/assets/xy/player-dibujo.png):
+// Limpia una hoja de sprites del estilo X e Y (art-src/xy/viajero/hoja-sprites.png → public/assets/xy/player-dibujo.png;
+// el juego carga la versión WebP: después correr python -I scripts/texturas-webp.py):
 // quita el halo rojizo que dejó el fondo violeta de la hoja original (píxeles semitransparentes o
 // casi rojos puros en el borde) y lleva la hoja a la misma grilla 5×4 que usa actorArt.
 import { chromium } from 'playwright';

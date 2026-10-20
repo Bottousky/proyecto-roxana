@@ -26,6 +26,7 @@ for step in "$@"; do case $step in
     # Para el juego: textura en JPEG y sin capas de color por vértice (comprimir.py).
     caffeinate -dims blender -b -P "$ROOT/scripts/blender/comprimir.py" -- "$OUT/$NAME.glb" "$ROOT/public/assets/xy/$NAME-3d.glb" 2>&1 | grep -E "comprimido|Error|Traceback"
     cp "$OUT/$NAME-regiones.png" "$ROOT/public/assets/xy/$NAME-3d-regiones.png"
+    "${PYTHON_WEBP:-$HOME/code/ohmdal-3d/venv-triposg/bin/python}" -I "$ROOT/scripts/texturas-webp.py" "$ROOT/public/assets/xy/$NAME-3d-regiones.png"
     node -e "const c=require('$ROOT/personajes/$NAME.json');require('fs').writeFileSync('$ROOT/public/assets/xy/$NAME-3d-regiones.json',JSON.stringify({regiones:c.regiones.map(r=>({nombre:r.nombre,muestra:r.muestra,tenible:r.tenible||null}))},null,1))"
     mkdir -p "$ROOT/kits/$NAME"; cp "$OUT/kit/kit.json" "$ROOT/kits/$NAME/";;
   *) echo "paso desconocido: $step"; exit 1;;
