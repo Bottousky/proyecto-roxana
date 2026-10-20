@@ -1,0 +1,44 @@
+{
+ "regiones": [
+  {
+   "nombre": "piel",
+   "muestra": "#f1b07a",
+   "tenible": "piel"
+  },
+  {
+   "nombre": "pelo",
+   "muestra": "#f1e3cb",
+   "tenible": "pelo"
+  },
+  {
+   "nombre": "gorro",
+   "muestra": "#3f4c68",
+   "tenible": null
+  },
+  {
+   "nombre": "bufanda",
+   "muestra": "#eeaa45",
+   "tenible": "bufanda"
+  },
+  {
+   "nombre": "abrigo",
+   "muestra": "#f2d6a6",
+   "tenible": "ropa"
+  },
+  {
+   "nombre": "camisa",
+   "muestra": "#3d4a55",
+   "tenible": null
+  },
+  {
+   "nombre": "pantalon",
+   "muestra": "#2e3a46",
+   "tenible": null
+  },
+  {
+   "nombre": "cuero",
+   "muestra": "#704426",
+   "tenible": null
+  }
+ ]
+}
