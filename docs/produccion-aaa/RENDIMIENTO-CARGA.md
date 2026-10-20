@@ -23,6 +23,15 @@ una computadora escolar, las proporciones son las que importan.
 | Heap tras la primera sesión | 175 MB | **119 MB** |
 | Hilo principal por cuadro (M2, 60 fps) | 2,9–3,1 ms | 2,7–2,8 ms |
 
+## En producción (GitHub Pages, publicado el 2026-10-20 desde `859f8faf`)
+
+Mismo medidor contra el sitio publicado, antes (`antes-publicado.json`) y después (`9-publicado.json`):
+escuela 3,01 → 2,63 MB y LCP 0,98 → 0,59 s; título listo 1,25 → 0,77 s; «Cruzar el Portal» → mundo
+19,1 → 3,7 s tras unos segundos en el título (16,1 s con clic inmediato). En esa corrida el mundo
+«quieto» marcó 80 recálculos de estilo por segundo porque la medición cayó durante un diálogo que se
+escribía; contadas aparte en el sitio publicado, las escrituras al DOM en el mundo son menos de una
+por segundo.
+
 ## Qué se hizo (en orden, cada uno medido)
 
 1. **Personajes por lugar y compartidos** (`style.js`, `world.js`): cada modelo 3D y su mapa de
