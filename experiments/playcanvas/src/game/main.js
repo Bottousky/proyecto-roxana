@@ -122,8 +122,9 @@ function refreshTitle(){
   $('#save-description').textContent=loaded.state?describe(loaded.state):loaded.error||'Sin prisa. Sin combate. Con curiosidad.';
 }
 refreshTitle();
-// Once the title is on screen, the engine downloads in the background: crossing the Portal does not wait for it.
-{const prefetch=()=>loadWorld().catch(()=>{worldModule=null;});if('requestIdleCallback' in window)requestIdleCallback(prefetch,{timeout:1500});else setTimeout(prefetch,300);}
+// Once the title is on screen, the engine and the first place's files download in the background, all
+// at once: while the traveller reads the title and chooses a name, crossing the Portal stops waiting.
+{const prefetch=()=>loadWorld().then(m=>m.prefetchWorldAssets?.()).catch(()=>{worldModule=null;});if('requestIdleCallback' in window)requestIdleCallback(prefetch,{timeout:1500});else setTimeout(prefetch,300);}
 // Pruebas por tramos (ciclo 30, sólo en desarrollo): ?tramo=castle abre una partida guardada al llegar
 // a ese lugar (dev-tramos/, del recorrido automático), aparte de la del jugador. «Continuar» la abre.
 if(import.meta.env.DEV){const tramo=new URLSearchParams(location.search).get('tramo');if(tramo&&!loadState().state)fetch(`./dev-tramos/${tramo.replace(/[^a-z]/g,'')}.json`).then(r=>r.ok?r.text():null).then(text=>{if(!text)return;try{JSON.parse(text);localStorage.setItem(SAVE_KEY,text);}catch{} /* a missing file comes back as the page itself */refreshTitle();}).catch(()=>{});}

@@ -16,6 +16,18 @@ import {createCinematic,sampleCinematic,returningCinematic,gameplayCameraPose} f
 import {quietMountState} from './game/quiet-mount.js';
 import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
+import reliefUrl from './data/relief.bin.gz?url';
+import {sharedBytes,takeBytes} from './shared-fetch.js';
+/** What the world's build downloads before the first place shows (2026-10-19, rendimiento). The build
+ * asked for it one file after another (19,6 s on 4G); fetched all at once while the title is on screen,
+ * it is then read from the browser's cache. A file left out of this list only loses the head start. */
+export function prefetchWorldAssets(){
+  const at=p=>new URL(p,document.baseURI).href,surfaces=['stone','meadow','wood','roof','cobble','trees','timber','rock','moss','plants-a','plants-b','plaster','flagstone'];
+  const people=PEOPLE_3D?[FIGURE_URL,FIGURES.ohm.url].flatMap(u=>[u,u.replace(/\.glb$/,'-regiones.json'),u.replace(/\.glb$/,'-regiones.webp')]):[];
+  const urls=[sceneUrl,geometryUrl,reliefUrl,...(XY?surfaces.map(n=>`./assets/xy/${n}.webp`):[]),'./assets/art-polish/waterside-plants.webp','./assets/art-polish/kingdom-banner.webp','./assets/art-polish/workshop-rug.webp','./assets/shore-distance.png','./assets/ground-ao.png','./assets/props/kit.glb','./assets/ohm.webp',...people];
+  // The geometry first (the build waits on it before anything else), then the rest together.
+  Promise.all([sharedBytes(sceneUrl),sharedBytes(geometryUrl)]).catch(()=>{}).finally(()=>{sharedBytes(reliefUrl).catch(()=>{});for(const u of urls.slice(3))fetch(at(u)).then(r=>r.arrayBuffer()).catch(()=>{});});
+}
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
 import {makeGround,makeRock,updateClouds,loadGroundAo,updateGroundLife} from './ground.js';
@@ -119,7 +131,7 @@ export class PlayCanvasWorld {
     try{await this.build();celShade(this.app);this.booted=true;return {ok:true,missing:[]};}catch(error){console.error(error);return {ok:false,missing:[error.message]};}
   }
   async build(){
-    const [data,binary]=await Promise.all([fetch(sceneUrl).then(r=>{if(!r.ok)throw new Error('Falta el mundo');return r.json();}),fetch(geometryUrl).then(async r=>{if(!r.ok)throw new Error('Falta la geometría');const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
+    const [data,binary]=await Promise.all([takeBytes(sceneUrl).catch(()=>{throw new Error('Falta el mundo');}).then(b=>JSON.parse(new TextDecoder().decode(b))),takeBytes(geometryUrl).catch(()=>{throw new Error('Falta la geometría');}).then(async buffer=>{const magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
     for(const id of [...Object.keys(AREAS),'landscape']){const root=new Entity(id==='landscape'?'Ohmdal · geografía compartida':AREAS[id].name);this.app.root.addChild(root);this.regions.set(id,{root,actors:[]});}
     const needed=[...new Set(data.meshes.flatMap(m=>m.material.texture?[m.material.texture]:[]))];for(const name of needed)await surface(this.app,name);
     const owners=new Map(),shore=await loadShore(this.app),groundAo=await loadGroundAo(this.app);this.receivers=[];let count=0;

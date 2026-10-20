@@ -1,5 +1,6 @@
 import {Entity,Mesh,MeshInstance,StandardMaterial,Color,SHADERLANGUAGE_GLSL} from 'playcanvas';
 import reliefUrl from './data/relief.bin.gz?url';
+import {takeBytes} from './shared-fetch.js';
 import grid from './data/relief.json';
 import {surface} from './art.ts';
 
@@ -52,7 +53,7 @@ void getAlbedo(){
 }`;
 
 export async function raiseRelief(world){
-  const r=await fetch(reliefUrl);if(!r.ok)return;const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);
+  const buffer=await takeBytes(reliefUrl).catch(()=>null);if(!buffer)return;const magic=new Uint8Array(buffer,0,2);
   const bytes=magic[0]===31&&magic[1]===139?await new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;
   heights=new Float32Array(bytes);
   const {cols,rows,cell,x0,z0}=grid;

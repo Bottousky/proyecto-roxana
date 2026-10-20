@@ -1,5 +1,8 @@
 # Rendimiento · build de producción (5 oct 2026)
 
+> 2026-10-19: carga, descargas, DOM y triángulos medidos antes y después de optimizar, en
+> [RENDIMIENTO-CARGA.md](RENDIMIENTO-CARGA.md). Esta página conserva la medición del 5 de octubre.
+
 Medido con `scripts/perf.mjs` sobre la build de producción de `b9c9915`, compilada con
 `VITE_INSPECT=1` (`dist-perf/`): el mismo código minificado más el acceso de inspección de
 sólo lectura, que la build entregada (`dist/`) no incluye. Se abre una bitácora terminada y se

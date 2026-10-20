@@ -75,6 +75,18 @@ async function session({ net = true, cpu = 1 } = {}) {
   report.tituloRepetido = s.summary();
   await s.context.close();
 }
+// 2b. Quien cruza el Portal apenas ve el título, sin darle tiempo a la precarga.
+{
+  const s = await session(); const t0 = Date.now();
+  await s.page.goto(site + 'ohmdal.html', { waitUntil: 'domcontentloaded', timeout: 180000 });
+  await s.page.locator('#new-game').waitFor({ state: 'visible', timeout: 180000 }); await s.page.locator('#new-game').click();
+  for (let i = 0; i < 160 && !(await s.page.locator('#hud').isVisible().catch(() => false)); i++) {
+    if (await s.page.locator('#player-name').isVisible().catch(() => false)) { await s.page.locator('#player-name').fill('Medición'); await s.page.locator('#name-form button[type="submit"]').click(); }
+    await s.page.waitForTimeout(250);
+  }
+  report.partidaInmediata = { ...s.summary(), worldMs: Date.now() - t0 };
+  await s.context.close();
+}
 // 3. Uso en el mundo: la Plaza, de pie y caminando, sin red emulada.
 {
   const s = await session({ net: false });
