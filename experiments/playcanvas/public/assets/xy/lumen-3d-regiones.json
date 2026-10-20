@@ -1,0 +1,39 @@
+{
+ "regiones": [
+  {
+   "nombre": "piel",
+   "muestra": "#f2b07a",
+   "tenible": "piel"
+  },
+  {
+   "nombre": "pelo",
+   "muestra": "#f6ead0",
+   "tenible": "pelo"
+  },
+  {
+   "nombre": "anteojos",
+   "muestra": "#2f8a8a",
+   "tenible": null
+  },
+  {
+   "nombre": "camisa",
+   "muestra": "#7a2f44",
+   "tenible": "ropa"
+  },
+  {
+   "nombre": "delantal",
+   "muestra": "#a5612c",
+   "tenible": "ropa2"
+  },
+  {
+   "nombre": "pantalon",
+   "muestra": "#4a4038",
+   "tenible": null
+  },
+  {
+   "nombre": "botas",
+   "muestra": "#8a5124",
+   "tenible": null
+  }
+ ]
+}

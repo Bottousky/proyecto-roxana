@@ -1,0 +1,10 @@
+Saved `frente-apose.png` using the built-in image_gen tool.
+
+- Size: 1024 × 1536 pixels; 1,410,518 bytes.
+- Alpha: No.
+
+Exact prompt:
+
+```text
+Generate exactly ONE image: a single full-body character model sheet view of Ivara, the councillor of the castle. Use the supplied sprite sheet ONLY as the character reference, preserving the exact same outfit, colours and hairstyle; do not copy its sprite-sheet layout, pixel rendering, poses or background. Front view, facing the viewer exactly, standing straight in a relaxed A-pose with arms angled gently away from her torso, neutral friendly expression, centred, full body visible with margin above her braided bun and below her boots. Ivara is a dignified young woman with warm brown skin, black hair in an elaborate braided bun, small gold earrings, a deep purple cape with gold embroidered borders fastened at the neck, a cream blouse, a long navy-blue robe with gold trim, a brown leather book held at her side, and brown boots. Keep the book in her left hand, on the viewer's right, as in the front-view reference. Render like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise. Plain pure white background, no ground or cast shadow, no text, no labels, no watermark. One character, one front view only.
+```

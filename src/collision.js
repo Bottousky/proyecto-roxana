@@ -88,8 +88,21 @@ function stopAxisAtWall(position, target, axis, obstacles, radius) {
  * position explicitly instead of movement silently teleporting through a wall.
  */
 export function moveWithCollisions(start, delta, bounds, obstacles = [], options = {}) {
-  const position = [...start];
-  if (!finitePoint(delta) || !isPositionClear(position, bounds, obstacles, options)) return position;
+  let position = [...start];
+  if (!finitePoint(delta)) return position;
+  if (!isPositionClear(position, bounds, obstacles, options)) {
+    // A walker resting a few centimetres inside a clearance (against a railing, after a talk) steps out
+    // to the nearest clear point first, preferring the way it wants to go. Truly embedded: no move.
+    const touch = { ...options, radius: 0 };
+    if (!isPositionClear(position, bounds, obstacles, touch)) return position;
+    const len = Math.hypot(delta[0], delta[1]) || 1, want = [delta[0] / len, delta[1] / len];
+    const leads = [];
+    for (let r = .01; r <= .0801; r += .01) for (let i = 0; i < 16; i++) { const a = i * Math.PI / 8, d = [Math.cos(a), Math.sin(a)]; leads.push({ r, d, score: r - (d[0] * want[0] + d[1] * want[1]) * .03 }); }
+    leads.sort((a, b) => a.score - b.score);
+    const lead = leads.map(l => [start[0] + l.d[0] * l.r, start[1] + l.d[1] * l.r]).find(p => isPositionClear(p, bounds, obstacles, options) && isSegmentClear(start, p, bounds, obstacles, touch));
+    if (!lead) return position;
+    position = lead; start = lead;
+  }
   const { radius = .34, margin = .6, maxStep = .1 } = options;
   const halfX = bounds[0] / 2 - margin, halfZ = bounds[1] / 2 - margin;
   const goal = [Math.max(-halfX, Math.min(halfX, start[0] + delta[0])), Math.max(-halfZ, Math.min(halfZ, start[1] + delta[1]))];

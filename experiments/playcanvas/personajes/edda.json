@@ -1,0 +1,151 @@
+{
+ "nombre": "Edda",
+ "nota": "Pelo y bombachos comparten el rojizo; piel y camisa, el crema: se separan por altura. Las manos debajo de los brazaletes son piel. Detrás y por encima de la cintura, todo es capa.",
+ "suavizado": 12,
+ "regiones": [
+  {
+   "nombre": "piel",
+   "tenible": "piel",
+   "muestra": "#f1cfae",
+   "colores": [
+    "#edd0ab",
+    "#cb8150"
+   ],
+   "z": [
+    1.5,
+    1.86
+   ],
+   "forzar": [
+    {
+     "absx": [
+      0.33,
+      0.62
+     ],
+     "z": [
+      0.6,
+      0.95
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "pelo",
+   "tenible": "pelo",
+   "muestra": "#c8501f",
+   "colores": [
+    "#c44a22",
+    "#aa401e",
+    "#d76131",
+    "#893117",
+    "#64220f"
+   ],
+   "z": [
+    1.48,
+    2.0
+   ]
+  },
+  {
+   "nombre": "ojos",
+   "muestra": "#4c8a4a",
+   "colores": [
+    "#4f8a4a",
+    "#1e2a1e",
+    "#f4f4f4"
+   ],
+   "z": [
+    1.6,
+    1.76
+   ]
+  },
+  {
+   "nombre": "capa",
+   "tenible": "ropa",
+   "muestra": "#6f7a3a",
+   "colores": [
+    "#807d44",
+    "#5c5c33",
+    "#45452a",
+    "#6b6a3c"
+   ],
+   "z": [
+    0.95,
+    1.66
+   ],
+   "forzar": [
+    {
+     "y": [
+      0.05,
+      0.6
+     ],
+     "z": [
+      1.08,
+      1.55
+     ],
+     "absx": [
+      0,
+      0.42
+     ]
+    }
+   ]
+  },
+  {
+   "nombre": "camisa",
+   "tenible": "ropa2",
+   "muestra": "#f0e2c8",
+   "colores": [
+    "#edd0ab",
+    "#ad8863"
+   ],
+   "z": [
+    [
+     0.95,
+     1.52
+    ],
+    [
+     0.3,
+     0.52
+    ]
+   ]
+  },
+  {
+   "nombre": "bombachos",
+   "muestra": "#c0471f",
+   "colores": [
+    "#c44a22",
+    "#aa401e",
+    "#893117",
+    "#64220f"
+   ],
+   "z": [
+    0.45,
+    1.1
+   ]
+  },
+  {
+   "nombre": "cuero",
+   "muestra": "#7a4424",
+   "colores": [
+    "#8d4f28",
+    "#693a1e",
+    "#3f1e0d",
+    "#cb8150"
+   ],
+   "z": [
+    0.0,
+    1.6
+   ]
+  },
+  {
+   "nombre": "metal",
+   "muestra": "#d1a043",
+   "colores": [
+    "#d9a441",
+    "#b98a35"
+   ],
+   "z": [
+    0.9,
+    1.55
+   ]
+  }
+ ]
+}

@@ -1,0 +1,117 @@
+{
+ "site": "http://127.0.0.1:4192/proyecto-roxana/",
+ "at": "2026-10-20T01:33:45.981Z",
+ "escuela": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 3.55,
+  "byTypeMB": {
+   "Image": 1.5,
+   "Fetch": 1.25,
+   "Script": 0.64,
+   "Font": 0.14,
+   "Stylesheet": 0.01,
+   "Document": 0
+  },
+  "fcp": 244,
+  "lcp": 244,
+  "domContentLoaded": 906,
+  "load": 975,
+  "longTasksMs": 659,
+  "longTasks": 5,
+  "heapMB": 90.6,
+  "networkIdleMs": 7760,
+  "scriptMs": 657,
+  "errors": []
+ },
+ "escuelaRepetida": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Font": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Fetch": 0
+  }
+ },
+ "titulo": {
+  "requests": 10,
+  "fromCache": 0,
+  "bytesMB": 1.05,
+  "byTypeMB": {
+   "Script": 0.71,
+   "Image": 0.23,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "fcp": 844,
+  "lcp": 844,
+  "domContentLoaded": 819,
+  "load": 1143,
+  "longTasksMs": 0,
+  "longTasks": 0,
+  "heapMB": 9,
+  "titleReadyMs": 838,
+  "networkIdleMs": 1649,
+  "scriptMs": 11,
+  "errors": []
+ },
+ "partidaNueva": {
+  "requests": 16,
+  "fromCache": 0,
+  "bytesMB": 15.13,
+  "byTypeMB": {
+   "Fetch": 8.6,
+   "Image": 6.53
+  },
+  "worldMs": 15832,
+  "heapMB": 59.1
+ },
+ "partidaNuevaTotal": {
+  "requests": 52,
+  "fromCache": 0,
+  "bytesMB": 28.22,
+  "byTypeMB": {
+   "Image": 10.93,
+   "Fetch": 9.06,
+   "XHR": 8.23
+  },
+  "quietMs": 31804,
+  "heapMB": 210.8
+ },
+ "tituloRepetido": {
+  "requests": 10,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Stylesheet": 0,
+   "Script": 0,
+   "Image": 0,
+   "Font": 0
+  }
+ },
+ "mundo": [
+  {
+   "label": "quieto (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 3.05,
+   "scriptMsPerFrame": 2.74,
+   "layoutsPerSec": 4.1,
+   "styleRecalcsPerSec": 71.3
+  },
+  {
+   "label": "caminando (Portal)",
+   "fps": 60.1,
+   "mainThreadMsPerFrame": 3.24,
+   "scriptMsPerFrame": 2.9,
+   "layoutsPerSec": 15.4,
+   "styleRecalcsPerSec": 65.9
+  }
+ ],
+ "mundoErrores": []
+}

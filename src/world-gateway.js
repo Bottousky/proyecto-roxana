@@ -39,7 +39,10 @@ export function buildGateway(world,width,depth){
     for(const y of [1.25,3.1,4.9])world.sphere(x,y,.18,.075,world.m.brass,leaf);
   }
   for(const y of [1.25,3.1,4.9])box('portcullis-crossbar',0,y,.05,20.5,.14,.26,world.m.metal,leaf);
-  world.gateLeaf=leaf;world.gateObstacle={x:0,z,w:10.25,d:.3};world.obstacles.push(world.gateObstacle);
+  world.gateLeaf=leaf;world.gateObstacle={x:0,z,w:10.25,d:.3};
+  // While the gate is shut its lifting chains hang to the ground in front of it: they stop a
+  // walker too. Opened, the chains wind up above head height and the passage is free.
+  world.gateObstacles=[world.gateObstacle,...[-1,1].map(side=>({x:side*8.8,z:z+.9,w:.16,d:.16}))];world.obstacles.push(...world.gateObstacles);
 
   const drives=[],chains=[],weights=[],signals=[];
   world.beam([-9.65,8.35,.85],[9.65,8.35,.85],.16,world.m.metal,group);
@@ -52,7 +55,7 @@ export function buildGateway(world,width,depth){
     const light=world.sphere(side*7.1,5.75,1.03,.14,material,group);light.name='gate-current-indicator';signals.push(light);
     for(let i=0;i<3;i++)world.torus(side*7.1,5.36+i*.12,1.03,.18,.035,world.m.cream,[Math.PI/2,0,0],group);
   }
-  const controller={group,leaf,progress:world.state.flags?.gate?1:0,drives,weights,
+  const controller={group,leaf,progress:world.state.flags?.gate?1:0,drives,weights,chains,
     setPose(progress,powered=false,overloaded=false){
       this.progress=THREE.MathUtils.clamp(progress,0,1);leaf.position.y=this.progress*5.8;
       for(const {mesh,side} of drives)mesh.rotation.z=side*this.progress*Math.PI*2.3;

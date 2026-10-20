@@ -1,0 +1,5 @@
+Saved `xy-wood.png` — 1024×1024 pixels, 925,450 bytes. Generated with the built-in image tool.
+
+Exact prompt:
+
+> Generate exactly one square 1024x1024 image. Front view seamless vertical wooden planks, warm medium brown, soft simple grain lines and a couple of small knots, clean. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain noise, no lighting gradient, no shadows cast across it, flat even light). The texture fills the entire image edge to edge, with no border or perspective. It must tile seamlessly on all four edges: left and right edges match, top and bottom edges match, with continuous plank seams and wood-grain lines across the wrap. No text or watermark.

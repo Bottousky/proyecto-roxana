@@ -12,6 +12,8 @@ const round=n=>Math.round(n*10000)/10000;
 const PAVING=new Set(['authored-connected-paving','continuous-road','road-threshold']);
 // The converter and the playable snapshot share exactly the same river course.
 sourceWatercourse.splice(0,sourceWatercourse.length,...WATERCOURSE.map(p=>[...p]));
+// Doors that lead somewhere: every authored building keeps its entrance (local coordinates).
+function entrancesOf(world){const doors=[];world.root.traverse(o=>{const a=o.userData?.architecture;if(a?.id&&a.entrance)doors.push({id:a.id,label:a.label,x:round(a.entrance.x),z:round(a.entrance.z),approach:[round(a.entrance.approach.x),round(a.entrance.approach.z)],direction:a.entrance.direction.map(round),width:round(a.dimensions.width),depth:round(a.dimensions.depth)});});return doors;}
 function capture(world,id,offset=[0,0],landscape=false){
   const mapNames=new Map(Object.entries(world.textures).map(([name,texture])=>[texture,name]));
   world.treeTextures.forEach((t,i)=>mapNames.set(t,'tree'+i));
@@ -28,6 +30,8 @@ function capture(world,id,offset=[0,0],landscape=false){
     tag(a.obj,{kind:a.kind,speed:a.speed||.2,flag:a.activationFlag,receiver:a.receiverId,spinAxis:axis.toArray().map(round)});
   }
   tag(world.gateLeaf,{kind:'gate'});
+  // The gate's lifting gear answers with the leaf: chains wind up, counterweights drop, drives turn.
+  if(world.gateway){for(const c of world.gateway.chains)tag(c,{kind:'gate-chain'});for(const w of world.gateway.weights)tag(w,{kind:'gate-weight'});for(const {mesh,side} of world.gateway.drives)tag(mesh,{kind:'gate-drive',side,spinAxis:[0,0,1]});}
   for(const l of world.levers||[])tag(l.pivot,{kind:'lever',flag:l.obj.action?.flag||l.obj.flag,axis:l.waterHandle?'z':'x'});
   for(const l of world.levers||[])tag(l.indicator,{kind:'control',object:l.obj.id});
   world.root.traverse(o=>{if(o.isMesh){const wire=world.conductors?.find(w=>w.mat===o.material);if(wire)tag(o,{kind:'conductor',object:wire.obj.id,return:wire.isReturn});}});
@@ -35,7 +39,11 @@ function capture(world,id,offset=[0,0],landscape=false){
   for(const mesh of [...(world.fountainWater||[]),...(world.fountainStreams||[])])tag(mesh,{kind:'visible',flag:'pump'});
   for(const mesh of world.irrigationWater||[])tag(mesh,{kind:'visible',flag:'irrigation'});
   if(world.springWaterworks)for(const key of ['flume','basin','fall'])tag(world.springWaterworks[key],{kind:'visible',flag:'spring_sluice',or:'pump'});
+  // The Casa de Compuertas answers the kingdom (src/quiet-mount.js): canal water, the weeping gate,
+  // the reservoir's level and the lamp. The runtime reads the state; here we only mark the pieces.
+  if(world.quietMount){const q=world.quietMount;tag(q.tailraceWater,{kind:'visible',flag:'spring_sluice',or:'pump'});tag(q.weep,{kind:'visible',flag:'pump'});tag(q.reservoirHigh,{kind:'quiet-mount',part:'reservoir-high'});tag(q.reservoirLow,{kind:'quiet-mount',part:'reservoir-low'});tag(q.lamp,{kind:'quiet-mount',part:'lamp'});}
   for(const lamp of world.lamps||[]){const p=lamp.bulb.getWorldPosition(new T.Vector3());output.lights.push({area:id,position:[p.x+offset[0],p.y,p.z+offset[1]]});}
+  for(const h of world.hangingLamps||[])output.lights.push({area:id,position:[h.x+offset[0],h.y,h.z+offset[1]],hanging:true});
   const captureMesh=(object,override=null,group=null)=>{
     if(!object.isMesh)return;
     if(!override&&Array.isArray(object.material)){for(const g of object.geometry.groups)captureMesh(object,object.material[g.materialIndex],g);return;}
@@ -59,8 +67,10 @@ function capture(world,id,offset=[0,0],landscape=false){
     // Seen from above, a cone range 50 m behind the Faro reads as rocks floating over the islet.
     if(object.name==='kingdom-distant-mountain')return;
     if(PAVING.has(object.name))descriptor.paving=true;
+    // The woodland loop is beaten earth: the ground shader wears it into the meadow (bake-shore).
+    if(object.name==='woodland-loop')descriptor.trail=true;
     if(object.name==='terrace-crop')descriptor.crop=true;
-    if(['field-rock','upland-outcrop'].includes(object.name))descriptor.rock=true;
+    if(['field-rock','upland-outcrop','quiet-mount-rock'].includes(object.name))descriptor.rock=true;
     if(['window-pane','workshop-window-glass'].includes(object.name))descriptor.pane=true;
     const batchKey=id+owner+(dynamic?.id||'')+JSON.stringify(descriptor);let batch=batches.get(batchKey);
     if(!batch){batch={area:id,owner,dynamic,material:descriptor,positions:[],normals:[],uvs:[],colors:[],indices:[]};batches.set(batchKey,batch);}
@@ -103,7 +113,7 @@ for(const id of Object.keys(AREAS)){
   w.bankTextures=Array.from({length:3},()=>new T.Texture());w.treeTextures=Array.from({length:6},()=>new T.Texture());
   w.loadArea(AREAS[id],w.state,AREAS[id].spawn,{continuous:id!=='workshop',deferRender:true});
   const offset=id==='workshop'?[0,0]:[KINGDOM[id].x,KINGDOM[id].z];
-  output.areas[id]={offset,bounds:AREAS[id].bounds,spawn:AREAS[id].spawn,walkSurfaces:w.walkSurfaces||[],obstacles:w.obstacles.map(o=>({...o,gate:o===w.gateObstacle,x:o.x+offset[0],z:o.z+offset[1]}))};
+  output.areas[id]={offset,bounds:AREAS[id].bounds,spawn:AREAS[id].spawn,walkSurfaces:w.walkSurfaces||[],entrances:entrancesOf(w),obstacles:w.obstacles.map(o=>({...o,gate:(w.gateObstacles||[w.gateObstacle]).includes(o),x:o.x+offset[0],z:o.z+offset[1]}))};
   capture(w,id,offset);
   if(id==='plaza'){
     const original=w.root;w.root=new T.Group();w.localGeometries=[];w.waterMaterials=[];buildKingdomLandscape(w);capture(w,'landscape',[0,0],true);w.root=original;

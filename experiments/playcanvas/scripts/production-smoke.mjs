@@ -1,9 +1,10 @@
 import {chromium} from 'playwright';
+import { chromePath, gpuArgs } from './chrome.mjs';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 
 const out='output/production';fs.mkdirSync(out,{recursive:true});
-const browser=await chromium.launch({headless:true,executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe'});
+const browser=await chromium.launch({headless:true,executablePath:chromePath});
 const page=await browser.newPage({viewport:{width:1440,height:900}}),errors=[];
 page.on('pageerror',e=>errors.push(e.message));
 page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
@@ -18,6 +19,8 @@ try {
  for(const area of ['lake','plaza']){
   await page.locator('#map-button').click();
   await page.screenshot({path:`${out}/map-${area}.png`});
+  // Travel destinations live in a fold of the map: open it, as a player would.
+  const fold=page.locator('details:has(.map-destination) > summary').first();if(await fold.count()&&!(await fold.evaluate(e=>e.parentElement.open)))await fold.click();
   await page.locator(`.map-destination[data-area="${area}"]`).click();
   await page.locator('#transition').waitFor({state:'hidden',timeout:90000});await page.waitForTimeout(1300);
   await page.keyboard.down('ArrowDown');await page.waitForTimeout(350);await page.keyboard.up('ArrowDown');

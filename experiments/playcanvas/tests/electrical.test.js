@@ -9,7 +9,7 @@ import { solveDC, measureVoltage, measureResistance, checkOperatingRange } from 
 // definitions and validators directly without requiring a DOM or bundler in CI.
 const puzzleSource = (await readFile(new URL('../src/game/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
-  .replace(/'\.\/(electrical|puzzle-model|bench-evidence)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/game/${name}.js`)).href));
+  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|bench-diagnosis|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/game/${name}.js`)).href));
 const { initialPuzzleSnapshot, evaluatePuzzle, normalizePuzzleSnapshot, PuzzleWorkbench, PUZZLES, BENCH_GUIDANCE, observePuzzle } = await import(`data:text/javascript;base64,${Buffer.from(puzzleSource).toString('base64')}`);
 const almost = (actual, expected, tolerance = 1e-7) => assert.ok(Math.abs(actual - expected) < tolerance, `${actual} ≈ ${expected}`);
 const source = voltage => ({ id: 'battery', positive: '+', negative: '-', voltage });
@@ -73,17 +73,20 @@ test('a source short trips protection and removes supply current before operatin
   assert.equal(r.solved, false);
 });
 
-const solutions = {
-  awaken(s) { s.wires.push(['heartOut', 'negative']); },
-  workshop(s) { s.wires.push(['spliceA', 'spliceB']); },
-  gate(s) { s.wires = [['positive','trimA'], ['trimB','latchIn'], ['latchOut','negative']]; },
-  pump(s) { s.wires.push(['lineA','lineB']); },
-  distribution(s) { s.switches.archive = false; s.wires = [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative'], ['positive','archiveIn'], ['archiveOut','negative']]; },
-  irrigation(s) { s.values.warmth = 12; s.values.flow = 12; s.values.forge = 8; },
-  beacon_supply(s) { s.values.ballast = 3; },
-  beacon_network(s) { s.wires = [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']]; },
-  beacon_lens(s) { s.wires = [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']]; s.values.upper = 12; },
-};
+// Each bench's canonical repair lives with the puzzle itself.
+// Installations to repair; an optional tray of stones is weighed, not repaired (its own test below).
+// Minijuegos that ask to look (Tala's readings) are done by what was seen, not by a repair.
+const solutions = Object.fromEntries(Object.keys(PUZZLES).filter(id => !PUZZLES[id].optional && !PUZZLES[id].readings).map(id => [id, s => PUZZLES[id].solve(s)]));
+
+test("Lumen's drawer is done by weighing three stones and the riddle one, with the bench off", () => {
+  const s = initialPuzzleSnapshot('drawer');
+  assert.equal(evaluatePuzzle('drawer', s).solved, false);
+  assert.equal(evaluatePuzzle('drawer', { ...s, weighed: [10, 12, 22] }).solved, false, 'three stones are not the riddle');
+  assert.equal(evaluatePuzzle('drawer', { ...s, weighed: [10, 220] }).solved, false, 'the riddle alone is not three stones');
+  PUZZLES.drawer.solve(s);
+  assert.equal(evaluatePuzzle('drawer', { ...s, sourceOn: false }).solved, true, 'stones are weighed with the bench off');
+  assert.deepEqual(normalizePuzzleSnapshot('drawer', { ...s, weighed: [10, 10, 33, 'x', 220] }).weighed, [10, 220], 'only stones the tray has, once each');
+});
 
 for (const [id, solve] of Object.entries(solutions)) {
   test(`${id}: initial fault is meaningful and a physical repair reaches operating ranges`, () => {
@@ -100,13 +103,15 @@ for (const [id, solve] of Object.entries(solutions)) {
 }
 
 test('solutions are operating ranges, not memorized control combinations', () => {
-  for (const resistance of [10, 12, 14]) {
+  // Terraces: two agreements (a strong or a gentle forge), each with either warm-bed notch.
+  for (const [warmth, forge] of [[12, 6], [18, 6], [12, 12], [18, 12]]) {
     const s = initialPuzzleSnapshot('irrigation');
-    s.values.warmth = resistance; s.values.flow = 12; s.values.forge = 8;
+    s.values.warmth = warmth; s.values.flow = 12; s.values.forge = forge;
     assert.equal(evaluatePuzzle('irrigation', s).solved, true);
   }
-  for (const resistance of [2, 3]) {
-    const s = initialPuzzleSnapshot('beacon_supply'); s.values.ballast = resistance;
+  // Lighthouse supply: with both lines sharing the load, two regulator notches hold the core.
+  for (const ballast of [1, 2]) {
+    const s = initialPuzzleSnapshot('beacon_supply'); PUZZLES.beacon_supply.solve(s); s.values.ballast = ballast;
     assert.equal(evaluatePuzzle('beacon_supply', s).solved, true);
   }
 });
@@ -125,7 +130,7 @@ test('restoring snapshots rejects nonexistent terminals and clamps corrupted set
   s.values.warmth = 999; s.values.flow = -10; s.wires.push(['missing','positive']); s.wires.push([...s.wires[0]].reverse());
   s.meter = { mode: 'teleport', a: 'missing', b: 'positive' };
   const repaired = normalizePuzzleSnapshot('irrigation', s);
-  assert.equal(repaired.values.warmth, 36); assert.equal(repaired.values.flow, 0);
+  assert.equal(repaired.values.warmth, 24); assert.equal(repaired.values.flow, 0);
   assert.equal(repaired.wires.length, 9); assert.equal(repaired.meter.mode, 'voltage'); assert.equal(repaired.meter.a, null);
 });
 
@@ -134,11 +139,11 @@ test('saved completed state never bypasses electrical validation', () => {
   assert.equal(evaluatePuzzle('beacon_lens', s).solved, false);
 });
 
-test('commissioning only commits a currently operating network and never repeats a solved callback', () => {
+test('a working bench goes into service once, by its button or by leaving; a broken one never does', () => {
   const originalDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try {
-    for (const condition of ['working', 'broken-after-working', 'already-commissioned', 'replace-open-panel']) {
+    for (const condition of ['commission-button', 'leave-working', 'broken-after-working', 'already-commissioned', 'replace-open-panel']) {
       const state = initialPuzzleSnapshot('awaken');
       solutions.awaken(state);
       const events = [];
@@ -151,13 +156,14 @@ test('commissioning only commits a currently operating network and never repeats
       assert.equal(events.length, 0, 'stable readings alone must not commission');
       if (condition === 'broken-after-working') state.wires.pop();
       if (condition === 'already-commissioned') state.completed = true;
-      // Leaving never commissions; only the explicit decision does.
-      if (condition === 'working') { bench.close(true); assert.equal(state.completed, false, 'leaving must not put the installation into service'); events.length = 0; bench.active = true; bench.shell = { remove() {} }; }
-      bench.close(condition !== 'replace-open-panel', { commission: true });
-      assert.deepEqual(events, condition === 'working' ? ['solve', 'save', 'close'] : condition === 'replace-open-panel' ? [] : ['close']);
-      if (condition === 'working') assert.equal(state.completed, true);
+      if (condition === 'commission-button') bench.close(true, { commission: true });
+      else if (condition === 'replace-open-panel') bench.close(false);
+      else bench.close();
+      const working = ['commission-button', 'leave-working'].includes(condition);
+      assert.deepEqual(events, working ? ['solve', 'save', 'close'] : condition === 'replace-open-panel' ? [] : ['close'], condition);
+      assert.equal(state.completed, working || condition === 'already-commissioned', condition);
       bench.close();
-      assert.equal(events.filter(e => e === 'solve').length, condition === 'working' ? 1 : 0);
+      assert.equal(events.filter(e => e === 'solve').length, working ? 1 : 0);
     }
   } finally { globalThis.document = originalDocument; }
 });
@@ -183,8 +189,8 @@ test('observations describe real operation for alternative valid repairs and dis
   const supply = initialPuzzleSnapshot('beacon_supply');
   supply.values.ballast = 0;
   assert.ok(observePuzzle('beacon_supply', supply).some(o => /cobre.*calentando/.test(o.text)));
-  supply.values.ballast = 3;
-  assert.ok(observePuzzle('beacon_supply', supply).every(o => !/calentando/.test(o.text)));
+  PUZZLES.beacon_supply.solve(supply);
+  assert.ok(observePuzzle('beacon_supply', supply).every(o => !/calentando/.test(o.text)), 'two lines share the load and neither overheats');
 });
 
 test('a novice can observe a safe failure without receiving an unexplained numeric diagnosis', () => {
@@ -200,7 +206,7 @@ test('a novice can observe a safe failure without receiving an unexplained numer
 test('plain continuity reads the actual connected network and numbers are explicitly optional', () => {
   const state = initialPuzzleSnapshot('workshop');
   state.sourceOn = false;
-  state.meter = { mode: 'continuity', a: 'spliceA', b: 'spliceB', branch: null };
+  state.meter = { mode: 'continuity', a: 's2a', b: 's2b', branch: null };
   const bench = Object.assign(Object.create(PuzzleWorkbench.prototype), { id: 'workshop', puzzle: PUZZLES.workshop, state, result: evaluatePuzzle('workshop', state), mode: 'continuity', showNumbers: false });
   assert.equal(bench.presentedReading().value, 'Sin camino');
   solutions.workshop(state);
@@ -221,8 +227,17 @@ test('comparison requires two valid points and preserves polarity without mandat
   state.meter.a = 'latchIn';
   assert.equal(bench.presentedReading().value, 'Una punta más');
   state.meter.b = 'latchOut';
-  assert.equal(bench.presentedReading().value, 'Al revés');
+  assert.match(bench.presentedReading().value, /^Al revés · /, 'polarity first, then how much of the source');
   bench.showNumbers = true;
   assert.ok(bench.presentedReading().value.startsWith('-'));
   assert.equal(bench.presentedReading().unit, 'V');
+});
+
+test('an installation put in service before its bench was redesigned stays in service', () => {
+  const old = { ...initialPuzzleSnapshot('workshop'), wires: [['positive', 'spliceA'], ['spliceA', 'spliceB'], ['spliceB', 'lampIn'], ['lampOut', 'negative']], completed: true };
+  const restored = normalizePuzzleSnapshot('workshop', old);
+  assert.equal(restored.completed, true);
+  assert.equal(evaluatePuzzle('workshop', restored).commissionable, true);
+  const unfinished = normalizePuzzleSnapshot('workshop', { ...old, completed: false });
+  assert.equal(unfinished.completed, false, 'an unfinished old bench simply starts over');
 });

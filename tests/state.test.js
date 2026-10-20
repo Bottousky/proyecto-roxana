@@ -8,5 +8,13 @@ test('unavailable storage returns a recoverable result',()=>{const db={getItem:(
 test('malformed imported destinations and settings cannot break map, audio or reading',()=>{
   const s=freshState();s.visited=['portal','unknown','plaza','plaza'];s.settings={volume:'loud',muted:'false',quality:'ultra',textSpeed:-1};
   const loaded=validateState(s);assert.deepEqual(loaded.visited,['portal','plaza']);assert.deepEqual(loaded.settings,freshState().settings);
-  const db=storage();db.setItem(SETTINGS_KEY,JSON.stringify({volume:8,textSpeed:0,reducedMotion:[] }));const prefs=loadSettings(db);assert.equal(prefs.volume,1);assert.equal(prefs.textSpeed,36);assert.equal(prefs.reducedMotion,false);
+  const db=storage();db.setItem(SETTINGS_KEY,JSON.stringify({volume:8,textSpeed:0,reducedMotion:[] }));const prefs=loadSettings(db);assert.equal(prefs.volume,1);assert.equal(prefs.textSpeed,60);assert.equal(prefs.reducedMotion,false);
+});
+
+test('walking with a click is on by default; only a choice made in the options turns it off (ciclo 30)',()=>{
+  const db=storage();
+  db.setItem(SETTINGS_KEY,JSON.stringify({clickToWalk:false,textSpeed:36}));let prefs=loadSettings(db);
+  assert.equal(prefs.clickToWalk,true,'the old default (off) is not a choice');assert.equal(prefs.textSpeed,60,'the old default pace gives way to the new one');
+  db.setItem(SETTINGS_KEY,JSON.stringify({clickToWalk:false,clickWalkChosen:true,textSpeed:9999}));prefs=loadSettings(db);
+  assert.equal(prefs.clickToWalk,false,'turned off in the options, it stays off');assert.equal(prefs.textSpeed,9999);
 });

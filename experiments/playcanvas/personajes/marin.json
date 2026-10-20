@@ -1,0 +1,16 @@
+{
+  "nombre": "Marín",
+  "nota": "Panadero robusto. Camisa y delantal comparten el crema: el delantal es el frente, debajo de la cintura.",
+  "esqueleto": { "axila": 1.22, "entrepierna": 0.55, "rodilla": 0.32 },
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#f4b37e", "colores": ["#f7b57d", "#d18451"], "z": [0.75, 1.84] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#7a4421", "colores": ["#713f1f", "#925429", "#4e2b15"], "z": [1.42, 2.0] },
+    { "nombre": "camisa", "tenible": "ropa2", "muestra": "#f8ead0", "colores": ["#fceac4", "#f3d9af"], "z": [1.0, 1.58] },
+    { "nombre": "chaleco", "tenible": "ropa", "muestra": "#d2882e", "colores": ["#d6882c", "#b16b24"], "z": [1.08, 1.56] },
+    { "nombre": "delantal", "muestra": "#f6e7c9", "colores": ["#fceac4", "#f3d9af", "#e5c292", "#b49470"], "z": [0.55, 1.2],
+      "forzar": [{ "absx": [0, 0.3], "y": [-0.7, 0.02], "z": [0.58, 1.12] }] },
+    { "nombre": "pantalon", "muestra": "#5a4a2e", "colores": ["#453823", "#6f5938"], "z": [0.25, 0.8] },
+    { "nombre": "cuero", "muestra": "#7a4421", "colores": ["#713f1f", "#925429", "#4e2b15", "#1c130d"], "z": [0.0, 1.25] }
+  ]
+}

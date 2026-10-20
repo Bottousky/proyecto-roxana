@@ -1,0 +1,22 @@
+{
+ "personaje": "Ohm",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "franja",
+   "caras": 475374,
+   "archivo": "pieza-franja.stl"
+  },
+  {
+   "pieza": "bronce",
+   "caras": 1794814,
+   "archivo": "pieza-bronce.stl"
+  },
+  {
+   "pieza": "ojo",
+   "caras": 175444,
+   "archivo": "pieza-ojo.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

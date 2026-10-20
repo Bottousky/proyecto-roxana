@@ -1,0 +1,16 @@
+Saved `frente-apose.png` using the built-in image_gen tool.
+
+- Size: 1024 × 1536 pixels; 1,232,382 bytes.
+- Alpha: No.
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image: a single full-body character model sheet view of Tala. Use the attached sprite sheet only as the character reference, preserving the exact same outfit, colours and hairstyle; do not reproduce its layout, poses, background or rendering style.
+
+Front view, facing the viewer exactly, standing straight in a relaxed A-pose with arms slightly away from her body, neutral friendly expression, centred, full body visible with margin above the hair and below the boots. Plain pure white background, no shadow, no text.
+
+Tala is a lively village girl of about 12: long wavy dark-brown hair loosely tied back, brown eyes, a mustard-yellow tunic, a dark teal vest with brass buttons, a small brown satchel and belt pouches, dark teal trousers tucked into brown boots. Keep the exact outfit, colours, hairstyle and accessory design from the reference.
+
+Render her like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise. Single character, single front view only.
+```

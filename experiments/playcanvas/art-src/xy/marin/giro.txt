@@ -1,0 +1,11 @@
+Saved `giro.png` — 1536×1024 pixels, 1,562,286 bytes, no alpha. Generated using the built-in image_gen tool.
+
+Exact prompt used:
+
+```text
+Generate exactly ONE image: a character turnaround sheet in one wide 1536x1024 image. Use the attached sprite sheet only as a character reference, not as a style, pose, layout, or background reference. Show the same character three times side by side at exactly the same size and height: left, straight front view; middle, strict right side profile view facing right; right, straight back view. All three figures stand straight in the same relaxed A-pose, with arms slightly away from the body, feet planted and no walking motion. Align the tops of their heads and the soles of their boots. Show all figures fully from hair to boots with comfortable margins and even spacing. Neutral friendly expression with a warm smile. Loose cloth hangs naturally and close to the body. Plain pure white opaque background, no shadows, no text, no labels.
+
+The character is Marin, the plump friendly baker of the village: curly brown shoulder-length hair, a short beard and moustache, a warm smile, a cream shirt with rolled sleeves, a mustard-ochre vest with buttons, a long cream baker's apron with a few flour stains, a small leather pouch at the belt, olive trousers, brown boots. Keep the exact same outfit, colours and hairstyle as the attached sprite sheet, consistently across all three views, including the apron ties visible from behind.
+
+Render like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise. No cast shadows or ground shadows. Exactly three views of one identical character in a single image.
+```

@@ -4,11 +4,12 @@ import { readFile } from 'node:fs/promises';
 import { pathToFileURL } from 'node:url';
 import { resolve } from 'node:path';
 import { appendBenchEvidence, getBenchEvidence, normalizeBenchEvidence } from '../src/bench-evidence.js';
-import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle } from '../src/puzzle-model.js';
+import { PUZZLES, initialPuzzleSnapshot, normalizePuzzleSnapshot, evaluatePuzzle, isSealed } from '../src/puzzle-model.js';
+import { ESTIMATES } from '../src/understanding.js';
 
 const source = (await readFile(new URL('../src/puzzles.js', import.meta.url), 'utf8'))
   .replace("import './puzzles.css';", '')
-  .replace(/'\.\/(electrical|puzzle-model|bench-evidence)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
+  .replace(/'\.\/(electrical|puzzle-model|bench-evidence|bench-diagnosis|understanding)\.js'/g, (_, name) => JSON.stringify(pathToFileURL(resolve(`src/${name}.js`)).href));
 const { PuzzleWorkbench } = await import(`data:text/javascript;base64,${Buffer.from(source).toString('base64')}`);
 function controller(id) {
   const saves = [], sounds = [], solved = [];
@@ -39,51 +40,53 @@ test('a completed marker on a broken imported montage cannot lock its controls',
   bench.state = normalizePuzzleSnapshot('workshop', broken);
   assert.equal(bench.state.completed, false);
   bench.state.sourceOn = false;
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
+  bench.touchPort('s2a'); bench.touchPort('s2b');
   bench.state.sourceOn = true;
   assert.equal(evaluatePuzzle('workshop', bench.state).solved, true);
 });
 
-test('wiring waits for isolation and the journal preserves the actual failed attempt', () => {
-  const { bench, click, saves } = controller('workshop');
-  const original = structuredClone(bench.state.wires);
-  bench.touchPort('spliceA');
-  assert.deepEqual(bench.state.wires, original); assert.equal(bench.selected, null);
-  assert.match(bench.feedback, /apagá/);
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0);
-  click({ action: 'power' });
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
-  click({ action: 'power' });
+test('the bench powers itself: a cable is laid at once and the journal preserves the actual attempt', () => {
+  const { bench, saves } = controller('workshop');
+  assert.equal(bench.state.sourceOn, true, 'the bench opens live');
+  bench.touchPort('s2a'); bench.touchPort('s2b');
+  assert.equal(bench.state.sourceOn, true, 'laying a cable never asks to switch off first');
   assert.equal(bench.result.solved, true);
-  assert.ok(saves.at(-1).evidence.some(e => e.kind === 'intervention' && /Uní Costura A con Costura B/.test(e.text)));
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0);
+  assert.ok(saves.at(-1).evidence.some(e => e.kind === 'intervention' && /Uní Tramo 2 · A con Tramo 2 · B/.test(e.text)));
   assert.ok(saves.at(-1).evidence.some(e => e.kind === 'result' && /clara y pareja/.test(e.text)));
 });
 
-test('only an actual probe reading becomes a measurement, and numeric disclosure is respected', () => {
+test('only an actual probe reading becomes a measurement, its result stays on the piece, and numeric disclosure is respected', () => {
   const { bench, click } = controller('workshop');
   click({ action: 'mode', mode: 'continuity' });
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0);
-  click({ action: 'power' });
-  const plain = bench.state.evidence.at(-1);
+  assert.equal(bench.state.sourceOn, false, 'the continuity probe runs on its own battery: the bench switches itself off');
+  assert.ok(bench.state.evidence.some(e => e.kind === 'intervention' && /pila/.test(e.text)), 'the journal says why the bench went quiet');
+  bench.touchPort('s2a');
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, 0, 'one probe on one terminal is not a reading');
+  bench.touchPort('s2b');
+  const plain = bench.state.evidence.filter(e => e.kind === 'measurement').at(-1);
   assert.equal(plain.kind, 'measurement'); assert.equal(plain.value, 'Sin camino');
-  assert.match(plain.reference, /Punta roja: Costura A; punta negra: Costura B/);
+  assert.match(plain.reference, /Punta roja: Tramo 2 · A; punta negra: Tramo 2 · B/);
   assert.doesNotMatch(plain.value, /\d|Ω|V|A/);
+  assert.equal(bench.probeMarks.seam2.word, 'Sin camino', 'the reading is left on the section it was taken across');
   click({ action: 'numbers' });
-  assert.equal(bench.state.evidence.at(-1).value, 'ABIERTO');
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').at(-1).value, 'ABIERTO');
+  click({ action: 'mode', mode: 'continuity' });
+  assert.equal(bench.mode, 'continuity', 'touching the instrument in hand again keeps it: a novice taps it to be sure');
+  click({ action: 'mode', mode: 'wire' });
+  assert.equal(bench.mode, 'wire', '«Cables» puts the instrument down');
+  assert.equal(bench.state.sourceOn, true, 'and the bench is live again');
 });
 
-test('current insertion is in series, requires isolation and shares the selected branch current', () => {
+test('current insertion is in series, needs no procedure and shares the selected branch current', () => {
   const { bench, click } = controller('distribution');
   assert.equal(bench.state.switches.archive, false);
   assert.equal(bench.state.tripped, false, 'the outside isolation must not be silently undone');
   click({ action: 'mode', mode: 'current' });
   click({ branch: 'clinic' });
-  assert.equal(bench.state.meter.branch, null);
-  click({ action: 'power' }); click({ branch: 'clinic' });
   assert.equal(bench.state.meter.branch, 'clinic');
   assert.match(bench.componentSvg(PUZZLES.distribution.components[0]), /Medidor insertado en serie/);
-  click({ action: 'power' }); click({ action: 'numbers' });
+  click({ action: 'numbers' });
   const reading = bench.state.evidence.at(-1);
   assert.equal(reading.kind, 'measurement'); assert.match(reading.reference, /en serie con Enfermería/);
   assert.equal(Number(reading.value.replace(' A', '').replace(',', '.')), Math.round(bench.result.solution.branches.clinic.current * 100) / 100);
@@ -91,61 +94,133 @@ test('current insertion is in series, requires isolation and shares the selected
   assert.equal(bench.state.switches.archive, false, 'external isolation is not a second independent local switch');
 });
 
-test('undo and reset retain experiment history instead of rewriting the past', () => {
+test('undo and reset retain experiment history, and what someone saw stays seen', () => {
   const { bench, click } = controller('workshop');
-  click({ action: 'power' });
-  bench.touchPort('spliceA'); bench.touchPort('spliceB');
+  click({ action: 'mode', mode: 'continuity' }); bench.touchPort('s2a'); bench.touchPort('s2b');
+  assert.equal(bench.state.proofs.foundBreak, true);
+  click({ action: 'mode', mode: 'wire' });
+  bench.touchPort('s2a'); bench.touchPort('s2b');
   const prior = structuredClone(bench.state.evidence);
   click({ action: 'undo' });
   assert.deepEqual(bench.state.evidence.slice(0, prior.length), prior);
-  assert.equal(bench.state.sourceOn, false);
+  assert.equal(bench.state.sourceOn, true, 'undo leaves the bench live');
   click({ action: 'reset' });
   assert.deepEqual(bench.state.evidence.slice(0, prior.length), prior);
-  assert.equal(bench.state.sourceOn, false);
+  assert.equal(bench.state.sourceOn, true);
+  assert.equal(bench.state.proofs.foundBreak, true, 'starting over moves the cables back, not what Lumen saw');
 });
 
-const solvedWires = {
-  awaken: [['positive', 'heartIn'], ['heartOut', 'negative']],
-  workshop: [...PUZZLES.workshop.initialWires, ['spliceA', 'spliceB']],
-  gate: [['positive','trimA'], ['trimB','latchIn'], ['latchOut','negative']],
-  pump: [...PUZZLES.pump.initialWires, ['lineA','lineB']],
-  distribution: [['positive','clinicIn'], ['clinicOut','negative'], ['positive','kitchenIn'], ['kitchenOut','negative']],
-  irrigation: PUZZLES.irrigation.initialWires,
-  beacon_supply: PUZZLES.beacon_supply.initialWires,
-  beacon_network: [['positive','opticIn'], ['opticOut','negative'], ['positive','bearingIn'], ['bearingOut','negative'], ['positive','signalIn'], ['signalOut','negative']],
-  beacon_lens: [['positive','upperA'], ['lowerB','negative'], ['tap','lensIn'], ['lensOut','negative']],
-};
-const settings = { irrigation: { warmth: 12, flow: 12, forge: 8 }, beacon_supply: { ballast: 3 }, beacon_lens: { upper: 12 } };
+test('a short circuit trips the protection once and the next change switches the bench back on', () => {
+  const { bench, click, sounds } = controller('awaken');
+  bench.touchPort('heartOut'); bench.touchPort('negative');
+  click({ wire: String(bench.state.wires.findIndex(w => w.includes('negative'))) });
+  bench.touchPort('positive'); bench.touchPort('negative');
+  assert.equal(bench.state.tripped, true);
+  assert.match(bench.feedback, /cambiá el montaje y la mesa vuelve a encender/);
+  const errors = sounds.filter(s => s === 'error').length;
+  click({ wire: String(bench.state.wires.findIndex(w => w.includes('positive') && w.includes('negative'))) });
+  assert.equal(bench.state.tripped, false); assert.equal(bench.state.sourceOn, true);
+  assert.equal(sounds.filter(s => s === 'error').length, errors, 'removing the short does not trip again');
+});
+
+test('help is offered after several changes that do not advance the brief, and asking resets the offer', () => {
+  const { bench, click } = controller('irrigation');
+  assert.equal(bench.needsNudge(), false, 'no offer on arrival');
+  for (let i = 0; i < 6; i++) click({ action: 'knob', key: 'forge', delta: i % 2 ? '-1' : '1' });
+  assert.equal(bench.needsNudge(), true, 'six changes without a new tick');
+  click({ action: 'hint' });
+  assert.equal(bench.needsNudge(), false, 'a hint was just given');
+  click({ action: 'knob', key: 'warmth', delta: '1' }); click({ action: 'knob', key: 'warmth', delta: '1' });
+  assert.equal(bench.needsNudge(), false);
+});
+
+// The canonical repair, played through the real controller: only movable wires change, within the cables in hand.
+const canonical = id => { const s = initialPuzzleSnapshot(id); PUZZLES[id].solve(s); return s; };
 for (const id of Object.keys(PUZZLES)) test(`${id}: the real controller still permits a novice repair, records it and commissions once`, () => {
-  const { bench, click, solved } = controller(id);
-  click({ action: 'power' });
-  while (bench.state.wires.length) click({ wire: '0' });
-  for (const [a, b] of solvedWires[id]) { bench.touchPort(a); bench.touchPort(b); }
-  for (const [key, target] of Object.entries(settings[id] ?? {})) {
-    while (bench.state.values[key] !== target) click({ action: 'knob', key, delta: String(Math.sign(target - bench.state.values[key])) });
+  const { bench, click, solved } = controller(id), target = canonical(id), proof = PUZZLES[id].proof;
+  // The instrument is taken up and put down with its own button, as on screen.
+  const probe = (mode, a, b) => { click({ action: 'mode', mode }); bench.touchPort(a); bench.touchPort(b); click({ action: 'mode', mode: 'wire' }); };
+  // The farero's book asks for a mark before the board changes; a novice may answer «No sé todavía».
+  if (ESTIMATES[id] && !ESTIMATES[id].when) click({ action: 'estimate', choice: 'skip' });
+  // The pump's loss only shows while it works: Vega sees it before the joint is bridged.
+  if (proof?.voltageAcross) probe('voltage', ...proof.voltageAcross);
+  // Lumen's break only shows with the bench off (the probe switches it off), before the bridge closes it.
+  if (proof?.continuityOpen) probe('continuity', ...proof.continuityOpen);
+  const tally = PUZZLES[id].tally;
+  const takeSum = () => { for (const part of tally.parts) {
+    if (tally.kind === 'voltage') { const c = PUZZLES[id].components.find(x => x.id === part); probe('voltage', c.a, c.b); }
+    else { click({ action: 'mode', mode: 'current' }); bench.handleSliderCommit({ target: { dataset: { meterBranch: '' }, value: part } }); click({ action: 'mode', mode: 'wire' }); }
+  } };
+  // Vega sums with the old joint in place, before the repair: that is where the volts went.
+  if (tally?.before) { takeSum(); assert.equal(bench.state.tally.closed, true, `${id}: the sum closes on the faulty loop`); }
+  // A minijuego done by its sum (Marín's cart): the sum is the whole task.
+  const sumIsTheTask = tally && !tally.before && PUZZLES[id].done;
+  if (sumIsTheTask) takeSum();
+  // A minijuego done by what the neighbour sees (Tala's lantern): each reading, once.
+  for (const r of PUZZLES[id].readings ?? []) probe('voltage', ...r.across);
+  const movable = () => bench.state.wires.findIndex(w => !isSealed(id, w));
+  while (movable() >= 0) click({ wire: String(movable()) });
+  for (const [a, b] of target.wires.filter(w => !isSealed(id, w))) { bench.touchPort(a); bench.touchPort(b); }
+  // Lumen's drawer: three stones weighed, then the riddle stone, answered before it can be weighed.
+  if (PUZZLES[id].weighs) {
+    for (const v of [10, 12, 100]) { click({ action: 'stone', key: 'tray', value: String(v) }); probe('weigh', 'trayA', 'trayB'); }
+    click({ action: 'stone', key: 'tray', value: '220' }); probe('weigh', 'trayA', 'trayB');
+    assert.equal(bench.state.weighed.includes(220), false, 'Lumen covers the riddle stone until it is answered');
+    click({ action: 'estimate', choice: 'doscientos' }); probe('weigh', 'trayA', 'trayB');
+    assert.deepEqual(bench.state.weighed, [10, 12, 100, 220]);
+    assert.match(getBenchEvidence(id, bench.state).map(e => e.text).join(' '), /Pesé la piedra de anillos marrón, rojo, negro y oro: 11,8 Ω/);
   }
-  click({ action: 'power' });
+  for (const [key, value] of Object.entries(target.values)) {
+    // A socket takes a stone in one gesture; a dial turns one notch at a time.
+    if (PUZZLES[id].knobs.find(k => k.key === key).stones) { if (bench.state.values[key] !== value) click({ action: 'stone', key, value: String(value) }); }
+    else while (bench.state.values[key] !== value) click({ action: 'knob', key, delta: String(Math.sign(value - bench.state.values[key])) });
+  }
+  assert.equal(bench.state.sourceOn, true, `${id}: the bench is live without being asked`);
   assert.equal(bench.result.solved, true, id);
-  if (PUZZLES[id].proof) {
-    assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
+  if (proof) {
+    if (proof.when || proof.measure) assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the requested proof`);
     if (id === 'distribution') { click({ action: 'switch', key: 'kitchen' }); click({ action: 'switch', key: 'kitchen' }); }
     if (id === 'beacon_lens') {
-      const measureTap = () => { bench.mode = 'voltage'; bench.state.meter = { ...bench.state.meter, a: null, b: null }; bench.touchPort('tap'); bench.touchPort('negative'); bench.mode = 'wire'; };
+      const measureTap = () => probe('voltage', 'tap', 'negative');
       measureTap();
       assert.equal(bench.state.proofs.tapLoaded, true); assert.equal(bench.result.commissionable, false, 'one side of the comparison is not enough');
-      click({ action: 'power' }); click({ wire: String(bench.state.wires.findIndex(w => w.includes('lensIn') && w.includes('tap'))) });
-      click({ action: 'power' }); measureTap();
-      click({ action: 'power' }); bench.touchPort('tap'); bench.touchPort('lensIn'); click({ action: 'power' });
+      click({ wire: String(bench.state.wires.findIndex(w => w.includes('lensIn') && w.includes('tap'))) });
+      measureTap();
+      bench.touchPort('tap'); bench.touchPort('lensIn');
     }
-    assert.equal(bench.state.proofs[PUZZLES[id].proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.commissionable, true, id);
+    assert.equal(bench.state.proofs[proof.id], true, id); bench.evaluate(false); assert.equal(bench.result.proven, true, id);
+    if (!PUZZLES[id].tally) assert.equal(bench.result.commissionable, true, id);
   }
+  // Nereo's knots: every part measured on this montage, then the brief is complete.
+  if (tally && !tally.before && !sumIsTheTask) {
+    assert.equal(bench.result.commissionable, false, `${id}: working is not enough before the keeper's sum`);
+    takeSum();
+    assert.equal(bench.state.tally.closed, true, `${id}: the sum closes`);
+  }
+  if (tally) assert.equal(bench.result.commissionable, true, id);
+  assert.ok(bench.result.checks.every(c => c.met), `${id}: every item of the brief is ticked`);
   assert.ok(bench.state.evidence.some(e => e.kind === 'result'));
-  // Only the lens asks for measurements (Nereo's comparison); they are the two the player took, never invented.
-  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, PUZZLES[id].proof?.measure ? 2 : 0, 'successful operation must not invent a measurement or require a quiz');
+  // Measurements are only the ones the player took for a requested proof, never invented.
+  assert.equal(bench.state.evidence.filter(e => e.kind === 'measurement').length, (proof?.measure ? 2 : proof?.continuityOpen || proof?.voltageAcross ? 1 : 0) + (tally?.parts.length ?? 0) + (PUZZLES[id].weighs ? 5 : 0) + (PUZZLES[id].readings?.length ?? 0), 'only the measurements the player took: the requested proof and the keeper\'s sum');
   const previousDocument = globalThis.document;
   globalThis.document = { removeEventListener() {} };
   try { bench.close(true, { commission: true }); bench.close(true, { commission: true }); } finally { globalThis.document = previousDocument; }
   assert.deepEqual(solved, [id]);
+});
+
+test('soldered wires stay, cables in hand run out, and a hand cable cannot span the lighthouse lines', () => {
+  const { bench, click } = controller('workshop');
+  click({ wire: '0' });
+  assert.equal(bench.state.wires.length, PUZZLES.workshop.sealed.length, 'a soldered wire is not removed');
+  assert.match(bench.feedback, /soldado/);
+  bench.touchPort('s1a'); bench.touchPort('s1b');
+  bench.touchPort('s3a'); bench.touchPort('s3b');
+  assert.equal(bench.state.wires.length, PUZZLES.workshop.sealed.length + 1, 'one cable in hand, one cable placed');
+  assert.match(bench.feedback, /No te quedan cables/);
+  const supply = controller('beacon_supply');
+  supply.bench.touchPort('positive'); supply.bench.touchPort('lineAb');
+  assert.equal(supply.bench.state.wires.length, PUZZLES.beacon_supply.sealed.length, 'the generator end and the core end are too far apart');
+  assert.match(supply.bench.feedback, /no llega tan lejos/);
 });
 
 test('measurements survive long experiments and one knob turned step by step is one intervention', () => {
@@ -168,14 +243,14 @@ test('the gate closing and its journal page only claim the brake tests the playe
   const page = JOURNAL.find(e => e.id === 'operating_window');
   const said = state => completionLines('gate', state).find(l => l.speaker === 'player').text;
   const fresh = initialPuzzleSnapshot('gate');
-  assert.doesNotMatch(said({ puzzles: { gate: fresh } }), /ajustar/); assert.doesNotMatch(journalText(page, { puzzles: { gate: fresh } }), /extremo no fue/);
-  const moved = { ...fresh, trace: { brake: { min: 6, max: 12 } } };
-  assert.match(said({ puzzles: { gate: moved } }), /ajustar la rueda/); assert.match(journalText(page, { puzzles: { gate: moved } }), /no la llevé a los extremos/);
-  const extreme = { ...fresh, trace: { brake: { min: 0, max: 30 } } };
+  assert.doesNotMatch(said({ puzzles: { gate: fresh } }), /piedra justa/); assert.doesNotMatch(journalText(page, { puzzles: { gate: fresh } }), /extremo no fue/);
+  const moved = { ...fresh, trace: { brake: { min: 10, max: 22 } } };
+  assert.match(said({ puzzles: { gate: moved } }), /piedra justa en el zócalo/); assert.match(journalText(page, { puzzles: { gate: moved } }), /no llegué a la que más frena/);
+  const extreme = { ...fresh, trace: { brake: { min: 0, max: 100 } } };
   assert.equal(journalText(page, { puzzles: { gate: extreme } }), page.text);
   // A save from before the trace existed claims nothing either way.
   const legacy = normalizePuzzleSnapshot('gate', { ...fresh, trace: undefined });
-  assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /rueda/);
+  assert.equal(legacy.trace, null); assert.doesNotMatch(said({ puzzles: { gate: legacy } }), /piedra/);
 });
 
 test('the castle proof: series wiring cannot show the infirmary alone; parallel can, and old commissions keep it', () => {
@@ -187,4 +262,33 @@ test('the castle proof: series wiring cannot show the infirmary alone; parallel 
   assert.equal(evaluatePuzzle('distribution', { ...parallel, switches: { ...parallel.switches, kitchen: true } }).commissionable, false);
   const legacy = normalizePuzzleSnapshot('distribution', { ...parallel, switches: { archive: false, kitchen: true }, completed: true, proofs: undefined });
   assert.equal(legacy.proofs.clinicAlone, true); assert.equal(legacy.completed, true);
+});
+
+test('Vega asks for her sum with the old joint in place: a bridge put first has to come out for a moment', () => {
+  const { bench, click } = controller('pump');
+  const probe = (a, b) => { click({ action: 'mode', mode: 'voltage' }); bench.touchPort(a); bench.touchPort(b); click({ action: 'mode', mode: 'wire' }); };
+  probe('e2a', 'e2b');
+  bench.touchPort('e2a'); bench.touchPort('e2b');
+  for (const [a, b] of [['e1a', 'e1b'], ['e2a', 'e2b'], ['e3a', 'e3b'], ['pumpIn', 'pumpOut']]) probe(a, b);
+  assert.equal(bench.state.tally?.closed ?? false, false, 'a healthy loop is not the sum Vega asked for');
+  assert.match(bench.message(null).text, /retirá un momento tu puente/, 'Vega says so while the pump runs bridged');
+  click({ wire: String(bench.state.wires.findIndex(w => w.includes('e2a') && w.includes('e2b'))) });
+  for (const [a, b] of [['e1a', 'e1b'], ['e2a', 'e2b'], ['e3a', 'e3b'], ['pumpIn', 'pumpOut']]) probe(a, b);
+  assert.equal(bench.state.tally.closed, true);
+  assert.ok(bench.state.tally.readings.joint2 > 6, 'the old joint kept most of the push');
+});
+
+// Jugadores 27 y 31: the farero's question vanished with the first wire. Now the board waits for a
+// mark (or «No sé todavía») and then changes as asked.
+test('beacon_network: the farero asks for a mark before the first wire changes', () => {
+  const { bench, click } = controller('beacon_network'), before = JSON.stringify(bench.state.wires);
+  const loose = bench.state.wires.findIndex(w => !isSealed('beacon_network', w));
+  click({ wire: String(loose) });
+  assert.equal(JSON.stringify(bench.state.wires), before, 'The first wire waits for the mark');
+  assert.equal(bench.message().kind, 'estimate');
+  assert.match(bench.message().text, /^Antes de tocar el tablero/);
+  assert.ok(bench.message().options.some(o => o.id === 'skip'), '«No sé todavía» is an answer');
+  click({ action: 'estimate', choice: 'skip' });
+  click({ wire: String(loose) });
+  assert.notEqual(JSON.stringify(bench.state.wires), before, 'Then the board changes');
 });

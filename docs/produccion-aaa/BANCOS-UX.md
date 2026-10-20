@@ -1,0 +1,143 @@
+# Bancos: rediseño de UX (ciclo 15)
+
+**Problema reportado por el usuario (5 oct 2026):** los bancos seguían siendo difíciles de
+entender, sobrecargados de información y con demasiadas opciones. No quedaba claro qué había que
+hacer, cómo, cuándo estaba resuelto ni cómo seguir con la historia.
+
+**Base:** investigación de puzzles y juegos parecidos en
+[INVESTIGACION-PUZZLES-UX.md](INVESTIGACION-PUZZLES-UX.md), con fuentes. Las más aplicadas fueron
+PhET (andamiaje implícito y números apagados), Horizon Forbidden West (objetivo visible desde el
+principio), The Witness (respuesta inmediata), Patrick's Parabox (pocas posibilidades, deshacer
+siempre visible), Taconis (el dibujo del tablero enseña física) y Mayer (texto pegado a lo que
+explica).
+
+## Qué cambió
+
+| Pregunta del jugador | Antes | Ahora |
+|---|---|---|
+| ¿Qué tengo que hacer? | Un párrafo de encargo a la derecha, un subtítulo y observaciones en prosa debajo del tablero | Arriba, el objetivo en una frase con ◎ y el encargo en pasos numerados que se tildan solos. El paso actual se resalta. Las piezas de la meta llevan ◎ en el tablero |
+| ¿Cómo? | Modos de herramienta, un interruptor de alimentación obligatorio (apagar para cablear, encender para probar), cajones de cables, de instrumentos y de pruebas | Ohm dice qué se puede tocar para el paso actual. Hay un solo instrumento por banco, y su botón se ilumina cuando el paso lo pide. La mesa se alimenta sola: el probador de camino la apaga mientras se usa y un cortocircuito se repone con el próximo cambio. Los cables se tienden con dos toques o arrastrando, y cada cable de mano tiene su × para retirarlo |
+| ¿Voy bien? | Frases largas debajo del tablero, lejos de cada pieza | Cada pieza dice su estado en palabras sobre sí misma (Funciona, Casi, Le falta fuerza, Demasiada fuerza, Al revés, Se calienta, Sin camino…). Una medición sobre un tramo o un empalme queda anotada en él |
+| ¿Ya está? | Una caja a la derecha con «Dejar funcionando», y «Volver» dejaba la instalación armada pero apagada | Aparece una tarjeta con «¡Funciona!», lo que se aprendió y un único botón: «Seguir la historia →». Salir con el banco funcionando también lo pone en servicio: no hay forma de perder lo resuelto |
+| ¿Y si me trabo? | «Pedir una observación», siempre igual | El botón de pista se ofrece solo (late) después de 90 s o de seis cambios sin tildar un paso nuevo. Las cuatro pistas siguen igual |
+
+**Tablero.** Los cables soldados de la instalación se dibujan como cobre fijo que corre por los
+bordes con un tronco común desde cada borne de la fuente; los de mano cuelgan. En las Terrazas, por
+ejemplo, el tablero se lee ahora como una escalera de tres ramas entre «Fuente +» y «Retorno −»,
+donde antes había nueve cables cruzados en diagonal. El mando de cada freno o regulador está sobre
+la pieza, con el mismo nombre que la pieza.
+
+**Quitado de la pantalla.** El subtítulo, el pie con atajos de teclado, el lema «Un cambio · una
+observación», el cajón de cables tendidos, «Otros instrumentos de Ohm», «Comparar mis pruebas» con
+la anotación de predicciones, «Leer las marcas numéricas» del pie y el interruptor de
+alimentación. Las mediciones, cambios y resultados se siguen anotando solos en la Bitácora. Los
+números siguen disponibles dentro del instrumento («Ver números»).
+
+**Cambios de comportamiento declarados.**
+- La mesa se alimenta sola. La seguridad sigue explicada donde importa: el probador de camino
+  apaga la mesa y lo dice («esta prueba usa la pila del instrumento»), y la protección contra
+  cortocircuito sigue saltando y explicando la causa.
+- Salir con el encargo cumplido pone la instalación en servicio. Salir con el encargo sin
+  cumplir nunca lo hace.
+- «Empezar de nuevo» devuelve los cables a su lugar, pero no borra lo que alguien ya vio (las
+  pruebas de Lumen, Vega, Ivara y Nereo) ni las pistas pedidas.
+- Cada banco ofrece un solo instrumento, el que pide su historia; antes podía ofrecer hasta tres.
+
+## Medido (1440×900, banco recién abierto, `scripts/qa-bench-load.mjs`)
+
+| | Antes (`6abad80`) | Ahora |
+|---|---|---|
+| Textos fuera del tablero, sumando los 9 bancos | 144 | 105, contando también las placas sobre el tablero |
+| Controles fuera del tablero, sumando los 9 bancos | 93 | 52 |
+| Bancos que obligan a desplazar | 2/9 | 0/9 (también a 1280×720) |
+| Placas encimadas | — | 0 a 1440×900; 1 a 1280×720 (Terrazas, rozándose) |
+
+`scripts/qa-bench-flow.mjs` juega cinco bancos con el mouse real: probador del Taller, cable
+arrastrado, mandos del Cerrojo y de las Terrazas, pedido de Ivara, cortocircuito del Portal y
+tarjeta de éxito.
+
+## Teléfono: apaisado primero (ciclo 16)
+
+El usuario propuso probar el teléfono apaisado. Es la forma natural de jugar una aventura en 3D,
+y la investigación sugería ese mismo diseño para el banco: tablero grande y acciones al alcance
+de los pulgares. Con 844×390 emulado, el mundo y el título ya se veían bien, pero el banco se
+reducía a una franja ilegible y el mapa quedaba debajo de su encabezado. Ahora:
+
+- **Banco:** dos columnas. A la izquierda, el tablero tan grande como deja la altura, con cada
+  mando sobre su pieza y botones de 34 px. A la derecha, el objetivo con el paso actual en
+  palabras (los demás, sólo con su marca), los cuatro botones arriba y siempre a mano, y la frase
+  de Ohm debajo, que se desplaza si es larga. Los bornes responden 8 px más allá de su borde.
+- **Mapa:** la guía y las pestañas a la izquierda; el mapa entero a la derecha.
+- **Bitácora:** la página ocupa casi toda la altura. **Diálogo:** más bajo, deja ver la escena.
+- **En vertical:** el título y los bancos sugieren girar el teléfono, sin impedir seguir así. La
+  barra de Ohm ya no queda fija sobre el tablero: en la prueba táctil tapaba los bornes.
+
+`scripts/qa-landscape.mjs` captura todas esas pantallas y `qa-touch.mjs` acepta `SIZE=844x390`.
+
+**Placas que no se pisan (ciclo 19).** Las placas se ubican sobre su pieza, en porcentajes del
+tablero. En el tablero chico del teléfono, dos pueden tocarse. En la lente del Faro, «Brazo
+inferior» tapaba la posición del freno. Ahora, si dos placas se tocan, la que no tiene mando se
+corre de costado lo justo, sin salirse del tablero, y se vuelven a acomodar al girar el teléfono.
+`qa-bench-load.mjs` cuenta 0 placas encimadas en los cuatro tamaños.
+
+## Pistas que miran tu montaje (ciclo 25)
+
+Antes, las cuatro pistas de cada banco salían siempre en el mismo orden, hiciera lo que hiciera el
+jugador. Un buen tutor mira primero lo que hizo el alumno. Ahora, al pedir pista, Ohm (o quien
+hable en ese banco) mira el montaje y, si reconoce un error **del jugador**, pregunta sobre ese
+error. Lo hace con una pregunta, nunca con el gesto. Las cuatro pistas fijas quedan para después y
+no se gastan.
+
+| Error reconocido | Cómo se reconoce | Ejemplo de lo que dice |
+|---|---|---|
+| Cortocircuito | «Fuente +» y «Retorno −» unidos por puro cobre | «Seguí ese camino con el dedo: ¿qué pieza atraviesa la corriente antes de volver?» |
+| Pieza puenteada | un cable une los dos lados de la pieza del encargo | «Si la corriente puede pasar por el cobre, ¿qué le queda para atravesar el corazón?» |
+| Al revés | una pieza con sentido recibe la corriente invertida | «¿Por cuál de sus bornes entra ahora la corriente? ¿Por cuál debería entrar?» |
+| Sin ida o sin vuelta | la pieza no recibe corriente; se sigue el cobre desde cada borne de la fuente | «A la enfermería le llega la corriente, pero desde ahí no tiene cómo volver. ¿Por dónde podría?» |
+| Una voz atraviesa a otra | Castillo y Faro II: sin la otra pieza, ésta se apaga | «Si la cocina se apaga, ¿qué le pasa a la enfermería?» |
+| Puntas sobre el mismo cobre | las dos puntas del instrumento en el mismo tramo de cable | «Entre esos dos bornes hay puro cobre: ¿dónde apoyarías las puntas?» |
+| Freno para el lado equivocado | el último cambio de freno o piedra alejó a la pieza de su punto | «Frenó más y le llega todavía menos fuerza. ¿Qué pasaría si frenaras menos?» |
+| Probar sin pregunta | el mismo cable puesto y sacado cuatro veces | «Antes de tenderlo otra vez: ¿qué esperás que cambie?» |
+
+- **Sólo errores del jugador.** Lo que ya está mal cuando el banco se abre es el puzzle: el corte
+  del Taller, el cerrojo al revés, las luces en serie del Castillo. Esos los cubren las pistas
+  fijas. Una prueba lo comprueba en los diez bancos.
+- **El botón de pista late antes** cuando el mismo error sigue después de dos cambios, en lugar
+  de esperar seis cambios o 90 segundos.
+- **Cada error queda contado** por tipo en el banco (`slips` en la partida guardada), para la
+  Bitácora y para un futuro informe para el docente.
+- Código en `src/bench-diagnosis.js`, puro y probado aparte. Probado en el juego: en el Taller,
+  con las puntas sobre el mismo cobre, Ohm responde a eso en lugar de la primera pista fija.
+
+## Teléfono (ciclo 29)
+
+Después del rediseño de los ciclos 21 a 25, varios bancos no entraban en el teléfono. Ahora:
+
+| Tamaño | Lo principal a la vista | Antes |
+|---|---|---|
+| 844×390 apaisado | 9/9 | 6/9 |
+| 390×844 vertical | 9/9 | 5/9 |
+| 740×360 apaisado chico | 7/9 (en el Taller y la Bomba, la frase de Ohm empieza apenas debajo) | — |
+| 1440×900 | 9/9, sin desplazar | 9/9 |
+
+- **Vertical.** El encargo muestra sólo el paso de ahora; los demás quedan como números. El conjuro
+  y la explicación del instrumento caben en dos renglones.
+- **Apaisado.** Deshacer y empezar de nuevo van antes del instrumento. Con las puntas sin apoyar,
+  el instrumento muestra sólo el visor, porque la explicación ya la da Ohm. El conjuro va después
+  de lo que dice Ohm. La meta ocupa dos renglones como mucho, y los demás pasos quedan como
+  puntitos en el mismo renglón.
+- **Si alguien pregunta** (la marca esperada de Nereo o de Vega), la pregunta y sus respuestas van
+  primero, en dos columnas. Mientras tanto, el encargo deja sólo la meta. `qa-bench-load.mjs`
+  cuenta entonces la pregunta entera como lo principal, en lugar de los botones.
+- Lo que sigue apretado (los nombres de las piezas en 390 px de ancho, los bancos de muchas piezas)
+  es lo que resolvería partir los bancos en minijuegos ([MINIJUEGOS.md](MINIJUEGOS.md)).
+
+## Pendiente o NO VERIFICADO
+
+- **Prueba con personas: NO VERIFICADA.** La investigación recomienda partidas grabadas con
+  jugadores nuevos que narren en voz alta. Nada de lo medido acá sustituye eso.
+- **Teléfono real: NO VERIFICADO.** Sólo con emulación táctil: apaisado 844×390 y 740×360, y
+  vertical 390×844 (ciclo 29: ver arriba).
+- Hecho en el ciclo 25: pistas que responden al error del jugador (arriba). La predicción en los
+  bancos clave quedó hecha en el ciclo 21. Sigue sin hacer: señalar en el tablero dónde se corta un
+  camino abierto.

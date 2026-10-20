@@ -1,0 +1,16 @@
+{
+  "nombre": "Nereo",
+  "nota": "Farero robusto: gorro azul, barba blanca, bufanda mostaza, chaquetón crema. Pantalón y camisa comparten el azul oscuro; se separan por altura.",
+  "esqueleto": { "axila": 1.15, "entrepierna": 0.64, "rodilla": 0.38 },
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#f1b07a", "colores": ["#f3b077", "#bd783c"], "z": [0.72, 1.76] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#f1e3cb", "colores": ["#eeddc2", "#ffffff"], "z": [1.42, 1.8] },
+    { "nombre": "gorro", "muestra": "#3f4c68", "colores": ["#424d65"], "z": [1.68, 2.0] },
+    { "nombre": "bufanda", "tenible": "bufanda", "muestra": "#eeaa45", "colores": ["#f0ab46"], "z": [1.15, 1.64] },
+    { "nombre": "abrigo", "tenible": "ropa", "muestra": "#f2d6a6", "colores": ["#f4d6a4", "#d2ae7e", "#a48159", "#675a4a"], "z": [0.62, 1.52] },
+    { "nombre": "camisa", "muestra": "#3d4a55", "colores": ["#313c44"], "z": [0.9, 1.4] },
+    { "nombre": "pantalon", "muestra": "#2e3a46", "colores": ["#313c44", "#171c1e"], "z": [0.3, 0.86] },
+    { "nombre": "cuero", "muestra": "#704426", "colores": ["#85522d", "#653c20", "#3d2818", "#171c1e"], "z": [0.0, 1.38] }
+  ]
+}

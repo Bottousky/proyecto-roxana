@@ -2,9 +2,64 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "ohmdal-playcanvas-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "experiments/playcanvas",
+        "run",
+        "dev"
+      ],
+      "port": 4190
+    },
+    {
+      "name": "ohmdal-playcanvas-preview",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": [
+        "--prefix",
+        "experiments/playcanvas",
+        "exec",
+        "--",
+        "vite",
+        "preview",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "4191",
+        "--strictPort"
+      ],
+      "port": 4191
+    },
+    {
+      "name": "ohmdal-pages-preview",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "experiments/playcanvas/node_modules/vite/bin/vite.js",
+        "preview",
+        "experiments/playcanvas",
+        "--base=/proyecto-roxana/",
+        "--outDir",
+        "dist-pages",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "4192",
+        "--strictPort"
+      ],
+      "port": 4192
+    },
+    {
       "name": "roxana-home",
       "runtimeExecutable": "node",
-      "runtimeArgs": ["experiments/playcanvas/node_modules/vite/bin/vite.js", "experiments/playcanvas", "--host", "127.0.0.1", "--port", "4196", "--strictPort"],
+      "runtimeArgs": [
+        "experiments/playcanvas/node_modules/vite/bin/vite.js",
+        "experiments/playcanvas",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "4196",
+        "--strictPort"
+      ],
       "port": 4196
     }
   ]

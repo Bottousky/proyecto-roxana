@@ -1,0 +1,15 @@
+Saved `frente-apose.png` using built-in image_gen.
+Size: **1024 × 1536 px**, **1,410,036 bytes**. Alpha: **no**.
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Generate exactly ONE image: a single full-body character model sheet view of Edda.
+Input image: use the attached sprite sheet only as the character reference for identity, exact outfit, colours and hairstyle. Do not reproduce its multiple figures, poses, pixel rendering or striped background.
+Composition: exactly one character, front view, facing the viewer exactly, standing straight in a relaxed A-pose with arms angled slightly out and down, neutral friendly expression, centred, entire body visible with margin around the head, hands and boots.
+Background: plain pure white, no shadow, no text.
+Character: Edda, a girl of about 14 from the family that keeps the Portal: copper-red wavy shoulder-length hair with a single braid falling on one side, green eyes, freckles, a short olive-green hooded cape fastened with a round brass clasp, a cream long-sleeved shirt, brown leather bracers on the forearms, two brown leather belts with small pouches, puffy rust-red terracotta trousers gathered below the knee, sturdy brown leather boots. Keep the exact same outfit, colours and hairstyle as the reference sprite sheet.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, proportions about 4.5 to 5 heads tall, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, no pixel art, no texture noise.
+Constraints: one front view only, no extra characters or views, no props, no text, no ground shadow, no background gradient.
+```

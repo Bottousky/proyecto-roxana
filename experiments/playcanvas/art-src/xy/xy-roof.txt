@@ -1,0 +1,5 @@
+Saved `xy-roof.png` — **1024×1024**, **1,057,045 bytes**, generated with the built-in image_gen tool.
+
+Exact prompt:
+
+> Generate exactly one square 1024x1024 image. Use case: stylized-concept. Asset type: seamless tileable roof texture for a modern cel-shaded 3D handheld RPG town. Front view, orthographic and face-on, of overlapping slate tiles in neutral light grey, suitable for tinting. Rows of rounded scalloped tiles with soft shading at each row edge. Clean hand-painted game texture: soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail. Flat even light. The texture fills the entire square with no roof silhouette, border, background, or perspective. It must tile seamlessly on all four edges: matching tile shapes, row spacing, colours and shading across left/right and top/bottom boundaries, with a repeating staggered row pattern. No pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, no text, no watermark.

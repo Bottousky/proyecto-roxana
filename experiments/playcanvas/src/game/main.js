@@ -1,8 +1,7 @@
-import { renderWorldMap, mapStyles } from './world-map.js';
+import { renderKingdomMap, bindKingdomMap } from './kingdom-map.js';
 import './style.css';
 import './interface.css';
 import './atlas.css';
-import {PlayCanvasWorld as World} from '../world.js';
 import '../fonts.css';
 import {mountTravelInstrument,updateTravelInstrument} from './travel-instrument.js';
 import {advanceJourneyTime,journeyPhase} from './story-time.js';
@@ -10,19 +9,23 @@ import './travel-instrument.css';
 import './art-polish.css';
 import './journey-ui.css';
 import './hud.css';
-import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
+import './journal.css';
+import '../xy-ui.css';
+import {APPEARANCE,APPEARANCE_DEFAULT,PEOPLE_3D,savedAppearance,chosenAppearance} from '../style-config.js';
+import {renderJourneyGuide} from './journey-guide.js';
+import {guideTarget,isExterior} from './kingdom-geography.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,speakerLabel,personLabel,personalize,learnNames,withIntroductions,knownFromSeen,playerName,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,joinWarning,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
-import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
+import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,SAVE_KEY,hasRequirements,minutes,validateState} from './state.js';
 import {prepareCinematic,recordCinematicComplete,recordEndingDismissed} from './cinematic-progress.js';
 import {placeInteractionPrompt} from './interaction-prompt.js';
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const icon={book:'<path d="M3 4h6q3 0 3 3v14q-1-3-4-3H3zm18 0h-6q-3 0-3 3v14q1-3 4-3h5z"/>',map:'<path d="m3 5 6-2 6 3 6-2v15l-6 2-6-3-6 2zM9 3v15M15 6v15"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',sound:'<path d="m3 9 4 0 5-5v16l-5-5H3zM16 8q5 4 0 8M19 4q9 8 0 16"/>',star:'<path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/>',arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>'};
+const icon={ohm:'<circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 2v2M12 20v2"/>',book:'<path d="M3 4h6q3 0 3 3v14q-1-3-4-3H3zm18 0h-6q-3 0-3 3v14q1-3 4-3h5z"/>',map:'<path d="m3 5 6-2 6 3 6-2v15l-6 2-6-3-6 2zM9 3v15M15 6v15"/>',menu:'<path d="M4 6h16M4 12h16M4 18h16"/>',sound:'<path d="m3 9 4 0 5-5v16l-5-5H3zM16 8q5 4 0 8M19 4q9 8 0 16"/>',star:'<path d="m12 2 2.5 7.5L22 12l-7.5 2.5L12 22l-2.5-7.5L2 12l7.5-2.5z"/>',arrow:'<path d="M4 12h16m-6-6 6 6-6 6"/>',close:'<path d="m6 6 12 12M6 18 18 6"/>'};
 const svg=name=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${icon[name]||icon.star}</svg>`;
 document.querySelector('#app').innerHTML=`
   <canvas id="world" aria-label="Mundo de Ohmdal. Movete con WASD o flechas, e interactuá con E." tabindex="0"></canvas>
@@ -31,12 +34,12 @@ document.querySelector('#app').innerHTML=`
     <div class="title-art"></div><div class="title-shade"></div><div class="title-dust"></div>
     <div class="title-content"><div class="eyebrow title-eyebrow">UNA AVENTURA EN LOS MUNDOS APLICADOS</div><div class="title-sigil">Ω</div><h1>OHMDAL</h1><div class="title-rule"><span></span>LA LUZ<span></span></div><p class="title-tagline">El mundo no perdió su luz.<br>Olvidó cómo encenderla.</p>
     <nav class="title-menu" aria-label="Menú principal"><button id="continue" class="primary hidden">Continuar el viaje ${svg('arrow')}</button><button id="new-game" class="primary">Cruzar el Portal ${svg('arrow')}</button><button id="title-settings" class="quiet">Opciones</button></nav>
-    <p id="save-description" class="save-description"></p></div><div class="title-foot"><span>ARCO I · LA PREGUNTA OLVIDADA</span><span>Explorá. Escuchá. Experimentá.</span></div>
+    <p id="save-description" class="save-description"></p><p class="rotate-hint"><span aria-hidden="true">⟳</span>Ohmdal se juega mejor con el teléfono apaisado.</p></div><div class="title-foot"><span>ARCO I · LA PREGUNTA OLVIDADA</span><span>Explorá. Escuchá. Experimentá.</span></div>
   </section>
-  <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools" aria-label="Herramientas de viaje"><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<span class="tool-label">Bitácora</span><kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<span class="tool-label">Mapa</span><kbd>M</kbd></button><button id="guide-button" class="icon-button" aria-label="Guía de viaje (H)" title="Guía de viaje · H">${svg('star')}<span class="tool-label">Guía</span></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<span class="tool-label">Pausa</span><kbd>Esc</kbd></button></nav></header>
+  <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools" aria-label="Herramientas de viaje"><button id="ohm-button" class="icon-button" hidden aria-label="Hablar con Ohm (O)" title="Hablar con Ohm · O">${svg('ohm')}<span class="tool-label">Ohm</span><kbd>O</kbd></button><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<span class="tool-label">Bitácora</span><kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<span class="tool-label">Mapa</span><kbd>M</kbd></button><button id="guide-button" class="icon-button" aria-label="Guía de viaje (H)" title="Guía de viaje · H">${svg('star')}<span class="tool-label">Guía</span></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<span class="tool-label">Pausa</span><kbd>Esc</kbd></button></nav></header>
     <div class="objective" id="objective"><span class="objective-glyph" aria-hidden="true">◇</span><div><button id="objective-toggle" aria-expanded="true" aria-controls="objective-detail"><span class="eyebrow">UNA PREGUNTA ABIERTA</span><span id="objective-title"></span><span class="objective-fold" aria-hidden="true">⌄</span></button><small id="objective-detail"></small></div></div>
     <div id="interaction" class="interaction hidden"><button id="interact-button"><kbd>E</kbd><span id="interaction-label"></span></button><button id="field-measure" class="field-measure hidden"><kbd>Q</kbd> Mirar con Ohm</button></div>
-    <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Guardar instrumento">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
+    <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Cerrar la observación (Esc)" title="Cerrar · Esc">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
     <div id="ohm-bubble" class="ohm-bubble hidden"><span class="ohm-eye"></span><p></p></div>
     <div class="hud-bottom"><span id="control-reminder"><kbd>W A S D</kbd> caminar <span>·</span> <kbd>Shift</kbd> correr <span>·</span> <kbd>E</kbd> usar</span><span id="save-indicator" role="status">◈ Bitácora al día</span></div>
     <div id="touch-controls"><div class="dpad"><button data-dir="up" aria-label="Caminar hacia arriba">↑</button><button data-dir="left" aria-label="Caminar a la izquierda">←</button><button data-dir="down" aria-label="Caminar hacia abajo">↓</button><button data-dir="right" aria-label="Caminar a la derecha">→</button></div><button id="touch-interact" aria-label="Interactuar" disabled>Acercate</button></div>
@@ -62,6 +65,10 @@ let playingCinematic=false;
 let chatterClock=0;
 let objectiveSignature='',objectiveUntil=0,hudUntil=0,travelTick=0;
 let intendedInteraction=null;
+// The key that closes a conversation must not reopen it: talking again to whoever was in reach
+// needs a short pause, and every press during that pause (a hurried reader) extends it.
+// Anything else in reach can be used at once.
+let interactAfter=0,interactAfterId=null;
 let activeMeasurement=null,measurementAvailable=false,lastMeasuredFlags='',lastMeasurementCandidate='';
 const dialogueQueue=[];
 function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,due:performance.now()+delay,area});}
@@ -69,7 +76,39 @@ function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,
 function show(node,value=true){(typeof node==='string'?$(node):node).classList.toggle('hidden',!value);if(node==='#dialogue')$('#hud').classList.toggle('conversing',value);}
 function toast(text,duration=3600){$('#toast').textContent=text;show('#toast');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>show('#toast',false),duration);}
 function sound(name){try{audio.play(name);}catch{}}
-function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);}
+// The player's name lives in the Instituto Roxana's register (the school's site, same origin):
+// whatever the student wrote there is how Ohmdal knows them. Without one, the game asks once.
+const SCHOOL_KEY='roxana.escuela.v1';
+function schoolProfile(){try{const data=JSON.parse(localStorage.getItem(SCHOOL_KEY)||'null');return data&&typeof data==='object'&&data.version===1?data:null;}catch{return null;}}
+function schoolName(){const name=schoolProfile()?.name;return typeof name==='string'?name.trim().slice(0,40):'';}
+function storeSchoolName(name){try{const profile=schoolProfile()||{version:1};profile.name=name;localStorage.setItem(SCHOOL_KEY,JSON.stringify(profile));}catch{}}
+// The traveller's look lives in the same register: hair, skin, coat and scarf, chosen by colour.
+// A drawn preview answers at once; in the world, the 3D figure changes too (style.js tints it).
+const LOOK_GROUPS=[['pelo','Pelo'],['piel','Piel'],['ropa','Abrigo'],['bufanda','Bufanda']];
+function storeAppearance(look){try{const profile=schoolProfile()||{version:1};profile.apariencia=look;localStorage.setItem(SCHOOL_KEY,JSON.stringify(profile));}catch{}}
+function lookChooser(){
+  const look={...APPEARANCE_DEFAULT,...savedAppearance()},fill=k=>APPEARANCE[k][look[k]];
+  const name=(k,v)=>k==='piel'?`Tono ${v}`:v;
+  return `<div class="look" data-look-root><svg class="look-preview" viewBox="0 0 120 140" aria-hidden="true"><ellipse cx="60" cy="134" rx="36" ry="5" fill="#0b2a4422"/><path data-part="ropa" fill="${fill('ropa')}" d="M28 133 Q28 96 60 90 Q92 96 92 133 Z"/><path d="M60 100 V132" stroke="#0004" stroke-width="2"/><circle cx="60" cy="110" r="2.4" fill="#d8b45a"/><circle cx="60" cy="121" r="2.4" fill="#d8b45a"/><path data-part="bufanda" fill="${fill('bufanda')}" d="M66 92 l9 27 l-10 3 l-6 -27z"/><rect data-part="bufanda" fill="${fill('bufanda')}" x="38" y="83" width="44" height="14" rx="7"/><circle data-part="piel" fill="${fill('piel')}" cx="60" cy="54" r="30"/><path data-part="pelo" fill="${fill('pelo')}" d="M28 58 Q24 20 60 18 Q96 20 92 58 Q88 42 78 37 Q72 46 60 41 Q48 47 40 40 Q32 46 28 58Z"/><circle data-part="pelo" fill="${fill('pelo')}" cx="32" cy="36" r="9"/><circle data-part="pelo" fill="${fill('pelo')}" cx="88" cy="36" r="9"/><circle data-part="pelo" fill="${fill('pelo')}" cx="60" cy="16" r="10"/><ellipse cx="49" cy="61" rx="3.6" ry="5.2" fill="#2a2230"/><ellipse cx="71" cy="61" rx="3.6" ry="5.2" fill="#2a2230"/><circle cx="48" cy="59" r="1.3" fill="#fff"/><circle cx="70" cy="59" r="1.3" fill="#fff"/><ellipse cx="41" cy="71" rx="5" ry="2.8" fill="#f0a08a" opacity=".7"/><ellipse cx="79" cy="71" rx="5" ry="2.8" fill="#f0a08a" opacity=".7"/><path d="M55 74 q5 4 10 0" stroke="#a8574e" stroke-width="2" fill="none" stroke-linecap="round"/></svg><div class="look-groups">${LOOK_GROUPS.map(([k,label])=>`<fieldset><legend>${label}</legend>${Object.entries(APPEARANCE[k]).map(([v,c])=>`<button type="button" class="look-swatch" data-look-key="${k}" data-look-value="${esc(v)}" style="--swatch:${c}" aria-pressed="${look[k]===v}" aria-label="${esc(label)}: ${esc(name(k,v))}" title="${esc(name(k,v))}"></button>`).join('')}</fieldset>`).join('')}</div></div>`;
+}
+function bindLookChooser(root){
+  root?.querySelectorAll('.look-swatch').forEach(b=>b.onclick=()=>{const k=b.dataset.lookKey,v=b.dataset.lookValue,look={...APPEARANCE_DEFAULT,...savedAppearance(),[k]:v};
+    storeAppearance(look);root.querySelectorAll(`.look-swatch[data-look-key="${k}"]`).forEach(o=>o.setAttribute('aria-pressed',String(o===b)));
+    root.querySelectorAll(`[data-part="${k}"]`).forEach(p=>p.setAttribute('fill',APPEARANCE[k][v]));world?.setPlayerAppearance?.(chosenAppearance());sound('click');});
+}
+function openLook(){
+  modal(`<div class="eyebrow">REGISTRO DEL INSTITUTO ROXANA</div><h2>Cómo te ven en Ohmdal</h2>${lookChooser()}<button class="primary look-done" type="button">Listo</button>`,'options-modal look-modal');
+  bindLookChooser($('[data-look-root]'));$('.look-done').onclick=closeModal;
+  // Where the traveller stands while choosing: in the middle of what the panel leaves free.
+  if(world){const r=$('.look-modal').getBoundingClientRect(),W=innerWidth,H=innerHeight;world.portraitAim=H>W?{x:.5,y:Math.min(.92,(r.bottom+(H-r.bottom)*.62)/H)}:{x:Math.max(.12,r.left*.5/W),y:.66};world.portrait=true;}
+}
+function askName(next){
+  modal(`<div class="eyebrow">REGISTRO DEL INSTITUTO ROXANA</div><h2>¿Cómo te llamás?</h2><p class="modal-intro">Así te van a conocer en Ohmdal. Es el mismo nombre de tu registro en la escuela; podés cambiarlo después desde Opciones.</p><form id="name-form" class="name-form"><input id="player-name" maxlength="40" autocomplete="nickname" placeholder="Tu nombre" aria-label="Tu nombre" required/>${PEOPLE_3D?`<p class="look-ask">¿Cómo te ves?</p>${lookChooser()}`:''}<button class="primary" type="submit">Cruzar el Portal ${svg('arrow')}</button></form>`,'options-modal name-modal');
+  // A name already known is offered as the placeholder, not as text: typing never lands beside it (ciclo 30).
+  const input=$('#player-name'),known=schoolName();if(known){input.placeholder=known;input.required=false;}setTimeout(()=>input.focus(),0);bindLookChooser($('#name-form [data-look-root]'));
+  $('#name-form').onsubmit=event=>{event.preventDefault();const name=(input.value.trim()||schoolName()).slice(0,40);if(!name){input.focus();return;}storeSchoolName(name);closeModal();next(name);};
+}
+function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);document.documentElement.classList.toggle('lumen-marks',!!settings.lumenMarks);}
 storeSettings();
 
 function refreshTitle(){
@@ -83,16 +122,25 @@ function refreshTitle(){
   $('#save-description').textContent=loaded.state?describe(loaded.state):loaded.error||'Sin prisa. Sin combate. Con curiosidad.';
 }
 refreshTitle();
+// Once the title is on screen, the engine and the first place's files download in the background, all
+// at once: while the traveller reads the title and chooses a name, crossing the Portal stops waiting.
+{const prefetch=()=>loadWorld().then(m=>m.prefetchWorldAssets?.()).catch(()=>{worldModule=null;});if('requestIdleCallback' in window)requestIdleCallback(prefetch,{timeout:1500});else setTimeout(prefetch,300);}
+// Pruebas por tramos (ciclo 30, sólo en desarrollo): ?tramo=castle abre una partida guardada al llegar
+// a ese lugar (dev-tramos/, del recorrido automático), aparte de la del jugador. «Continuar» la abre.
+if(import.meta.env.DEV){const tramo=new URLSearchParams(location.search).get('tramo');if(tramo&&!loadState().state)fetch(`./dev-tramos/${tramo.replace(/[^a-z]/g,'')}.json`).then(r=>r.ok?r.text():null).then(text=>{if(!text)return;try{JSON.parse(text);localStorage.setItem(SAVE_KEY,text);}catch{} /* a missing file comes back as the page itself */refreshTitle();}).catch(()=>{});}
 
 function persist(){
   if(!started)return;
-  if(world)state.position=world.getPlayerPosition();
+  if(world)state.position=world.getSavePosition?.()||world.getPlayerPosition();
   state.settings={...settings};
   const ok=saveState(state);
   $('#save-indicator').textContent=ok?'◈ Bitácora al día':'Guardado no disponible · exportá tu bitácora';
   return ok;
 }
 
+// A control locked by a commissioned installation can still be looked at, but never wins the
+// interaction over a person standing next to it, and says what it is instead of offering a change.
+function isLatched(flag){return WORLD_SYSTEMS.find(system=>(system.requires?.includes(flag)||system.off?.includes(flag))&&state.flags[system.latch]);}
 function refreshWorldSystems(silent=false){
   const changes=evaluateWorld(state)||[];
   for(const change of changes){
@@ -125,7 +173,9 @@ function renderFieldMeasurement(){
   const reading=measureWorld(state.area,state,activeMeasurement.id);
   if(!reading){activeMeasurement=null;show('#field-meter',false);return;}
   const fmt=v=>v===null?'— —':Number(v).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  $('#field-title').textContent=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id)?.label||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
+  const measured=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);
+  // A lever's label is what E will do next; the observation names the thing itself (jugador 21).
+  $('#field-title').textContent=(measured?.kind==='lever'?reading.title:measured?.label)||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
   $('#field-reference').textContent=reading.reference;$('#field-observation').textContent=reading.notice;
   $('#field-meter').classList.toggle('fault',Boolean(reading.overloaded));
 }
@@ -137,16 +187,20 @@ function fieldMeasure(){
   if(recordFieldObservation(state,nearby,reading)){show('#journal-dot');persist();}
 }
 
-function initWorld(){
+// The engine and the world arrive after the title (2026-10-19, rendimiento: the title waited for
+// 540 kB of PlayCanvas it does not use); loadWorld() starts the download as soon as the title shows.
+let worldModule=null;const loadWorld=()=>worldModule??=import('../world.js');
+async function initWorld(){
   if(world)return;
-  world=new World($('#world'));
+  const {PlayCanvasWorld:World}=await loadWorld();if(world)return;
+  world=new World($('#world'));world.isLatched=isLatched;
   workbench=new PuzzleWorkbench($('#workbench'),{
     onChange:(id,snapshot)=>{state.puzzles[id]=snapshot;persist();},
     onSound:sound,
     onClose:()=>{
       show('#workbench',false);world.setInspection(false);mode='world';show('#hud');held.clear();persist();$('#world').focus({preventScroll:true});
       const solved=pendingPuzzleResult;pendingPuzzleResult=null;
-      if(solved){if(solved==='beacon_lens')runFinale();else if(state.activeCinematic?.id===solved)playPendingCinematic();else{world.playRestoration?.(solved);audio.playRestoration?.(solved);queueDialogue(PUZZLE_STORY[solved]?.complete,500);}}
+      if(solved){if(solved==='beacon_lens')runFinale();else if(state.activeCinematic?.id===solved)playPendingCinematic();else{world.playRestoration?.(solved);audio.playRestoration?.(solved);queueDialogue(PUZZLE_STORY[solved]?.complete??SIDE_BENCHES[solved]?.complete,500);}}
     },
     onSolve:(id,result)=>{
       state.flags[id]=true;
@@ -168,18 +222,20 @@ async function startGame(resume=false){
   await audio.unlock();
   if(resume){state=resumeState;settings={...state.settings};storeSettings();}
   else state=freshState(settings);
-  try{initWorld();}catch(error){console.error(error);modalReturn='title';modal('<div class="eyebrow">OHMDAL</div><h2>El mundo no pudo abrirse</h2><p class="modal-intro">El navegador no pudo iniciar los gráficos. Activá la aceleración gráfica del navegador y volvé a intentar, o abrí el juego en Chrome o Edge actualizados.</p>','options-modal');return;}
+  {const registered=schoolName();if(registered)state.playerName=registered;}
+  if(!Array.isArray(state.known))state.known=knownFromSeen(state);
+  try{await initWorld();}catch(error){console.error(error);modalReturn='title';modal('<div class="eyebrow">OHMDAL</div><h2>El mundo no pudo abrirse</h2><p class="modal-intro">El navegador no pudo iniciar los gráficos. Activá la aceleración gráfica del navegador y volvé a intentar, o abrí el juego en Chrome o Edge actualizados.</p>','options-modal');return;}
   $('#transition-name').textContent='Abriendo los caminos de Ohmdal';show('#transition');
   const art=await (assetLoadFailed?world.loadArtAssets():world.assetsReady);
   assetLoadFailed=!art.ok;
   if(assetLoadFailed){
-    show('#transition',false);show('#title-screen');show('#hud',false);show('#dialogue',false);started=false;mode='title';
+    show('#transition',false);show('#title-screen');show('#hud',false);hideDialogueBox();started=false;mode='title';
     console.warn('Ohmdal: no se pudieron cargar las imágenes',art.missing);
     modal('<div class="eyebrow">LOS CAMINOS ESTÁN ESPERANDO</div><h2>Falta cargar el arte</h2><p class="modal-intro">No se pudieron abrir todas las imágenes de Ohmdal. Abrí «Jugar PlayCanvas.cmd» para iniciar el servidor local y volvé a intentar.<br>Tu bitácora guardada sigue disponible.</p><div class="options-actions"><button class="primary" id="retry-art">Volver a intentar</button></div>','options-modal');
     $('#retry-art').onclick=()=>{closeModal();startGame(resume);};
     return;
   }
-  world.cancelCinematic();playingCinematic=false;pendingPuzzleResult=null;dialogue=null;dialogueEnd=null;show('#cinematic',false);show('#dialogue',false);
+  world.cancelCinematic();playingCinematic=false;pendingPuzzleResult=null;dialogue=null;dialogueEnd=null;show('#cinematic',false);hideDialogueBox();
   dialogueQueue.length=0;started=true;mode='world';show('#title-screen',false);show('#hud');held.clear();
   refreshWorldSystems(true);
   await enterArea(state.area,state.position,{initial:true});
@@ -196,7 +252,7 @@ function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   if(transitioning||!AREAS[id])return;
   transitioning=true;if(!continuous){mode='transition';held.clear();world.cancelCinematic();}
-  show('#interaction',false);show('#dialogue',false);show('#arrival',false);
+  show('#interaction',false);hideDialogueBox();show('#arrival',false);
   playingCinematic=false;show('#cinematic',false);
   if(!continuous){$('#transition-name').textContent=AREAS[id].name;show('#transition');if(!initial)await wait(settings.reducedMotion?0:110);}
   state.area=id;state.position=spawn||AREAS[id].spawn;
@@ -205,6 +261,8 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   hudUntil=performance.now()+11000;objectiveUntil=performance.now()+12000;
   $('#hud').classList.remove('settled');$('#objective').classList.remove('folded');$('#objective-toggle').setAttribute('aria-expanded','true');
   for(const [key,value] of Object.entries(AREAS[id].initialFlags||{}))if(!(key in state.flags))state.flags[key]=value;
+  // A save from before the keepers operated their own installations: what their scenes would have set.
+  for(const [scene,effect] of Object.entries(DIALOGUE_EFFECTS))if(state.seen.includes(scene))for(const f of effect.flags)if(!(f in state.flags))state.flags[f]=true;
   refreshWorldSystems(true);
   const first=!state.visited.includes(id);if(first)state.visited.push(id);
   advanceJourneyTime(state);
@@ -214,12 +272,16 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   if(initial&&first&&id==='portal'){world.playPortalArrival();sound('portal');}
   if(initial&&first){$('#arrival h2').textContent=AREAS[id].name;$('#arrival p').textContent=AREAS[id].subtitle||'';show('#arrival');arrivalTimeout=setTimeout(()=>show('#arrival',false),2400);}
   $('#world').focus({preventScroll:true});persist();
-  if(first && AREAS[id].entryDialogue)queueDialogue(AREAS[id].entryDialogue,initial?(id==='portal'?2500:1400):1200,id);
+  // A place introduces itself until that introduction has actually been heard: turning back at the
+  // border or reloading before reaching its heart must not lose it for good.
+  {const entry=AREAS[id].entryDialogue;if(entry&&!state.seen.includes(entry)&&!dialogueQueue.some(q=>q.id===entry))queueDialogue(entry,initial?(id==='portal'?2500:1400):1200,id);}
 }
 
 function linesFor(id){
-  if(Array.isArray(id))return id;
-  try{return resolveDialogue(id,state)||DIALOGUES[id]||[];}catch{return DIALOGUES[id]||[];}
+  let lines;
+  if(Array.isArray(id))lines=id;
+  else try{lines=resolveDialogue(id,state)||DIALOGUES[id]||[];}catch{lines=DIALOGUES[id]||[];}
+  return withIntroductions(lines,state).map(line=>({...line,text:personalize(line.text,state)}));
 }
 function speak(id,onEnd=null,target=null){
   if(typeof id==='string')id=resolveDialogueId(id,state);
@@ -232,9 +294,23 @@ function speak(id,onEnd=null,target=null){
   if(typeof id==='string'&&!state.seen.includes(id))state.seen.push(id);
 }
 const portraits={edda:'edda',ohm:'ohm',lumen:'lumen',nereo:'nereo',vega:'vega',consejera:'consejera',yesca:'yesca',marin:'marin',tala:'tala',player:'player'};
+// Where the dialogue box begins, as a share of the world's height: on a tall screen the box covers the
+// lower half, and the camera lifts the traveller and whoever speaks above it (World dialogueClear).
+function hideDialogueBox(){show('#dialogue',false);if(world)world.dialogueClear=null;}
+function measureDialogueBox(){if(!world||mode!=='dialogue')return;const box=$('#dialogue').getBoundingClientRect(),view=$('#world').getBoundingClientRect();world.dialogueClear=view.height?(box.top-view.top)/view.height:null;}
+// The box grows as the line types itself: follow its size, not only its first frame.
+if('ResizeObserver' in window)new ResizeObserver(measureDialogueBox).observe($('#dialogue'));
 function renderLine(){
-  const line=dialogue.lines[dialogue.index];const character=CHARACTERS[line.speaker]||{name:line.speaker||'Ohmdal',role:''};
-  $('#speaker').textContent=character.name;$('#speaker-role').textContent=character.role||'';
+  requestAnimationFrame(measureDialogueBox);
+  const line=dialogue.lines[dialogue.index];
+  // A name appears in the box when it is said in front of its owner: if the speaker says it,
+  // the label changes as the typing reaches the name.
+  const before=speakerLabel(line.speaker,state);
+  const learned=learnNames(dialogue.lines,dialogue.index,state);
+  const character=learned.includes(line.speaker)?before:speakerLabel(line.speaker,state);
+  nameReveal=null;
+  if(learned.includes(line.speaker)){const at=CHARACTERS[line.speaker].names.map(word=>line.text.indexOf(word)).filter(i=>i>=0).sort((a,b)=>a-b)[0]??0;nameReveal={at,label:speakerLabel(line.speaker,state)};}
+  $('#speaker').textContent=character.name;$('#speaker-role').textContent=character.role||'';$('#speaker').classList.remove('name-revealed');
   $('#portrait').className=`portrait ${portraits[line.speaker]?'portrait-'+portraits[line.speaker]:'portrait-symbol'}`;
   $('#portrait span').textContent=portraits[line.speaker]?'':line.speaker==='narrator'?'Ω':character.name.slice(0,1);
   $('#portrait').style.setProperty('--character-color',character.color||'#c9b084');
@@ -249,6 +325,8 @@ function renderLine(){
   sound('voice');
   state.activeDialogue=typeof dialogue.id==='string'?{id:dialogue.id,index:dialogue.index}:null;persist();
 }
+let nameReveal=null;
+function revealName(){if(!nameReveal)return;$('#speaker').textContent=nameReveal.label.name;$('#speaker-role').textContent=nameReveal.label.role||'';$('#speaker').classList.add('name-revealed');$('#dialogue-announcement').textContent=`${nameReveal.label.name}: ${dialogue.lines[dialogue.index].text}`;nameReveal=null;}
 function removeChoices(){if(typeof document!=='undefined')document.getElementById('dialogue-choices')?.remove();}
 function chooseInDialogue(id){
   if(!dialogue?.lines[dialogue.index]?.choices)return;
@@ -259,22 +337,36 @@ function nextLine(){
   if(!dialogue)return;
   if(dialogue.lines[dialogue.index]?.choices){const focused=document.activeElement?.closest?.('#dialogue-choices button');if(focused)focused.click();return;}
   const text=dialogue.lines[dialogue.index].text;
-  if(typed<text.length){typed=text.length;typing=typed;$('#dialogue-text').textContent=text;return;}
+  if(typed<text.length){typed=text.length;typing=typed;$('#dialogue-text').textContent=text;revealName();return;}
   if(++dialogue.index<dialogue.lines.length){renderLine();return;}
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
   const effect=typeof dialogue.id==='string'&&DIALOGUE_EFFECTS[dialogue.id];if(effect){for(const f of effect.flags)state.flags[f]=true;world?.updateFlags?.(state);refreshWorldSystems();}
-  show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
+  hideDialogueBox();dialogue=null;state.activeDialogue=null;mode='world';interactAfter=performance.now()+450;interactAfterId=nearby?.id??null;$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
 }
 
 function bubble(text){if(mode!=='world'||!$('#field-meter').classList.contains('hidden'))return;$('#ohm-bubble p').textContent=text;show('#ohm-bubble');bubbleUntil=performance.now()+6500;}
 
+// Doors of the houses: a short curtain, then the room (or the street) on the other side.
+async function useDoor(door){
+  if(transitioning||!world||mode!=='world')return;transitioning=true;mode='transition';held.clear();sound('interact');
+  $('#transition-name').textContent=door.leave?(door.label||AREAS[state.area].name):door.label;show('#transition');await wait(settings.reducedMotion?0:260);
+  if(door.leave)world.leaveHome();else world.enterHome(door.enter);
+  await wait(settings.reducedMotion?0:120);show('#transition',false);transitioning=false;mode='world';persist();
+}
+function talkToOhm(){if(mode!=='world')return;const ohm=world?.getCompanion?.();if(ohm)interact(ohm);}
+/** Whether a lever already sits as its installation needs it: joined, or apart for the Calzada's bridge and the wet archive. */
+const leverDone=action=>{const on=!!state.flags[action.flag];return WORLD_SYSTEMS.some(w=>(w.off||[]).includes(action.flag))?!on:on;};
+let undoAsked=null;
 function interact(obj=nearby){
   if(mode!=='world'||!obj)return;
   intendedInteraction=null;
   sound('interact');held.clear();
+  if(obj.door){useDoor(obj.door.leave?{leave:true,label:AREAS[state.area].name}:obj.door);return;}
   if(!hasRequirements(state,obj.requires)){
-    if(obj.lockedDialogue)speak(obj.lockedDialogue);else bubble('Todavía hay algo que observar antes de seguir.');return;
+    // A bench locked for more than one reason says the one that is missing (the Manantial: levers, then Tala).
+    const missing=(obj.requires??[]).find(f=>!hasRequirements(state,[f])),locked=obj.lockedBy?.[missing]??obj.lockedDialogue;
+    if(locked)speak(locked);else bubble('Todavía hay algo que observar antes de seguir.');return;
   }
   if(obj.target){if(world.followPassage(obj))return;enterArea(obj.target,obj.spawn);return;}
   if(obj.secret){
@@ -285,11 +377,14 @@ function interact(obj=nearby){
   if(obj.action){
     const action=obj.action;
     if(action.type==='toggle'){
-      const latched=WORLD_SYSTEMS.find(system=>(system.requires?.includes(action.flag)||system.off?.includes(action.flag))&&state.flags[system.latch]);
+      const latched=isLatched(action.flag);
       if(latched){bubble('Los mandos quedaron asegurados al poner esta instalación en servicio.');return;}
-      state.flags[action.flag]=!state.flags[action.flag];sound('switch');
+      // Undoing a lever that is already right asks twice (players undid finished steps with one E too many).
+      if(leverDone(action)&&!(undoAsked?.id===obj.id&&performance.now()<undoAsked.until)){undoAsked={id:obj.id,until:performance.now()+4000};bubble('Esto ya está como corresponde. Para deshacerlo, usalo otra vez.');return;}
+      undoAsked=null;
+      Object.assign(state.flags,toggleMemory(action.flag,state.flags));state.flags[action.flag]=!state.flags[action.flag];sound('switch');
       toast(state.flags[action.flag]?(action.onText||'Contacto cerrado'):(action.offText||'Contacto abierto'));
-      refreshWorldSystems();persist();return;
+      refreshWorldSystems();persist();const undone=unjoinDialogue(action.flag,state)||joinWarning(action.flag,state);if(undone)speak(undone);return;
     }
     if(action.type==='inspect'){
       const first=!state.flags[action.flag];state.flags[action.flag]=true;refreshWorldSystems();persist();
@@ -300,6 +395,8 @@ function interact(obj=nearby){
   }
   if(obj.puzzle){
     const open=()=>openPuzzle(obj.puzzle);
+    // A neighbour whose minijuego is done just talks; a bench reopens for a look.
+    if(state.flags[obj.puzzle]&&obj.kind==='npc'){speak(obj.afterDialogue||obj.dialogue,null,obj.id);return;}
     if(state.flags[obj.puzzle]){const after=obj.afterDialogue||PUZZLE_STORY[obj.puzzle]?.complete;if(after&&!state.seen.includes(after))speak(after,open);else open();return;}
     const arrival=obj.dialogue||PUZZLE_STORY[obj.puzzle]?.arrival;
     if(arrival&&!state.seen.includes(arrival))speak(arrival,open);else open();return;
@@ -309,7 +406,7 @@ function interact(obj=nearby){
 }
 function openPuzzle(id){mode='puzzle';held.clear();show('#hud',false);show('#arrival',false);world.setInspection(true);show('#workbench');workbench.open(id,state.puzzles[id]);}
 
-function closeModal(){for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
+function closeModal(){if(world)world.portrait=false;for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(mode!=='world'&&modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
 function modal(html,kind='standard'){
   if(mode!=='modal'){modalReturn=mode;modalFocus=document.activeElement;}
   mode='modal';held.clear();show('#interaction',false);for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=true;
@@ -320,36 +417,70 @@ function modal(html,kind='standard'){
 function openJournal(selected){
   if(!started||!['world','modal'].includes(mode))return;
   show('#journal-dot',false);
-  modal(renderJournal(state,{selected:typeof selected==='string'?selected:undefined,puzzles:PUZZLES,evidenceFor:getBenchEvidence}),'journal-modal');
-  const current=document.querySelector('.book-index [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
-  document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);$('.book-leaf')?.scrollIntoView({block:'nearest'});});
+  // Turning forward swings the right leaf in, turning back the left one.
+  const previousPage=document.querySelector('.dj-desk')?.dataset.journalPage,order=[...document.querySelectorAll('.dj-tab')].map(tab=>tab.dataset.journalPage);
+  const turn=typeof selected==='string'&&previousPage&&selected!==previousPage?(order.indexOf(selected)>order.indexOf(previousPage)?'next':'prev'):'';
+  if(turn)sound('page');
+  modal(renderJournal(state,{selected:typeof selected==='string'?selected:undefined,puzzles:PUZZLES,evidenceFor:getBenchEvidence,turn}),'journal-modal');
+  const current=document.querySelector('.dj-tabs [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
+  document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);});
   $('#personal-journal-note')?.addEventListener('input',event=>{state.personalNotes||={};state.personalNotes[event.target.dataset.noteFor]=event.target.value.slice(0,1200);persist();});
+  document.querySelectorAll('[data-journal-download]').forEach(button=>button.onclick=()=>downloadBitacora(button.dataset.journalDownload));
+  if(journalDownload)showDownloadProgress();
+}
+// The Bitácora as a file the player keeps: built in the browser on demand (the PDF tools load only then),
+// as A4 spreads to read or print at home, or as A5 pages for a print shop.
+let journalDownload=null;
+function showDownloadProgress(){
+  const buttons=document.querySelectorAll('[data-journal-download]');
+  buttons.forEach(b=>{b.disabled=!!journalDownload?.busy;});
+  const main=document.querySelector('[data-journal-download="spreads"]');if(main&&journalDownload)main.textContent=journalDownload.label;
+}
+async function downloadBitacora(layout){
+  if(journalDownload?.busy)return;
+  journalDownload={busy:true,label:'Encuadernando…'};showDownloadProgress();
+  try{
+    const {downloadJournal}=await import('./journal-pdf.js');
+    const result=await downloadJournal(state,{layout,puzzles:PUZZLES,evidenceFor:getBenchEvidence,onProgress:(done,total)=>{journalDownload.label=`Encuadernando… ${done}/${total}`;showDownloadProgress();}});
+    journalDownload={busy:false,label:'Descargada ✓'};sound('page');
+    console.info(`Bitácora: ${result.filename}, ${result.sheets} hojas, ${(result.bytes/1048576).toFixed(1)} MB`);
+  }catch(error){console.error(error);journalDownload={busy:false,label:'No se pudo armar. Probá de nuevo'};}
+  showDownloadProgress();
+  setTimeout(()=>{if(journalDownload&&!journalDownload.busy){journalDownload=null;const main=document.querySelector('[data-journal-download="spreads"]');if(main)main.textContent='Descargar la Bitácora';}},6000);
 }
 
-function openGuide(){
+// The golden arrow is a hint, not a road (the user: Pokémon shows no arrow): it appears after a while
+// without progress, or as soon as the player asks for help by opening the Guide or the map.
+const GUIDE_AFTER_MS=75000,guideAlways=import.meta.env.DEV&&new URLSearchParams(location.search).get('flecha')==='siempre';
+let guideProgress='',guideSince=0,guideAsked=false;
+function openGuide(){guideAsked=true;
   if(!started||!['world','modal'].includes(mode))return;
   modal(renderJourneyGuide(state),'guide-modal');
   $('[data-guide-map]').onclick=openMap;
   $('[data-guide-journal]').onclick=openJournal;
 }
 
-function openMap(){
+function openMap(){guideAsked=true;
   if(!started||!['world','modal'].includes(mode))return;
-  modal(`<style>${mapStyles}</style>${renderWorldMap(state,{position:world.getPlayerPosition(),inhabitants:world.getInteractions().filter(o=>o.kind==='npc'),objectiveArea:getObjective(state)?.area})}`,'map-modal');
-  bindMapViews($('#modal-layer'));
+  // The kingdom map: the world painted from above, with the journey drawn over it.
+  modal(renderKingdomMap(state,{position:world.getPlayerPosition(),facing:world.lastStep,inhabitants:world.getInteractions().filter(o=>o.kind==='npc')}),'kingdom-map');
+  sound('map');
+  bindKingdomMap($('#modal-layer'),{onTravel:id=>{if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);}});
   $('[data-map-guide]').onclick=openGuide;
-  document.querySelectorAll('[data-area]').forEach(button=>button.onclick=()=>{const id=button.dataset.area;if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);});
 }
 
 function openOptions(){
   const titleMode=mode==='title';
-  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Tu nombre<span class="setting-note">El de tu registro en el Instituto Roxana</span></span><input id="player-name-option" maxlength="40" autocomplete="nickname" aria-label="Tu nombre" value="${esc(schoolName()||state.playerName||'')}" placeholder="Tu nombre"/></label>${PEOPLE_3D?'<div class="look-row"><span>Tu apariencia<span class="setting-note">Pelo, piel, abrigo y bufanda</span></span><button id="look-option" type="button">Cambiar</button></div>':''}<label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Las marcas de Lumen<span class="setting-note">Cada anillo de las piedras lleva la inicial de su color</span></span><input id="lumen-marks" aria-label="Las marcas de Lumen" type="checkbox" ${settings.lumenMarks?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label><label><span>Caminar con clic<span class="setting-note">Con el mouse. En pantallas táctiles siempre se puede tocar para ir</span></span><input id="click-walk" aria-label="Caminar con clic" type="checkbox" ${settings.clickToWalk?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>O</kbd> Hablar con Ohm <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic sobre algo cercano para usarlo. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  $('#player-name-option').onchange=e=>{const name=e.target.value.trim().slice(0,40);if(!name){e.target.value=schoolName()||state.playerName||'';return;}storeSchoolName(name);state.playerName=name;if(started)persist();toast(`En Ohmdal te conocen como ${name}.`);};
+  $('#look-option')?.addEventListener('click',openLook);
   $('#volume').oninput=e=>{settings.volume=Number(e.target.value);storeSettings();};
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
-  $('#click-walk').onchange=e=>{settings.clickToWalk=e.target.checked;storeSettings();};
+  $('#lumen-marks').onchange=e=>{settings.lumenMarks=e.target.checked;storeSettings();};
+  $('#click-walk').onchange=e=>{settings.clickToWalk=e.target.checked;settings.clickWalkChosen=true;storeSettings();};
   $('#quality').onchange=e=>{settings.quality=e.target.value;storeSettings();world?.resize();};
-  $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:36;storeSettings();};
+  $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:60;storeSettings();};
   $('#resume-option').onclick=closeModal;
   $('#fullscreen').onclick=async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.documentElement.requestFullscreen();}catch{toast('Podés usar F11 para ampliar la ventana.');}};
   $('#export-save')?.addEventListener('click',()=>{persist();const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Bitácora exportada.');});
@@ -362,14 +493,14 @@ function playPendingCinematic(){
   const pending=state.activeCinematic;if(!pending||playingCinematic)return;
   playingCinematic=true;mode='cinematic';held.clear();activePointer=null;
   world.target=null;world.route=[];world.setInspection(false);world.updateFlags(state);
-  clearTimeout(arrivalTimeout);show('#hud',false);show('#arrival',false);show('#dialogue',false);show('#interaction',false);show('#ohm-bubble',false);show('#toast',false);
+  clearTimeout(arrivalTimeout);show('#hud',false);show('#arrival',false);hideDialogueBox();show('#interaction',false);show('#ohm-bubble',false);show('#toast',false);
   world.playRestoration(pending.id);
   if(pending.id!=='beacon_lens')audio.playRestoration?.(pending.id);
   if(pending.id==='beacon_lens'){dialogueQueue.length=0;audio.finale();}
   persist();
   if(!world.startCinematic(pending.id,{reducedMotion:settings.reducedMotion})){finishCinematic();return;}
   $('#cinematic-caption').textContent=world.getCinematicState()?.caption||'';
-  $('#skip-cinematic').disabled=false;$('#skip-cinematic').innerHTML='Saltar escena <kbd>Esc</kbd>';
+  $('#skip-cinematic').disabled=false;$('#skip-cinematic').innerHTML='Saltar escena <kbd>Enter</kbd>';
   show('#cinematic');$('#skip-cinematic').focus({preventScroll:true});
 }
 function skipCinematic(){
@@ -405,22 +536,27 @@ async function startLesson(){
 }
 function showEnding(){
     state.endingPending=true;persist();
-    modalReturn='world';modal(`<div class="eyebrow">ARCO I · COMPLETO</div><div class="end-sigil">Ω</div><h2>La primera luz</h2><p class="end-copy">El Faro vuelve a orientar a quienes lo necesitan.<br>Ahora el conocimiento también sabe encontrar el camino de vuelta.</p>${lessonGift(state)?`<p class="end-gift">A Tala le dejaste ${lessonGift(state).memory}.</p>`:''}<div class="end-stats"><span><strong>${state.visited.length}</strong>lugares compartidos</span><span><strong>${JOURNAL.filter(e=>hasRequirements(state,e.requires)).length}</strong>observaciones</span><span><strong>${state.secrets.length}</strong>recuerdos recuperados</span></div><button class="primary" id="keep-exploring">Seguir en Ohmdal ${svg('arrow')}</button><p class="end-note">Todavía quedan conversaciones, rincones y preguntas.<br>Tu viaje está guardado.</p>`,'ending-modal');$('#keep-exploring').onclick=()=>{world.endCinematic?.();closeModal();bubble('No voy a olvidar esto. Hice una copia. Y otra por si acaso.');};
+    modalReturn='world';modal(`<div class="eyebrow">ARCO I · COMPLETO</div><div class="end-sigil">Ω</div><h2>La primera luz</h2><p class="end-copy">El Faro vuelve a orientar a quienes lo necesitan.<br>Ahora el conocimiento también sabe encontrar el camino de vuelta.</p><p class="end-gift">En el libro de llegadas del Portal, debajo de «Hoy: ${esc(playerName(state))}», Edda agregó: «Volvió la luz».</p>${lessonGift(state)?`<p class="end-gift">A Tala le dejaste ${lessonGift(state).memory}.</p>`:''}<div class="end-stats"><span><strong>${state.visited.length}</strong>lugares compartidos</span><span><strong>${JOURNAL.filter(e=>hasRequirements(state,e.requires)).length}</strong>observaciones</span><span><strong>${state.secrets.length}</strong>recuerdos recuperados</span></div><button class="primary" id="keep-exploring">Seguir en Ohmdal ${svg('arrow')}</button><p class="end-note">Todavía quedan conversaciones, rincones y preguntas.<br>Tu viaje está guardado.</p>`,'ending-modal');$('#keep-exploring').onclick=()=>{world.endCinematic?.();closeModal();bubble('No voy a olvidar esto. Hice una copia. Y otra por si acaso.');};
 }
 
 $('#new-game').onclick=()=>{
-  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">El nuevo viaje reemplazará la bitácora de este navegador. Podés exportar una copia desde Opciones antes de comenzar.</p><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');$('#confirm-new').onclick=()=>{closeModal();startGame(false);};$('#cancel-new').onclick=closeModal;}
-  else startGame(false);
+  if(loadState().state){modal('<div class="eyebrow">UN NUEVO COMIENZO</div><h2>Volver a cruzar</h2><p class="modal-intro">Un viaje nuevo empieza desde el Portal y reemplaza tu viaje guardado en este navegador (con su cuaderno, la Bitácora). Si querés conservarlo, guardá una copia antes.</p><button class="quiet" id="export-before-new">Guardar una copia de mi bitácora</button><button class="primary" id="confirm-new">Comenzar un nuevo viaje</button><button class="quiet" id="cancel-new">Conservar mi viaje</button>','options-modal');
+    $('#export-before-new').onclick=()=>{const saved=loadState().state;if(!saved)return;const blob=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='Ohmdal-La-Luz-bitacora.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Bitácora guardada.');};$('#confirm-new').onclick=()=>{closeModal();askName(()=>startGame(false));};$('#cancel-new').onclick=closeModal;}
+  // Every new journey opens the register (ciclo 30): the name comes filled in from the school, and
+  // the look can be chosen again; a player whose name was already known never saw the chooser.
+  else askName(()=>startGame(false));
 };
-$('#continue').onclick=()=>startGame(true);$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
-$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
+$('#continue').onclick=()=>{if(!schoolName()&&!loadState().state?.playerName)askName(()=>startGame(true));else startGame(true);};$('#title-settings').onclick=openOptions;$('#pause-button').onclick=openOptions;
+$('#ohm-button').onclick=()=>talkToOhm();$('#guide-button').onclick=openGuide;$('#journal-button').onclick=openJournal;$('#map-button').onclick=openMap;$('#interact-button').onclick=()=>interact();$('#touch-interact').onclick=()=>interact();$('#dialogue-next').onclick=nextLine;
 $('#field-measure').onclick=fieldMeasure;$('#close-field-meter').onclick=()=>{activeMeasurement=null;show('#field-meter',false);};
 $('#objective-toggle').onclick=()=>{const folded=$('#objective').classList.toggle('folded');$('#objective-toggle').setAttribute('aria-expanded',String(!folded));objectiveUntil=folded?0:Infinity;};
 $('#dialogue-text').onclick=nextLine;
 $('#skip-cinematic').onclick=skipCinematic;
 $('#world').addEventListener('pointerdown',event=>{
   if(mode!=='world'||event.button!==0)return;
-  const object=world.pickInteraction(event.clientX,event.clientY);
+  // A click on the golden arrow goes to what it marks (ciclo 30: players clicked the arrow and the
+  // ground under it lay inside a planter, so nobody moved).
+  const object=world.guidePick?.(event.clientX,event.clientY)||world.pickInteraction(event.clientX,event.clientY);
   intendedInteraction=null;
   // With a mouse the keyboard walks; a click only uses what is within reach. Touch keeps tap-to-go.
   const walk=event.pointerType!=='mouse'||settings.clickToWalk;
@@ -442,6 +578,11 @@ window.addEventListener('keydown',event=>{
   if(mode==='puzzle')return;
   if(mode==='modal'){
     if(event.key==='Escape'){event.preventDefault();if(!event.repeat)closeModal();return;}
+    // The key that opened a window closes it again (J, M, H), unless someone is writing in it.
+    if(!event.repeat&&!['INPUT','SELECT','TEXTAREA'].includes(event.target.tagName)&&!event.target.isContentEditable){
+      const k=event.key.toLowerCase();
+      if((k==='j'&&$('.journal-modal'))||(k==='m'&&$('.kingdom-map'))||((k==='h'||k==='?')&&$('.guide-modal'))){event.preventDefault();closeModal();return;}
+    }
     if(event.key==='Tab'){
       const controls=[...$('#modal-layer').querySelectorAll('button,input,select,textarea,summary,a[href],[tabindex]')].filter(x=>!x.disabled&&x.tabIndex>=0&&x.getClientRects().length);
       if(controls.length){const first=controls[0],last=controls.at(-1);if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}}
@@ -453,30 +594,48 @@ window.addEventListener('keydown',event=>{
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Enter','Escape'].includes(event.key))event.preventDefault();
   if(event.key==='Escape'){
     if(event.repeat)return;
-    if(mode==='dialogue')nextLine();else if(mode==='world')openOptions();return;
+    // Escape puts Ohm's instrument away first, then pauses (ciclo 30).
+    if(mode==='dialogue')nextLine();else if(mode==='world'&&activeMeasurement){activeMeasurement=null;show('#field-meter',false);}else if(mode==='world')openOptions();return;
   }
   if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
-  if(['e','E','Enter',' '].includes(event.key)){if(!event.repeat)interact();return;}
+  // Just after a conversation, the same key does not use anything (a player re-opened a closure by
+  // pressing Enter once too often, ciclo 30): E and Enter wait a moment for every object.
+  // Enter is how conversations advance: in the world it never moves a lever (jugador 26 undid two
+  // with an Enter too many) and uses other things only a while after the last one
+  // ended (a player kept pressing Enter at the pump's box and heard Vega's line again and again).
+  if(['e','E','Enter',' '].includes(event.key)){const now=performance.now();if(event.key==='Enter'?now<interactAfter+950&&nearby:now<interactAfter&&nearby&&nearby.id===interactAfterId){if(event.key!=='Enter')interactAfter=now+450;}else if(event.key==='Enter'&&nearby?.action?.type==='toggle'){if(!event.repeat)bubble('Las manivelas se mueven con E.');}else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}
   if(['q','Q'].includes(event.key)){fieldMeasure();return;}
-  held.add(event.key);
+  if(['o','O'].includes(event.key)&&!event.repeat){talkToOhm();return;}
+  held.add(event.key);if(!event.repeat)pressedAt.set(event.key,performance.now());
 });
-window.addEventListener('keyup',event=>held.delete(event.key));
+// A short tap still takes a short step (ciclo 30): the key counts as held for at least 180 ms.
+const pressedAt=new Map();
+window.addEventListener('keyup',event=>{const since=performance.now()-(pressedAt.get(event.key)??-1e9),key=event.key;pressedAt.delete(key);if(since>=180)held.delete(key);else tapRelease.set(key,performance.now()+180-since);});
+const tapRelease=new Map();
 window.addEventListener('blur',()=>{held.clear();persist();});
 document.addEventListener('visibilitychange',()=>{held.clear();persist();audio.setMuted(document.hidden||settings.muted);});
 window.addEventListener('beforeunload',persist);
 window.addEventListener('resize',()=>world?.resize());
 
 function loop(now){
-  const dt=document.hidden?0:Math.min((now-lastTime)/1000,0.05);lastTime=now;
+  // A slow frame (a weak phone, a throttled window) is caught up in steps of at most 50 ms, up to a
+  // quarter second: walking keeps its pace instead of slowing down with the frame rate (ciclo 30).
+  // The journey's clock is the real one (a bench or a conversation is travel too; jugador 23 saw
+  // «4 min de viaje» after two hours in a throttled window), at most 5 s per frame.
+  const wall=document.hidden?0:Math.min((now-lastTime)/1000,5);
+  const elapsed=document.hidden?0:Math.min((now-lastTime)/1000,0.25),steps=Math.max(1,Math.ceil(elapsed/0.05)),dt=elapsed/steps;lastTime=now;
   if(world && !world.disposed && started && mode!=='title'&&!document.hidden&&!world.preparingJourney){
     const x=mode==='world'?Number(held.has('d')||held.has('D')||held.has('ArrowRight'))-Number(held.has('a')||held.has('A')||held.has('ArrowLeft')):0;
     const z=mode==='world'?Number(held.has('s')||held.has('S')||held.has('ArrowDown'))-Number(held.has('w')||held.has('W')||held.has('ArrowUp')):0;
     if(x||z||mode!=='world')intendedInteraction=null;
-    world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
+    for(let i=0;i<steps;i++)world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
+    // A short tap is let go only after a frame has used it: at one frame a second it still gives a step.
+    for(const [key,at] of tapRelease)if(performance.now()>=at){tapRelease.delete(key);if(!pressedAt.has(key))held.delete(key);}
+    state.playtime+=wall;
     if(world.getAudioScene)audio.updateWorld?.(world.getAudioScene());
     if(mode==='cinematic'){
       const scene=world.getCinematicState();
@@ -485,7 +644,14 @@ function loop(now){
     }
     if(world.walking&&mode==='world')sound(`step:${world.groundKind?.()||'stone'}${held.has('Shift')?':run':''}`);
     if(mode==='world'){
-      if(now-travelTick>250){travelTick=now;updateTravelInstrument(document,state,world.getPlayerPosition(),getObjective(state));}
+      if(now-travelTick>250){
+        // Inside, the door is behind the camera: a chip at the bottom edge says where the way out is.
+        const way=!isExterior(state.area)&&!world.home?AREAS[state.area]?.exits?.[0]:null;let chip=$('#exit-hint');
+        if(way&&!chip){chip=document.createElement('button');chip.id='exit-hint';chip.className='exit-hint';chip.type='button';chip.onclick=()=>{const o=world.getInteractions().find(i=>i.id===way.id);if(o&&!world.canInteractWith(o))world.approachInteraction(o);intendedInteraction=way.id;};$('#hud').append(chip);}
+        if(chip){chip.hidden=!way||nearby?.id===way?.id;if(way)chip.innerHTML=`<span aria-hidden="true">↓</span> Salida: ${esc(way.label)}`;}
+        travelTick=now;const objective=getObjective(state);updateTravelInstrument(document,state,world.getPlayerPosition(),objective);
+        const progress=`${state.area}|${Object.values(state.flags).filter(Boolean).length}|${Object.values(state.puzzles||{}).filter(p=>p?.completed).length}`;if(progress!==guideProgress){guideProgress=progress;guideSince=now;guideAsked=false;}
+        world.setGuide?.(guideAlways||guideAsked||now-guideSince>GUIDE_AFTER_MS?guideTarget(state,objective):null);}
       const crossing=world.getTravelEvent();
       if(crossing?.locked)interact(crossing.locked);
       else if(crossing?.target)enterArea(crossing.target,null,{continuous:true});
@@ -495,20 +661,31 @@ function loop(now){
       if(dialogueQueue.length&&dialogueQueue[0].due<=now&&world.isInsidePlace())speak(dialogueQueue.shift().id);
     }
     if(mode==='world'){
-      state.playtime+=dt;autosave+=dt;
+      autosave+=elapsed;
+      {const door=world.getDoorEvent?.();if(door){useDoor(door.leave?{leave:true,label:AREAS[state.area].name}:door);}}
       nearby=world.getNearby();
-      $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
-      $('#touch-interact').setAttribute('aria-label',nearby?.label||'Acercate a una persona o instalación');
+      // Every frame, but written only when it changes: an unchanged write still recomputes the HUD's
+      // styles (60 times a second, 2026-10-19).
+      {const ohm=$('#ohm-button'),hide=!world.getCompanion();if(ohm.hidden!==hide)ohm.hidden=hide;const touch=$('#touch-interact');if(touch.disabled!==!nearby)touch.disabled=!nearby;
+      const word=nearby?'Interactuar':'Acercate';if(touch.textContent!==word)touch.textContent=word;const said=nearby?.label||'Acercate a una persona o instalación';if(touch.getAttribute('aria-label')!==said)touch.setAttribute('aria-label',said);}
       if(intendedInteraction){const object=world.getInteractions().find(o=>o.id===intendedInteraction);if(!object)intendedInteraction=null;else if(world.canInteractWith(object)){intendedInteraction=null;world.target=null;world.route=[];interact(object);}else if(!world.target&&!world.route.length){if(!world.approachInteraction(object))intendedInteraction=null;}}
       show('#interaction',mode==='world'&&!!nearby);
       if(nearby&&mode==='world'){
         $('#interaction').classList.toggle('companion-prompt',nearby.id==='ohm_companion');
-        let label=nearby.label||'Observar';
-        if(nearby.action?.type==='toggle')label=(state.flags[nearby.action.flag]?nearby.action.offLabel:nearby.action.onLabel)||label;
-        $('#interaction-label').textContent=label;
+        let label=personLabel(nearby,state)||'Observar';
+        // A lever already set says so first: «Reconectar…» alone read as «still to do» (jugador 22).
+        if(nearby.action?.type==='toggle')label=isLatched(nearby.action.flag)?'Mando asegurado':(()=>{const a=nearby.action,next=state.flags[a.flag]?a.offLabel:a.onLabel,done=leverDone(a);if(!hasRequirements(state,nearby.requires))return 'Todavía no';return done&&next?'✓ Hecho':next;})()||label;
+        // A bench says it opens (ciclo 30: a player measured the gate's regulator without knowing E opened it).
+        else if(nearby.puzzle&&nearby.kind==='panel')label=`${hasRequirements(state,nearby.requires)?'Abrir':'Mirar'}: ${nearby.label}`;
+        // A way to another place says so (jugador 21 read «El Lago de las Señales» as a signpost).
+        else if(nearby.target&&AREAS[nearby.target]&&!/^Volver/.test(nearby.label))label=`Camino a: ${nearby.label}`;
+        if($('#interaction-label').textContent!==label)$('#interaction-label').textContent=label;
         const candidate=state.area+nearby.id+JSON.stringify(state.flags);if(candidate!==lastMeasurementCandidate){lastMeasurementCandidate=candidate;measurementAvailable=Boolean(state.flags.awaken&&measureWorld(state.area,state,nearby.id));}show('#field-measure',measurementAvailable);
         const pos=world.getScreenPosition(nearby),prompt=$('#interaction');
         const blocked=world.area.exits.map(exit=>world.getScreenPosition({...exit,target:true})).filter(point=>point.visible).map(point=>({left:point.x-30,right:point.x+30,top:point.y-24,bottom:point.y+24}));
+        // Never over the player: the figure is what the eye follows while walking up to something.
+        {const [px,pz]=world.getPlayerPosition(),feet=world.getScreenPosition({x:px,z:pz,ground:true}),head=world.getScreenPosition({x:px,z:pz,character:true});
+          if(feet.visible||head.visible)blocked.push({left:Math.min(feet.x,head.x)-24,right:Math.max(feet.x,head.x)+24,top:Math.min(feet.y,head.y)-14,bottom:Math.max(feet.y,head.y)+6});}
         for(const selector of ['#travel-instrument','#field-meter','#ohm-bubble','.dpad','#touch-interact']){
           const element=$(selector);if(element.getClientRects().length)blocked.push(element.getBoundingClientRect());
         }
@@ -518,7 +695,7 @@ function loop(now){
       }
       if(activeMeasurement){const position=world.getPlayerPosition();const inReach=Math.hypot(position[0]-activeMeasurement.x,position[1]-activeMeasurement.z)<4;show('#field-meter',inReach);const flags=JSON.stringify(state.flags);if(flags!==lastMeasuredFlags){lastMeasuredFlags=flags;renderFieldMeasurement();if(inReach){const object=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);if(recordFieldObservation(state,object,measureWorld(state.area,state,activeMeasurement.id)))show('#journal-dot');}}}
       if(autosave>5){autosave=0;persist();}
-      chatterClock+=dt;
+      chatterClock+=elapsed;
       if(state.flags.awaken&&chatterClock>38&&$('#field-meter').classList.contains('hidden')){
         chatterClock=0;
         const line=(OHM_CHATTER[state.area]||[]).find(c=>!state.seen.includes(c.id)&&hasRequirements(state,c.requires)&&!(c.unless||[]).some(f=>state.flags[f]));
@@ -527,12 +704,13 @@ function loop(now){
     }else {show('#interaction',false);show('#field-meter',false);}
   }
   if(mode==='dialogue'&&dialogue){
-    const line=dialogue.lines[dialogue.index];typing+=dt*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
-    if(amount>typed){typed=amount;$('#dialogue-text').textContent=line.text.slice(0,typed);}
+    const line=dialogue.lines[dialogue.index];typing+=elapsed*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
+    if(amount>typed){typed=amount;$('#dialogue-text').textContent=line.text.slice(0,typed);if(nameReveal&&typed>=nameReveal.at)revealName();}
   }
   if(now>bubbleUntil)show('#ohm-bubble',false);
   requestAnimationFrame(loop);
 }
 requestAnimationFrame(loop);
 // Development-only inspection of the actual game; excluded from production.
-if(import.meta.env.DEV)window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench}};
+// Read-only inspection for tests: development, or a measurement build (VITE_INSPECT=1), never the shipped one.
+if(import.meta.env.DEV||import.meta.env.VITE_INSPECT==='1')window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench},areaEntryDialogue:id=>AREAS[id]?.entryDialogue??null};

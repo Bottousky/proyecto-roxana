@@ -1,0 +1,133 @@
+{
+ "site": "http://127.0.0.1:4197/proyecto-roxana/",
+ "at": "2026-10-20T02:13:37.648Z",
+ "escuela": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 3.55,
+  "byTypeMB": {
+   "Image": 1.5,
+   "Fetch": 1.25,
+   "Script": 0.64,
+   "Font": 0.14,
+   "Stylesheet": 0.01,
+   "Document": 0
+  },
+  "fcp": 256,
+  "lcp": 256,
+  "domContentLoaded": 923,
+  "load": 991,
+  "longTasksMs": 665,
+  "longTasks": 5,
+  "heapMB": 89.8,
+  "networkIdleMs": 7818,
+  "scriptMs": 593,
+  "errors": []
+ },
+ "escuelaRepetida": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Font": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Fetch": 0
+  }
+ },
+ "titulo": {
+  "requests": 10,
+  "fromCache": 0,
+  "bytesMB": 1.05,
+  "byTypeMB": {
+   "Script": 0.71,
+   "Image": 0.23,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "fcp": 888,
+  "lcp": 888,
+  "domContentLoaded": 849,
+  "load": 1176,
+  "longTasksMs": 0,
+  "longTasks": 0,
+  "heapMB": 9,
+  "titleReadyMs": 870,
+  "networkIdleMs": 1683,
+  "scriptMs": 15,
+  "errors": []
+ },
+ "partidaNueva": {
+  "requests": 16,
+  "fromCache": 0,
+  "bytesMB": 15.13,
+  "byTypeMB": {
+   "Fetch": 8.6,
+   "Image": 6.53
+  },
+  "worldMs": 15857,
+  "heapMB": 59
+ },
+ "partidaNuevaTotal": {
+  "requests": 51,
+  "fromCache": 0,
+  "bytesMB": 28.22,
+  "byTypeMB": {
+   "Image": 10.93,
+   "Fetch": 9.06,
+   "XHR": 8.23
+  },
+  "quietMs": 31586,
+  "heapMB": 175
+ },
+ "tituloRepetido": {
+  "requests": 11,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "XHR": 0,
+   "Document": 0,
+   "Stylesheet": 0,
+   "Script": 0,
+   "Image": 0,
+   "Font": 0
+  }
+ },
+ "partidaInmediata": {
+  "requests": 88,
+  "fromCache": 0,
+  "bytesMB": 37.31,
+  "byTypeMB": {
+   "XHR": 14.02,
+   "Image": 13.39,
+   "Fetch": 9.06,
+   "Script": 0.71,
+   "Font": 0.09,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "worldMs": 41966
+ },
+ "mundo": [
+  {
+   "label": "quieto (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 2.93,
+   "scriptMsPerFrame": 2.7,
+   "layoutsPerSec": 4.3,
+   "styleRecalcsPerSec": 71.4
+  },
+  {
+   "label": "caminando (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 3.1,
+   "scriptMsPerFrame": 2.86,
+   "layoutsPerSec": 15.3,
+   "styleRecalcsPerSec": 65.9
+  }
+ ],
+ "mundoErrores": []
+}

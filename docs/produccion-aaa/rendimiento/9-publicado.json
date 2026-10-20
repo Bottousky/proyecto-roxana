@@ -1,0 +1,133 @@
+{
+ "site": "https://bottousky.github.io/proyecto-roxana/",
+ "at": "2026-10-20T11:20:01.651Z",
+ "escuela": {
+  "requests": 23,
+  "fromCache": 0,
+  "bytesMB": 2.63,
+  "byTypeMB": {
+   "Image": 1.6,
+   "Script": 0.65,
+   "Fetch": 0.24,
+   "Font": 0.14,
+   "Stylesheet": 0.01,
+   "Document": 0
+  },
+  "fcp": 592,
+  "lcp": 592,
+  "domContentLoaded": 1190,
+  "load": 1257,
+  "longTasksMs": 580,
+  "longTasks": 5,
+  "heapMB": 105.5,
+  "networkIdleMs": 8298,
+  "scriptMs": 644,
+  "errors": []
+ },
+ "escuelaRepetida": {
+  "requests": 23,
+  "fromCache": 2,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Font": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Fetch": 0
+  }
+ },
+ "titulo": {
+  "requests": 42,
+  "fromCache": 0,
+  "bytesMB": 15.18,
+  "byTypeMB": {
+   "Fetch": 14.12,
+   "Script": 0.72,
+   "Image": 0.23,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "fcp": 440,
+  "lcp": 440,
+  "domContentLoaded": 383,
+  "load": 1008,
+  "longTasksMs": 0,
+  "longTasks": 0,
+  "heapMB": 26.2,
+  "titleReadyMs": 770,
+  "networkIdleMs": 15197,
+  "scriptMs": 34,
+  "errors": []
+ },
+ "partidaNueva": {
+  "requests": 31,
+  "fromCache": 25,
+  "bytesMB": 0.09,
+  "byTypeMB": {
+   "Image": 0.07,
+   "Font": 0.02
+  },
+  "worldMs": 3662,
+  "heapMB": 212.3
+ },
+ "partidaNuevaTotal": {
+  "requests": 42,
+  "fromCache": 25,
+  "bytesMB": 3.35,
+  "byTypeMB": {
+   "XHR": 2.56,
+   "Image": 0.77,
+   "Font": 0.02,
+   "Fetch": 0
+  },
+  "quietMs": 18800,
+  "heapMB": 125.9
+ },
+ "tituloRepetido": {
+  "requests": 43,
+  "fromCache": 29,
+  "bytesMB": 8.57,
+  "byTypeMB": {
+   "Fetch": 8.57,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Font": 0,
+   "Image": 0
+  }
+ },
+ "partidaInmediata": {
+  "requests": 72,
+  "fromCache": 25,
+  "bytesMB": 15.24,
+  "byTypeMB": {
+   "Fetch": 14.12,
+   "Script": 0.72,
+   "Image": 0.3,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "worldMs": 16066
+ },
+ "mundo": [
+  {
+   "label": "quieto (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 2.96,
+   "scriptMsPerFrame": 2.62,
+   "layoutsPerSec": 23.6,
+   "styleRecalcsPerSec": 79.7
+  },
+  {
+   "label": "caminando (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 2.83,
+   "scriptMsPerFrame": 2.64,
+   "layoutsPerSec": 0,
+   "styleRecalcsPerSec": 60
+  }
+ ],
+ "mundoErrores": []
+}

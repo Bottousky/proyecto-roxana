@@ -7,11 +7,11 @@ import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { findPath } from './navigation.js';
 import { buildArchitecture } from './architecture.js';
 import { buildFountain, buildCuriosity as buildLandmark } from './landmarks.js';
-import { AREA_LAYOUTS, pointOnPaving, lakeShoreX } from './world-layout.js';
+import { AREA_LAYOUTS, pointOnPaving, lakeShoreX, backdropFrame, backdropYards } from './world-layout.js';
 import { buildPaving, buildPlayableBoundary } from './world-ground.js';
 import { buildSpringWaterworks, buildLighthouseIslet } from './world-waterworks.js';
 import { moveWithCollisions, isPositionClear, isSegmentClear } from './collision.js';
-import { HUMAN_ACTORS, ACTOR_ATLAS, idleActor, advanceActor, opaqueBounds, actorFrameLayout } from './actor-animation.js';
+import { HUMAN_ACTORS, ACTOR_ATLAS, idleActor, advanceActor, opaqueBounds, actorFrameLayout, isolateFigure } from './actor-animation.js';
 import { createCinematic, sampleCinematic, returningCinematic, gameplayCameraPose } from './cinematics.js';
 import { isMechanicalControl, readControlFeedback, readReceiverFeedback, worldFeedbackSignature } from './world-feedback.js';
 import { buildGateway } from './world-gateway.js';
@@ -87,7 +87,9 @@ function textureSet() {
     for(let i=0;i<640;i++){const b=branches[Math.floor(rand()*branches.length)],x=b[0]+(rand()-.5)*55,y=b[1]+(rand()-.5)*46;const v=80+rand()*75;c.fillStyle=`rgb(${v+13},${v+34},${v*.63})`;c.save();c.translate(x,y);c.rotate(rand()*6);c.beginPath();c.ellipse(0,0,2.5+rand()*4.5,1.5+rand()*2.5,0,0,Math.PI*2);c.fill();if(i%4===0){c.strokeStyle='rgba(220,222,133,.36)';c.lineWidth=.8;c.beginPath();c.moveTo(-3,0);c.lineTo(3,0);c.stroke();}c.restore();}
   });
   const fern=canvasTexture(128,(c,s)=>{c.strokeStyle='#536d43';c.lineWidth=2;for(let k=0;k<9;k++){const a=-Math.PI*.95+k*Math.PI*.115,endX=64+Math.cos(a)*55,endY=102+Math.sin(a)*90;c.beginPath();c.moveTo(64,120);c.quadraticCurveTo(64,82,endX,endY);c.stroke();for(let j=1;j<10;j++){const f=j/10,x=64+(endX-64)*f,y=120+(endY-120)*f,w=(1-f)*15;c.fillStyle=k%2?'#91a773':'#638c58';for(const side of [-1,1]){c.beginPath();c.ellipse(x+side*w*.4,y-2,w*.7,2,-side*.4,0,Math.PI*2);c.fill();}}}});
-  return {stone,wood,roof,ground,cobble,glow,foliage,fern};
+  // Entramado: paneles de revoque claro entre vigas oscuras (la versión PlayCanvas usa la textura pixel art).
+  const timber=canvasTexture(256,(c,s)=>{c.fillStyle='#e8dfc9';c.fillRect(0,0,s,s);c.fillStyle='#4a3526';for(const x of [0,s/3,2*s/3])c.fillRect(x,0,14,s);for(const y of [0,s/2])c.fillRect(0,y,s,14);c.strokeStyle='#4a3526';c.lineWidth=12;c.beginPath();c.moveTo(14,s/2);c.lineTo(s/3,14);c.moveTo(2*s/3+14,14);c.lineTo(s,s/2);c.stroke();});
+  return {stone,wood,roof,ground,cobble,glow,foliage,fern,timber};
 }
 
 const GradeShader={uniforms:{tDiffuse:{value:null},time:{value:0},restored:{value:0},night:{value:0}},vertexShader:`varying vec2 vUv; void main(){ vUv=uv; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.); }`,fragmentShader:`uniform sampler2D tDiffuse; uniform float time; uniform float restored; uniform float night; varying vec2 vUv;
@@ -174,10 +176,13 @@ export class World {
     for(const name of HUMAN_ACTORS)load(`/assets/actors/${name}.webp`,(img,own)=>{
       const tiles=[],bounds=[],width=img.naturalWidth||img.width,height=img.naturalHeight||img.height;
       for(let row=0;row<ACTOR_ATLAS.rows;row++)for(let col=0;col<ACTOR_ATLAS.columns;col++){
-        const x=Math.round(col*width/ACTOR_ATLAS.columns),y=Math.round(row*height/ACTOR_ATLAS.rows),w=Math.round((col+1)*width/ACTOR_ATLAS.columns)-x,h=Math.round((row+1)*height/ACTOR_ATLAS.rows)-y;
+        // Cut a window wider than the cell and keep only this cell's figure: sheets are drawn loosely.
+        const cx0=Math.round(col*width/ACTOR_ATLAS.columns),cy0=Math.round(row*height/ACTOR_ATLAS.rows),cx1=Math.round((col+1)*width/ACTOR_ATLAS.columns),cy1=Math.round((row+1)*height/ACTOR_ATLAS.rows);
+        const x=Math.max(0,cx0-48),y=Math.max(0,cy0-48),w=Math.min(width,cx1+48)-x,h=Math.min(height,cy1+48)-y;
         const tile=document.createElement('canvas');tile.width=w;tile.height=h;const ctx=tile.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,x,y,w,h,0,0,w,h);
         const data=ctx.getImageData(0,0,w,h),pixels=data.data;
         for(let i=0;i<pixels.length;i+=4){const magenta=Math.min(pixels[i],pixels[i+2])-pixels[i+1];if(magenta>50&&pixels[i]>95&&pixels[i+2]>90){pixels[i+3]=Math.min(pixels[i+3],Math.max(0,255-(magenta-50)*5));if(pixels[i+3]<30)pixels[i+3]=0;}}
+        isolateFigure(pixels,w,h,{x0:cx0-x,x1:cx1-x,y0:cy0-y,y1:cy1-y});
         ctx.putImageData(data,0,0);tiles.push(tile);bounds.push(opaqueBounds(pixels,w,h));
       }
       const {placements}=actorFrameLayout(bounds),directions=Array.from({length:4},()=>[]);
@@ -214,15 +219,15 @@ export class World {
 
   loadArea(area,state={},spawn,{deferRender=false,continuous=false}={}) {
     if(!this.lastAssetResult?.ok)throw new Error(`Required artwork is not ready. Await assetsReady and retry loadArtAssets if needed. Missing: ${(this.lastAssetResult?.missing||[]).join(', ')}`);
-    this.clearArea();this.area=area;this.layout=AREA_LAYOUTS[area.id];this.pavingGrid=null;this.boundaryObstacles=[];this.state=state;this.rand=seeded(area.id);this.root=new THREE.Group();this.scene.add(this.root);this.localGeometries=[];this.obstacles=[];this.walkSurfaces=[];this.animations=[];this.lamps=[];this.machines=[];this.actors=[];this.waterMaterials=[];this.restorationParticles=[];this.objectModels=new Map();this.levers=[];this.conductors=[];this.treeModels=[];this.fountainStreams=[];this.fountainWater=[];this.irrigationWater=[];this.springWaterworks=null;this.dormantOhm=null;this.gateLeaf=null;this.gateObstacle=null;this.gateway=null;this.cinematic=null;this.target=null;
+    this.clearArea();this.area=area;this.layout=AREA_LAYOUTS[area.id];this.pavingGrid=null;this.boundaryObstacles=[];this.state=state;this.rand=seeded(area.id);this.root=new THREE.Group();this.scene.add(this.root);this.localGeometries=[];this.obstacles=[];this.walkSurfaces=[];this.animations=[];this.lamps=[];this.hangingLamps=[];this.machines=[];this.actors=[];this.waterMaterials=[];this.restorationParticles=[];this.objectModels=new Map();this.levers=[];this.conductors=[];this.treeModels=[];this.fountainStreams=[];this.fountainWater=[];this.irrigationWater=[];this.springWaterworks=null;this.dormantOhm=null;this.gateLeaf=null;this.gateObstacle=null;this.gateObstacles=[];this.gateway=null;this.cinematic=null;this.target=null;
     this.continuous=continuous&&area.id!=='workshop';this.coreBounds=area.bounds;
     const p=PALETTES[area.id]||PALETTES.plaza;this.palette=p;this.scene.background=new THREE.Color(p.sky);this.scene.fog=new THREE.FogExp2(p.fog,area.id==='workshop'?.0015:.004);
-    this.m={stone:this.mat(p.stone,'stone'),stoneDark:this.mat('#6d786c','stone'),cream:this.mat('#d5c2a0','stone'),wood:this.mat('#ad8150','wood'),darkwood:this.mat('#5e4837','wood'),roof:this.mat('#648b89','roof'),roofRed:this.mat('#ba7858','roof'),metal:this.mat('#4c655f',null,{metalness:.72,roughness:.5}),brass:this.mat('#bc9857',null,{metalness:.65,roughness:.36}),grass:this.mat(p.grass,'ground'),path:this.mat('#d0bd96','cobble'),leaf:this.mat('#518557'),leafLight:this.mat('#8c9a52'),flower:this.mat('#e0c27c'),blue:this.mat('#56c7c6',null,{emissive:'#42bdbc',emissiveIntensity:.75}),dark:this.mat('#233d41'),cloth:this.mat('#c6a365',null,{side:THREE.DoubleSide}),redcloth:this.mat('#a85f4d',null,{side:THREE.DoubleSide}),glass:this.mat('#edca8a',null,{emissive:'#fdb966',emissiveIntensity:.45}),white:this.mat('#e3d2a1')};
+    this.m={stone:this.mat(p.stone,'stone'),stoneDark:this.mat('#6d786c','stone'),cream:this.mat('#d5c2a0','stone'),timber:this.mat('#ffffff','timber'),wood:this.mat('#ad8150','wood'),darkwood:this.mat('#5e4837','wood'),roof:this.mat('#648b89','roof'),roofRed:this.mat('#ba7858','roof'),metal:this.mat('#4c655f',null,{metalness:.72,roughness:.5}),brass:this.mat('#bc9857',null,{metalness:.65,roughness:.36}),grass:this.mat(p.grass,'ground'),path:this.mat('#d0bd96','cobble'),leaf:this.mat('#518557'),leafLight:this.mat('#8c9a52'),flower:this.mat('#e0c27c'),blue:this.mat('#56c7c6',null,{emissive:'#42bdbc',emissiveIntensity:.75}),dark:this.mat('#233d41'),cloth:this.mat('#c6a365',null,{side:THREE.DoubleSide}),redcloth:this.mat('#a85f4d',null,{side:THREE.DoubleSide}),glass:this.mat('#edca8a',null,{emissive:'#fdb966',emissiveIntensity:.45}),white:this.mat('#e3d2a1')};
     const groundTones={portal:'#bac4ab',plaza:'#c1c9a9',road:'#c4c4aa',spring:'#b4c5b7',castle:'#b7bcba',terraces:'#c8c3a6',lake:'#b4c4bf',lighthouse:'#b2c2bf'};
     const pavingTones={spring:'#a6b4aa',castle:'#b4afa6',terraces:'#b8ac8c',lake:'#a6b3ae',lighthouse:'#a9b7b5'};
     this.m.grass.color.set(groundTones[area.id]||'#c1c9a9');this.m.path.color.set(pavingTones[area.id]||'#aba78c');
     this.m.contact=new THREE.MeshBasicMaterial({map:this.textures.glow,color:'#15201c',transparent:true,opacity:.32,depthWrite:false});this.sharedMaterials.add(this.m.contact);
-    this.worldMapped(this.m.path,5);this.worldMapped(this.m.grass,6);this.wallMapped(this.m.stone,4);this.wallMapped(this.m.stoneDark,4);this.wallMapped(this.m.cream,4);
+    this.worldMapped(this.m.path,5);this.worldMapped(this.m.grass,6);this.wallMapped(this.m.stone,4);this.wallMapped(this.m.stoneDark,4);this.wallMapped(this.m.cream,4);this.wallMapped(this.m.timber,4.5);
     this.m.foliage=this.mat('#b4c99c',null,{map:this.textures.foliage,alphaTest:.45,side:THREE.DoubleSide,roughness:1});
     this.m.fern=this.mat('#a7c17e',null,{map:this.textures.fern,alphaTest:.4,side:THREE.DoubleSide,roughness:1});
     const hemi=new THREE.HemisphereLight('#c6e4e7','#8b845d',1.65);this.hemi=hemi;this.root.add(hemi);
@@ -287,15 +292,33 @@ export class World {
     return group;
   }
   buildAuthoredBuildings(){
-    // Backdrop houses: no interaction, only a yard fence and a tree so each reads as someone's home.
+    // Backdrop houses: no interaction, but a door, a fenced front garden with a closed gate and its
+    // own tree behind, so each reads as someone's home. Their yards stay clear of planted trees.
+    this.backdropYards=backdropYards(this.layout);
     for(const b of this.layout.backdrop||[]){
-      const g=this.building(b.x,b.z,b.w,b.d,b.h,b.options);g.name='village-backdrop-house';delete g.userData.architecture;const r=b.options.rotation||0,fx=Math.sin(r),fz=Math.cos(r),reach=b.d/2+1.6;
-      this.fence(b.x+fx*reach,b.z+fz*reach,b.w*.7,!r);this.tree(b.x-fx*(b.d/2+2)+fz*(b.w/2+1.2),b.z-fz*(b.d/2+2)-fx*(b.w/2+1.2),.9+(Math.abs(b.x)%3)*.12);
+      const g=this.building(b.x,b.z,b.w,b.d,b.h,b.options);g.name='village-backdrop-house';delete g.userData.architecture;
+      this.backdropGarden(b);
     }
     for(const b of this.layout.buildings){
       const group=this.building(b.x,b.z,b.w,b.d,b.height,b.options);
       Object.assign(group.userData.architecture,{id:b.id,label:b.label});
     }
+  }
+  backdropGarden(b){
+    const {at,front,garden}=backdropFrame(b),r=b.options.rotation||0,half=b.w/2+.45,line=front+garden;
+    // A low picket fence: the front run leaves room for the gate, the sides return to the walls.
+    const run=(p,q)=>{const [x0,z0]=at(...p),[x1,z1]=at(...q),steps=Math.max(1,Math.round(Math.hypot(x1-x0,z1-z0)/1.2));
+      for(let i=0;i<=steps;i++){const x=x0+(x1-x0)*i/steps,z=z0+(z1-z0)*i/steps;this.box(x,.45,z,.13,.9,.13,this.m.darkwood);this.solid(x,z,.2,.2);}
+      for(const y of [.32,.7])this.beam([x0,y,z0],[x1,y,z1],.07,this.m.wood);};
+    run([-half,line],[-.7,line]);run([.7,line],[half,line]);run([-half,front+.35],[-half,line]);run([half,front+.35],[half,line]);
+    // The gate stays shut: boards between two taller posts, on the path to the door.
+    const [gx,gz]=at(0,line),gate=this.group(gx,0,gz);gate.rotation.y=r;gate.name='village-garden-gate';
+    for(const side of [-1,1]){this.box(side*.66,.55,0,.17,1.1,.17,this.m.darkwood,gate);const [px,pz]=at(side*.66,line);this.solid(px,pz,.24,.24);}
+    for(let k=-.45;k<.5;k+=.15)this.box(k,.43,0,.11,.68,.05,this.m.wood,gate);this.box(0,.63,.03,1.12,.08,.05,this.m.darkwood,gate);
+    // Beaten earth from the doorstep to the gate.
+    const [wx,wz]=at(0,front+.35+(garden-.35)/2),walk=this.box(wx,.05,wz,.95,.04,garden-.35,this.mat('#a1906c'));walk.rotation.y=r;walk.name='village-garden-walk';
+    // Its own tree grows behind, beside the back wall: it frames the roof instead of hiding the door.
+    const [tx,tz]=at(b.w/2-.8,-(b.d/2+3));this.tree(tx,tz,.95+(Math.abs(b.x)%3)*.1,false,!inKingdomWater(this.area.id,tx,tz,1));
   }
   door(x,y,z,g){this.box(x,y+1.23,z+.02,1.28,2.4,.15,this.m.darkwood,g);this.box(x,y+1.15,z+.12,.92,2.18,.12,this.m.wood,g);for(let k=-.4;k<.5;k+=.18)this.box(x+k,y+1.15,z+.19,.018,2.13,.012,this.m.darkwood,g);this.torus(x+.3,y+1.1,z+.23,.065,.022,this.m.brass,null,g);this.box(x,y+.07,z+.35,1.7,.14,.75,this.m.stone,g);this.box(x,y+2.45,z+.1,1.5,.2,.25,this.m.darkwood,g);}
   window(x,y,z,g,small=false){const w=small?.8:1.05,h=small?1.15:1.25;this.box(x,y,z,w+.22,h+.22,.12,this.m.darkwood,g);this.box(x,y,z+.08,w,h,.06,this.m.glass,g).name='window-pane';this.box(x,y,z+.13,.07,h,.05,this.m.darkwood,g);this.box(x,y,z+.13,w,.07,.05,this.m.darkwood,g);for(const side of [-1,1]){this.box(x+side*(w/2+.24),y,z+.02,.28,h+.08,.12,this.m.wood,g);this.box(x+side*(w/2+.24),y-h*.3,z+.09,.32,.07,.08,this.m.darkwood,g);}this.box(x,y-h/2-.15,z+.2,w+.6,.16,.5,this.m.stone,g);}
@@ -305,6 +328,7 @@ export class World {
   crate(x,z,scale=.75){this.solid(x,z,scale,scale+.12);this.box(x,scale/2,z,scale,scale,scale,this.m.wood);for(const side of [-1,1])this.box(x+side*scale*.4,scale/2,z+scale*.51,.1,scale,.06,this.m.darkwood);this.beam([x-scale*.36,.1,z+scale*.53],[x+scale*.36,scale-.1,z+scale*.53],.09,this.m.darkwood);}
   lamp(x,z,h=3.4){this.solid(x,z,.7,.7);const g=this.group(x,0,z);this.cylinder(0,.16,0,.35,.3,this.m.stone,g);this.cylinder(0,h*.46,0,.09,h*.9,this.m.metal,g);this.beam([0,h-.3,0],[.6,h-.15,0],.075,this.m.metal,g);this.box(.6,h-.42,0,.4,.6,.36,this.m.brass,g);const bulb=this.box(.6,h-.4,0,.29,.4,.26,this.m.glass,g);this.mesh('cone',this.m.metal,.6,h-.04,0,.38,.35,.38,g);const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:this.textures.glow,color:'#ffca75',transparent:true,opacity:.55,depthWrite:false,blending:THREE.AdditiveBlending}));glow.position.set(.6,h-.4,0);glow.scale.set(2.5,2.5,1);g.add(glow);this.sharedMaterials.add(glow.material);this.lamps.push({bulb,glow,phase:this.rand()*6});if(this.lamps.length<5){const light=new THREE.PointLight('#ffc079',3.0,6,2);light.position.set(x+.6,h-.45,z);this.root.add(light);this.lamps.at(-1).light=light;}return g;}
   fence(x,z,length,alongX=true){this.solid(x,z,alongX?length+.16:.16,alongX?.16:length+.16);const steps=Math.ceil(length/1.5);for(let i=0;i<=steps;i++){const t=(i/steps-.5)*length;this.box(x+(alongX?t:0),.6,z+(alongX?0:t),.16,1.2,.16,this.m.darkwood);}for(const h of [.45,.95])this.box(x,h,z,alongX?length:.1,.13,alongX?.1:length,this.m.wood);}
+  inBackdropYard(x,z,margin=.4){return (this.backdropYards||[]).some(b=>Math.abs(x-b.x)<b.w/2+margin&&Math.abs(z-b.z)<b.d/2+margin);}
   sceneryBlocksFacade(x,z,size=1){
     // The straight gameplay camera projects height against depth at 13.5 / 25.
     // Reserve the facade and its immediate approach, not merely the tree trunk.
@@ -315,15 +339,15 @@ export class World {
       return z>front&&Math.abs(x-b.x)<halfWidth+b.w*.45+.35&&top>facadeBottom-.8&&bottom<facadeBottom+b.height;
     });
   }
-  tree(x,z,size=1,autumn=false){
-    if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size))return this.group();
+  tree(x,z,size=1,autumn=false,beyond=false){
+    if(!(beyond||this.onLand(x,z))||this.sceneryBlocksFacade(x,z,size)||this.inBackdropYard(x,z))return this.group();
     const g=this.group(x,0,z);const entry={g,size:size*.86,type:Math.floor(this.rand()*6)};this.treeModels.push(entry);if(this.treeTextures){this.applyTreeArt(entry);this.solid(x,z,.7,.7);return g;}const bend=(this.rand()-.5)*.4;this.cylinder(0,1.35*size,0,.18*size,2.7*size,this.m.darkwood,g);for(let k=0;k<3;k++){const a=k*2.15;this.beam([0,size,0],[Math.cos(a)*size,2.65*size,Math.sin(a)*size],.15*size,this.m.wood,g);}
     const foliage=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,38),dummy=new THREE.Object3D();
     for(let i=0;i<38;i++){const a=i*2.4,r=Math.sqrt(this.rand())*1.25*size,y=(2.5+this.rand()*1.8)*size;dummy.position.set(Math.cos(a)*r+bend,y,Math.sin(a)*r);dummy.rotation.set((this.rand()-.5)*1.6,this.rand()*Math.PI,0);dummy.scale.set((1.65+this.rand()*.65)*size,(1.25+this.rand()*.4)*size,1);dummy.updateMatrix();foliage.setMatrixAt(i,dummy.matrix);foliage.setColorAt(i,new THREE.Color().setHSL(autumn?.16:.22+this.rand()*.06,.25+this.rand()*.15,.58+this.rand()*.18));}foliage.castShadow=true;foliage.receiveShadow=true;g.add(foliage);
     for(let k=0;k<4;k++){const a=k*1.57;this.beam([0,.17,0],[Math.cos(a)*.5*size,.03,Math.sin(a)*.5*size],.15*size,this.m.darkwood,g);}
     this.animations.push({kind:'tree',obj:g,phase:this.rand()*6,speed:.4});this.solid(x,z,.7,.7);return g;
   }
-  pine(x,z,size=1){const g=this.group(x,0,z);if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size))return g;this.solid(x,z,.35*size,.35*size);this.cylinder(0,2.4*size,0,.13*size,4.8*size,this.m.darkwood,g);const leaves=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,32),dummy=new THREE.Object3D();for(let i=0;i<32;i++){const tier=Math.floor(i/8),angle=i*2.4,r=(1.2-tier*.24)*size;dummy.position.set(Math.cos(angle)*r*.35,(1.35+tier*.9)*size,Math.sin(angle)*r*.35);dummy.rotation.set(-.35,angle,0);dummy.scale.set(r*2.3,r*1.35,1);dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);leaves.setColorAt(i,new THREE.Color('#79a097'));}leaves.castShadow=true;leaves.receiveShadow=true;g.add(leaves);return g;}
+  pine(x,z,size=1){const g=this.group(x,0,z);if(!this.onLand(x,z)||this.sceneryBlocksFacade(x,z,size)||this.inBackdropYard(x,z))return g;this.solid(x,z,.35*size,.35*size);this.cylinder(0,2.4*size,0,.13*size,4.8*size,this.m.darkwood,g);const leaves=new THREE.InstancedMesh(this.geo.plane,this.m.foliage,32),dummy=new THREE.Object3D();for(let i=0;i<32;i++){const tier=Math.floor(i/8),angle=i*2.4,r=(1.2-tier*.24)*size;dummy.position.set(Math.cos(angle)*r*.35,(1.35+tier*.9)*size,Math.sin(angle)*r*.35);dummy.rotation.set(-.35,angle,0);dummy.scale.set(r*2.3,r*1.35,1);dummy.updateMatrix();leaves.setMatrixAt(i,dummy.matrix);leaves.setColorAt(i,new THREE.Color('#79a097'));}leaves.castShadow=true;leaves.receiveShadow=true;g.add(leaves);return g;}
   rock(x,z,size=1){
     this.solid(x,z,size*1.7,size*1.7);
     // Each boulder gets its own faceted shape: shared vertices pushed in and out.
@@ -343,12 +367,14 @@ export class World {
     for(let i=0;i<16;i++){const a=i/16*Math.PI*2;const block=this.box(Math.cos(a)*3.15,3.5+Math.sin(a)*3.15,0,.54,.64,1.1,i%3?this.m.stone:this.m.stoneDark,arch);block.rotation.z=a;this.sphere(Math.cos(a)*2.85,3.5+Math.sin(a)*2.85,.35,.065,this.m.blue,arch);}
     const mat=new THREE.ShaderMaterial({transparent:true,side:THREE.DoubleSide,depthWrite:false,uniforms:{time:{value:0}},vertexShader:`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`,fragmentShader:`varying vec2 vUv;uniform float time;void main(){vec2 p=(vUv-.5)*2.;float r=length(p);float a=atan(p.y,p.x);float swirl=sin(a*4.+r*14.-time)*.5+.5;vec3 col=mix(vec3(.12,.37,.57),vec3(.36,.86,.91),swirl*.6+pow(r,4.)*.5);float edge=1.-smoothstep(.94,1.,r);gl_FragColor=vec4(col,edge*(.28+.45*pow(r,3.)));}`});
     this.sharedMaterials.add(mat);this.waterMaterials.push(mat);const disk=this.mesh('plane',mat,0,3.5,.05,5.5,5.5,1,arch);disk.castShadow=false;
-    this.box(-3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.box(3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.solid(-3.25,-5.7,1,1.2);this.solid(3.25,-5.7,1,1.2);this.solid(0,-5.7,5.5,.6,'portal-surface');
+    this.box(-3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.box(3.25,1.5,0,.85,3,1.25,this.m.stone,arch);this.solid(-3.25,-5.7,1,1.2);this.solid(3.25,-5.7,1,1.2);this.solid(0,-5.7,5.5,1.2,'portal-surface');
     for(const x of [-9.2,9.2]){this.ruinPillar(x,-5,3.2);this.ruinPillar(x,5,2.1);this.lamp(x*.8,1,2.8);}
     // The Porteros' punt, moored on the canal that once carried visitors down to the village.
     this.portersLanding(15.2,1.6);
     for(const [x,z,s] of [[11.6,-8.6,1.25],[12.2,8.8,1.1],[20.4,-10.5,1.5],[20.8,9.5,1.6]])this.tree(x,z,s);
-    for(let side of [-1,1]){for(let j=0;j<4;j++){this.box(side*(6.9+j*.9),.35,-2.4+j*.13,.75,.6+this.rand()*.35,.9,this.m.stoneDark);this.solid(side*(6.9+j*.9),-2.4+j*.13,.75,.9);this.rock(side*(7.5+j*.9),-1.5,.3+this.rand()*.35);}this.tree(side*9,d*.64,1.7);this.tree(side*14,d*.7,1.9);}
+    // The rows of fallen blocks and rocks on either side of the dais stood in front of Edda's house and in
+    // the way, and said nothing (the user, 2026-10-20). Their draws stay so the rest of the scenery keeps its place.
+    for(let side of [-1,1]){for(let j=0;j<20;j++)this.rand();this.tree(side*9,d*.64,1.7);this.tree(side*14,d*.7,1.9);}
   }
   portersLanding(x,z){
     const g=this.group(x,.16,z);g.name='porteros-punt';
@@ -368,11 +394,11 @@ export class World {
   ruinPillar(x,z,h){this.solid(x,z,1.3,1.3);this.box(x,.18,z,1.3,.35,1.3,this.m.stoneDark);this.cylinder(x,h/2+.35,z,.42,h,this.m.stone);this.box(x,h+.38,z,1.05,.3,1.05,this.m.stone);for(let i=0;i<3;i++)this.box(x+.45+this.rand()*.7,.1,z+.4+this.rand(),.4,.2,.4,this.m.stone);}
   buildPlaza(w,d){
     
-    for(const [x,z] of [[-7.5,-5.2],[10.6,-2.8],[-7.6,11.7],[10,8.5]])this.lamp(x,z);
+    // The Mercado lamp stands at the edge of its street, not on it.
+    for(const [x,z] of [[-7.5,-5.2],[10.6,-2.8],[-7.6,11.7],[10,10.1]])this.lamp(x,z);
     this.banner(-2.65,-15.2,3.2);this.banner(2.65,-15.2,3.2);
     const festoon=t=>[-7.5+18.1*t,3.2-Math.sin(t*Math.PI)*.5,-5.2+2.4*t];
     for(let i=0;i<7;i++){const a=festoon(i/7),b=festoon((i+.5)/7),c=festoon((i+1)/7);this.cable([a,b,c],this.m.darkwood);const bulb=this.sphere(b[0],b[1]-.12,b[2],.11,this.m.glass);bulb.castShadow=false;}
-    for(const [x,z] of this.layout.adjustments.find(a=>a.id==='plaza-crates').positions)this.crate(x,z,.6);
     for(const [x,z] of this.layout.adjustments.find(a=>a.id==='plaza-barrels').positions)this.barrel(x,z,.7);
   }
   fountain(x,z,r=1.5){const g=buildFountain(this,x,z,r),b=g.userData.landmark.footprint;this.solid(b.x,b.z,b.w,b.d,'fountain');return g;}
@@ -406,13 +432,26 @@ export class World {
     this.hangingLamp(-3,0,5.5);this.hangingLamp(5,-4,5.6);this.hangingLamp(-7,6,5.2);
     for(const side of [-1,1]){const x=side*(w/2-1.5);this.solid(x,-3,1.4,9,"workshop-shelves");for(let y=1.2;y<4.4;y+=1.0){this.box(x,y,-3.0,1.4,.14,9,this.m.darkwood);for(let k=0;k<11;k++){const z=-6.8+k*.76;this.box(x+(this.rand()-.5)*.55,y+.2,z,.18+this.rand()*.2,.25+this.rand()*.35,.32,k%4===0?this.m.leaf:k%3?this.m.redcloth:this.m.brass);}}}
     for(let k=0;k<4;k++){const x=-5.5+k*2.1;this.box(x,2.45,-d/2+.75,1.6,1.0,.06,this.m.darkwood);for(let j=0;j<4;j++){this.beam([x-.5+j*.3,2.5,-d/2+.88],[x-.5+j*.3,2.12,-d/2+.88],.05,this.m.metal);this.torus(x-.5+j*.3,2.65,-d/2+.9,.1,.025,this.m.brass);}}
-    for(const pos of [[-3,-4],[5,0],[-6,5],[6,6]])this.stool(...pos);
+    // Copper wire on spools, the raw material of every repair: aged copper, never glowing.
+    const copper=this.mat('#9c5f3c',null,{metalness:.55,roughness:.55});
+    for(const [x,z] of [[-8.2,-3.3],[7.6,2.6]]){this.cylinder(x,.06,z,.6,.12,this.m.darkwood);this.cylinder(x,.46,z,.42,.7,copper);this.cylinder(x,.86,z,.6,.12,this.m.darkwood);this.solid(x,z,1.2,1.2,'workshop-copper-spool');}
     for(let i=0;i<6;i++){const x=-8+i*2.5;this.cable([[x,5.6,-11],[x,5.4,-7],[x+.7,4.8,-5]],i%2?this.m.metal:this.m.brass);}
+    // The tools of the trade on their board, beside the cable hooks: hammer, pliers, screwdrivers, a
+    // wrench and a coil of solder. On the east counter, lamp globes wait for their repair.
+    {const bx=3.55,by=2.5,bz=-d/2+.72,f=bz+.07,steel=this.m.metal;
+      this.box(bx,by,bz,2.5,1.3,.06,this.m.wood).name='workshop-tool-board';for(const y of [by-.69,by+.69])this.box(bx,y,bz+.03,2.6,.08,.12,this.m.darkwood);
+      this.beam([bx-.95,by-.42,f],[bx-.95,by+.3,f],.06,this.m.darkwood);this.box(bx-.95,by+.36,f,.36,.12,.1,steel);
+      this.beam([bx-.62,by-.42,f],[bx-.5,by+.32,f],.035,steel);this.beam([bx-.38,by-.42,f],[bx-.5,by+.32,f],.035,steel);
+      for(let k=0;k<3;k++){const x=bx-.1+k*.2;this.cylinder(x,by+.16,f,.035,.26,k===1?this.m.redcloth:this.m.wood);this.cylinder(x,by-.18,f,.012,.42,steel);}
+      this.beam([bx+.62,by-.4,f],[bx+.62,by+.22,f],.05,steel);this.torus(bx+.62,by+.3,f,.08,.028,steel);
+      this.torus(bx+1.0,by+.12,f,.13,.035,this.m.brass);this.torus(bx+1.0,by+.12,f,.08,.03,this.m.brass);}
+    for(const [k,x] of [6.4,7.2,9.6].entries()){this.cylinder(x,2.74,-7.78,.11,.1,this.m.brass);const globe=this.sphere(x,2.98,-7.78,.21,this.m.glass,this.root,1.15);globe.name='workshop-lamp-globe';if(k===1)this.beam([x-.02,2.84,-7.78],[x+.03,3.1,-7.78],.012,this.m.metal);}
     const warm=new THREE.PointLight('#ffd4a1',17,20,1.5);warm.position.set(-7,4,3);this.root.add(warm);
     this.box(-w*.44,2.2,d*.38,1.6,4.4,2.5,this.m.darkwood);for(let y of [1,2.1,3.2,4.3]){this.box(-w*.42,y,d*.38,1.9,.13,2.7,this.m.wood);for(let k=0;k<4;k++)this.box(-w*.42,y+.22,d*.30+k*.5,.6,.4,.28,k%2?this.m.brass:this.m.roofRed);}
     this.sun.intensity=1.4;this.sun.position.set(5,12,-16);
   }
-  hangingLamp(x,z,y=5){this.cylinder(x,y+.65,z,.035,1.3,this.m.metal);this.torus(x,y,z,.63,.075,this.m.brass,[Math.PI/2,0,0]);for(let i=0;i<5;i++){const a=i*Math.PI*2/5,xx=x+Math.cos(a)*.55,zz=z+Math.sin(a)*.55;this.cylinder(xx,y+.2,zz,.085,.36,this.m.cream);this.sphere(xx,y+.45,zz,.09,this.m.glass);}const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:this.textures.glow,color:'#ffce8b',transparent:true,depthWrite:false,opacity:.65,blending:THREE.AdditiveBlending}));glow.position.set(x,y+.2,z);glow.scale.set(3.5,3.5,1);this.root.add(glow);this.sharedMaterials.add(glow.material);const light=new THREE.PointLight('#ffce91',12,10,2);light.position.set(x,y-.3,z);this.root.add(light);}
+  // Electric hanging lamps: their light point is exported with the street lamps (export-scene.mjs).
+  hangingLamp(x,z,y=5){(this.hangingLamps??=[]).push({x,y:y-.3,z});this.cylinder(x,y+.65,z,.035,1.3,this.m.metal);this.torus(x,y,z,.63,.075,this.m.brass,[Math.PI/2,0,0]);for(let i=0;i<5;i++){const a=i*Math.PI*2/5,xx=x+Math.cos(a)*.55,zz=z+Math.sin(a)*.55;this.cylinder(xx,y+.2,zz,.085,.36,this.m.cream);this.sphere(xx,y+.45,zz,.09,this.m.glass);}const glow=new THREE.Sprite(new THREE.SpriteMaterial({map:this.textures.glow,color:'#ffce8b',transparent:true,depthWrite:false,opacity:.65,blending:THREE.AdditiveBlending}));glow.position.set(x,y+.2,z);glow.scale.set(3.5,3.5,1);this.root.add(glow);this.sharedMaterials.add(glow.material);const light=new THREE.PointLight('#ffce91',12,10,2);light.position.set(x,y-.3,z);this.root.add(light);}
   windowRay(x,y,z){const mat=new THREE.ShaderMaterial({transparent:true,depthWrite:false,side:THREE.DoubleSide,blending:THREE.AdditiveBlending,vertexShader:'varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec2 vUv;void main(){float edge=pow(sin(vUv.x*3.14159),2.);float lengthFade=smoothstep(0.,.35,vUv.y);gl_FragColor=vec4(.56,.72,.78,edge*lengthFade*.022);}'});this.sharedMaterials.add(mat);const start=new THREE.Vector3(x,y,z),end=new THREE.Vector3(x-2.2,.1,z+9),mid=start.clone().add(end).multiplyScalar(.5),geo=new THREE.ConeGeometry(1.45,start.distanceTo(end),20,1,true);this.localGeometries.push(geo);const ray=this.mesh(geo,mat,mid.x,mid.y,mid.z);ray.quaternion.setFromUnitVectors(UP,start.sub(end).normalize());ray.castShadow=false;ray.receiveShadow=false;const cool=new THREE.PointLight('#9fcbde',7,11,2);cool.position.set(x-1,2,z+3);this.root.add(cool);}
   stool(x,z){this.solid(x,z,.86,.86);this.cylinder(x,.85,z,.43,.18,this.m.wood);for(let i=0;i<3;i++){const a=i*Math.PI*2/3;this.beam([x+Math.cos(a)*.3,.79,z+Math.sin(a)*.3],[x+Math.cos(a)*.4,.05,z+Math.sin(a)*.4],.1,this.m.darkwood);}}
   buildRoad(w,d){
@@ -429,7 +468,7 @@ export class World {
   }
   buildSpring(w,d){
     this.springWaterworks=buildSpringWaterworks(this);
-    this.cable([[3,3.5,-10],[3,3.5,-4],[6,.6,-4]],this.m.metal);
+    this.cable([[3,3.5,-10],[3,3.5,-4],[6,3.5,-4],[6,.75,-4]],this.m.metal);this.box(6,.38,-4,.36,.76,.36,this.m.darkwood);this.solid(6,-4,.22,.22,'spring-line-drop');
     this.fountain(-2,-4.5,1.5);this.lamp(5,7,3);this.lamp(-5,7,3);
   }
   buildCastle(w,d){
@@ -443,7 +482,7 @@ export class World {
       const arch=new THREE.ExtrudeGeometry(shape,{depth:3.5,bevelEnabled:false,curveSegments:16});this.localGeometries.push(arch);this.mesh(arch,this.m.stone,0,0,-d*.4-1.75).name='castle-gate-arch';
       for(let i=0;i<=8;i++){const a=Math.PI*i/8,v=this.box(Math.cos(a)*2.12,3.3+Math.sin(a)*2.12,-d*.4+1.78,.34,.5,.1,this.m.cream);v.rotation.z=a-Math.PI/2;}
       const grid=this.group(0,0,-d*.4+.6);grid.name='castle-portcullis';for(let x=-1.75;x<=1.76;x+=.5){this.box(x,4.55,0,.09,1.5,.09,this.m.metal,grid);this.mesh('cone',this.m.metal,x,3.72,0,.07,.18,.07,grid).rotation.x=Math.PI;}for(const y of [4.15,4.75])this.box(0,y,0,3.7,.08,.08,this.m.metal,grid);}
-    this.box(-2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.box(2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.gear(-3,3.2,-d*.4+1.9,.7);this.gear(3,3.2,-d*.4+1.9,.7);
+    this.box(-2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);this.box(2.2,2,-d*.4+1.8,.3,4,.4,this.m.brass);/* no gears beside the gate: players took them for the levers (jugador 29) */
     for(const x of [-11,11]){this.lamp(x,6,4);this.lamp(x,-4,4);this.pot(x,9,.65);}
     this.banner(-6,8,4);this.banner(6,8,4);this.cable([[-12,.17,-5],[0,.17,-5],[12,.17,-5]],this.m.brass);
   }
@@ -455,7 +494,8 @@ export class World {
       for(let k=0;k<5;k++){this.cylinder(x-3.3+k*1.65,1.45+lift,z-.7,.035,1.7,this.m.wood);}for(let y of [1.4,2.0])this.beam([x-3.5,y+lift,z-.7],[x+3.5,y+lift,z-.7],.025,this.m.darkwood);
       const channel=this.water(x,.73+lift,z+1.1,7.6,.35);this.irrigationWater.push(channel);
     }
-    for(const [x,z] of [[-4.7,-10.8],[4.7,-2.8],[-4.7,5.2],[4.7,13.2]])this.lamp(x,z,2.8);
+    // Lamps flank the upper street and the west work lane from outside their paving.
+    for(const [x,z] of [[-4.7,-12],[4.7,-2.8],[-4.7,6.5],[4.7,13.2]])this.lamp(x,z,2.8);
     const mill=this.layout.buildings.find(b=>b.id==='terrace-mill');
     this.beam([mill.x,mill.height+1.05,mill.z+mill.d/2-.1],[mill.x,mill.height+1.05,mill.z+mill.d/2+.52],.18,this.m.metal).name='mill-drive-shaft';
     const blades=this.group(mill.x,mill.height+1.05,mill.z+mill.d/2+.45);blades.name='mill-sails';blades.scale.setScalar(.68);this.cylinder(0,0,0,.22,.35,this.m.brass,blades).rotation.x=Math.PI/2;for(let i=0;i<4;i++){const g=this.group(0,0,0,blades);g.rotation.z=i*Math.PI/2;this.box(0,1.9,0,.15,3.8,.14,this.m.darkwood,g);this.box(.43,2.65,-.05,.82,1.5,.045,this.m.cloth,g);for(let j=0;j<6;j++)this.box(.45,.7+j*.45,0,.85,.2,.08,this.m.wood,g);}this.animations.push({kind:'wheel',obj:blades,speed:.23});
@@ -528,7 +568,7 @@ export class World {
   }
   buildNature(w,d){
     const footprints=[];this.root.traverse(o=>{if(o.userData.architecture)footprints.push(o.userData.architecture.footprint)});
-    const clearScenery=(x,z,r)=>(!this.continuous||Math.abs(z)<d/2-1&&!inTravelCorridor(this.area.id,x,z,-r))&&!inKingdomWater(this.area.id,x,z,Math.min(r,1))&&!pointOnPaving(this.layout,x,z,r)&&!this.nearObject(x,z,Math.max(1.4,r))&&!footprints.some(b=>Math.abs(x-b.x)<b.w/2+r&&Math.abs(z-b.z)<b.d/2+r);
+    const clearScenery=(x,z,r)=>(!this.continuous||Math.abs(z)<d/2-1&&!inTravelCorridor(this.area.id,x,z,-r))&&!inKingdomWater(this.area.id,x,z,Math.min(r,1))&&!pointOnPaving(this.layout,x,z,r)&&!this.nearObject(x,z,Math.max(1.4,r))&&!footprints.some(b=>Math.abs(x-b.x)<b.w/2+r&&Math.abs(z-b.z)<b.d/2+r)&&!this.inBackdropYard(x,z,Math.min(r,1.2));
     const positions=[];
     buildGardenArt(this,clearScenery);
     for(let i=0;i<24;i++){const side=i%2?-1:1,x=side*(w*.4+this.rand()*5),z=(this.rand()-.5)*(d+7);if((this.area.id==='portal'&&side>0)||!clearScenery(x,z,3.4))continue;positions.push([x,z]);if(i%4===0)this.pine(x,z,.85+this.rand()*.45);else this.tree(x,z,.72+this.rand()*.5,this.area.id==='terraces');}
@@ -557,8 +597,10 @@ export class World {
     }
   }
   lever(obj){
-    this.solid(obj.x,obj.z,1.2,.9,obj.id);
-    const g=this.group(obj.x,0,obj.z);this.box(0,.16,0,1.2,.32,.9,this.m.stoneDark,g);this.box(0,.72,0,.8,.9,.6,this.m.wood,g);this.box(0,1.2,0,1.04,.12,.75,this.m.brass,g);
+    // The few levers the player works (the Calzada's bridge, the wet archive, the lake's return) are
+    // half as big again and carry a plate; the ones their keepers operate stay plain scenery.
+    const own=!obj.story;this.solid(obj.x,obj.z,own?1.8:1.2,own?1.35:.9,obj.id);
+    const g=this.group(obj.x,0,obj.z);if(own){g.scale.setScalar(1.5);this.box(.95,.55,.1,.09,1.1,.09,this.m.darkwood,g);this.box(.95,1.12,.1,.5,.34,.05,this.m.cream,g);this.box(.95,1.12,.13,.3,.07,.02,this.m.brass,g);}this.box(0,.16,0,1.2,.32,.9,this.m.stoneDark,g);this.box(0,.72,0,.8,.9,.6,this.m.wood,g);this.box(0,1.2,0,1.04,.12,.75,this.m.brass,g);
     const material=this.mat('#c3a664',null,{emissive:'#4b3a19',emissiveIntensity:.2});const indicator=this.sphere(0,.85,.34,.13,material,g);
     const waterHandle=WATER_HANDLES.has(obj.id),mechanical=isMechanicalControl(obj);
     const pivot=this.group(0,waterHandle?1.75:1.27,0,g);
@@ -698,7 +740,7 @@ export class World {
     this.sphere(-.052,.87,.489,.026,this.m.white,g);
     this.animations.push({kind:'ohm',obj:g,phase:this.rand()*6,companion});return g;
   }
-  buildExitMarkers(){for(const exit of this.area.exits||[]){const g=this.group(exit.x,0,exit.z);if(this.continuous&&exit.target!=='workshop'){const sign=this.group(exit.x+2.6,0,exit.z);this.box(0,.7,0,.13,1.4,.13,this.m.darkwood,sign);this.box(0,1.25,0,.85,.28,.14,this.m.wood,sign);this.box(0,1.26,.081,.35,.035,.025,this.m.cream,sign);sign.userData.interaction=exit;this.solid(exit.x+2.6,exit.z,.25,.25,"waypost");this.objectModels.set(exit.id,sign);continue;}const ring=this.torus(0,.052,0,.72,.035,this.m.brass,[Math.PI/2,0,0],g);for(let i=0;i<3;i++){const arrow=this.box(0,.06,.3-i*.32,.24,.025,.24,this.m.cream,g);arrow.rotation.y=Math.PI/4;}if(Math.abs(exit.x)>4)this.sign(exit.x+(exit.x>0?1:-1),exit.z-1.1);this.animations.push({kind:'exit',obj:ring,phase:this.rand()*6});this.objectModels.set(exit.id,g);}}
+  buildExitMarkers(){for(const exit of this.area.exits||[]){const g=this.group(exit.x,0,exit.z);if(this.continuous&&exit.target!=='workshop'){const sign=this.group(exit.x+2.6,0,exit.z);this.solid(exit.x+2.6,exit.z,.95,.3,'waypost-sign');this.box(0,.7,0,.13,1.4,.13,this.m.darkwood,sign);this.box(0,1.25,0,.85,.28,.14,this.m.wood,sign);this.box(0,1.26,.081,.35,.035,.025,this.m.cream,sign);sign.userData.interaction=exit;this.solid(exit.x+2.6,exit.z,.25,.25,"waypost");this.objectModels.set(exit.id,sign);continue;}const ring=this.torus(0,.052,0,.72,.035,this.m.brass,[Math.PI/2,0,0],g);for(let i=0;i<3;i++){const arrow=this.box(0,.06,.3-i*.32,.24,.025,.24,this.m.cream,g);arrow.rotation.y=Math.PI/4;}if(Math.abs(exit.x)>4)this.sign(exit.x+(exit.x>0?1:-1),exit.z-1.1);this.animations.push({kind:'exit',obj:ring,phase:this.rand()*6});this.objectModels.set(exit.id,g);}}
   smoke(x,y,z){const group=this.group(x,y,z);const material=new THREE.SpriteMaterial({map:this.textures.glow,color:'#bbc5b0',transparent:true,opacity:.06,depthWrite:false});this.sharedMaterials.add(material);for(let i=0;i<4;i++){const s=new THREE.Sprite(material);s.position.set(i*.1,i*.6,0);s.scale.setScalar(.8+i*.3);group.add(s);}this.animations.push({kind:'smoke',obj:group,phase:this.rand()*6});}
   buildAtmosphere(w,d){
     const count=220,positions=new Float32Array(count*3),colors=new Float32Array(count*3);for(let i=0;i<count;i++){positions[i*3]=(this.rand()-.5)*(w+12);positions[i*3+1]=.4+this.rand()*9;positions[i*3+2]=(this.rand()-.5)*(d+12);const c=new THREE.Color(i%5===0?'#ffda83':'#e6e5ba');c.toArray(colors,i*3);}
@@ -719,7 +761,7 @@ export class World {
     for(const water of this.irrigationWater||[])water.visible=!!f.irrigation;
     for(const stream of this.fountainStreams)stream.visible=!!f.pump;
     for(const water of this.fountainWater)water.visible=!!f.pump;
-    if(this.gateObstacle){const present=this.obstacles.includes(this.gateObstacle);if(f.gate&&present)this.obstacles.splice(this.obstacles.indexOf(this.gateObstacle),1);if(!f.gate&&!present)this.obstacles.push(this.gateObstacle);}
+    for(const o of this.gateObstacles||[]){const present=this.obstacles.includes(o);if(f.gate&&present)this.obstacles.splice(this.obstacles.indexOf(o),1);if(!f.gate&&!present)this.obstacles.push(o);}
     this.renderer.shadowMap.needsUpdate=true;
   }
   update(dt,state=this.state,input={x:0,z:0,run:false}){

@@ -1,0 +1,119 @@
+{
+ "site": "http://127.0.0.1:4192/proyecto-roxana/",
+ "at": "2026-10-20T01:44:48.248Z",
+ "escuela": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 3.55,
+  "byTypeMB": {
+   "Image": 1.5,
+   "Fetch": 1.25,
+   "Script": 0.64,
+   "Font": 0.14,
+   "Stylesheet": 0.01,
+   "Document": 0
+  },
+  "fcp": 236,
+  "lcp": 236,
+  "domContentLoaded": 883,
+  "load": 949,
+  "longTasksMs": 620,
+  "longTasks": 5,
+  "heapMB": 90,
+  "networkIdleMs": 7698,
+  "scriptMs": 605,
+  "errors": []
+ },
+ "escuelaRepetida": {
+  "requests": 21,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Font": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Fetch": 0
+  }
+ },
+ "titulo": {
+  "requests": 10,
+  "fromCache": 0,
+  "bytesMB": 1.05,
+  "byTypeMB": {
+   "Script": 0.71,
+   "Image": 0.23,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "fcp": 860,
+  "lcp": 860,
+  "domContentLoaded": 832,
+  "load": 1158,
+  "longTasksMs": 0,
+  "longTasks": 0,
+  "heapMB": 9,
+  "titleReadyMs": 854,
+  "networkIdleMs": 1664,
+  "scriptMs": 14,
+  "errors": []
+ },
+ "partidaNueva": {
+  "requests": 27,
+  "fromCache": 0,
+  "bytesMB": 14.21,
+  "byTypeMB": {
+   "Fetch": 9.05,
+   "Image": 2.7,
+   "XHR": 2.47
+  },
+  "worldMs": 16565,
+  "heapMB": 125
+ },
+ "partidaNuevaTotal": {
+  "requests": 54,
+  "fromCache": 0,
+  "bytesMB": 22.8,
+  "byTypeMB": {
+   "Fetch": 9.06,
+   "XHR": 8.27,
+   "Image": 5.45,
+   "Font": 0.02
+  },
+  "quietMs": 31812,
+  "heapMB": 147.4
+ },
+ "tituloRepetido": {
+  "requests": 10,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Font": 0
+  }
+ },
+ "mundo": [
+  {
+   "label": "quieto (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 3.06,
+   "scriptMsPerFrame": 2.79,
+   "layoutsPerSec": 4.2,
+   "styleRecalcsPerSec": 71.3
+  },
+  {
+   "label": "caminando (Portal)",
+   "fps": 60.1,
+   "mainThreadMsPerFrame": 3.11,
+   "scriptMsPerFrame": 2.83,
+   "layoutsPerSec": 15.4,
+   "styleRecalcsPerSec": 65.9
+  }
+ ],
+ "mundoErrores": []
+}

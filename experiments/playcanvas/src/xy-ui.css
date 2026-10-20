@@ -1,0 +1,170 @@
+/* The X and Y look for the game's own interface (ciclo 28, ?estilo=xy): white rounded panels with a
+   coloured rim, dark rounded type, pill buttons. Loaded last; everything is scoped to the look. */
+html[data-estilo="xy"]{--xy-blue:#2f8fd6;--xy-blue-deep:#1f6fb0;--xy-ink:#25313b;--xy-soft:#55626e;--xy-font:ui-rounded,'SF Pro Rounded','Arial Rounded MT Bold','Trebuchet MS',sans-serif}
+/* Dialogue: a white box with a blue rim; the speaker's name on a blue tab. */
+html[data-estilo="xy"] .dialogue{background:#fff;border:4px solid var(--xy-blue);border-radius:24px;box-shadow:0 6px 0 var(--xy-blue-deep),0 18px 40px #0b2a4459;overflow:hidden}
+html[data-estilo="xy"] .dialogue:after{display:none}
+html[data-estilo="xy"] .dialogue .portrait{border-right:0;border-radius:18px 0 0 18px;background-color:#e8f2fb}
+html[data-estilo="xy"] .dialogue-copy p{color:var(--xy-ink);font-family:var(--xy-font);font-weight:600}
+html[data-estilo="xy"] .dialogue-who h3{color:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] .dialogue-who span{color:var(--xy-soft)}
+html[data-estilo="xy"] .dialogue-copy button{color:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:700}
+html[data-estilo="xy"] .dialogue-copy kbd{background:#e8f2fb;color:var(--xy-blue-deep);border-color:#bcd8ee}
+/* The travel instrument and the objective: white cards. */
+html[data-estilo="xy"] #travel-instrument{background:#ffffffee!important;border:3px solid #fff;box-shadow:0 4px 0 #c9d3dc,0 10px 26px #0b2a4433;color:var(--xy-ink)}
+html[data-estilo="xy"] #travel-instrument *{text-shadow:none}
+html[data-estilo="xy"] #travel-instrument .place h2,html[data-estilo="xy"] #travel-instrument h2{color:var(--xy-blue-deep)!important;font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] #travel-instrument .eyebrow,html[data-estilo="xy"] #travel-instrument small,html[data-estilo="xy"] #travel-instrument span,html[data-estilo="xy"] #travel-instrument p{color:var(--xy-soft)!important}
+html[data-estilo="xy"] #travel-instrument .hud-tools{border-top-color:#dbe3ea}
+html[data-estilo="xy"] #travel-instrument .icon-button{box-shadow:none;background:#eef5fb}
+html[data-estilo="xy"] #objective{background:#ffffffe6;border-radius:18px;padding:10px 16px;box-shadow:0 4px 0 #c9d3dc;text-shadow:none;color:var(--xy-ink)}
+html[data-estilo="xy"] #objective *{text-shadow:none}
+html[data-estilo="xy"] #objective button,html[data-estilo="xy"] #objective-title{color:var(--xy-ink)!important;font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] #objective .eyebrow{color:var(--xy-blue-deep)!important}
+html[data-estilo="xy"] #objective-detail{color:var(--xy-soft)!important;font-family:var(--xy-font);font-weight:600}
+html[data-estilo="xy"] #objective .objective-glyph,html[data-estilo="xy"] #objective .objective-fold{color:#f29b2e!important}
+/* Interaction prompt, buttons, toasts, reminders. */
+html[data-estilo="xy"] #interaction{background:none;border:0;box-shadow:none}
+html[data-estilo="xy"] #interaction button{background:#fff!important;border:3px solid var(--xy-blue)!important;border-radius:999px!important;color:var(--xy-ink)!important;box-shadow:0 4px 0 var(--xy-blue-deep)!important;font-family:var(--xy-font);font-weight:800;text-shadow:none}
+html[data-estilo="xy"] #interaction button+button{border-color:#f2b33a!important;box-shadow:0 4px 0 #c98a12!important}
+html[data-estilo="xy"] #interaction kbd{background:var(--xy-blue)!important;color:#fff!important;border:0!important;border-radius:8px}
+html[data-estilo="xy"] #interaction button+button kbd{background:#f2b33a!important}
+html[data-estilo="xy"] .icon-button{background:#fff;border:0;border-radius:999px;color:var(--xy-blue-deep);box-shadow:0 3px 0 #c9d3dc}
+html[data-estilo="xy"] .toast{background:#fff;border:3px solid var(--xy-blue);border-radius:999px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:700;box-shadow:0 4px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] .hud-bottom #control-reminder,html[data-estilo="xy"] .hud-bottom #save-indicator{background:#ffffffd9!important;color:var(--xy-ink)!important;border-radius:999px}
+html[data-estilo="xy"] .hud-bottom kbd{background:var(--xy-blue);color:#fff;border:0}
+html[data-estilo="xy"] #ohm-bubble{background:#fff;color:var(--xy-ink);border:3px solid #f2b33a;border-radius:18px;font-family:var(--xy-font);font-weight:600}
+html[data-estilo="xy"] :is(#ohm-button,#journal-button,#map-button,#guide-button,#pause-button){background:#fff!important;border:0!important;color:var(--xy-blue-deep)!important;box-shadow:0 3px 0 #c9d3dc!important}
+html[data-estilo="xy"] :is(#ohm-button,#journal-button,#map-button,#guide-button,#pause-button) *{color:var(--xy-blue-deep)!important;stroke:currentColor}
+html[data-estilo="xy"] #travel-instrument{border-radius:24px!important}
+/* The title: the kingdom itself (scripts/portada.mjs), a soft shade on the left so the name reads. */
+html[data-estilo="xy"] .title-art{background-image:linear-gradient(90deg,#0d2a44dd 0%,#0d2a4499 28%,#0d2a4400 48%),url('/assets/xy/portada.webp')!important;background-size:cover!important;background-position:center!important}
+html[data-estilo="xy"] .title-screen :is(h1,.title-logo){text-shadow:0 3px 0 #0d2a4480,0 0 30px #0d2a4466}
+/* The arrival banner: a white rounded plate with the place's name, as when entering a town. */
+html[data-estilo="xy"] .arrival{background:none!important}
+html[data-estilo="xy"] .arrival::before,html[data-estilo="xy"] .arrival::after{display:none!important}
+html[data-estilo="xy"] .arrival h2{display:inline-block;background:#fff;color:var(--xy-blue-deep)!important;font-family:var(--xy-font)!important;font-weight:800;padding:8px 28px 10px;border-radius:999px;border:4px solid var(--xy-blue);box-shadow:0 6px 0 var(--xy-blue-deep),0 14px 30px #0b2a4440;text-shadow:none!important}
+html[data-estilo="xy"] .arrival p{color:#fff!important;font-family:var(--xy-font)!important;font-weight:700;text-shadow:0 2px 0 #0b2a44aa,0 0 14px #0b2a4488!important}
+html[data-estilo="xy"] .arrival .eyebrow{color:#fff!important;text-shadow:0 2px 0 #0b2a44aa!important}
+html[data-estilo="xy"] .arrival-line{display:none}
+html[data-estilo="xy"] .title-shade{background:linear-gradient(0deg,#0d2a4455,transparent 30%)!important}
+html[data-estilo="xy"] .title-art{background-position:60% center!important}
+
+/* Ciclo 29: el resto de la interfaz en el estilo X e Y, que pasa a ser el del reino. */
+html[data-estilo="xy"]{--xy-line:#d5dde5}
+/* Ventanas (pausa, guía, nombre): tarjeta blanca redondeada con borde azul. */
+html[data-estilo="xy"] .modal-layer{background:#0b2a4466;backdrop-filter:blur(3px)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map){background:#fff;border:4px solid var(--xy-blue);border-radius:26px;box-shadow:0 6px 0 var(--xy-blue-deep),0 24px 70px #0b2a4466;color:var(--xy-ink)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) :is(h2,h3){color:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800;letter-spacing:0}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) .eyebrow{color:var(--xy-blue)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) :is(p,li,label,span,small,.modal-intro,.setting-note){color:var(--xy-soft)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) label>span:first-child{color:var(--xy-ink);font-weight:700}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) .options-list label{border-color:#e3eaf0}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) :is(input[type=text],#player-name-option,select),html[data-estilo="xy"] .name-form input{background:#f2f8fd;border:2px solid var(--xy-line);border-radius:14px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:700}
+html[data-estilo="xy"] .modal :is(input[type=range],input[type=checkbox]){accent-color:var(--xy-blue)}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) button:not(.modal-close){background:#fff;border:2px solid var(--xy-line);border-radius:999px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:700;box-shadow:0 3px 0 #c9d3dc}
+html[data-estilo="xy"] .modal:not(.journal-modal):not(.kingdom-map) button.primary{background:var(--xy-blue);border-color:var(--xy-blue);color:#fff;box-shadow:0 3px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] .modal .modal-close{background:#fff!important;border:0!important;border-radius:999px;color:var(--xy-blue-deep)!important;box-shadow:0 3px 0 #c9d3dc}
+html[data-estilo="xy"] .modal.journal-modal>.modal-close{box-shadow:0 3px 0 #8a6a43}
+/* La observación de Ohm en el mundo. */
+html[data-estilo="xy"] .field-meter{background:#fff;border:3px solid var(--xy-blue);border-radius:22px;box-shadow:0 5px 0 var(--xy-blue-deep),0 14px 34px #0b2a4440;color:var(--xy-ink)}
+html[data-estilo="xy"] .field-meter:after{display:none}
+html[data-estilo="xy"] .field-meter :is(h3){color:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] .field-meter :is(p,.field-guide,li,dd,dt,span:not(.eyebrow)){color:var(--xy-ink)}
+html[data-estilo="xy"] .field-meter .eyebrow{color:var(--xy-blue)}
+html[data-estilo="xy"] .field-meter summary{color:var(--xy-blue-deep);font-weight:700}
+html[data-estilo="xy"] .field-meter summary:before{color:var(--xy-blue)}
+html[data-estilo="xy"] .field-meter #close-field-meter{color:var(--xy-blue-deep);background:none;border:0;border-radius:999px;top:6px;right:6px}
+html[data-estilo="xy"] .field-meter :is(h3,p){padding-right:30px}
+html[data-estilo="xy"] .kmap-player .kmap-label{background:var(--xy-blue);border:2px solid #fff;color:#fff;font-family:var(--xy-font);font-weight:800;box-shadow:0 2px 0 var(--xy-blue-deep);text-shadow:none}
+/* Controles táctiles: botones blancos redondeados, el de interactuar como las píldoras del mundo. */
+html[data-estilo="xy"] .dpad button{background:#ffffffe6;border:3px solid var(--xy-blue);border-radius:16px;color:var(--xy-blue-deep);font-weight:800;box-shadow:0 4px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] #touch-interact{background:#fff;border:3px solid #f2b33a;border-radius:999px;color:var(--xy-ink);font-family:var(--xy-font);font-weight:800;box-shadow:0 4px 0 #c98a12;text-shadow:none}
+html[data-estilo="xy"] #touch-interact:disabled{background:#ffffffb3;border-color:#d5dde5;color:var(--xy-soft);box-shadow:0 3px 0 #c9d3dc}
+/* El mapa: el reino a todo color, con carteles blancos como un mapa de pueblo. */
+html[data-estilo="xy"] .modal-layer .modal.kingdom-map{background:#7cc0ea}
+html[data-estilo="xy"] .kmap-viewport{background:radial-gradient(ellipse at 50% 40%,#9bd3f3,#5aa6dc 80%),#5aa6dc}
+html[data-estilo="xy"] .kmap-world{box-shadow:0 0 0 6px #fff,0 0 0 10px var(--xy-blue),0 24px 60px #0b2a4466}
+html[data-estilo="xy"] .kmap-world::after{box-shadow:inset 0 0 40px 10px #ffffff88}
+html[data-estilo="xy"] .kmap-aged{filter:grayscale(.35) brightness(1.12) contrast(.86)}
+html[data-estilo="xy"] .kmap-frame{box-shadow:inset 0 0 90px 10px #0b2a4440}
+html[data-estilo="xy"] .kmap-label{color:var(--xy-ink);font-family:var(--xy-font);font-weight:800;text-shadow:0 0 3px #fff,0 0 6px #fff,0 1px 0 #fff}
+html[data-estilo="xy"] .kmap-region{color:#fff;font-family:var(--xy-font);font-style:normal;font-weight:800;letter-spacing:.2em;text-shadow:0 0 3px var(--xy-blue-deep),0 0 8px var(--xy-blue-deep),0 2px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] .kmap-place{font:800 18px/1 var(--xy-font);letter-spacing:0;color:var(--xy-blue-deep);background:#fff;border:3px solid var(--xy-blue);border-radius:999px;padding:5px 14px 6px;box-shadow:0 3px 0 var(--xy-blue-deep);text-shadow:none}
+html[data-estilo="xy"] .kmap-place.unknown{color:var(--xy-soft);background:#ffffffcc;border-color:#d5dde5;box-shadow:0 3px 0 #c9d3dc;font-style:normal}
+html[data-estilo="xy"] .kmap-place.current{color:#fff;background:var(--xy-blue);border-color:#fff}
+html[data-estilo="xy"] .kmap-landmark-name{font-family:var(--xy-font)!important;font-weight:800;color:var(--xy-blue-deep)!important;background:#fff!important;border:3px solid var(--xy-blue)!important;border-radius:999px!important;box-shadow:0 3px 0 var(--xy-blue-deep)!important;text-shadow:none!important}
+html[data-estilo="xy"] :is(.kmap-title,.kmap-quest,.kmap-travel,.kmap-legend,.kmap-popover){background:#fff;border:3px solid #fff;border-radius:20px;box-shadow:0 4px 0 #c9d3dc,0 10px 26px #0b2a4433;color:var(--xy-ink)}
+html[data-estilo="xy"] .kmap-title h2{font-family:var(--xy-font);font-weight:800;color:var(--xy-blue-deep)}
+html[data-estilo="xy"] .kmap-title .eyebrow{color:var(--xy-blue)}
+html[data-estilo="xy"] :is(.kmap-title p,.kmap-quest p,.kmap-legend){color:var(--xy-soft)}
+html[data-estilo="xy"] :is(.kmap-quest strong,.kmap-popover strong){color:var(--xy-ink);font-family:var(--xy-font);font-weight:800}
+html[data-estilo="xy"] .kmap-quest{border-left:3px solid #fff}
+html[data-estilo="xy"] :is(.kmap-quest button,.kmap-travel .map-destination,.kmap-popover .kmap-dismiss){background:#f2f8fd;border:2px solid var(--xy-line);border-radius:14px;color:var(--xy-ink);font-weight:700}
+html[data-estilo="xy"] .kmap-travel summary{color:var(--xy-blue-deep);font-weight:800}
+html[data-estilo="xy"] .kmap-travel .map-destination small{color:var(--xy-soft)}
+html[data-estilo="xy"] .kmap-popover .kmap-go{background:var(--xy-blue);border:0;border-radius:999px;color:#fff;box-shadow:0 3px 0 var(--xy-blue-deep)}
+html[data-estilo="xy"] :is(.kmap-controls button,.modal.kingdom-map .modal-close){background:#fff!important;border:0!important;color:var(--xy-blue-deep)!important;box-shadow:0 3px 0 #c9d3dc,0 6px 14px #0b2a4433!important}
+html[data-estilo="xy"] .kmap-scale i{border-color:var(--xy-ink);box-shadow:0 1px 0 #fff}
+html[data-estilo="xy"] .kmap-scale span{color:var(--xy-ink);font-weight:700;text-shadow:0 0 3px #fff,0 0 6px #fff}
+html[data-estilo="xy"] .kmap-compass{filter:drop-shadow(0 3px 0 #c9d3dc)}
+html[data-estilo="xy"] .kmap-compass .ring{fill:#fff;stroke:var(--xy-blue)}
+html[data-estilo="xy"] .kmap-compass .needle-n{fill:#e8503a;stroke:#fff}
+html[data-estilo="xy"] .kmap-compass .needle-s{fill:#fff;stroke:var(--xy-soft)}
+html[data-estilo="xy"] .kmap-compass text{fill:var(--xy-blue-deep);font-family:var(--xy-font);font-weight:800}
+/* Elegir la apariencia: un dibujo que responde al instante y cuatro filas de colores. En el camino,
+   el panel queda a un costado sin tapar ni desenfocar al viajero, que cambia en vivo. */
+.look{display:grid;grid-template-columns:104px minmax(0,1fr);gap:12px;align-items:center;margin:4px 0 6px}
+.look-preview{width:104px;height:122px;filter:drop-shadow(0 3px 0 #d5dde5)}
+.look-preview [data-part]{stroke:#25313b;stroke-width:2.4;stroke-linejoin:round}
+.look-groups{display:grid;gap:6px;min-width:0}
+.look fieldset{display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin:0;padding:0;border:0;min-width:0}
+.look legend{float:left;width:62px;margin-right:2px;font:800 13px var(--xy-font,inherit);color:var(--xy-ink,#25313b)}
+.look-swatch{width:31px;height:31px;min-height:31px!important;padding:0!important;border-radius:50%!important;background:var(--swatch)!important;border:3px solid #fff!important;box-shadow:0 0 0 2px #d5dde5,0 2px 0 2px #c9d3dc!important;cursor:pointer;transition:transform .12s}
+.look-swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--xy-blue,#2f8fd6),0 3px 0 3px var(--xy-blue-deep,#1f6fb0)!important;transform:scale(1.08)}
+.look-swatch:focus-visible{outline:3px solid #f2b33a;outline-offset:3px}
+.look-ask{margin:6px 0 0;font:800 15px var(--xy-font,inherit);color:var(--xy-ink,#25313b)}
+.look-ask span{display:block;font-weight:600;font-size:12px;color:var(--xy-soft,#55626e)}
+.look-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #e3eaf0}
+.look-row>span{display:flex;flex-direction:column;gap:2px;font-weight:700;color:var(--xy-ink,#25313b)}
+.look-row button{min-height:44px;padding:8px 18px}
+.look-done{margin-top:10px;min-height:46px;width:100%}
+.modal-layer:has(.look-modal){background:none!important;backdrop-filter:none!important}
+.modal.look-modal{justify-self:end;width:min(520px,100%)}
+@media (max-width:600px) and (orientation:portrait){.modal-layer:has(.look-modal){align-items:start}.modal.look-modal{justify-self:stretch;max-height:52dvh;overflow:auto}}
+@media (max-width:420px){.look{grid-template-columns:84px minmax(0,1fr);gap:8px}.look-preview{width:84px;height:98px}.look legend{width:100%;float:none;margin-bottom:2px}.look-swatch{width:30px;height:30px}}
+@media (orientation:landscape) and (max-height:540px){
+  .modal.look-modal{max-height:calc(100dvh - 20px);overflow:auto;padding:16px 20px}.look-modal h2{font-size:20px}
+  .name-modal .modal-intro{display:none}.name-modal h2{font-size:24px;margin-bottom:4px}.name-modal .name-form{gap:8px;margin-top:8px}
+  .look{grid-template-columns:72px minmax(0,1fr);gap:10px;margin:0}.look-preview{width:72px;height:84px}.look-swatch{width:28px;height:28px;min-height:28px!important}.look-groups{gap:4px}.look-ask{margin:0}
+  .modal.name-modal{padding:16px 22px}
+}
+body:has(.look-modal) #touch-controls{display:none}
+/* El rumbo bajo el instrumento: texto chico en su propio renglón, sin sombra, sobre la tarjeta. */
+html[data-estilo="xy"] #hud #travel-instrument #travel-bearing{position:relative;z-index:3;color:var(--xy-soft);text-shadow:none;font-weight:700;font-family:var(--xy-font);padding:6px 0 2px 23px}
+html[data-estilo="xy"] #hud #travel-instrument #travel-bearing::before{color:var(--xy-blue)}
+
+/* Ciclo 30, lo que encontró un primer jugador. */
+/* La Guía: la tarjeta «Ahora» clara, con el paso siguiente legible. */
+html[data-estilo="xy"] .guide-current{background:#eef6fc;border:2px solid #cfe3f3;border-left:5px solid #f2b33a;border-radius:18px}
+html[data-estilo="xy"] .guide-current :is(p,span,small,.guide-direction){color:var(--xy-ink)!important}
+html[data-estilo="xy"] .guide-current .guide-direction{font-weight:700}
+html[data-estilo="xy"] .guide-current .eyebrow{color:var(--xy-blue-deep)!important}
+html[data-estilo="xy"] .modal kbd{background:var(--xy-blue);color:#fff;border:0;border-radius:6px;padding:1px 6px}
+/* Los botones de arriba dicen qué son: el nombre debajo de cada uno, en una pastilla. */
+html[data-estilo="xy"] #hud .hud-tools{gap:12px;padding-bottom:20px}
+html[data-estilo="xy"] #hud .hud-tools .icon-button{position:relative;overflow:visible}
+html[data-estilo="xy"] #hud .hud-tools .icon-button .tool-label{position:absolute;left:50%;top:calc(100% + 5px);width:auto;height:auto;clip:auto;overflow:visible;transform:translateX(-50%);white-space:nowrap;padding:1px 7px;border-radius:999px;background:#ffffffe6;color:var(--xy-blue-deep)!important;font:800 10px/1.5 var(--xy-font);box-shadow:0 1px 0 #c9d3dc}
+html[data-estilo="xy"] #hud .hud-tools .icon-button kbd{display:none}
+@media (max-width:640px),(max-height:540px){html[data-estilo="xy"] #hud .hud-tools .icon-button .tool-label{display:none}html[data-estilo="xy"] #hud .hud-tools{padding-bottom:0}}
+/* El título: una sombra más firme a la izquierda, para que el nombre y los botones se lean. */
+html[data-estilo="xy"] .title-art{background-image:linear-gradient(90deg,#0d2a44f2 0%,#0d2a44d9 30%,#0d2a4466 46%,#0d2a4400 58%),url('/assets/xy/portada.webp')!important}
+html[data-estilo="xy"] .title-screen :is(.title-foot,.title-foot *){color:#e8f1f8!important;opacity:1!important;text-shadow:0 1px 3px #0b2a44}
+/* La pantalla de carga, en el mismo cielo que el juego. */
+html[data-estilo="xy"] #transition{background:radial-gradient(ellipse at 50% 40%,#5fb0e6,#2f7fc0 80%)!important}
+html[data-estilo="xy"] #transition :is(*){color:#fff!important;font-family:var(--xy-font)!important;font-weight:800}
+/* La salida de un interior, que queda detrás de la cámara (ciclo 30). */
+.exit-hint{position:absolute;left:50%;bottom:44px;transform:translateX(-50%);z-index:6;padding:6px 16px;border-radius:999px;border:2px solid #f2b33a;background:#fff8e6;color:#7a4f0f;font:800 14px/1.2 ui-rounded,'Arial Rounded MT Bold',sans-serif;box-shadow:0 3px 0 #c98a12;cursor:pointer;pointer-events:auto}
+.exit-hint span{color:#c98a12}
+.exit-hint[hidden]{display:none}
+@media (pointer:coarse){.exit-hint{bottom:auto;top:max(10px,env(safe-area-inset-top));}}

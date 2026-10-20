@@ -1,0 +1,13 @@
+Saved `giro.png` — **1536 × 1024**, **1,605,743 bytes**, **no alpha**. Generated with the built-in image tool.
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Create exactly ONE character turnaround sheet in one wide 1536x1024 image.
+Input image: use the attached sprite sheet ONLY as the character reference for Tala's identity, exact outfit, colours, hairstyle, and accessories. Do not copy its sprite-sheet layout, poses, background, or painted rendering style.
+Composition: show the same character exactly three times side by side, full body, at exactly the same size and height, with aligned tops of heads and soles of boots. Left: straight front view. Middle: true right side profile view, facing right. Right: straight back view. Use consistent orthographic framing and generous clear spacing. All three stand straight in the same relaxed A-pose, arms slightly away from the body, legs straight, feet planted, neutral friendly expression. Keep every figure fully inside the image. Loose cloth hangs naturally and close to the body.
+Character: Tala, a lively village girl of about 12, proportions about 4.5 to 5 heads tall. Long wavy dark-brown hair loosely tied back, brown eyes, mustard-yellow tunic, dark teal vest with brass buttons, small brown satchel and belt pouches, dark teal trousers tucked into brown boots. Keep the exact same outfit, colours and hairstyle as the reference sprite sheet, consistent across all three views.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours. No pixel art, no texture noise.
+Background: plain pure white (#FFFFFF), opaque. No cast shadows, no ground shadows, no text, no labels, no watermark, no extra objects or characters.
+```

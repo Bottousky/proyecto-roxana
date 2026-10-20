@@ -4,3 +4,4 @@ dist-pages/
 .vite/
 *.log
 output/
+dist-perf/

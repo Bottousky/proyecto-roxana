@@ -146,8 +146,10 @@ button:disabled{opacity:.4;cursor:not-allowed;transform:none!important}
 .switch input:checked::after{transform:translateX(18px);background:#fff6df}
 
 /* Taller */
-.world-hero{position:relative;height:210px;border-radius:14px;overflow:hidden;background:var(--cover) center 30%/cover;border:1px solid var(--line)}
+.world-hero{position:relative;height:210px;border-radius:14px;overflow:hidden;background:var(--cover) center 55%/cover;border:1px solid var(--line)}
 .hero-shade{position:absolute;inset:0;background:linear-gradient(180deg,rgba(8,14,14,.1),rgba(8,14,14,.85))}
+/* The game's own cover is a bright morning: a deeper shade keeps the title readable over sky and bunting. */
+.world-hero:not(.generated) .hero-shade{background:linear-gradient(180deg,rgba(8,14,14,.35),rgba(8,14,14,.62) 45%,rgba(8,14,14,.9))}
 .hero-text{position:absolute;left:1.2rem;right:1.2rem;bottom:1rem}
 .hero-text h3{margin:.25rem 0 0;font:600 2.6rem/1 var(--serif);letter-spacing:.12em;color:#fbf3dd}
 .hero-text .rule{margin:.1rem 0 .4rem;font:600 .8rem/1 var(--sans);letter-spacing:.5em;color:var(--brass)}

@@ -1,0 +1,47 @@
+{
+ "personaje": "Yesca",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "anteojos",
+   "caras": 6893,
+   "archivo": "pieza-anteojos.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 108105,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "delantal",
+   "caras": 223879,
+   "archivo": "pieza-delantal.stl"
+  },
+  {
+   "pieza": "pechera",
+   "caras": 63076,
+   "archivo": "pieza-pechera.stl"
+  },
+  {
+   "pieza": "camisa",
+   "caras": 47317,
+   "archivo": "pieza-camisa.stl"
+  },
+  {
+   "pieza": "pantalon",
+   "caras": 90833,
+   "archivo": "pieza-pantalon.stl"
+  },
+  {
+   "pieza": "botas",
+   "caras": 113243,
+   "archivo": "pieza-botas.stl"
+  },
+  {
+   "pieza": "pelo",
+   "caras": 198010,
+   "archivo": "pieza-pelo.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

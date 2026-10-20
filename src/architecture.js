@@ -37,7 +37,7 @@ function roof(world, parent, width, depth, base, rise, material, wall, options =
   const alongZ = options.ridge === 'z';
   if (alongZ) group.rotation.y = Math.PI / 2;
   const a = (alongZ ? depth : width) / 2, b = (alongZ ? width : depth) / 2;
-  const overhang = options.overhang ?? .34, outerA = a + overhang, outerB = b + overhang;
+  const overhang = options.overhang ?? .5, outerA = a + overhang, outerB = b + overhang;
   const pitch = rise / b, eave = -overhang * pitch, thickness = .16;
   const hip = options.hip === true;
   const ridgeEnd = hip ? Math.max(.25, a - Math.min(a * .65, b * .76)) : outerA;
@@ -120,7 +120,7 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
   const rectangle = (px, pz, width, depth, kind) => ({ ...transform(px, pz), w: Math.abs(cosine) * width + Math.abs(sine) * depth, d: Math.abs(sine) * width + Math.abs(cosine) * depth, ...(kind ? { kind } : {}) });
   const footprint = rectangle(0, 0, w + .3, d + .3);
   const blockers = [];
-  const front = d / 2, wallTop = h + .45, wall = opts.stone ? world.m.stone : world.m.cream;
+  const front = d / 2, wallTop = h + .45, wall = opts.stone ? world.m.stone : (world.m.timber || world.m.cream);
   const covering = opts.red ? world.m.roofRed : world.m.roof;
   const fullStorey = h >= 4.55;
   const mainWorkshop = opts.workshop && w >= 7.5 && h >= 5.5;
@@ -131,6 +131,8 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
   base.name = 'building-foundation';
   world.box(0, h / 2 + .45, 0, w, h, d, wall, group).name = 'building-walls';
   world.box(0, .69, 0, w + .08, .18, d + .08, world.m.stone, group);
+  // Framed houses stand on a stone plinth to the windowsills, like the village houses of the references.
+  if (!opts.stone) world.box(0, .8, 0, w + .07, .7, d + .07, world.m.stone, group).name = 'building-plinth';
   world.box(0, wallTop - .06, 0, w + .1, .18, d + .1, world.m.darkwood, group);
 
   // Structural bays deliberately frame doors/windows rather than crossing them.
@@ -156,22 +158,26 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     }
   }
 
-  const door = world.group(0, 0, front + .045, group);
-  door.name = 'building-entrance-door';
-  if (mainWorkshop) door.scale.set(1.22, 1.14, 1);
-  world.door(0, 0, 0, door);
-  const doorFrame = world.group(0, 0, front + .02, group);
-  doorFrame.name = 'building-entrance-frame';
-  for (const side of [-1, 1]) {
-    world.box(side * (mainWorkshop ? .89 : .7), mainWorkshop ? 1.48 : 1.29, 0, mainWorkshop ? .22 : .18, mainWorkshop ? 2.9 : 2.52, .25, opts.stone ? world.m.stone : world.m.darkwood, doorFrame);
-  }
-  // A lintel and a warm transom make the usable entrance legible below the eave.
-  world.box(0, mainWorkshop ? 2.99 : 2.61, .04, mainWorkshop ? 2.08 : 1.62, .21, .33, world.m.stone, doorFrame);
-  if (h > 3.7) {
-    const transomY = mainWorkshop ? 3.23 : 2.88;
-    world.box(0, transomY, .055, mainWorkshop ? 1.08 : .78, .28, .15, world.m.darkwood, doorFrame);
-    world.box(0, transomY, .145, mainWorkshop ? .9 : .62, .17, .05, world.m.glass, doorFrame).name = 'window-pane';
-    for (const side of [-1, 1]) world.box(side * (mainWorkshop ? .24 : .16), transomY, .18, .035, .18, .03, world.m.brass, doorFrame);
+  // A door promises a room you can enter; houses that cannot be entered show a window instead.
+  if (opts.noDoor) world.window(0, 1.98, front + .075, group);
+  else {
+    const door = world.group(0, 0, front + .045, group);
+    door.name = 'building-entrance-door';
+    if (mainWorkshop) door.scale.set(1.22, 1.14, 1);
+    world.door(0, 0, 0, door);
+    const doorFrame = world.group(0, 0, front + .02, group);
+    doorFrame.name = 'building-entrance-frame';
+    for (const side of [-1, 1]) {
+      world.box(side * (mainWorkshop ? .89 : .7), mainWorkshop ? 1.48 : 1.29, 0, mainWorkshop ? .22 : .18, mainWorkshop ? 2.9 : 2.52, .25, opts.stone ? world.m.stone : world.m.darkwood, doorFrame);
+    }
+    // A lintel and a warm transom make the usable entrance legible below the eave.
+    world.box(0, mainWorkshop ? 2.99 : 2.61, .04, mainWorkshop ? 2.08 : 1.62, .21, .33, world.m.stone, doorFrame);
+    if (h > 3.7) {
+      const transomY = mainWorkshop ? 3.23 : 2.88;
+      world.box(0, transomY, .055, mainWorkshop ? 1.08 : .78, .28, .15, world.m.darkwood, doorFrame);
+      world.box(0, transomY, .145, mainWorkshop ? .9 : .62, .17, .05, world.m.glass, doorFrame).name = 'window-pane';
+      for (const side of [-1, 1]) world.box(side * (mainWorkshop ? .24 : .16), transomY, .18, .035, .18, .03, world.m.brass, doorFrame);
+    }
   }
   for (const side of [-1, 1]) {
     if (mainWorkshop) {
@@ -183,6 +189,10 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     if (opts.workshop) windowGroup.scale.x = 1.12;
     // Leave a complete sill-to-lintel gap between storeys.
     world.window(0, 1.98, front + .075, windowGroup);
+    // A flower box under each ground-floor window.
+    world.box(0, 1.08, front + .36, 1.25, .26, .34, world.m.darkwood, windowGroup).name = 'window-flower-box';
+    blockers.push(rectangle(side * w * .30, front + .36, 1.25 * (opts.workshop ? 1.12 : 1) + .1, .44, 'flower-box'));
+    for (let i = 0; i < 7; i++) world.sphere(-.5 + i * .167, 1.3 + (i % 2) * .05, front + .36 + (i % 3 - 1) * .06, .12, i % 3 === 1 ? world.m.leafLight : i % 2 ? world.m.leaf : world.m.flower, windowGroup, .8);
     if (fullStorey) world.window(0, h - .4, front + .075, windowGroup, true);
   }
   // Even a rotated house retains inhabited side walls, not blank slabs.
@@ -197,7 +207,7 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
 
   const rise = Math.max(1.3, Math.min(2.22, Math.min(w, d) * .34));
   const ridge = opts.ridge || (opts.stone && w < 5.2 ? 'z' : 'x');
-  roof(world, group, w, d, wallTop + .08, rise, covering, wall, { ridge, hip: opts.stone && w >= 6.8 });
+  roof(world, group, w, d, wallTop + .08, rise, covering, wall, { ridge, hip: opts.stone && w >= 6.8, overhang: opts.eave });
 
   // Compact dormers break broad roof slopes and keep the front silhouette human.
   if (ridge === 'x' && (opts.workshop || (fullStorey && !opts.stone))) {
@@ -212,6 +222,29 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
     roof(world, dormer, 1.55, 1.15, .72, .56, covering, wall, { ridge: 'z', overhang: .14, name: 'dormer-roof' });
   }
 
+  // A two-storey framed house carries a small timber balcony under its upper middle bay.
+  if (fullStorey && !opts.stone && !opts.workshop) {
+    const balcony = world.group(0, storeyLine + .05, front, group);
+    balcony.name = 'front-balcony';
+    world.box(0, 0, .42, 1.9, .12, .84, world.m.darkwood, balcony);
+    for (const side of [-1, 1]) world.beam([side * .8, -.7, .04], [side * .8, -.06, .78], .08, world.m.darkwood, balcony);
+    world.box(0, .52, .82, 1.9, .07, .07, world.m.wood, balcony);
+    world.box(0, .08, .82, 1.9, .05, .05, world.m.wood, balcony);
+    for (let i = 0; i < 9; i++) world.box(-.88 + i * .22, .3, .82, .05, .44, .05, world.m.wood, balcony);
+    for (const side of [-1, 1]) world.box(side * .92, .3, .43, .05, .44, .8, world.m.wood, balcony);
+    for (let i = 0; i < 5; i++) world.sphere(-.6 + i * .3, .62, .78, .13, i % 2 ? world.m.flower : world.m.leafLight, balcony, .75);
+  }
+  // A trade hangs its sign from a wrought bracket at the corner, above head height.
+  if (opts.service || opts.awning) {
+    const sign = world.group(w / 2 + .06, -.9, front - .25, group);
+    sign.name = 'trade-sign';
+    sign.scale.setScalar(1.3);
+    world.box(.42, 3.05, 0, .9, .06, .06, world.m.metal, sign);
+    world.beam([.04, 2.62, 0], [.62, 3.03, 0], .035, world.m.metal, sign);
+    for (const x of [.22, .72]) world.box(x, 2.9, 0, .02, .26, .02, world.m.metal, sign);
+    world.box(.47, 2.55, 0, .74, .52, .07, world.m.wood, sign);
+    world.box(.47, 2.55, .045, .6, .38, .02, opts.red ? world.m.roofRed : world.m.brass, sign);
+  }
   const chimneyX = opts.workshop ? w * .31 : w * .29, chimneyZ = -d * .16;
   const chimneyTop = wallTop + rise + (opts.service === 'forge' ? 1.15 : opts.workshop ? .76 : .48);
   const chimney = world.group(chimneyX, 0, chimneyZ, group);
@@ -317,10 +350,10 @@ export function buildArchitecture(world, x, z, w = 6, d = 5, h = 4, opts = {}) {
 
   group.userData.architecture = {
     footprint,
-    entrance: { ...transform(0, front + .29), direction: [sine, cosine], approach: transform(0, front + .9) },
+    entrance: opts.noDoor ? null : { ...transform(0, front + .29), direction: [sine, cosine], approach: transform(0, front + .9) },
     blockers,
     dimensions: { width: w, depth: d, height: h, foundation: .3 },
-    roof: { ridge, rise, overhang: .34 },
+    roof: { ridge, rise, overhang: opts.eave ?? .5 },
   };
   return group;
 }

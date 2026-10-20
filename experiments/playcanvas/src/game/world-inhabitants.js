@@ -3,6 +3,8 @@ import { findPath } from './navigation.js';
 import { isSegmentClear } from './collision.js';
 
 const has = (state, flag) => Boolean(state.flags?.[flag]);
+/** Where Edda stops to welcome a traveller in the Portal, coming from the door of her house. */
+export const GREETING_DOOR = [-10.36, -4.5], GREETING_SPOT = [-1.8, -1.7];
 
 /** Small authored errands; positions are world X/Z, not animation offsets. */
 export function inhabitantPlan(area, object, state = {}) {
@@ -10,31 +12,47 @@ export function inhabitantPlan(area, object, state = {}) {
   const plan = { present: !object.requiresFlag || has(state, object.requiresFlag), stage: 'before',
     stops: [[object.x, object.z]], lookAt: null, rest: 5.5 };
   const set = (stage, stops, lookAt, rest = 5.5) => Object.assign(plan, { stage, stops, lookAt, rest });
+  // Nobody waits on the way between the things the player uses (the user: «que la gente nunca se
+  // pare en el paso»; tests/inhabitants-paso.test.js).
   switch (object.id) {
     case 'edda_portal':
       plan.present = !f.workshop;
-      set(f.awaken ? 'drawing-the-return' : 'examining-ohm', f.awaken ? [[-3.2, -1.8], [-1.8, -3.4]] : [[-4, 2], [-2.8, .8]], [3.5, 0]); break;
+      // A traveller who has just crossed finds Edda beside them (she runs out of her house: World
+      // playPortalArrival), above the dialogue box rather than below it; after the welcome she goes to the
+      // pedestal with them.
+      if (Array.isArray(state.seen) && !state.seen.includes('portal_arrival') && !f.awaken) set('greeting-the-traveller', [GREETING_SPOT, [-2.4, -1.1]], [0, -2.4]);
+      else set(f.awaken ? 'drawing-the-return' : 'examining-ohm', f.awaken ? [[-3.2, -1.8], [-1.8, -3.4]] : [[5.2, -1.4], [5.7, -.5]], [3.5, 0]); break;
     case 'edda_plaza':
       plan.present = !f.workshop || (final && Boolean(f.epilogue_shared));
       set(final ? 'festival-notes' : 'public-history', final ? [[-4.8, 4.8], [-3.8, 4.4]] : [[-5, 3], [-5.2, 1.3]], [-6.4, -3.9]); break;
     case 'edda_road':
       plan.present = !f.pump;
       set(f.gate ? 'toward-the-castle' : f.bridge_ready ? 'watching-the-latch' : 'comparing-the-posts',
-        f.gate ? [[-2.3, -7.5], [-.9, -9]] : f.bridge_ready ? [[-4.5, -3.5], [-3.4, -4.4]] : [[-4.5, 5], [-4.2, 2.4]], f.gate ? [0, -14] : [0, 3.5]); break;
+        f.gate ? [[-3.6, -8.2], [-4.4, -9.4]] : f.bridge_ready ? [[-4.5, -3.5], [-3.4, -4.4]] : [[-2.2, 7.6], [-1.4, 6.6]], f.gate ? [0, -14] : [0, 3.5]); break; // clear of the west post while it is still to be joined
     case 'edda_castle':
       plan.present = !f.irrigation;
-      set(f.distribution ? 'copying-the-public-plan' : 'comparing-the-archive', f.distribution ? [[-4.8, -3], [-6.1, -3.5]] : [[-9.2, -3.6], [-8.4, -2.4]], [-11, -6]); break;
+      set(f.distribution ? 'copying-the-public-plan' : 'comparing-the-archive', f.distribution ? [[-6.6, -6.4], [-7.4, -5.6]] : [[-9.2, -3.6], [-10.4, -4.4]], [-11, -6]); break;
     case 'edda_lake':
       plan.present = !f.beacon_supply;
       set(f.beacon_link ? 'toward-the-tower' : 'watching-the-markers', f.beacon_link ? [[-3.8, .8], [-2.8, -1]] : [[-5, 6], [-5.8, 3.8]], [8, -3]); break;
+    // In the Faro, Edda and Nereo wait beside the walk between each pair of levers, never on it
+    // (jugador 30 could not get past Edda to the motor's lever).
     case 'edda_tower':
       set(final ? 'teaching' : f.beacon_network ? 'observing-the-lens' : f.beacon_supply ? 'comparing-services' : 'sketching-the-base',
-        final ? [[-4, -10], [-4.2, -9.3]] : f.beacon_network ? [[-3.8, -7], [-4.4, -6.4]] : f.beacon_supply ? [[-3.8, 1], [-4.3, 1.8]] : [[-4, 12], [-3.8, 10.7]], final ? [-4, -12.5] : [0, f.beacon_network ? -12 : f.beacon_supply ? -4 : 4], 7); break;
+        final ? [[-4, -10], [-4.2, -9.3]] : f.beacon_network ? [[-6.4, -3.2], [-6.9, -2.6]] : f.beacon_supply ? [[-5, 3.4], [-5.6, 4.2]] : [[-4, 12], [-3.8, 10.7]], final ? [-4, -12.5] : [0, f.beacon_network ? -12 : f.beacon_supply ? -4 : 4], 7); break;
+    // While the Plaza has no water (gate open, pump not yet), Marín and Tala are at the Manantial.
     case 'marin':
-      set(final ? 'bread-for-the-festival' : 'bakery-round', [[object.x, object.z], [-4.8, -5.8]], [-5.15, -10.3], 4.5); break;
+      plan.present = !(f.gate && !f.pump);
+      set(final ? 'bread-for-the-festival' : 'bakery-round', [[object.x, object.z], [-6.4, -6.8]], [-5.15, -10.3], 4.5); break;
     case 'tala_plaza':
-      plan.present = !final || Boolean(f.epilogue_shared);
+      plan.present = (!final || Boolean(f.epilogue_shared)) && !(f.gate && !f.pump);
       set(f.epilogue_shared ? 'trying-her-own-question' : 'collecting-questions', [[11.2, 6], [12, 7]], final ? [0, -2] : [11, -7], 4.5); break;
+    case 'tala_spring':
+      plan.present = Boolean(f.gate) && !f.pump;
+      set(f.tala_lantern ? 'watching-the-pump' : 'waiting-with-her-lantern', f.tala_lantern ? [[5.2, -3.4], [5.9, -4.5]] : [[object.x, object.z], [object.x + .7, object.z - .7]], f.tala_lantern ? [2.5, -5.5] : [0, 10], 5); break;
+    case 'marin_spring':
+      plan.present = Boolean(f.gate) && !f.pump;
+      set('filling-the-cart', [[object.x, object.z], [object.x - .7, object.z - .7]], [-6.5, 2], 5); break;
     case 'lumen':
       set(f.workshop ? 'comparing-old-and-new' : 'sorting-parts', f.workshop ? [[-2.7, -2.2], [-3.7, -3.2]] : [[-3.5, 1.5], [-4, -.4]], [3, -3], 7); break;
     case 'vega_spring':
@@ -42,17 +60,17 @@ export function inhabitantPlan(area, object, state = {}) {
       set(f.pump ? 'checking-the-restored-pump' : 'watching-the-level', f.pump ? [[4.6, -1], [5.2, .5]] : [[-4.2, -1.4], [-4.6, .8]], f.pump ? [2.5, -5.5] : [-9, -2], 6); break;
     case 'consejera':
       set(f.distribution ? 'checking-public-services' : f.castle_ready ? 'witnessing-the-test' : 'guarding-the-seal',
-        f.distribution ? [[3.2, -5.2], [2.4, -6.6]] : [[4.2, -6.4], [3.4, -7.4]], [6.4, -9.5], 8); break;
+        f.distribution ? [[8.2, -5.8], [9.2, -6.6]] : [[8.4, -7.6], [9, -8.6]], [6.4, -9.5], 8); break;
     case 'yesca':
       set(f.irrigation ? 'working-a-sustainable-shift' : 'checking-the-forge', f.irrigation ? [[-12.2, -11.3], [-10.6, -11.4]] : [[-11.4, -11.2], [-12.6, -11.4]], [-13.6, -14.5], 5); break;
     case 'vega_terraces':
       set(f.irrigation ? 'checking-the-beds' : 'watching-the-last-parcel', f.irrigation ? [[7.4, 1.8], [7.4, -3.2]] : [[7.6, 4.2], [7.4, 1.8]], [14.4, 3.8], 6); break;
     case 'nereo_lake':
       set(final ? 'resting-by-the-lake' : f.beacon_link ? 'ready-to-go' : 'listening-to-the-water',
-        final ? [[8.2, 3.4], [10.6, 2.8]] : f.beacon_link ? [[2.3, -10], [-.5, -11.5]] : [[9.5, 3.2], [11.2, 3.4]], final ? [16, 3] : f.beacon_link ? [0, -15] : [16, 2], 8); break;
+        final ? [[8.2, 3.4], [10.6, 2.8]] : f.beacon_link ? [[-3.6, -10.6], [-4.4, -11.6]] : [[9.5, 3.2], [11.2, 3.4]], final ? [16, 3] : f.beacon_link ? [0, -15] : [16, 2], 8); break;
     case 'nereo_tower':
       set(final ? 'recognizing-the-signal' : f.beacon_network ? 'listening-to-the-crown' : f.beacon_supply ? 'checking-the-gallery' : 'listening-to-the-base',
-        final ? [[3.6, -10.4], [3.8, -9.2]] : f.beacon_network ? [[3.4, -7], [3.8, -6.2]] : f.beacon_supply ? [[3.4, 1], [3.8, 2]] : [[3.5, 11], [3.6, 9.7]], [0, final ? -12 : f.beacon_network ? -4 : 4], 8); break;
+        final ? [[3.6, -10.4], [3.8, -9.2]] : f.beacon_network ? [[6.4, -3.2], [6.9, -2.6]] : f.beacon_supply ? [[5, 3.4], [5.6, 4.2]] : [[3.5, 11], [3.6, 9.7]], [0, final ? -12 : f.beacon_network ? -4 : 4], 8); break;
     case 'lumen_epilogue': set('sharing-an-old-lamp', [[-5.5, -11], [-5.1, -10.4]], [-4, -12.5], 8); break;
     case 'tala_epilogue': set(f.epilogue_shared ? 'trying-the-lamp' : 'examining-the-old-repair', [[-4, -12.5], [-3.5, -12.7]], [-4, -10], 8); break;
   }
@@ -130,7 +148,7 @@ function walkErrand(world, actor, dt) {
 /** Update only human NPCs; World still owns the player and Ohm's following. */
 export function updateInhabitants(world, dt, state, { paused = false, reducedMotion = false } = {}) {
   for (const actor of world.actors || []) {
-    if (actor.g === world.player) continue;
+    if (actor.g === world.player || actor.scripted) continue; // a scripted walk (World.playPortalArrival) moves itself
     const x = actor.g.position.x, z = actor.g.position.z;
     if (actor.inhabitant) {
       adoptPlan(world, actor, inhabitantPlan(world.area.id, actor.inhabitant.object, state));
@@ -148,11 +166,16 @@ export function getInhabitantInteractions(world, state = world.state) {
     ...actor.inhabitant.object, x: actor.g.position.x, z: actor.g.position.z,
     inhabitant: true, activity: actor.inhabitant.plan.stage,
   }));
-  if (world.ohm?.visible && has(state, 'awaken')) interactions.push({
-    id: 'ohm_companion', kind: 'npc', character: 'ohm', label: 'Hablar con Ohm', dialogue: 'ohm_companion',
-    x: world.ohm.position.x, z: world.ohm.position.z, inhabitant: true, interactionPriority: -1, radius: 2,
-  });
   return interactions;
+}
+
+/** Ohm walks at the player's heels: talking to him has its own key (O), never a proximity prompt. */
+export function companionInteraction(world, state = world.state) {
+  if (!world.ohm?.visible || !has(state, 'awaken')) return null;
+  return {
+    id: 'ohm_companion', kind: 'npc', character: 'ohm', label: 'Hablar con Ohm', dialogue: 'ohm_companion',
+    x: world.ohm.position.x, z: world.ohm.position.z, inhabitant: true,
+  };
 }
 
 function conversationActor(world, target) {

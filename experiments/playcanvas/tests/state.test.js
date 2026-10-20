@@ -8,5 +8,5 @@ test('unavailable storage returns a recoverable result',()=>{const db={getItem:(
 test('malformed imported destinations and settings cannot break map, audio or reading',()=>{
   const s=freshState();s.visited=['portal','unknown','plaza','plaza'];s.settings={volume:'loud',muted:'false',quality:'ultra',textSpeed:-1};
   const loaded=validateState(s);assert.deepEqual(loaded.visited,['portal','plaza']);assert.deepEqual(loaded.settings,freshState().settings);
-  const db=storage();db.setItem(SETTINGS_KEY,JSON.stringify({volume:8,textSpeed:0,reducedMotion:[] }));const prefs=loadSettings(db);assert.equal(prefs.volume,1);assert.equal(prefs.textSpeed,36);assert.equal(prefs.reducedMotion,false);
+  const db=storage();db.setItem(SETTINGS_KEY,JSON.stringify({volume:8,textSpeed:0,reducedMotion:[] }));const prefs=loadSettings(db);assert.equal(prefs.volume,1);assert.equal(prefs.textSpeed,60);assert.equal(prefs.reducedMotion,false);
 });

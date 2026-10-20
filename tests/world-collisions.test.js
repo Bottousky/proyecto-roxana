@@ -88,6 +88,17 @@ for(const area of Object.values(AREAS)){
   });
 }
 
+// While the Plaza has no water, Tala and Marín wait at the Manantial and Edda's beacon is on the
+// Calzada (minijuegos, ciclo 29): each one can be reached on foot and answers there.
+const waterOut={awaken:true,workshop:true,bridge_ready:true,gate:true};
+for(const id of ['road','spring'])test(`${id}: the neighbours' minijuegos can be reached while the water is out`,()=>{
+  const world=buildCollisionWorld(id,{flags:waterOut});
+  try{
+    const reachable=reachableInteractions(world,AREAS[id].spawn);
+    for(const object of AREAS[id].objects.filter(o=>o.mini))assert.ok(reachable.has(object.id),`${object.id} (${object.x},${object.z}) has no reachable interaction position`);
+  }finally{world.dispose();}
+});
+
 test('visible building interiors stay solid even beside an interaction or exit',()=>{
   for(const area of Object.values(AREAS)){
     const world=buildCollisionWorld(area.id,{flags:repaired});

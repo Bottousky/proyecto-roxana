@@ -1,0 +1,12 @@
+{
+  "nombre": "Ohm",
+  "nota": "Robot de bronce: un cuerpo y dos pies. Sin pelo ni piel. El ojo: cristal cian en un aro oscuro.",
+  "robot": true,
+  "pies": 0.35,
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "bronce", "tenible": "ropa", "muestra": "#d9a43e", "colores": ["#e8b14a", "#ce963c", "#ad7c31", "#8c6428", "#65491f", "#f6d36c", "#f6f2c7", "#402f14", "#9c8d57"] },
+    { "nombre": "franja", "tenible": "ropa2", "muestra": "#22585a", "colores": ["#173636", "#205356", "#444b38"], "z": [0.25, 0.85] },
+    { "nombre": "ojo", "muestra": "#3cc2d6", "colores": ["#38c1d3", "#0f0d09"], "z": [0.62, 1.4] }
+  ]
+}

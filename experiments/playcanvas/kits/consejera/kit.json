@@ -1,0 +1,42 @@
+{
+ "personaje": "Ivara",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "pelo",
+   "caras": 122043,
+   "archivo": "pieza-pelo.stl"
+  },
+  {
+   "pieza": "vestido",
+   "caras": 464704,
+   "archivo": "pieza-vestido.stl"
+  },
+  {
+   "pieza": "capa",
+   "caras": 272290,
+   "archivo": "pieza-capa.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 195020,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "oro",
+   "caras": 180926,
+   "archivo": "pieza-oro.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 47551,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "blusa",
+   "caras": 42024,
+   "archivo": "pieza-blusa.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

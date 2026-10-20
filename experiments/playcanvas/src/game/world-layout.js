@@ -29,7 +29,7 @@ export const AREA_LAYOUTS = {
     courts: [circle('arch-court', 0, -3, 4.2), circle('ohm-court', 3.5, 0, 2.85), circle('garden-rest', 0, 5.2, 1.8)],
     buildings: [{ ...building('portal-keeper', 'Casa de los Porteros', -10.36, -7.2, 4.8, 4, 3.5, {stone:true}), composition: 'La casa de Edda y su familia, que reciben a quien cruza. Escala baja junto al arco; su puerta se abre al claro, sin invadir el pilar occidental.' }],
     landmarks: [{ id: 'portal', label: 'Portal Ω', x: 0, z: -5.7 }],
-    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2), rect('portal-surface', 0, -5.7, 5.5, .6)],
+    exclusions: [rect('portal-pier-west', -3.25, -5.7, 1, 1.2), rect('portal-pier-east', 3.25, -5.7, 1, 1.2), rect('portal-surface', 0, -5.7, 5.5, 1.2)],
   },
   plaza: {
     identity: 'Un circuito alrededor de la fuente y calles cortas que terminan en puertas visibles.',
@@ -58,18 +58,19 @@ export const AREA_LAYOUTS = {
       { ...building('plaza-market', 'Mercado', 14.8, 3, 4.8, 4.6, 3.6, {awning:true,red:true}), composition: 'Pabellón bajo del este, enteramente dentro del jardín; la puerta mira al paseo sur y las provisiones quedan al costado.' },
     ],
     landmarks: [{ id: 'fountain', label: 'Fuente de Ohm', x: 0, z: -2 }],
-    // The rest of the village, beyond the playable square: low houses facing the Plaza, off every road.
+    // The rest of the village, beyond the playable square. Each house shows its door and a fenced
+    // front garden: three look onto the square from behind its west fence, three line the road to
+    // the Calzada (7,4 m off its centre, turned to face it; garden gate on the verge).
     backdrop: [
-      { x: -28, z: -5, w: 5, d: 4.2, h: 3.6, options: { stone: true, rotation: Math.PI / 2 } },
-      { x: -29, z: 7, w: 4.6, d: 4, h: 3.4, options: { red: true, rotation: Math.PI / 2 } },
-      { x: -34, z: -14, w: 4.4, d: 3.8, h: 3.3, options: { rotation: Math.PI / 2 } },
-      { x: -24, z: -19, w: 5.2, d: 4.4, h: 3.8, options: { red: true } },
-      { x: -12, z: -25, w: 4.6, d: 4, h: 3.5, options: { stone: true } },
-      { x: -1, z: -28, w: 5, d: 4.2, h: 3.6, options: {} },
+      { x: -26.5, z: -9.5, w: 5, d: 4.2, h: 3.6, options: { stone: true, rotation: Math.PI / 2 } },
+      { x: -26.5, z: -1, w: 4.6, d: 4, h: 3.4, options: { red: true, rotation: Math.PI / 2 } },
+      { x: -26.5, z: 7.5, w: 4.4, d: 3.8, h: 3.3, options: { rotation: Math.PI / 2 } },
+      { x: -2.23, z: -24.44, w: 5.2, d: 4.4, h: 3.8, options: { red: true, rotation: .577 }, road: true },
+      { x: 3.36, z: -27.2, w: 4.6, d: 4, h: 3.5, options: { stone: true, rotation: .379 }, road: true },
+      { x: 9.67, z: -29.43, w: 5, d: 4.2, h: 3.6, options: { rotation: .316 }, road: true },
     ],
     exclusions: [],
     adjustments: [
-      { id: 'plaza-crates', reason: 'Almacén junto al costado este, fuera de la fachada y su explanada', positions: [[-7.7, 0], [-7.7, .8], [-6.9, 0], [-6.9, .8]] },
       { id: 'plaza-barrels', reason: 'Almacén al este del Mercado, entre el cimiento y el muro, fuera de su puerta y explanada', positions: [[17.8, 1.3], [17.8, 2.2], [17.8, 3.1], [17.8, 4]] },
     ],
   },
@@ -116,7 +117,7 @@ export const AREA_LAYOUTS = {
       path('vega-garden', 2.0, [0, 5], [4, 4.5], [7, 6], [10, 7.3]),
     ],
     courts: [rect('pump-apron', 3, -2.7, 5.2, 3.6), circle('source-basin-apron', -2, -4.5, 2.8), rect('vega-work-court', 4, 4.3, 6.5, 3.6)],
-    buildings: [{ ...building('wheel-house', 'Casa de la rueda', 11.56, -9, 6, 5.5, 4.2, {stone:true}), composition: 'La rueda se separa del flanco oeste para mostrar sus apoyos y eje; la puerta conserva el acceso por la margen seca.' }],
+    buildings: [{ ...building('wheel-house', 'Casa de la rueda', 11.56, -9, 6, 5.5, 4.2, {stone:true,eave:.34}), composition: 'La rueda se separa del flanco oeste para mostrar sus apoyos y eje; la puerta conserva el acceso por la margen seca.' }],
     landmarks: [{ id: 'spring-wheel', label: 'Rueda del Manantial', x: 7.82, z: -5.7 }, { id: 'aqueduct', label: 'Acueducto', x: -6, z: -12.6 }],
     exclusions: [rect('spring-water', -11.56, -2, 6.5, 25, 'Manantial'), rect('spring-wheel', 7.82, -5.7, 4.5, .75), rect('source-basin', -2, -4.5, 3.6, 3.6), ...SPRING_WATERWORKS_FOOTPRINTS],
     waters: [{ id: 'spring-channel', label: 'Manantial', points: [[-14.81, -14.5], [-8.31, -14.5], [-8.31, 10.5], [-14.81, 10.5]] }],
@@ -212,7 +213,7 @@ for (const [id, layout] of Object.entries(AREA_LAYOUTS)) {
   layout.exclusions.push(...layout.buildings.map(b => rect(`${b.id}-footprint`, b.x, b.z, b.w + .3, b.d + .3)));
   for (const object of area.objects) {
     if (object.kind === 'npc' || object.character) continue;
-    const size = object.kind === 'well' ? [4.2, 4.2] : object.kind === 'lever' ? [1.2, .9] : MACHINE_FOOTPRINTS[object.puzzle] || [1.25, .95];
+    const size = object.kind === 'well' ? [4.2, 4.2] : object.kind === 'lever' ? (object.story ? [1.2, .9] : [1.8, 1.35]) : MACHINE_FOOTPRINTS[object.puzzle] || [1.25, .95];
     layout.exclusions.push(rect(object.id, object.x, object.z, ...size));
   }
 }
@@ -249,4 +250,30 @@ export function pointOnPaving(layout, x, z, margin = 0) {
     if (path.points.length === 1) return Math.hypot(x - path.points[0][0], z - path.points[0][1]) <= path.width / 2 + margin;
     return path.points.slice(1).some((point, i) => distanceToPathSegment(x, z, path.points[i], point) <= path.width / 2 + margin);
   });
+}
+
+/** A village house beyond the square, in its own frame: front +Z, turned by options.rotation. */
+export function backdropFrame(house) {
+  const r = house.options?.rotation || 0, cos = Math.cos(r), sin = Math.sin(r);
+  // Road houses open their gate on the verge; the others keep a short garden before the square's fence.
+  const garden = house.road ? 7.4 - house.d / 2 - 2.7 : 2.2;
+  const at = (px, pz) => [house.x + px * cos + pz * sin, house.z - px * sin + pz * cos];
+  const box = (px, pz, width, depth) => { const [x, z] = at(px, pz); return { x, z, w: Math.abs(cos) * width + Math.abs(sin) * depth, d: Math.abs(sin) * width + Math.abs(cos) * depth }; };
+  return { at, box, front: house.d / 2, garden, facing: [sin, cos] };
+}
+
+/**
+ * Ground kept clear of trees around each village house (full-size boxes, area coordinates):
+ * the walls with their eaves, the fenced front garden and, toward the camera in the south,
+ * the view of the facade. A tree there either grows through the roof or hides the house.
+ */
+export function backdropYards(layout) {
+  return (layout?.backdrop || []).flatMap(house => {
+    const { box, front, garden } = backdropFrame(house), walls = box(0, 0, house.w + 2, house.d + 2);
+    return [walls, box(0, front + garden / 2 + .4, house.w + 2, garden + 1.6), { x: walls.x, z: walls.z + walls.d / 2 + 2.5, w: walls.w, d: 5 }];
+  });
+}
+
+export function inBackdropYard(layout, x, z, margin = 0) {
+  return backdropYards(layout).some(b => Math.abs(x - b.x) < b.w / 2 + margin && Math.abs(z - b.z) < b.d / 2 + margin);
 }

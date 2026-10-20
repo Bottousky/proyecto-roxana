@@ -1,0 +1,13 @@
+Saved `frente-apose.png` using built-in image_gen.
+Size: **1374 × 1145 px**, **1,232,016 bytes**. Alpha: **No**.
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Generate exactly one image: a single full-body character model sheet view of Ohm. Use the attached sprite sheet only as the character identity reference, not as a style, background, or layout reference.
+Composition: exact straight-on front view, facing the viewer exactly, standing upright on two feet in a relaxed neutral stance, centred, entire body visible with generous white margin. No arms; ignore A-pose arm positioning. Neutral friendly expression conveyed by the single eye.
+Character: a small round brass robot companion shaped like an old diving helmet, about as tall as a child's waist. Preserve the reference's compact spherical body and short rounded brass feet. Polished brass sphere with small rivets, one big round glowing cyan glass eye in a thick brass ring centred on the front, an Ω (omega) symbol engraved immediately below the eye, round brass screw bolts on both sides, a dark teal metal band around the lower half, and two short rounded brass feet. Preserve the reference's exact character design and colours; no added outfit or hairstyle, no hair, no arms, no mouth, no second eye.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, crisp edges. Translate the large expressive anime-eye painted-flat look to its ONE cyan glass eye. The requested 4.5-to-5-head-tall character styling is a general game-style cue only: retain this armless robot's reference sphere-and-feet anatomy rather than inventing a humanoid body or separate head. Clean polished surfaces, no texture noise, no scratches or weathering, no pixel art.
+Background: plain pure white, fully opaque. No cast shadow, no ground shadow, no floor line, no scenery, no props, no text or labels except the engraved Ω on the robot, no watermark. One character, one view, not a sprite sheet or multi-panel image.
+```

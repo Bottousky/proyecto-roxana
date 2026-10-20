@@ -1,0 +1,11 @@
+Saved `giro.png` using built-in image_gen. Size: **1536 × 1024**, **1,303,941 bytes**. Alpha: **no**. No other workspace files changed.
+
+Exact prompt:
+
+```text
+Generate exactly ONE character turnaround sheet, a single wide 1536x1024 image. Use the attached sprite sheet only as the character identity reference, not as a style or background reference. Show Ohm exactly three times side by side at exactly the same size and height, with aligned tops and feet: left is a straight front view, middle is a true right side profile facing right, right is a straight back view. Each figure is fully visible, evenly spaced, upright, standing still on two feet with a neutral friendly presence. Pure white background (#FFFFFF), no ground shadows, no text, no labels, no border.
+
+Ohm is a small round brass robot companion shaped like an old diving helmet, about as tall as a child's waist. Preserve the reference's compact spherical silhouette and exact character design: polished brass sphere body with small rivets; one big round glowing cyan glass eye in a thick brass ring on the front; an Ω (omega) symbol engraved below the eye; round brass screw bolts on both sides; a dark teal metal band around the lower half; two short rounded brass feet. No arms, no mouth, no hair, no added clothing or accessories. Ignore A-pose instructions because this character has no arms. The back view has no eye or omega symbol; the side view shows the eye housing at the front edge. Keep the same brass, dark teal, and cyan colours as the reference. Any loose cloth, if present in the reference, would hang naturally close to the body; do not invent cloth.
+
+Render like a character from Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours, flat-painted expressive anime treatment of the single cyan eye while retaining its glass lens design. The general style brief mentions proportions about 4.5 to 5 heads tall, but Ohm has no separate head or humanoid body: preserve its reference spherical body and short feet rather than elongating it. Clean polished surfaces, no pixel art, no texture noise, no weathering. Consistent geometry, materials, camera height, scale, and lighting across all three views.
+```

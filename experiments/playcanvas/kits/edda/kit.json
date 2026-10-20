@@ -1,0 +1,47 @@
+{
+ "personaje": "Edda",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "ojos",
+   "caras": 3952,
+   "archivo": "pieza-ojos.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 253304,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "capa",
+   "caras": 248167,
+   "archivo": "pieza-capa.stl"
+  },
+  {
+   "pieza": "camisa",
+   "caras": 75295,
+   "archivo": "pieza-camisa.stl"
+  },
+  {
+   "pieza": "bombachos",
+   "caras": 156010,
+   "archivo": "pieza-bombachos.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 55450,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "metal",
+   "caras": 3323,
+   "archivo": "pieza-metal.stl"
+  },
+  {
+   "pieza": "pelo",
+   "caras": 134263,
+   "archivo": "pieza-pelo.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

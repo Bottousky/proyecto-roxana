@@ -1,0 +1,52 @@
+{
+ "personaje": "El viajero",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "ojos",
+   "caras": 1595,
+   "archivo": "pieza-ojos.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 59137,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 132941,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "abrigo",
+   "caras": 237916,
+   "archivo": "pieza-abrigo.stl"
+  },
+  {
+   "pieza": "bufanda",
+   "caras": 64549,
+   "archivo": "pieza-bufanda.stl"
+  },
+  {
+   "pieza": "camisa",
+   "caras": 12506,
+   "archivo": "pieza-camisa.stl"
+  },
+  {
+   "pieza": "metal",
+   "caras": 8420,
+   "archivo": "pieza-metal.stl"
+  },
+  {
+   "pieza": "pantalon",
+   "caras": 97133,
+   "archivo": "pieza-pantalon.stl"
+  },
+  {
+   "pieza": "pelo",
+   "caras": 91991,
+   "archivo": "pieza-pelo.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

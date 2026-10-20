@@ -1,0 +1,19 @@
+{
+ "regiones": [
+  {
+   "nombre": "bronce",
+   "muestra": "#d9a43e",
+   "tenible": "ropa"
+  },
+  {
+   "nombre": "franja",
+   "muestra": "#22585a",
+   "tenible": "ropa2"
+  },
+  {
+   "nombre": "ojo",
+   "muestra": "#3cc2d6",
+   "tenible": null
+  }
+ ]
+}

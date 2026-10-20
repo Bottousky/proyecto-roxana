@@ -1,0 +1,7 @@
+Saved `xy-trees.png` — **1536 × 1024**, **2,219,862 bytes**. **Alpha: yes**, including fully transparent pixels. Generated once using the built-in tool.
+
+Exact prompt:
+
+```text
+Generate exactly ONE 1536x1024 PNG sprite sheet with a fully transparent background (real alpha channel). Use case: stylized-concept game sprites. Composition: a 3-column by 2-row grid of six trees, one tree in each equal 512x512 cell. Do not draw the grid. Each tree is centred horizontally in its cell, with its trunk base at the bottom centre of that cell, fully contained within its own cell and never crossing into another cell. Top row, left to right: a big round broad oak with a short trunk; a tall narrow cypress; a birch with a white trunk and golden-yellow leaves. Bottom row, left to right: a weeping willow with long hanging fronds; a large round blue-green oak; an apple tree with small red apples. Style: clean cel-shaded 3D-render look of a modern handheld RPG, like a bright 3DS-era town; soft rounded volumes, two-tone toon shading with a soft lighter top, thin darker-green outline, bright fresh colours, low detail. No pixel art, no noise. Nothing else in the image: no ground, no ground shadows, no text, no labels, no borders, no scenery. All space outside the six tree silhouettes must be truly transparent.
+```

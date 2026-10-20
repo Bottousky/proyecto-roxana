@@ -8,6 +8,23 @@ Arco I jugable en la rama **codex/playcanvas-slice**.
 - Iniciar localmente: abrir **Jugar PlayCanvas.cmd**, o ejecutar npm run dev.
 - En un checkout nuevo: npm ci antes de iniciar.
 
+### Jugar la build candidata (Windows, macOS o Linux)
+
+Requiere Node.js 22.12 o posterior y un navegador con WebGL2 (Chrome o Edge actualizados).
+
+```sh
+npm ci
+npm run build
+npx vite preview --host 127.0.0.1 --port 4191
+```
+
+Abrir `http://127.0.0.1:4191/` y elegir **Cruzar el Portal**. La partida se guarda sola en ese
+navegador; en **Opciones** se exporta o importa la Bitácora. Teclado: WASD o flechas, Shift
+para correr, E usar, Q medir con Ohm, O hablar con Ohm, J Bitácora, M mapa, H guía, Esc pausa.
+En pantallas táctiles: cruceta, tocar el suelo para ir, tocar algo para acercarse y usarlo,
+y el botón **Interactuar**. Estado de producción, aceptación y límites de verificación:
+[docs/produccion-aaa](../../docs/produccion-aaa/ESTADO.md).
+
 ## Instituto Roxana (landing)
 
 `escuela.html` es la escuela-diorama que recibe al estudiante: una isla flotante con el
@@ -153,6 +170,10 @@ la raíz del sitio es la escuela 3D (Instituto Roxana) y el juego vive en `ohmda
 
 - `index.html`: campus 3D · `escuela-clasica.html`: versión sin 3D · `escuela.html`: redirige a la raíz.
 - `ohmdal.html`: el juego. **No publicar el `index.html` del juego en la raíz**: pisaría la escuela.
+
+Publicar todo junto (escuela y juego del mismo commit, desde 2026-10-19): `node scripts/pages-site.mjs dist-pages`
+y reemplazar el contenido de `gh-pages` por esa carpeta (ya trae `index.html` = campus, `ohmdal.html` = juego,
+la versión clásica, la redirección `escuela.html` y `.nojekyll`).
 
 Publicar el juego: `node node_modules/vite/bin/vite.js build --base=/proyecto-roxana/ --outDir dist-pages`,
 copiar `dist-pages` sobre `gh-pages` **renombrando su `index.html` a `ohmdal.html`**.

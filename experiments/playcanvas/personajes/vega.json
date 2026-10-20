@@ -1,0 +1,14 @@
+{
+  "nombre": "Vega",
+  "nota": "Vestido verde salvia con delantal verde azulado; la trenza larga cae sobre el hombro. La falda tapa las piernas: el esqueleto sube la entrepierna.",
+  "esqueleto": { "axila": 1.22, "entrepierna": 0.78, "rodilla": 0.42 },
+  "suavizado": 8,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#eeb47c", "colores": ["#efb275", "#bd7642"], "z": [0.85, 1.82] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#a59a92", "colores": ["#9e9087", "#c9c3bd", "#6f6863"], "z": [1.05, 2.0] },
+    { "nombre": "vestido", "tenible": "ropa", "muestra": "#9a9a58", "colores": ["#a6a561", "#909053", "#747745", "#555835", "#3d4026"], "z": [0.42, 1.62] },
+    { "nombre": "delantal", "tenible": "ropa2", "muestra": "#4f6362", "colores": ["#505f5e", "#3c4241"], "z": [0.55, 1.58] },
+    { "nombre": "punos", "muestra": "#ece0c2", "colores": ["#eadbb9"], "z": [1.1, 1.62] },
+    { "nombre": "cuero", "muestra": "#6b4a2f", "colores": ["#523b2a", "#825a38", "#1e1b16"], "z": [0.0, 1.35] }
+  ]
+}

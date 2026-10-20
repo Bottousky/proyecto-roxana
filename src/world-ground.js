@@ -11,7 +11,7 @@ export function buildPaving(world) {
   const halfX=world.bounds[0]/2-.42,halfZ=world.bounds[1]/2-.42;
   const cols=Math.ceil(halfX*2/step),rows=Math.ceil(halfZ*2/step);
   const dx=halfX*2/cols,dz=halfZ*2/rows,filled=new Uint8Array(cols*rows);
-  const permanent=world.obstacles.filter(o=>o!==world.gateObstacle);
+  const permanent=world.obstacles.filter(o=>!(world.gateObstacles||[]).includes(o));
   const clear=(x,z)=>!permanent.some(o=>Math.abs(x-o.x)<o.w&&Math.abs(z-o.z)<o.d);
   for(let iz=0;iz<rows;iz++)for(let ix=0;ix<cols;ix++){
     const x=-halfX+(ix+.5)*dx,z=-halfZ+(iz+.5)*dz;

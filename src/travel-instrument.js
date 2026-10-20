@@ -20,17 +20,20 @@ export function mountTravelInstrument(document){
   document.querySelector('#area-subtitle').classList.add('screen-reader-only');
   const bearing=document.createElement('span');bearing.id='travel-bearing';bearing.className='travel-bearing';header.append(bearing);compass.setAttribute('aria-describedby','travel-bearing');
 }
+// Written only when something changes: the instrument is refreshed four times a second, and an
+// unchanged write still makes the browser recompute the HUD's styles (2026-10-19, rendimiento).
+const text=(el,v)=>{if(el&&el.textContent!==v)el.textContent=v;},attr=(el,n,v)=>{if(el&&el.getAttribute(n)!==v)el.setAttribute(n,v);};
 export function updateTravelInstrument(document,state,position,objective){
   const phase=advanceJourneyTime(state),bearing=travelBearing(state,position,objective);
-  document.querySelector('#travel-phase').textContent=phase.label;
-  document.querySelector('#travel-day').textContent=`Día ${phase.day}`;
-  document.querySelector('#travel-sky').textContent=phase.symbol;
+  text(document.querySelector('#travel-phase'),phase.label);
+  text(document.querySelector('#travel-day'),`Día ${phase.day}`);
+  text(document.querySelector('#travel-sky'),phase.symbol);
   // The sun climbs the rim through the day; at night the moon sits at the top.
   const mark=document.querySelector('#travel-daymark'),night=phase.id==='night'||phase.id==='dusk',t={morning:.12,afternoon:.42,sunset:.78,dusk:.3,night:.5,'next-morning':.12}[phase.id]??.12,a=Math.PI*(1+t);
-  mark.setAttribute('transform',`translate(${50+46*Math.cos(a)} ${56+46*Math.sin(a)})`);mark.toggleAttribute('data-night',night);
-  document.querySelector('#travel-time').dataset.phase=phase.id;
-  document.querySelector('#travel-needle').setAttribute('transform',`rotate(${bearing.angle} 50 51)`);
-  document.querySelector('#travel-bearing').textContent=bearing.label;
-  document.querySelector('#travel-compass').title=`${bearing.label} · Abrir mapa`;
-  document.querySelector('#chapter-label').textContent=KINGDOM[state.area]?.region||'Ohmdal';
+  attr(mark,'transform',`translate(${50+46*Math.cos(a)} ${56+46*Math.sin(a)})`);if(mark.hasAttribute('data-night')!==night)mark.toggleAttribute('data-night',night);
+  attr(document.querySelector('#travel-time'),'data-phase',phase.id);
+  attr(document.querySelector('#travel-needle'),'transform',`rotate(${bearing.angle} 50 51)`);
+  text(document.querySelector('#travel-bearing'),bearing.label);
+  attr(document.querySelector('#travel-compass'),'title',`${bearing.label} · Abrir mapa`);
+  text(document.querySelector('#chapter-label'),KINGDOM[state.area]?.region||'Ohmdal');
 }

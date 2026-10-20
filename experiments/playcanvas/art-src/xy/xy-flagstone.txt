@@ -1,0 +1,9 @@
+Saved `xy-flagstone.png` — **1024 × 1024**, **1,061,431 bytes**. Generated with the built-in image_gen tool.
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept
+Asset type: seamless game paving texture, square 1024x1024 PNG.
+Generate exactly one image. Strict orthographic top-down view of square paving slabs in an exact 4 by 4 aligned grid. Light warm grey, with soft subtle tone differences between slabs and thin soft joints. Clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town: soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail. Flat even light across the entire image. No pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it. Fill the whole square with paving; no border, no text, no objects. It must tile seamlessly on all four edges: matching opposite edges, with joints at the perimeter joining into the same thin joint width when repeated horizontally and vertically.
+```

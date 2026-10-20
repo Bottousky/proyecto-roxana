@@ -6,7 +6,7 @@ export const CINEMATIC_DEFINITIONS = {
   pump:{area:'spring',duration:9,returnAt:7.6,captions:[{at:0,text:'La bomba vuelve a empujar el agua.'},{at:4.4,text:'Más abajo, el agua vuelve a encontrar la Plaza.'}]},
   irrigation:{area:'terraces',duration:5.8,returnAt:4.7,captions:[{at:0,text:'El agua alcanza el último bancal.'}]},
   beacon_network:{area:'lighthouse',duration:5.5,returnAt:4.4,captions:[{at:0,text:'La torre recupera su viejo sonido.'}]},
-  beacon_lens:{area:'lighthouse',duration:17,returnAt:15,captions:[{at:0,text:'La luz se sostiene detrás del cristal.'},{at:3,text:'Una vuelta. Una pausa.'},{at:7.6,text:'El haz cruza el lago y sube por las Terrazas.'},{at:11.6,text:'Desde la Plaza, una campana responde.'}]},
+  beacon_lens:{area:'lighthouse',duration:19.6,returnAt:17.6,captions:[{at:0,text:'La luz se sostiene detrás del cristal.'},{at:3,text:'Una vuelta. Una pausa.'},{at:7.6,text:'El haz cruza el lago y sube por las Terrazas.'},{at:11.6,text:'Desde la Plaza, una campana responde.'},{at:14.4,text:'Al oeste, en el Monte Quieto, una luz responde.'}]},
 };
 
 const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
@@ -31,19 +31,24 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     if(!context.companion)return null;
     const companion=context.companion,points=[player,companion,puzzle],xs=points.map(p=>p[0]),zs=points.map(p=>p[2]);
     const x=(Math.min(...xs)+Math.max(...xs))/2,z=(Math.min(...zs)+Math.max(...zs))/2,span=Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...zs)-Math.min(...zs));
-    const close=pose([x,1.1+companion[1]*.5,z],clamp(14/(span+6),1.1,1.62),[0,18,25]);
+    // Close enough to see the light come on under the glass.
+    const close=pose([x,1.1+companion[1]*.5,z],clamp(20/(span+6),1.35,1.75),[0,18,25]);
     const reveal=pose([x*.8,1.6,z-.7],1.28,[0,16.5,25]);
     shots=[key(1,close),key(2.4,close),key(3.5,reveal),key(definition.returnAt,reveal)];
   }else if(id==='workshop'){
     const lamp=pose([puzzle[0],1.8,puzzle[2]],1.68),room=pose([.3,1.7,-1],1.22);
     shots=[key(1,lamp),key(2.3,lamp),key(3.5,room),key(definition.returnAt,room)];
   }else if(id==='gate'){
-    const mechanism=pose([puzzle[0],2,puzzle[2]],1.45),gateway=pose([0,4.3,-(context.bounds?.[1]||32)*.32],.94,[0,15,25]);
-    shots=[key(.85,mechanism),key(1.5,mechanism),key(3.5,gateway),key(definition.returnAt,gateway)];
+    // The latch, then the Ω over the open gate up close, then the valley it opens onto.
+    const mechanism=pose([puzzle[0],2,puzzle[2]],1.45),gateZ=-(context.bounds?.[1]||32)*.32,sign=pose([0,4.8,gateZ-1.5],1.4,[0,15,25]),gateway=pose([0,4.3,gateZ],.94,[0,15,25]);
+    shots=[key(.85,mechanism),key(1.4,mechanism),key(2.6,sign),key(3.4,sign),key(definition.returnAt,gateway)];
   }else if(id==='pump'){
-    // The water travels: from the pump down to the Plaza's fountain, 95 m south.
+    // The water travels: from the pump down the canal it really runs in (the Manantial's east bank,
+    // the Calzada's canal, the Plaza's) to the fountain, 95 m south. Spring-local coordinates.
     const pump=pose([puzzle[0],1.7,puzzle[2]],1.48),water=pose([2,1.4,-3.8],1.62,[0,16,25]),fountain=pose([-12,1.2,92.2],1.35,[0,15,25]);
-    shots=[key(1,pump),key(2,pump),key(3.3,water),key(3.9,water),key(5.4,fountain),key(definition.returnAt,fountain)];
+    const springCanal=pose([20,.6,6],1.12,[0,16,25]),roadCanal=pose([41.8,.6,47],1.05,[0,16,25]),plazaCanal=pose([10,.6,86],1.12,[0,16,25]);
+    // Back from the Plaza by a cut to the wheel, not a 95 m flight over the treetops.
+    shots=[key(1,pump),key(2,pump),key(2.9,water),key(3.3,water),key(4,springCanal),key(4.8,roadCanal),key(5.6,plazaCanal),key(6.3,fountain),key(definition.returnAt,fountain),key(definition.returnAt+.04,water)];
   }else if(id==='irrigation'){
     const panel=pose([puzzle[0],1.7,puzzle[2]],1.38),canal=pose([(context.bounds?.[0]||40)*.36,1.5,-(context.bounds?.[1]||36)*.28+6.1],1.28,[0,17,25]);
     shots=[key(.9,panel),key(1.5,panel),key(3.3,canal),key(definition.returnAt,canal)];
@@ -55,7 +60,10 @@ export function createCinematic(id,context,{reducedMotion=false}={}){
     // The beam leaves the island: the camera follows it over the night lake and up the terraces,
     // whose lamps are lit again, before the bell answers from the Plaza.
     const lake=pose([-38,1.5,50],.82,[0,15,25]),terraces=pose([-80,2,98],.7,[0,17,25]);
-    shots=[key(1.3,lens),key(2.4,lens),key(4.5,rise),key(5.1,rise),key(7,beacon),key(7.6,beacon),key(9.6,lake),key(10.6,lake),key(12.8,terraces),key(definition.returnAt,terraces)];
+    // Last, the Casa de Compuertas on the Monte Quieto, seen from the Manantial's side (from the east),
+    // so the mountain rises behind its lit window instead of standing between it and the lens.
+    const mount=pose([-92.2,2.6,211],1.05,[24,14,4]);
+    shots=[key(1.3,lens),key(2.4,lens),key(4.5,rise),key(5.1,rise),key(7,beacon),key(7.6,beacon),key(9.6,lake),key(10.6,lake),key(12.8,terraces),key(13.5,terraces),key(15.3,mount),key(definition.returnAt,mount)];
   }
   return{id,duration:definition.duration,returnAt:definition.returnAt,captions:definition.captions.map(c=>({...c})),frames:[key(0,context.start),...shots,key(definition.duration,game)]};
 }

@@ -1,25 +1,46 @@
-import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES} from 'playcanvas';
-import {surface,actorArt} from './art.ts';
-import {AREAS} from './game/content.js';
+import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
+import {XY,XY_LENS,XY_GRADES,XY_SKIES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,shadeFigure,FIGURE_URL,FIGURES,chosenAppearance} from './style.js';
+import {surface,actorArt,blankActorArt} from './art.ts';
+import {AREAS,WORLD_SYSTEMS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
 import {lakeShoreX,AREA_LAYOUTS,pointOnPaving} from './game/world-layout.js';
 import {findPath} from './game/navigation.js';
 import {moveWithCollisions,isPositionClear} from './game/collision.js';
 import {advanceActor,idleActor,actorDirection} from './game/actor-animation.js';
-import {initializeInhabitants,updateInhabitants,getInhabitantInteractions,beginInhabitantConversation,faceInhabitantSpeaker,endInhabitantConversation} from './game/world-inhabitants.js';
+import {GREETING_DOOR,initializeInhabitants,updateInhabitants,getInhabitantInteractions,companionInteraction,beginInhabitantConversation,faceInhabitantSpeaker,endInhabitantConversation} from './game/world-inhabitants.js';
 import {inInteractionReach,approachInteraction} from './game/world-interaction.js';
 import {describeWorldAudio} from './game/world-audio.js';
 import {journeyPhase} from './game/story-time.js';
 import {readReceiverFeedback,readControlFeedback} from './game/world-feedback.js';
 import {createCinematic,sampleCinematic,returningCinematic,gameplayCameraPose} from './game/cinematics.js';
+import {quietMountState} from './game/quiet-mount.js';
 import sceneUrl from './data/scene.json?url';
 import geometryUrl from './data/geometry.bin.gz?url';
+import reliefUrl from './data/relief.bin.gz?url';
+import {sharedBytes,takeBytes} from './shared-fetch.js';
+/** What the world's build downloads before the first place shows (2026-10-19, rendimiento). The build
+ * asked for it one file after another (19,6 s on 4G); fetched all at once while the title is on screen,
+ * it is then read from the browser's cache. A file left out of this list only loses the head start. */
+export function prefetchWorldAssets(){
+  const at=p=>new URL(p,document.baseURI).href,surfaces=['stone','meadow','wood','roof','cobble','trees','timber','rock','moss','plants-a','plants-b','plaster','flagstone'];
+  const people=PEOPLE_3D?[FIGURE_URL,FIGURES.ohm.url].flatMap(u=>[u,u.replace(/\.glb$/,'-regiones.json'),u.replace(/\.glb$/,'-regiones.webp')]):[];
+  const urls=[sceneUrl,geometryUrl,reliefUrl,...(XY?surfaces.map(n=>`./assets/xy/${n}.webp`):[]),'./assets/art-polish/waterside-plants.webp','./assets/art-polish/kingdom-banner.webp','./assets/art-polish/workshop-rug.webp','./assets/shore-distance.png','./assets/ground-ao.png','./assets/props/kit.glb','./assets/ohm.webp',...people];
+  // The geometry first (the build waits on it before anything else), then the rest together.
+  Promise.all([sharedBytes(sceneUrl),sharedBytes(geometryUrl)]).catch(()=>{}).finally(()=>{sharedBytes(reliefUrl).catch(()=>{});for(const u of urls.slice(3))fetch(at(u)).then(r=>r.arrayBuffer()).catch(()=>{});});
+}
 import {walkableTerrain} from './terrain.js';
 import {makeWater,updateWater,loadShore,bindShore} from './water.js';
-import {makeGround,makeRock,updateClouds} from './ground.js';
+import {makeGround,makeRock,updateClouds,loadGroundAo,updateGroundLife} from './ground.js';
 import {makeWind,updateWind,windKind} from './wind.js';
+import {occludes,makeSeeThrough,seeThroughFrame,applySeeThrough} from './see-through.js';
+import {channel} from './geometry-format.js';
 import {makePortalSurface} from './portal.js';
 import {buildGrid,updateGrid} from './grid.js';
+import {placeDressing,propObstacles} from './props.js';
+import {sowFlora,recolorFlora,WILD_LIFE} from './flora.js';
+import {makeLiving,setDry} from './living.js';
+import {raiseRelief} from './relief.js';
+import {buildHomes} from './homes.js';
 
 // Small coordinate value adapter for the existing renderer-independent game rules.
 class Position extends Vec3 {
@@ -43,6 +64,12 @@ function paneTexture(app){
   x.globalAlpha=.55;x.fillStyle='#e8f1ee';x.beginPath();x.moveTo(8,64);x.lineTo(22,64);x.lineTo(50,0);x.lineTo(36,0);x.fill();x.globalAlpha=.3;x.beginPath();x.moveTo(26,64);x.lineTo(31,64);x.lineTo(59,0);x.lineTo(54,0);x.fill();
   paneMap=new Texture(app.graphicsDevice,{width:64,height:64,format:PIXELFORMAT_RGBA8,mipmaps:true});paneMap.setSource(c);return paneMap;
 }
+function poolTexture(app){
+  // Where the beam touches down: nothing under the island, a long band over water and fields.
+  const c=document.createElement('canvas');c.width=256;c.height=32;const x=c.getContext('2d'),img=x.createImageData(256,32),s=(a,b,t)=>{const k=Math.max(0,Math.min(1,(t-a)/(b-a)));return k*k*(3-2*k);};
+  for(let j=0;j<32;j++)for(let i=0;i<256;i++){const u=i/255,v=Math.abs(j/31-.5)*2,a=s(.22,.45,u)*(1-s(.7,1,u))*Math.pow(Math.max(0,1-v*v),2.6),k=(j*256+i)*4;img.data[k]=img.data[k+1]=img.data[k+2]=255;img.data[k+3]=Math.round(a*255);}
+  x.putImageData(img,0,0);const t=new Texture(app.graphicsDevice,{width:256,height:32,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);return t;
+}
 function beamTexture(app){
   // Bright at the lens, fading with distance; soft across its width.
   const c=document.createElement('canvas');c.width=256;c.height=64;const x=c.getContext('2d'),img=x.createImageData(256,64);
@@ -50,14 +77,21 @@ function beamTexture(app){
   x.putImageData(img,0,0);const t=new Texture(app.graphicsDevice,{width:256,height:64,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);return t;
 }
 const waitFrame=()=>new Promise(r=>requestAnimationFrame(r));
+// A long lens, low over the diorama: the perspective recedes to the top of the frame and the
+// depth of field blurs near and far like a tilt-shift photograph. ?lens=0 restores the old
+// orthographic view; ?lens=distance,pitch tries another framing.
+const LENS=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('lens');if(!q&&XY)return {...XY_LENS};if(q==='0')return {fov:false,distance:1,pitch:0};const [distance,pitch]=(q||'1.3,26').split(',').map(Number);return {fov:true,distance:distance||1.3,pitch:pitch||26};})();
+
+// ?dof=range,radius tries another depth of field on the same camera (comparisons for QA).
+const DOF=(()=>{const q=new URLSearchParams(globalThis.location?.search||'').get('dof');if(!q)return null;const [range,radius]=q.split(',').map(Number);return {range:range||null,radius:radius||null};})();
 
 export class PlayCanvasWorld {
   constructor(canvas){
     this.canvas=canvas;this.state={flags:{},settings:{}};this.clock=0;this.route=[];this.target=null;this.actors=[];this.regions=new Map();this.allActors=[];this.dynamics=[];this.waters=[];this.glasses=[];this.lights=[];this.sprites=new Map();this.focus=new Position();this.cameraOffset=new Position(0,13.5,25);this.currentZoom=.93;this.companionRoute=[];this.companionAge=0;this.walking=false;
     this.app=new Application(canvas,{graphicsDeviceOptions:{alpha:false,antialias:true}});
     this.app.setCanvasFillMode(FILLMODE_FILL_WINDOW);this.app.setCanvasResolution(RESOLUTION_AUTO);
-    this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);this.buildFrame();
-    this.sun=new Entity('Sol de Ohmdal');this.sun.addComponent('light',{type:'directional',color:color('#ffe6bc'),intensity:1.6,castShadows:true,shadowResolution:2048,shadowDistance:100,normalOffsetBias:.04,shadowBias:.2});this.sun.setEulerAngles(50,-35,0);this.app.root.addChild(this.sun);
+    this.camera=new Entity('Cámara de viaje');this.camera.addComponent('camera',{projection:LENS.fov?PROJECTION_PERSPECTIVE:PROJECTION_ORTHOGRAPHIC,orthoHeight:12/.93,nearClip:.1,farClip:LENS.fov?600:250,clearColor:color('#8fa5a6')});this.camera.camera.toneMapping=TONEMAP_ACES;this.app.root.addChild(this.camera);this.buildFrame();
+    this.sun=new Entity('Sol de Ohmdal');this.sun.addComponent('light',{type:'directional',color:color('#ffe6bc'),intensity:1.6,castShadows:true,shadowResolution:2048,shadowDistance:70,normalOffsetBias:.04,shadowBias:.2});this.sun.setEulerAngles(50,-35,0);this.app.root.addChild(this.sun);
     this.app.scene.ambientLight=color('#8eaaad');this.resize();this.assetsReady=this.loadArtAssets();
     this.destroy=()=>this.dispose();addEventListener('beforeunload',this.destroy,{once:true});
   }
@@ -70,43 +104,58 @@ export class PlayCanvasWorld {
     f.vignette.intensity=.32;f.vignette.inner=.6;f.vignette.outer=1.35;f.vignette.curvature=.7;
     f.colorEnhance.enabled=true;f.colorEnhance.vibrance=.12;f.colorEnhance.shadows=.15;
     f.grading.enabled=true;this.grade=[...GRADES.morning];
-    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=3.5;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
-    f.update();
+    f.dof.enabled=true;f.dof.nearBlur=true;f.dof.focusDistance=57;f.dof.focusRange=12;f.dof.blurRadius=DOF?.radius??3;f.dof.blurRings=4;f.dof.blurRingPoints=5;f.dof.highQuality=true;
+    f.update();xyFrame(f,this.app,this.camera.camera);
   }
   focusFrame(){
     if(!this.frame?.enabled||!this.player)return;
     // In a cinematic the camera may leave the player behind: focus where it looks.
     const [ox,oz]=this.data.areas[this.area.id].offset,p=this.player.position,wanted=this.camera.getPosition().distance(this.cinematic?this.focus:new Vec3(p.x+ox,p.y+1,p.z+oz));
-    const range=this.inspect||this.cinematic?16:this.area.id==='workshop'?18:12;
+    // Wide enough that each place's landmark (fountain, wheel, gate, forge) reads in focus on arrival;
+    // only the far rim and the nearest foliage keep the miniature blur.
+    const range=this.inspect||this.cinematic?16:this.indoors()?18:DOF?.range??28;
     if(Math.abs(wanted-this.frame.dof.focusDistance)>.05||range!==this.frame.dof.focusRange){this.frame.dof.focusDistance=wanted;this.frame.dof.focusRange=range;this.frame.update();}
+  }
+  // Quien juega y Ohm nunca se pierden detrás del primer plano (src/see-through.js).
+  updateSeeThrough(){
+    const device=this.app.graphicsDevice;
+    for(const [actor,tall,name] of [[this.playerActor,2.5,'uSeeThrough'],[this.ohmActor,1.35,'uSeeThroughOhm']]){
+      if(!actor?.entity?.enabled||this.inspect){applySeeThrough(device,null,name);continue;}
+      const feet=this.seeFeet??=new Vec3(),head=this.seeHead??=new Vec3();
+      feet.copy(actor.entity.getPosition());head.copy(actor.entity.up).mulScalar(tall).add(feet);
+      applySeeThrough(device,seeThroughFrame(this.camera.camera,this.camera.getPosition(),feet,head,device.width,device.height),name);
+    }
   }
   async loadArtAssets(){
     if(this.booted)return {ok:true,missing:[]};
-    try{await this.build();this.booted=true;return {ok:true,missing:[]};}catch(error){console.error(error);return {ok:false,missing:[error.message]};}
+    try{await this.build();celShade(this.app);this.booted=true;return {ok:true,missing:[]};}catch(error){console.error(error);return {ok:false,missing:[error.message]};}
   }
   async build(){
-    const [data,binary]=await Promise.all([fetch(sceneUrl).then(r=>{if(!r.ok)throw new Error('Falta el mundo');return r.json();}),fetch(geometryUrl).then(async r=>{if(!r.ok)throw new Error('Falta la geometría');const buffer=await r.arrayBuffer(),magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
+    const [data,binary]=await Promise.all([takeBytes(sceneUrl).catch(()=>{throw new Error('Falta el mundo');}).then(b=>JSON.parse(new TextDecoder().decode(b))),takeBytes(geometryUrl).catch(()=>{throw new Error('Falta la geometría');}).then(async buffer=>{const magic=new Uint8Array(buffer,0,2);return magic[0]===31&&magic[1]===139?new Response(new Blob([buffer]).stream().pipeThrough(new DecompressionStream('gzip'))).arrayBuffer():buffer;})]);this.data=data;
     for(const id of [...Object.keys(AREAS),'landscape']){const root=new Entity(id==='landscape'?'Ohmdal · geografía compartida':AREAS[id].name);this.app.root.addChild(root);this.regions.set(id,{root,actors:[]});}
     const needed=[...new Set(data.meshes.flatMap(m=>m.material.texture?[m.material.texture]:[]))];for(const name of needed)await surface(this.app,name);
-    const owners=new Map(),shore=await loadShore(this.app);this.receivers=[];let count=0;
+    const owners=new Map(),shore=await loadShore(this.app),groundAo=await loadGroundAo(this.app);this.receivers=[];let count=0;
     const cobble=await surface(this.app,'cobble');
     for(const b of data.meshes){
-      if(b.material.paving)continue; // painted by the ground shader
+      if(b.material.paving||b.material.trail)continue; // painted by the ground shader
       const d=b.material,e=new Entity(b.owner||`${b.area} · ${count}`),m=new StandardMaterial();m.diffuse=color('#'+d.color);m.emissive=color('#'+d.emissive);m.emissiveIntensity=d.emission;m.shininess=10;m.useMetalness=true;m.metalness=0;m.diffuseVertexColor=true;m.alphaTest=d.alpha;m.opacity=d.opacity;m.cull=d.double?CULLFACE_NONE:CULLFACE_BACK;
       if(d.texture){m.diffuseMap=await surface(this.app,d.texture);if(d.alpha){m.opacityMap=m.diffuseMap;m.opacityMapChannel='a';}}
       if(d.opacity<1){m.blendType=BLEND_NORMAL;m.depthWrite=false;}
       if(d.texture==='water'){makeWater(m);bindShore(m,shore,!b.dynamic,{lighthouse:1,lake:.6}[b.area]||0);this.waters.push(m);}
-      if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble}));
-      m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>new (key==='indices'?Uint32Array:Float32Array)(binary,b[key].offset,b[key].length);
-      mesh.setPositions(attr('positions'));mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
+      if(d.texture==='ground')(this.grounds??=[]).push(makeGround(m,{shoreMap:shore,meadow:m.diffuseMap,cobble,ao:groundAo}));
+      // Leaves, ferns, hedges and waterside plants dry and green with their place (see updateEnvironment).
+      if(/^(tree\d|fern|foliage|bank\d)$/.test(d.texture||'')||(!d.texture&&['518557','8c9a52','829559'].includes(d.color))){makeLiving(m);(this.living??=[]).push({material:m,area:b.area});}
+      m.update();const mesh=new Mesh(this.app.graphicsDevice),attr=key=>channel(binary,b,key);
+      mesh.setPositions(attr('positions'));if(b.normals.type==='i8')mesh.setVertexStream(SEMANTIC_NORMAL,attr('normals'),4,undefined,TYPE_INT8,true);else mesh.setNormals(attr('normals'));mesh.setUvs(0,attr('uvs'));if(b.colors.type==='u8')mesh.setVertexStream(SEMANTIC_COLOR,attr('colors'),4,undefined,TYPE_UINT8,true);else mesh.setColors(attr('colors'));mesh.setIndices(attr('indices'));mesh.update();
       const instance=new MeshInstance(mesh,m,e);instance.castShadow=d.shadow&&d.opacity===1;instance.receiveShadow=true;e.addComponent('render',{meshInstances:[instance]});let parent=this.regions.get(b.area).root;
       if(b.owner&&!b.dynamic){if(!owners.has(b.owner)){const owner=new Entity(b.owner);parent.addChild(owner);owners.set(b.owner,owner);}parent=owners.get(b.owner);}
       parent.addChild(e);
       if(b.dynamic){e.setPosition(...b.dynamic.pivot);this.dynamics.push({...b.dynamic,area:b.area,entity:e,material:m,angle:0,progress:0,rotation:new Quat(),axle:new Vec3(...(b.dynamic.spinAxis||[0,0,1]))});}
       if(d.glass)this.glasses.push({area:b.area,material:m});
       if(d.crop)(this.crops??=[]).push({material:m,lush:m.diffuse.clone()});
-      if(d.rock)makeRock(m);
+      if(d.rock)makeRock(m,{rock:await surface(this.app,'rock'),moss:await surface(this.app,'moss')});
       if(windKind(d.texture)&&!b.dynamic)(this.windy??=[]).push(makeWind(m,windKind(d.texture)));
+      if(occludes(d))makeSeeThrough(m);
       if(d.pane){m.diffuse=color('#5d7780');m.diffuseMap=paneTexture(this.app);m.gloss=.8;m.metalness=.1;m.update();}
       if(d.receiver)this.receivers.push({area:b.area,material:m,...d.receiver});
       if(++count%15===0){const text=document.getElementById('transition-name');if(text)text.textContent=`Tejiendo Ohmdal · ${Math.round(count/data.meshes.length*100)}%`;await new Promise(r=>setTimeout(r,0));}
@@ -114,30 +163,50 @@ export class PlayCanvasWorld {
     // The far countryside continues behind the authored region surfaces.
     // Eastern slopes south of the lake, so the valley never ends in the clear colour.
     {const e=new Entity('Laderas del este'),m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(37,78);m.update();e.addComponent('render',{type:'plane'});e.render.material=m;e.setPosition(122.5,-.15,-63);e.setLocalScale(155,1,326);this.regions.get('landscape').root.addChild(e);}
-    for(const [z,depth] of [[-95,390]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
+    // It stops 20 m short of the Faro's sea: past there only the open water remains.
+    for(const [z,depth] of [[-85,370]]){const e=new Entity('Laderas del reino');e.addComponent('render',{type:'plane'});const m=new StandardMaterial();m.diffuse=color('#b5bba0');m.diffuseMap=await surface(this.app,'ground');m.diffuseMapTiling=new Vec2(42,65);m.update();e.render.material=m;e.setPosition(-42.5,-.15,z);e.setLocalScale(175,1,depth);this.regions.get('landscape').root.addChild(e);}
     // Open sea to the horizon north of the Faro: the authored planes stop 20 m past the islet.
     {const e=new Entity('Mar abierto'),m=makeWater(new StandardMaterial());bindShore(m,shore,true,1);e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(75,-.45,-540);e.setLocalScale(760,1,530);this.regions.get('landscape').root.addChild(e);this.waters.push(m);}
+    await placeDressing(this);await raiseRelief(this);await sowFlora(this);await buildHomes(this,this.kit);
+    // People in 3D load by place (2026-10-19, rendimiento): the build only notes who lives where; the
+    // place the traveller is in loads under the first curtain and its neighbours in the background
+    // (ensureFigures). Until its model is there, a person waits unseen instead of as a flat drawing.
+    this.figureJobs=new Map();this.figuresByArea=new Map();
     for(const [id,area] of Object.entries(AREAS))for(const object of area.objects.filter(o=>o.character&&o.character!=='ohm')){
       const a=await this.makeActor(object.character,object.x,object.z,id,object);this.allActors.push(a);this.regions.get(id).actors.push(a);
+      if(PEOPLE_3D&&FIGURES[object.character]){a.entity.sprite.enabled=false;(this.figureJobs.get(id)??this.figureJobs.set(id,[]).get(id)).push({actor:a,character:object.character});}
     }
     this.playerActor=await this.makeActor('player',0,0,'player');this.player=this.playerActor.g;this.ohmActor=await this.makeActor('ohm',-1,.7,'companion');this.ohm=this.ohmActor.g;
+    // The traveller and Ohm, together (a missing Ohm model keeps the sprite).
+    if(PEOPLE_3D)await Promise.all([attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37,{chosen:chosenAppearance()}),attachFigure(this.app,this.ohmActor,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{})]);
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
+    // Asleep on his pedestal he is the same 3D figure he will be at the traveller's heels, only dimmer (the
+    // user: the drawing stood out among the 3D people). Same model, already downloaded for the companion.
+    if(PEOPLE_3D)await attachFigure(this.app,this.sleeping,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{});
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
     this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();
   }
   async makeActor(name,x,z,area,object){
-    if(!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
-    const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:this.sprites.get(name),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-28.37,0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
+    // In 3D Ohm keeps his drawn sheet in case his small model fails; the others' sheets wait for the same.
+    const drawn=!PEOPLE_3D||name==='ohm';if(drawn&&!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
+    const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:drawn?this.sprites.get(name):blankActorArt(this.app),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-(LENS.pitch||28.37),0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
     return {name,area,entity:e,script,phase:this.allActors.length*.71,animation:idleActor(),g:{position:new Position(x,0,z),visible:true,userData:{interaction:object}}};
   }
   animateActor(a,dx,dz,dt,{paused=false,reducedMotion=false}={}){
     a.animation=advanceActor(a.animation,paused?0:dx,paused?0:dz,dt,{reducedMotion});a.script.showFrame(a.animation,a.name==='ohm',this.clock);
+    if(a.figure){
+      // What a 3D figure is doing beyond walking: talking while its line is on screen, cheering in a celebration.
+      const c=this.celebration;a.figure.talking=this.speaking?.actor===a;
+      a.figure.cheer=c&&c.actors.includes(a)?Math.max(0,c.t-.35-c.actors.indexOf(a)*.14):-1;
+      a.figure.reduced=reducedMotion;updateFigure(a,paused?0:dx,paused?0:dz,dt);
+    }
   }
   context(id){
     const context=Object.create(this);context.area=AREAS[id];context.coreBounds=context.area.bounds;context.bounds=travelBounds(id);context.obstacles=this.localObstacles(id);context.actors=this.regions.get(id).actors;return context;
   }
-  localObstacles(id){const [ox,oz]=this.data.areas[id].offset;return this.data.areas[id].obstacles.filter(o=>!o.gate||!this.state.flags.gate).map(o=>({...o,x:o.x-ox,z:o.z-oz}));}
+  localObstacles(id){const [ox,oz]=this.data.areas[id].offset;return [...this.data.areas[id].obstacles.filter(o=>!o.gate||!this.state.flags.gate).map(o=>({...o,x:o.x-ox,z:o.z-oz})),...propObstacles(id)];}
   loadArea(area,state,spawn,{continuous=false}={}){
+    if(this.prepared)this.preloadFigures(area.id); // people of the next places, while this one is walked
     const old=this.area?.id,preserve=continuous&&old&&isExterior(old)&&isExterior(area.id),global=preserve?toKingdom(old,this.getPlayerPosition()):null,companion=preserve?toKingdom(old,[this.ohm.position.x,this.ohm.position.z]):null;
     this.area=area;this.state=state;this.coreBounds=area.bounds;this.bounds=travelBounds(area.id);this.obstacles=this.localObstacles(area.id);this.actors=[this.playerActor,...this.regions.get(area.id).actors];
     if(preserve){let p=fromKingdom(area.id,global);const o=fromKingdom(area.id,companion);
@@ -146,42 +215,129 @@ export class PlayCanvasWorld {
     else{this.setPlayerPosition(spawn||area.spawn);this.cancelCinematic();}
     initializeInhabitants(this);this.updateFlags(state);this.arrange();this.syncActors();
   }
+  indoors(){return this.area?.id==='workshop'||!!this.home;}
+  // Interiors of the houses (src/homes.js): a synthetic place with its own bounds and objects.
+  enterHome(id){
+    const home=this.homes.get(id);if(!home)return false;
+    this.outside={area:this.area,door:home.door};this.home=home;
+    this.area={id:home.region,name:home.label,bounds:home.bounds,spawn:[0,home.bounds[1]/2-1.4],objects:home.objects,exits:[]};
+    this.coreBounds=home.bounds;this.bounds=home.bounds;this.obstacles=home.obstacles;this.actors=[this.playerActor];
+    this.setPlayerPosition(this.area.spawn);this.cancelCinematic();this.arrange();this.syncActors();return true;
+  }
+  leaveHome(){
+    const back=this.outside;if(!back)return false;this.home=null;this.outside=null;const area=back.area;
+    this.area=area;this.coreBounds=area.bounds;this.bounds=travelBounds(area.id);this.obstacles=this.localObstacles(area.id);this.actors=[this.playerActor,...this.regions.get(area.id).actors];
+    const a=back.door.approach;this.setPlayerPosition([a[0]+back.door.direction[0]*.4,a[1]+back.door.direction[1]*.4]);this.cancelCinematic();this.arrange();this.syncActors();return true;
+  }
+  getSavePosition(){return this.outside?this.outside.door.approach:this.getPlayerPosition();}
+  // Walking through a door, in or out, is as good as pressing E in front of it.
+  getDoorEvent(){
+    if(!this.walking||!this.player||this.cinematic)return null;const [x,z]=this.getPlayerPosition(),[mx,mz]=this.lastStep||[0,0];
+    if(this.home)return z>this.home.bounds[1]/2-1.05&&Math.abs(x)<1.3&&mz>0?{leave:true,label:this.outside.area.name}:null;
+    for(const home of this.homes?.values()||[])if(home.area===this.area.id){const d=home.door;if(Math.hypot(x-d.x,z-d.z)<.8&&(mx*-d.direction[0]+mz*-d.direction[1])>.4)return {enter:home.id,label:home.label};}
+    return null;
+  }
+  doorInteractions(){if(this.home||!this.homes)return [];return [...this.homes.values()].filter(h=>h.area===this.area.id).map(h=>({id:'door:'+h.id,kind:'door',x:h.door.approach[0],z:h.door.approach[1],label:'Entrar · '+h.label,door:{enter:h.id,label:h.label},radius:1.4,ground:true}));}
   arrange(){
-    const inside=this.area?.id==='workshop';
-    for(const [id,r] of this.regions)r.root.enabled=inside?id==='workshop':id!=='workshop';
+    const inside=this.area?.id==='workshop',home=this.home?.region;
+    for(const [id,r] of this.regions)r.root.enabled=home?id===home:inside?id==='workshop':id!=='workshop'&&!id.startsWith('home:');
     for(const a of this.allActors){if(a.area!==this.area?.id){const ctx=this.context(a.area);ctx.actors=[a];if(!a.inhabitant)initializeInhabitants(ctx);}}
   }
+  /** The people of a place in 3D, loaded once (shared models), all at the same time. */
+  ensureFigures(id){
+    if(!PEOPLE_3D||!this.figureJobs)return Promise.resolve();
+    if(!this.figuresByArea.has(id))this.figuresByArea.set(id,Promise.all((this.figureJobs.get(id)||[]).map(({actor,character})=>attachFigure(this.app,actor,FIGURES[character].url,LENS.pitch||28.37,{size:FIGURES[character].size}).catch(async e=>{console.warn('figura',character,e);if(!this.sprites.has(character))this.sprites.set(character,await actorArt(this.app,character));actor.entity.sprite.sprite=this.sprites.get(character);actor.entity.sprite.enabled=true;}))));
+    return this.figuresByArea.get(id);
+  }
+  /** This place's people now, its neighbours' next (they are what the next crossing shows). */
+  preloadFigures(id){const here=this.ensureFigures(id);here.then(()=>{for(const e of AREAS[id]?.exits||[])if(e.target)this.ensureFigures(e.target);});return here;}
   async prepareJourney(progress=()=>{}){
     if(this.prepared)return;this.preparingJourney=true;
+    await this.preloadFigures(this.area?.id);
     const prior=this.area?.id,pose=this.camera.getPosition().clone(),savedRotation=this.camera.getRotation().clone();let n=0;
     // Warm each place under the first curtain; crossings never create assets.
     for(const id of Object.keys(AREAS)){for(const [name,r] of this.regions)r.root.enabled=id==='workshop'?name==='workshop':name!=='workshop';const [x,z]=this.data.areas[id].offset;this.camera.setPosition(x,28,z+50);this.camera.lookAt(x,1,z);await waitFrame();await waitFrame();progress(++n,9);}
     this.camera.setPosition(pose);this.camera.setRotation(savedRotation);if(prior)this.arrange();this.prepared=true;this.preparingJourney=false;
   }
   walkableLand(x,z){
+    if(this.home)return true;
     return walkableTerrain(this.area.id,x,z);
   }
+  // Path guidance for keyboard walkers. Pushing straight into a hedge or a wall slides toward the
+  // way through, preferring paving; walking along a path that bends follows the bend (up to ~35°)
+  // instead of stepping off into the planting. Leaving a path on purpose (a wider angle) still works.
+  /** Between two places the road is the guide: a keyboard walker heading roughly along it (within
+   * about 80°) follows its bends, drawn gently back toward its middle. Null away from any road. */
+  corridorDirection(x,z,ux,uz){
+    if(!this.area||!isExterior(this.area.id))return null;
+    // Inside a place the road no longer leads: whoever just arrived and walks in is not pulled back
+    // along it (the castle's entry from the Manantial dragged an arriving walker west).
+    // Nor at its mouth, when four steps ahead already land inside: the walker is entering, not following.
+    {const [w,d]=AREAS[this.area.id].bounds,inside=(px,pz)=>Math.abs(px)<=w/2&&Math.abs(pz)<=d/2;if(inside(x,z)||inside(x+ux*4,z+uz*4))return null;}
+    const [gx,gz]=toKingdom(this.area.id,[x,z]);let best=null;
+    for(const exit of passagesFor(this.area.id)){const pass=passageGeometry(this.area.id,exit.target);if(!pass)continue;const pts=pass.points;
+      for(let i=1;i<pts.length-1;i++){const d=Math.hypot(pts[i][0]-gx,pts[i][1]-gz);if(!best||d<best.d)best={d,i,pts};}}
+    if(!best||best.d>5.5)return null;
+    const {i,pts}=best;let tx=pts[i+1][0]-pts[i-1][0],tz=pts[i+1][1]-pts[i-1][1];const tl=Math.hypot(tx,tz)||1;tx/=tl;tz/=tl;
+    let along=ux*tx+uz*tz;if(along<0){tx=-tx;tz=-tz;along=-along;}
+    if(along<.18)return null;
+    // Only where the road turns away from the key held: on a road that already runs that way, walking stays free.
+    if(along>.92)return null;
+    const cx=pts[i][0]-gx,cz=pts[i][1]-gz,pull=Math.min(.35,best.d*.12),vx=tx+cx/(best.d||1)*pull,vz=tz+cz/(best.d||1)*pull,vl=Math.hypot(vx,vz);
+    return [vx/vl,vz/vl];
+  }
+  followPaths(p,dx,dz,step,next,walk){
+    { const l=Math.hypot(dx,dz),guide=l&&this.corridorDirection(p.x,p.z,dx/l,dz/l);
+      if(guide){const alt=walk(...guide);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.3)return alt;} }
+    const layout=AREA_LAYOUTS[this.area?.id];if(!layout)return next;
+    const paved=(x,z)=>pointOnPaving(layout,x,z),l=Math.hypot(dx,dz),ux=dx/l,uz=dz/l;
+    const turn=a=>[ux*Math.cos(a)-uz*Math.sin(a),ux*Math.sin(a)+uz*Math.cos(a)];
+    const moved=Math.hypot(next[0]-p.x,next[1]-p.z);
+    if(moved<step*.25){
+      let best=null;
+      for(const a of [.44,.79,1.13])for(const side of [1,-1]){const [vx,vz]=turn(a*side),alt=walk(vx,vz),d=Math.hypot(alt[0]-p.x,alt[1]-p.z);if(d<step*.3)continue;
+        const ahead=paved(alt[0]+vx*.8,alt[1]+vz*.8),score=(ahead?2:0)+((alt[0]-p.x)*ux+(alt[1]-p.z)*uz)/step-a*.2;if(!best||score>best.score)best={alt,score};}
+      return best?best.alt:next;
+    }
+    if(!paved(p.x,p.z)||paved(p.x+ux*.9,p.z+uz*.9))return next;
+    for(const a of [.2,.4,.6])for(const side of [1,-1]){const [vx,vz]=turn(a*side);if(!paved(p.x+vx*.9,p.z+vz*.9))continue;const alt=walk(vx,vz);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.5)return alt;}
+    return next;
+  }
+  /** The nearest point within 2.5 m where the traveller can stand with room to walk on (a step clear around). */
+  openGroundNear(x,z){for(let r=.35;r<=2.51;r+=.25)for(let i=0;i<16;i++){const a=i*Math.PI/8,q=[x+Math.cos(a)*r,z+Math.sin(a)*r];if(this.canStand(...q,.45)&&[0,1,2,3].filter(k=>this.canStand(q[0]+Math.cos(k*Math.PI/2)*.4,q[1]+Math.sin(k*Math.PI/2)*.4)).length>=3)return q;}return null;}
   canStand(x,z,radius=.34){return isPositionClear([x,z],this.bounds,this.obstacles,{radius,isWalkable:(x,z)=>this.walkableLand(x,z)});}
   nearestWalkable(p,radius=.34){if(this.canStand(...p,radius))return [...p];for(let d=.15;d<15;d+=.15)for(let i=0;i<32;i++){const x=p[0]+Math.cos(i*Math.PI/16)*d,z=p[1]+Math.sin(i*Math.PI/16)*d;if(this.canStand(x,z,radius))return [x,z];}return [...this.area.spawn];}
   groundHeight(x,z){if(this.area.id==='lake'&&Math.abs(x-9.2)<4.5&&Math.abs(z-3)<2.25)return .24;let height=.08;for(const s of this.data.areas[this.area.id].walkSurfaces||[]){if(s.r!=null?Math.hypot(x-s.x,z-s.z)<=s.r:Math.abs(x-s.x)<=s.w/2&&Math.abs(z-s.z)<=s.d/2)height=Math.max(height,s.y+.02);}return height;}
   // What the player stands on, for footsteps and dust: wood, stone paving or grass/earth.
   groundKind(){
-    if(!this.area||!this.player)return 'stone';if(this.area.id==='workshop')return 'wood';
+    if(!this.area||!this.player)return 'stone';if(this.indoors())return 'wood';
     const [x,z]=this.getPlayerPosition();if(this.area.id==='lake'&&Math.abs(x-9.2)<4.5&&Math.abs(z-3)<2.25)return 'wood';
     if(Math.abs(z)>this.area.bounds[1]/2-.2)return 'stone';
     return pointOnPaving(AREA_LAYOUTS[this.area.id],x,z)?'stone':'grass';
   }
   getPlayerPosition(){return this.player?[this.player.position.x,this.player.position.z]:[0,0];}
+  /** The traveller's look changed in the register: tint the 3D figure again (colours from style.js). */
+  setPlayerAppearance(look){this.playerActor?.figure?.setAppearance?.(look);}
   setPlayerPosition(p){const q=this.nearestWalkable(p);this.player.position.set(q[0],this.groundHeight(...q),q[1]);const o=this.nearestWalkable([q[0]-1,q[1]+.7]);this.ohm.position.set(o[0],this.groundHeight(...o),o[1]);this.route=[];this.target=null;this.companionRoute=[];}
   setTarget(p){this.route=findPath(this.getPlayerPosition(),p,this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)});this.target=this.route.shift()||null;}
-  getInteractions(){if(!this.area)return [];return [...this.area.objects.filter(o=>!o.character&&o.kind!=='npc'),...this.area.exits,...getInhabitantInteractions(this)].filter(o=>!o.hidden&&(!o.requiresFlag||this.state.flags[o.requiresFlag]));}
+  getInteractions(){if(!this.area)return [];return [...this.area.objects.filter(o=>!o.character&&o.kind!=='npc'&&!o.story),...this.area.exits,...this.doorInteractions(),...(this.home?[]:getInhabitantInteractions(this))].filter(o=>!o.hidden&&(!o.requiresFlag||this.state.flags[o.requiresFlag]));}
   canInteractWith(o){return !!o&&inInteractionReach(this,o);}
   planInteraction(o){return approachInteraction(this,o);}
   approachInteraction(o){const path=approachInteraction(this,o);if(path===null)return false;this.route=path;this.target=this.route.shift()||null;return true;}
-  getNearby(){return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>(b.interactionPriority||0)-(a.interactionPriority||0)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
+  getCompanion(){return this.area?companionInteraction(this):null;}
+  // What the golden arrow marks wins over a person standing beside it (ciclo 30: a player at the
+  // Calzada's west post kept talking to Edda instead of joining the closure).
+  getNearby(){const g=this.guide,rank=o=>(o.interactionPriority||0)-(o.action&&this.isLatched?.(o.action.flag)?2:0)+(g&&!o.character&&Math.abs(o.x-g.x)<.01&&Math.abs(o.z-g.z)<.01?1:0)+(o.kind==='panel'||o.kind==='beacon'?.5:0)-(o.kind==='door'?.5:0)-(o.secret&&this.state?.secrets?.includes(o.secret)?.5:0); /* a bench beside a person: E opens the bench (people answer a click); a house door yields to a lever beside it (jugador 21) */return this.getInteractions().filter(o=>this.canInteractWith(o)).sort((a,b)=>rank(b)-rank(a)||Math.hypot(a.x-this.player.position.x,a.z-this.player.position.z)-Math.hypot(b.x-this.player.position.x,b.z-this.player.position.z))[0]||null;}
   getScreenPosition(o){if(this.disposed||!this.camera.camera)return {x:0,y:0,visible:false};const [ox,oz]=this.data.areas[this.area.id].offset,p=this.camera.camera.worldToScreen(new Vec3(o.x+ox,o.ground?0:o.target?.35:o.character?2.5:1.6,o.z+oz)),r=this.canvas.getBoundingClientRect();return {x:p.x,y:p.y,visible:p.x>0&&p.x<r.width&&p.y>0&&p.y<r.height};}
-  pick(x,y){const r=this.canvas.getBoundingClientRect(),a=this.camera.camera.screenToWorld(x-r.left,y-r.top,0),b=this.camera.camera.screenToWorld(x-r.left,y-r.top,200),t=-a.y/(b.y-a.y),[ox,oz]=this.data.areas[this.area.id].offset;return [a.x+(b.x-a.x)*t-ox,a.z+(b.z-a.z)*t-oz];}
-  pickInteraction(x,y){const r=this.canvas.getBoundingClientRect();return this.getInteractions().map(o=>({o,p:this.getScreenPosition(o)})).filter(({o,p})=>p.visible&&Math.hypot(p.x-(x-r.left),p.y-(y-r.top))<(o.character?24:20)).sort((a,b)=>Math.hypot(a.p.x-x+r.left,a.p.y-y+r.top)-Math.hypot(b.p.x-x+r.left,b.p.y-y+r.top))[0]?.o||null;}
+  pick(x,y){const r=this.canvas.getBoundingClientRect(),a=this.camera.camera.screenToWorld(x-r.left,y-r.top,0),b=this.camera.camera.screenToWorld(x-r.left,y-r.top,200),[ox,oz]=this.data.areas[this.area.id].offset;
+    const at=h=>{const t=(h-a.y)/(b.y-a.y);return [a.x+(b.x-a.x)*t-ox,a.z+(b.z-a.z)*t-oz];};
+    // A click on a wall, a fence or a roof lands on the ground behind it, where nobody can stand.
+    // The ray is followed back up toward the camera until it meets ground in front of what was
+    // clicked (ciclo 30: first players clicked houses and got stuck behind them).
+    const ground=at(0);if(this.canStand?.(...ground))return ground;
+    for(let h=.25;h<=4.01;h+=.25){const p=at(h);if(this.canStand(...p))return p;}
+    return ground;}
+  pickInteraction(x,y){const r=this.canvas.getBoundingClientRect();return this.getInteractions().map(o=>({o,p:this.getScreenPosition(o)})).filter(({o,p})=>p.visible&&Math.hypot(p.x-(x-r.left),p.y-(y-r.top))<(o.character?24:32)) /* a lever box is small on screen: a click on its body counts (jugador 33); undoing asks twice */.sort((a,b)=>Math.hypot(a.p.x-x+r.left,a.p.y-y+r.top)-Math.hypot(b.p.x-x+r.left,b.p.y-y+r.top))[0]?.o||null;}
   followPassage(exit){const p=passageGeometry(this.area.id,exit.target);if(!p)return false;this.travelIntent=exit.target;this.setTarget(fromKingdom(this.area.id,[p.mid[0],p.mid[1]+Math.sign(p.b[1]-p.a[1])*.7]));return true;}
   getTravelEvent(){if(!isExterior(this.area.id)||!this.walking)return null;const global=toKingdom(this.area.id,this.getPlayerPosition());for(const exit of passagesFor(this.area.id)){const p=passageGeometry(this.area.id,exit.target),direction=Math.sign(p.b[1]-p.a[1]);if(!(exit.requires||[]).every(f=>this.state.flags[f])){const threshold=KINGDOM[this.area.id].z+exit.z;if((global[1]-threshold)*direction>0&&Math.abs(global[0]-KINGDOM[this.area.id].x-exit.x)<3){this.setPlayerPosition([exit.x,exit.z-direction*.6]);return {locked:exit};}}else if((global[1]-p.mid[1])*direction>.02)return {target:exit.target};}return null;}
   isInsidePlace(){return !isExterior(this.area.id)||Math.abs(this.player.position.z)<this.area.bounds[1]/2-3;}
@@ -197,29 +353,65 @@ export class PlayCanvasWorld {
   faceInhabitantSpeaker(s){faceInhabitantSpeaker(this,s);const a=this.speakerActor(s);if(a)this.speaking={actor:a,t:0};}
   speakerActor(s){if(!s||s==='narrator')return null;if(s==='player')return this.playerActor;if(s==='ohm'||s==='ohm_companion')return this.ohm.visible?this.ohmActor:null;return this.regions.get(this.area.id)?.actors.find(a=>a.name===s&&a.entity.enabled)||null;}
   endInhabitantConversation(){endInhabitantConversation(this);this.speaking=null;}
-  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.wakeOhm(state);this.signature=JSON.stringify([state.flags,state.puzzles]);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
+  // The Casa de Compuertas answers the kingdom: the reservoir's level, and a lamp that lights with
+  // the Faro, steady over a full reservoir and faltering over a drawn-down one (game/quiet-mount.js).
+  answerQuietMount(d,mount){
+    if(d.part==='reservoir-high')d.entity.enabled=mount.reservoir==='high';
+    if(d.part==='reservoir-low')d.entity.enabled=mount.reservoir==='low';
+    if(d.part==='lamp'){d.lampMode=mount.lamp;
+      if(!d.light){d.light=new Entity('Farol de la Casa de Compuertas');d.light.addComponent('light',{type:'omni',color:color('#ffcf86'),intensity:0,range:11,castShadows:false});d.light.setPosition(d.pivot[0]+.6,d.pivot[1],d.pivot[2]);d.entity.parent.addChild(d.light);}
+      d.material.emissive=color('#ffcf86');this.lightQuietMount(d,this.clock);}
+  }
+  lightQuietMount(d,t){
+    const on=d.lampMode==='off'?0:1,s=Math.sin(t*3.1)+Math.sin(t*7.7+1.3)*.6+Math.sin(t*17.3)*.3,k=d.lampMode==='flicker'?(s>-.35?.78+.22*Math.sin(t*23):.12):1;
+    d.material.emissiveIntensity=2.6*on*k;d.material.update();if(d.light)d.light.light.intensity=1.5*on*k;
+  }
+  updateFlags(state){this.state=state;if(this.area)this.obstacles=this.localObstacles(this.area.id);this.ohm&&(this.ohm.visible=!!state.flags.awaken);this.wakeOhm(state);this.signature=JSON.stringify([state.flags,state.puzzles]);const mount=quietMountState(state);for(const d of this.dynamics){if(d.kind==='visible')d.entity.enabled=!!(state.flags[d.flag]??state.flags[d.or]);if(d.kind==='quiet-mount')this.answerQuietMount(d,mount);if(d.kind==='indicator'){const active=!!state.flags[d.flag];d.material.emissive=color(active?'#62d7ae':'#675430');d.material.emissiveIntensity=active?1.1:.25;d.material.update();}if(d.receiver)d.feedback=readReceiverFeedback(d.area,state,d.receiver);}for(const r of this.receivers||[]){r.material.emissiveIntensity=r.intensity*readReceiverFeedback(r.area,state,r.object).level;r.material.update();}}
   // Ohm wakes where he slept: he stays on the pedestal through the scene, then hops down.
   wakeOhm(state){
     const awake=!!state.flags.awaken,was=this.ohmWasAwake;this.ohmWasAwake=awake;
     if(was!==false||!awake||this.area?.id!=='portal'||!this.sleeping)return;
-    const p=this.sleeping.g.position;this.ohm.position.set(p.x,p.y,p.z);this.ohmHop={t:0,from:[p.x,p.y,p.z],to:this.nearestWalkable([p.x,p.z+1])};this.companionRoute=[];
+    const p=this.sleeping.g.position;this.ohm.position.set(p.x,p.y,p.z);this.ohmAwaiting=true;this.ohmHop={t:0,from:[p.x,p.y,p.z],to:this.nearestWalkable([p.x,p.z+1])};this.companionRoute=[];
   }
   setInspection(v){this.inspect=v;if(v){this.target=null;this.route=[];}}
   cameraPose(){const [ox,oz]=this.data.areas[this.area.id].offset;return {focus:[this.focus.x-ox,this.focus.y,this.focus.z-oz],offset:this.cameraOffset.toArray(),zoom:this.currentZoom};}
   startCinematic(id,{reducedMotion=false}={}){const p=this.area.objects.find(o=>o.puzzle===id);if(!p)return false;const timeline=createCinematic(id,{areaId:this.area.id,flags:this.state.flags,player:this.player.position.toArray(),companion:this.ohm.position.toArray(),puzzle:[p.x,1.4,p.z],bounds:this.area.bounds,start:this.cameraPose()},{reducedMotion});if(!timeline)return false;this.cinematic={timeline,elapsed:0};this.target=null;this.route=[];return true;}
   getCinematicState(){if(!this.cinematic)return null;return sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);}
   skipCinematic(){if(!this.cinematic)return false;this.cinematic={timeline:returningCinematic(this.cinematic.timeline.id,this.cameraPose(),gameplayCameraPose(this.area.id,this.player.position.toArray())),elapsed:0};return true;}
-  cancelCinematic(){this.cinematic=null;this.inspect=false;this.route=[];this.target=null;if(!this.area||!this.player)return;const p=gameplayCameraPose(this.area.id,this.player.position.toArray()),[ox,oz]=this.data.areas[this.area.id].offset;this.focus.set(p.focus[0]+ox,p.focus[1],p.focus[2]+oz);this.cameraOffset.fromArray(p.offset);this.currentZoom=p.zoom;this.positionCamera();}
+  // Interiors are framed as a whole room that only drifts with the player. On a tall screen the
+  // room does not fit across, so the camera follows the player further to bring each side in.
+  restPose(player){const tall=this.canvas.clientWidth<this.canvas.clientHeight;if(this.home)return {focus:[player[0]*(tall?.75:.25),.4,-1.3+player[2]*.15],offset:[0,13.5,25],zoom:1.85};const pose=gameplayCameraPose(this.area.id,player);if(tall&&this.area.id==='workshop')pose.focus[0]=player[0]*.85;return pose;}
+  cancelCinematic(){this.cinematic=null;this.inspect=false;this.route=[];this.target=null;if(!this.area||!this.player)return;const p=this.restPose(this.player.position.toArray()),[ox,oz]=this.data.areas[this.area.id].offset;this.focus.set(p.focus[0]+ox,p.focus[1],p.focus[2]+oz);this.cameraOffset.fromArray(p.offset);this.currentZoom=p.zoom;this.positionCamera();}
   endCinematic(){this.cancelCinematic();}
   // The moment an installation returns: a ring of light runs over the ground, sparks rise
   // from the object and the bloom swells, then everything settles over three seconds.
   playRestoration(id){
-    this.updateFlags(this.state);this.restoration=3;
+    this.updateFlags(this.state);this.restoration=3;if(id==='awaken')this.awakening={t:0};
     const objects=(this.area?.objects||[]).filter(o=>!o.character&&o.kind!=='npc'),o=objects.find(o=>o.puzzle===id)||objects.find(o=>o.id===id||o.action?.flag===id)||objects.find(o=>o.flag===id);if(!o||!this.burst)return;
     // The neighbours react: everyone nearby turns to the installation and jumps, one after another.
     this.celebration={t:0,x:o.x,z:o.z,actors:[this.playerActor,this.ohmActor,...(this.regions.get(this.area.id)?.actors||[])].filter(a=>a.entity.enabled&&Math.hypot(a.g.position.x-o.x,a.g.position.z-o.z)<22)};
     for(const a of this.celebration.actors)if(a!==this.playerActor)a.animation=idleActor(actorDirection(o.x-a.g.position.x,o.z-a.g.position.z,a.animation.direction));
     const [ox,oz]=this.data.areas[this.area.id].offset,y=this.groundHeight(o.x,o.z);this.fireBurst([o.x+ox,y,o.z+oz],'#ffd98f');
+  }
+  // How lit the waking Ohm looks: dim like the sleeping figure until the light reaches him.
+  ohmWake(){if(!this.ohmAwaiting)return 1;const t=this.awakening?.t??0;return .52+.48*Math.max(0,Math.min(1,(t-.55)/.8));}
+  // «Una pequeña luz despierta bajo el vidrio»: it flickers, swells, beats twice and settles.
+  awakeningLevel(t,reduced){
+    if(reduced)return Math.min(1,t/.6)*.7*(t<2.2?1:Math.max(0,1-(t-2.2)/.8));
+    const flicker=t<.55?(t/.55)*(.18+.14*Math.sin(t*46)):0,swell=Math.max(0,Math.min(1,(t-.5)/.6)),beat=(at,w)=>Math.max(0,1-Math.abs(t-at)/w);
+    const hold=t<3.1?1:Math.max(0,1-(t-3.1)/1.4);
+    return Math.max(flicker,(swell*.62+.38*beat(1.2,.16)+.3*beat(1.55,.14))*hold);
+  }
+  updateAwakening(dt,reduced){
+    const w=this.awakening;if(!w||!this.ohmSpark)return;w.t+=dt;
+    const level=this.awakeningLevel(w.t,reduced),e=this.ohmSpark.entity,light=this.ohmSparkLight,a=this.ohmActor.entity;
+    const p=a.getPosition(),toward=this.camera.getPosition().clone().sub(p).normalize().mulScalar(.35);
+    e.enabled=level>.01;light.enabled=level>.01;
+    e.setPosition(p.x+toward.x,p.y+.78+toward.y,p.z+toward.z);// Small: it lights Ohm from inside, it does not hide him.
+    const size=.35+1.25*level;e.setLocalScale(size,1,size);
+    this.ohmSpark.material.opacity=Math.min(.7,level*.85);this.ohmSpark.material.update();
+    light.setPosition(p.x,p.y+.9,p.z+.4);light.light.intensity=4*level;
+    if(w.t>(reduced?3.1:4.6)){this.awakening=null;this.ohmAwaiting=false;e.enabled=false;light.enabled=false;}
   }
   fireBurst(origin,tint){
     const b=this.burst;b.origin=origin;b.t=0;b.root.enabled=true;b.material.emissive=color(tint);b.material.update();
@@ -231,6 +423,18 @@ export class PlayCanvasWorld {
     const [ox,oz]=this.data.areas.portal.offset,to=this.player.position.toArray(),from=[to[0],to[2]-1.7];
     this.portalArrival={t:0,from,to:[to[0],to[2]]};this.player.position.set(from[0],this.groundHeight(...from),from[1]);
     this.fireBurst([ox,this.groundHeight(0,-4.4),-4.4+oz],'#9ff2ff');
+
+    // Edda hears the Portal and runs out of her house to the traveller (the user: she was hidden under
+    // the dialogue box, standing south of the dais).
+    const edda=(this.actors||[]).find(a=>a.inhabitant?.plan?.stage==='greeting-the-traveller'&&a.g.visible);
+    if(edda&&!this.state?.settings?.reducedMotion){const door=this.nearestWalkable(GREETING_DOOR),spot=edda.inhabitant.stops[0];edda.g.position.set(door[0],this.groundHeight(...door),door[1]);edda.scripted={t:0,route:findPath(door,spot,this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)})};}
+  }
+  // A scripted walk that goes on during the arrival and its first lines, when everyone else waits.
+  updateGreeting(dt,reduced){
+    for(const a of this.actors||[]){const s=a.scripted;if(!s)continue;s.t+=dt;const p=a.g.position,old=[p.x,p.z];
+      if(s.t>.6){let left=dt*2.6;while(left>0&&s.route.length){const q=s.route[0],d=Math.hypot(q[0]-p.x,q[1]-p.z);if(d<=left){p.x=q[0];p.z=q[1];s.route.shift();left-=d;}else{p.x+=(q[0]-p.x)/d*left;p.z+=(q[1]-p.z)/d*left;left=0;}}p.set(p.x,this.groundHeight(p.x,p.z),p.z);}
+      this.animateActor(a,p.x-old[0],p.z-old[1],dt,{paused:false,reducedMotion:reduced});
+      if(s.t>.6&&!s.route.length){a.scripted=null;const q=this.player.position;a.animation=idleActor(actorDirection(q.x-p.x,q.z-p.z,a.animation.direction));this.animateActor(a,0,0,0,{paused:true});}}
   }
   updatePortalArrival(dt,reduced){
     const a=this.portalArrival;if(!a)return;a.t+=dt;const t=a.t,p=this.player.position,sprite=this.playerActor.entity.sprite;
@@ -257,14 +461,17 @@ export class PlayCanvasWorld {
     for(const p of b.sparks){const u=Math.max(0,t-p.delay),life=Math.max(0,1-u/2.4),r=p.radius+u*.35,s=reduced?0:.17*life*(.6+.4*Math.sin(u*9+p.angle)**2);
       p.entity.setPosition(x+Math.cos(p.angle+u*.8)*r,y+.4+u*p.speed,z+Math.sin(p.angle+u*.8)*r);p.entity.setLocalScale(s,s,s);}
   }
-  positionCamera(){this.camera.setPosition(this.focus.x+this.cameraOffset.x*2,this.focus.y+this.cameraOffset.y*2,this.focus.z+this.cameraOffset.z*2);this.camera.lookAt(this.focus);this.camera.camera.orthoHeight=12/this.currentZoom;}
+  positionCamera(){
+    const lens=LENS,o=this.cameraOffset,len=Math.hypot(o.x,o.y,o.z)||1,d=len*2*(lens.fov?lens.distance:1),pitch=lens.pitch*Math.PI/180,flat=Math.hypot(o.x,o.z)||1,dir=lens.pitch?[o.x/flat*Math.cos(pitch),Math.sin(pitch),o.z/flat*Math.cos(pitch)]:[o.x/len,o.y/len,o.z/len];
+    this.camera.setPosition(this.focus.x+dir[0]*d,this.focus.y+dir[1]*d,this.focus.z+dir[2]*d);this.camera.lookAt(this.focus);
+    if(lens.fov){this.camera.camera.fov=2*Math.atan(12/this.currentZoom/d)*180/Math.PI;}else this.camera.camera.orthoHeight=12/this.currentZoom;}
   syncActors(){
-    const inside=this.area.id==='workshop';for(const a of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const active=a===this.playerActor||a===this.ohmActor,id=active?this.area.id:a.area,[ox,oz]=this.data.areas[id].offset,p=a.g.position;
-      a.entity.enabled=a.g.visible&&(active||(inside?id==='workshop':id!=='workshop'))&&(a!==this.sleeping||!this.state.flags.awaken);
+    const inside=this.indoors(),home=!!this.home;for(const a of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const active=a===this.playerActor||a===this.ohmActor,id=active?this.area.id:a.area,[ox,oz]=this.data.areas[id].offset,p=a.g.position;
+      a.entity.enabled=a.g.visible&&(active||(!home&&(inside?id==='workshop':id!=='workshop')))&&(a!==this.sleeping||!this.state.flags.awaken);
       a.entity.setPosition(p.x+ox,p.y,p.z+oz);
       // Idle breathing: feet stay planted (bottom pivot), each actor on its own phase.
       const breathe=this.state.settings?.reducedMotion||a.animation?.moving?0:Math.sin(this.clock*2.1+a.phase)*.014;a.entity.setLocalScale(1-breathe*.4,1+breathe,1);
-      const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);
+      const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:a===this.ohmActor?this.ohmWake():1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);if(a.figure&&a.name==='ohm')shadeFigure(a,sleep);
       if(a.shadow){a.shadow.enabled=a.entity.enabled;a.shadow.setPosition(p.x+ox,.105,p.z+oz+.06);}
     }
   }
@@ -280,19 +487,50 @@ export class PlayCanvasWorld {
       // Only when a short sidestep (under half a metre) opens the way ahead; flat walls still stop the walker.
       if(!this.target&&Math.hypot(next[0]-p.x,next[1]-p.z)<step*.25){const l=Math.hypot(dx,dz),ux=dx/l,uz=dz/l;
         find:for(const o of [.15,.3,.45])for(const side of [1,-1]){const sx=p.x-uz*side*o,sz=p.z+ux*side*o;if(this.canStand(sx,sz)&&this.canStand(sx+ux*.35,sz+uz*.35)){const alt=walk(-uz*side,ux*side);if(Math.hypot(alt[0]-p.x,alt[1]-p.z)>step*.3)next=alt;break find;}}}
+      if(!this.target)next=this.followPaths(p,dx,dz,step,next,walk);
       p.set(next[0],this.groundHeight(...next),next[1]);}
-    this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
+    // Stuck (ciclo 30: players got wedged between a bush and a fence and even a reload left them
+    // there): asked to move for more than a second without moving, the traveller steps to the
+    // nearest open ground around.
+    {const asked=!paused&&((dx||dz)||!!this.target);this.stuckFor=asked&&Math.hypot(p.x-old[0],p.z-old[1])<.002?(this.stuckFor||0)+dt:0;
+      // Pushing against a wall is not being stuck: only when no direction around is free.
+      if(this.stuckFor>1.1){this.stuckFor=0;const boxed=!this.canStand(p.x,p.z)&&[0,1,2,3,4,5,6,7].every(k=>!this.canStand(p.x+Math.cos(k*Math.PI/4)*.3,p.z+Math.sin(k*Math.PI/4)*.3,.2));const open=boxed&&this.openGroundNear(p.x,p.z);if(open){p.x=open[0];p.z=open[1];p.y=this.groundHeight(open[0],open[1]);this.target=null;this.route=[];}}}
+    // Left standing on the way between two places (jugador 26 stopped a crossing with a click and
+    // stood outside the Castle's wall, the arrow hidden behind it): after a moment the traveller
+    // goes on to the place that way leads to.
+    {const [bx,bz]=this.area.bounds||[Infinity,Infinity],outside=!this.home&&(Math.abs(p.x)>bx/2+.4||Math.abs(p.z)>bz/2+.4);
+      this.outsideFor=outside&&!paused&&!dx&&!dz&&!this.target?(this.outsideFor||0)+dt:0;
+      // On the way out (a crossing was started) it goes on; otherwise it walks into this place: just
+      // arrived, the nearest way is the one it came by (jugador 32 was taken back to the Plaza).
+      if(this.outsideFor>1.5){this.outsideFor=0;const exit=(this.area.exits||[]).find(e=>e.target&&e.target===this.travelIntent&&passageGeometry(this.area.id,e.target));
+        if(exit)this.followPassage(exit);else this.setTarget(this.area.spawn);}}
+    this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.walking){const l=Math.hypot(p.x-old[0],p.z-old[1]);this.lastStep=[(p.x-old[0])/l,(p.z-old[1])/l];}if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
-    this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
+    this.updateCompanion(dt,paused,reduced);this.updateGreeting(dt,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
-    this.syncActors();this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
+    this.syncActors();this.updateAwakening(dt,reduced);this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateGuide(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
     if(this.cinematic){this.cinematic.elapsed+=dt;const s=sampleCinematic(this.cinematic.timeline,this.cinematic.elapsed);this.focus.set(s.pose.focus[0]+ox,s.pose.focus[1],s.pose.focus[2]+oz);this.cameraOffset.fromArray(s.pose.offset);this.currentZoom=s.pose.zoom;if(s.done)this.cinematic=null;}
-    else{const rest=gameplayCameraPose(this.area.id,p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
-      // Conversations: frame both speakers above the dialogue panel and lean in slightly.
-      const talk=this.inhabitantConversation&&this.area.id!=='workshop'&&!this.inspect?this.speaking?.actor||this.speakerActor(this.inhabitantConversation.target):null;
-      if(talk&&talk!==this.playerActor){const q=talk.g.position;wanted.set((p.x+q.x)/2+ox,1.5,(p.z+q.z)/2+2.4+oz);rest.zoom=1.1;}this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
-    this.positionCamera();this.focusFrame();
+    else{const rest=this.restPose(p.toArray()),wanted=new Vec3(rest.focus[0]+ox,rest.focus[1],rest.focus[2]+oz);
+      // Choosing a look: the camera comes close to the traveller, who stands clear of the panel
+      // (to its left on a wide screen, below it on a tall one).
+      // portraitAim (main.js) says where on screen the traveller should stand; the camera slides
+      // until the figure is there, whatever the screen and panel sizes.
+      if(this.portrait){const tall=this.canvas.clientWidth<this.canvas.clientHeight,aim=this.portraitAim||{x:.5,y:.6},at=this.getScreenPosition({x:p.x,z:p.z,ground:true}),shift=this.portraitShift??={x:0,z:0};
+        if(at&&Number.isFinite(at.x)){shift.x=Math.max(-7,Math.min(7,shift.x+(at.x/this.canvas.clientWidth-aim.x)*dt*30));shift.z=Math.max(-7,Math.min(7,shift.z+(at.y/this.canvas.clientHeight-aim.y)*dt*30));}
+        wanted.set(p.x+ox+shift.x,p.y+.9,p.z+oz+shift.z);rest.zoom=this.portraitZoom||(tall?1.7:2.3);}
+      else this.portraitShift=null;
+      // On a tall screen (a phone held upright) the dialogue box covers much of the view: the camera slides until the
+      // traveller, and whoever speaks beside them, stand in the middle of the space left above it.
+      const clear=!this.portrait&&this.dialogueClear>0&&this.canvas.clientHeight>this.canvas.clientWidth?this.dialogueClear:null;
+      if(clear){const s=this.speaking?.actor,q=s&&s!==this.playerActor&&s.entity.enabled&&Math.hypot(s.g.position.x-p.x,s.g.position.z-p.z)<6?s.g.position:null,
+          at=this.getScreenPosition({x:q?(p.x+q.x)/2:p.x,z:q?(p.z+q.z)/2:p.z,ground:true}),shift=this.dialogueShift??={x:0,z:0};
+        if(at&&Number.isFinite(at.x)){shift.x=Math.max(-6,Math.min(6,shift.x+(at.x/this.canvas.clientWidth-.5)*dt*20));shift.z=Math.max(-6,Math.min(6,shift.z+(at.y/this.canvas.clientHeight-clear*.62)*dt*20));}
+        wanted.x+=shift.x;wanted.z+=shift.z;}
+      else this.dialogueShift=null;
+      // Conversations keep the camera where the interaction began: the portrait says who speaks.
+      this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect&&!this.portrait?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
+    this.positionCamera();this.focusFrame();this.updateSeeThrough();
   }
   // The current speaker gives a small hop as each of their lines begins.
   // Morning light shafts: a few soft diagonal beams drifting near the player, daylight only.
@@ -301,13 +539,14 @@ export class PlayCanvasWorld {
     for(let j=0;j<256;j++)for(let i=0;i<64;i++){const u=Math.abs(i/63-.5)*2,v=j/255,a=Math.pow(Math.max(0,1-u),2.2)*Math.pow(1-v,1.3)*Math.min(1,v*6),k=(j*64+i)*4;img.data[k]=img.data[k+1]=img.data[k+2]=255;img.data[k+3]=Math.round(a*255);}
     x.putImageData(img,0,0);const t=new Texture(this.app.graphicsDevice,{width:64,height:256,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});t.setSource(c);
     const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#fff0cc');m.emissiveMap=t;m.opacityMap=t;m.opacityMapChannel='a';m.opacity=0;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.useLighting=false;m.update();this.shaftMaterial=m;
-    this.shafts=[[-10,1,3.4],[-4,-2,2.4],[4,0,3.8],[11,2,2.6],[0,-5,3]].map(([x,z,w],i)=>{const e=new Entity('Rayo de luz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;this.app.root.addChild(e);return {entity:e,x,z,w,phase:i*1.7};});
+    // Behind the player, never between the lens and the scene: with perspective a near shaft reads as fog.
+    this.shafts=[[-10,-7,2.6],[-4,-9,1.8],[4,-8,2.8],[11,-6,2],[0,-11,2.2]].map(([x,z,w],i)=>{const e=new Entity('Rayo de luz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;this.app.root.addChild(e);return {entity:e,x,z,w,phase:i*1.7};});
   }
   updateShafts(dt,inside,day,reduced){
     if(!this.shafts)return;const level=inside?0:day;this.shaftLevel=(this.shaftLevel??level)+(level-(this.shaftLevel??level))*Math.min(1,dt*.6);
     const on=this.shaftLevel>.02;for(const s of this.shafts){s.entity.enabled=on;if(!on)continue;const drift=reduced?0:Math.sin(this.clock*.05+s.phase)*1.5;
       s.entity.setPosition(this.focus.x+s.x+drift,4.2,this.focus.z+s.z);s.entity.setEulerAngles(62,0,-24);s.entity.setLocalScale(s.w,1,13);}
-    this.shaftMaterial.opacity=this.shaftLevel*(reduced?.13:.11+.04*Math.sin(this.clock*.4));this.shaftMaterial.update();
+    this.shaftMaterial.opacity=this.shaftLevel*(reduced?.09:.08+.03*Math.sin(this.clock*.4));this.shaftMaterial.update();
   }
   celebrate(dt,reduced){
     const c=this.celebration;if(!c)return;c.t+=dt;if(c.t>3.4||reduced){this.celebration=null;return;}
@@ -338,8 +577,66 @@ export class PlayCanvasWorld {
     // The restored Faro sweeps a soft wedge of light across land and sea.
     this.beacon=new Entity('Señal del Faro');const m2=new StandardMaterial(),ray=beamTexture(this.app);m2.diffuse=color('#000000');m2.emissive=color('#ffe3a8');m2.emissiveMap=ray;m2.opacityMap=ray;m2.opacityMapChannel='a';m2.emissiveIntensity=1.6;m2.opacity=.5;m2.blendType=BLEND_ADDITIVEALPHA;m2.depthWrite=false;m2.cull=CULLFACE_NONE;m2.useLighting=false;m2.update();this.beaconMaterial=m2;
     const sweep=new Entity('Haz');sweep.addComponent('render',{type:'plane'});sweep.render.material=m2;sweep.render.castShadows=false;sweep.setLocalPosition(70,0,0);sweep.setLocalScale(140,1,26);this.beacon.addChild(sweep);this.app.root.addChild(this.beacon);
+    // Seen from above, the beam itself passes over the camera: what reads is where it lands. A band
+    // of light laid on the water and the fields turns with it, away from the island it leaves.
+    {const m=new StandardMaterial(),pool=poolTexture(this.app);m.diffuse=color('#000000');m.emissive=color('#ffd08a');m.emissiveMap=pool;m.opacityMap=pool;m.opacityMapChannel='a';m.emissiveIntensity=1.3;m.opacity=0;m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.useLighting=false;m.update();
+      const e=new Entity('Donde llega el haz');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setLocalPosition(80,-16.6,0);e.setLocalScale(160,1,22);this.beacon.addChild(e);this.beaconPool=m;}
   }
   // A soft golden ring on the ground under the object the player can use right now.
+  // The next step marked in the world (ciclo 30, a first player got lost in the Plaza): a golden
+  // diamond over the door, exit or thing the objective points to, like the gold mark on the map.
+  // It fades when the traveller is within reach (the focus ring takes over) and inside houses.
+  setGuide(target){this.guide=target&&Number.isFinite(target.x)?target:null;}
+  /** The thing under the golden arrow, when a click lands on the arrow (or the thing itself). */
+  guidePick(x,y){const t=this.guide;if(!t||!this.guideMarker?.enabled||this.disposed||(this.travelIntent&&this.target))return null;const r=this.canvas.getBoundingClientRect(),p=this.guideMarker.getPosition(),q=this.camera.camera.worldToScreen(p);
+    if(Math.hypot(q.x-(x-r.left),q.y-(y-r.top))>70)return null;return this.getInteractions().find(o=>Math.abs(o.x-t.x)<.01&&Math.abs(o.z-t.z)<.01)||null;}
+  updateGuide(dt,paused,reduced){
+    if(!this.guideMarker){
+      // A golden arrow pointing down, white rim and a soft glow, drawn once on a canvas.
+      const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+      const glow=g.createRadialGradient(64,58,10,64,58,62);glow.addColorStop(0,'#ffd76a88');glow.addColorStop(1,'#ffd76a00');g.fillStyle=glow;g.fillRect(0,0,128,128);
+      g.beginPath();g.moveTo(64,112);g.lineTo(26,58);g.quadraticCurveTo(22,20,64,16);g.quadraticCurveTo(106,20,102,58);g.closePath();
+      g.lineJoin='round';g.lineWidth=12;g.strokeStyle='#ffffff';g.stroke();g.lineWidth=4;g.strokeStyle='#c98a12';g.stroke();
+      const fill=g.createLinearGradient(0,16,0,112);fill.addColorStop(0,'#ffe27a');fill.addColorStop(1,'#f2a51e');g.fillStyle=fill;g.fill();
+      g.beginPath();g.arc(64,48,13,0,Math.PI*2);g.fillStyle='#ffffff';g.fill();
+      const tex=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});tex.setSource(c);
+      const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffffff');m.emissiveMap=tex;m.opacityMap=tex;m.opacityMapChannel='a';m.blendType=BLEND_NORMAL;m.useLighting=false;m.depthTest=false;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update(); // drawn last, seen through roofs and porches
+      const e=new Entity('Marca del siguiente paso');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.enabled=false;this.app.root.addChild(e);this.guideMarker=e;this.guideLevel=0;
+    }
+    this.updateUsableRings();
+    const t=this.guide,p=this.player?.position;
+    // On the way through a passage the arrow has done its job: a click on it would turn the walk back.
+    const want=!!t&&!!p&&!this.home&&!this.cinematic&&!(this.travelIntent&&this.target)&&Math.hypot(t.x-p.x,t.z-p.z)>2.6?1:0;
+    this.guideLevel+=(want-this.guideLevel)*Math.min(1,dt*4);
+    const e=this.guideMarker;e.enabled=this.guideLevel>.03&&!!t;if(!e.enabled)return;
+    const [ox,oz]=this.data.areas[this.area.id].offset,bob=reduced?0:Math.sin(this.clock*2.6)*.16,s=1.4*this.guideLevel;
+    // Facing the camera, gently bobbing.
+    e.setPosition(t.x+ox,this.groundHeight(t.x,t.z)+3+bob,t.z+oz);e.setLocalScale(s,s,s);e.setRotation(this.camera.getRotation());e.rotateLocal(90,0,0);
+  }
+  // Ciclo 30, «que se distinga lo que se usa»: in X and Y, a soft disc on the ground under every
+  // lever and bench of this place, coloured by its state (amber: still to do, green: joined/working,
+  // blue: a bench). Players took the closures for signposts and lamps.
+  updateUsableRings(){
+    if(!XY||!this.area)return;
+    const key=this.home?null:this.area.id;
+    if(this.usableArea!==key){
+      for(const r of this.usableRings??[])r.entity.destroy();this.usableRings=[];this.usableArea=key;if(!key)return;
+      if(!this.usableTexture){const c=document.createElement('canvas');c.width=c.height=128;const g=c.getContext('2d');
+        const grad=g.createRadialGradient(64,64,30,64,64,62);grad.addColorStop(0,'#ffffff30');grad.addColorStop(.72,'#ffffff70');grad.addColorStop(.8,'#ffffffff');grad.addColorStop(.9,'#ffffffaa');grad.addColorStop(1,'#ffffff00');g.fillStyle=grad;g.fillRect(0,0,128,128);
+        this.usableTexture=new Texture(this.app.graphicsDevice,{width:128,height:128,format:PIXELFORMAT_RGBA8,mipmaps:true,addressU:ADDRESS_CLAMP_TO_EDGE,addressV:ADDRESS_CLAMP_TO_EDGE});this.usableTexture.setSource(c);}
+      const [ox,oz]=this.data.areas[key].offset;
+      for(const o of this.area.objects.filter(o=>['lever','panel','beacon'].includes(o.kind)&&!o.hidden&&!o.story)){ // a lever its keeper operates is scenery
+        const m=new StandardMaterial();m.diffuse=color('#000000');m.emissive=color('#ffffff');m.emissiveMap=this.usableTexture;m.opacityMap=this.usableTexture;m.opacityMapChannel='a';m.blendType=BLEND_NORMAL;m.useLighting=false;m.depthWrite=false;m.update();
+        const e=new Entity('Se puede usar');e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;const size=o.kind==='lever'?2.9:2.6; /* under a lever half as big again */e.setPosition(o.x+ox,this.groundHeight(o.x,o.z)+.17,o.z+oz);e.setLocalScale(size,1,size);this.app.root.addChild(e);
+        this.usableRings.push({entity:e,material:m,object:o,shown:''});
+      }
+    }
+    for(const r of this.usableRings??[]){
+      // A lever is green when it is as its installation needs it: joined, or open for a short (the Calzada's bridge).
+      const o=r.object,flag=o.action?.flag,f=this.state?.flags||{},wantsOff=WORLD_SYSTEMS.some(w=>(w.off||[]).includes(flag)),state=o.kind==='lever'?((wantsOff?!f[flag]:!!f[flag])?'on':'off'):(f[o.puzzle]?'on':'bench');
+      if(state===r.shown)continue;r.shown=state;r.material.emissive=color(state==='on'?'#7fd88f':state==='off'?'#ffb23a':'#5fb4ee');r.material.update();
+    }
+  }
   buildFocusRing(){
     const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d'),g=x.createRadialGradient(64,64,34,64,64,62);
     g.addColorStop(0,'#ffe2a000');g.addColorStop(.35,'#ffe2a0ff');g.addColorStop(.55,'#ffe2a0aa');g.addColorStop(1,'#ffe2a000');x.fillStyle=g;x.fillRect(0,0,128,128);
@@ -362,6 +659,9 @@ export class PlayCanvasWorld {
     for(const actor of [...this.allActors,this.playerActor,this.ohmActor,this.sleeping]){const e=new Entity('Sombra de '+actor.name);e.addComponent('render',{type:'plane'});e.render.material=contact;e.render.castShadows=false;e.setLocalScale(actor.name==='ohm'?1.3:.95,1,.65);this.app.root.addChild(e);actor.shadow=e;}
     const glow=(name,position,scale,tint,parent)=>{const e=new Entity(name),m=new StandardMaterial();m.diffuse=color(tint);m.emissive=color(tint);m.emissiveIntensity=1.2;m.diffuseMap=texture;m.opacityMap=texture;m.opacityMapChannel='a';m.blendType=BLEND_ADDITIVEALPHA;m.depthWrite=false;m.cull=CULLFACE_NONE;m.update();e.addComponent('render',{type:'plane'});e.render.material=m;e.render.castShadows=false;e.setPosition(...position);e.setEulerAngles(62,0,0);e.setLocalScale(scale,1,scale);parent.addChild(e);return {entity:e,material:m};};
     {const e=new Entity('Superficie del Portal Ω');this.portalSurface=makePortalSurface(texture);e.addComponent('render',{type:'plane'});e.render.material=this.portalSurface;e.render.castShadows=false;e.setPosition(KINGDOM.portal.x,3.5,KINGDOM.portal.z-5.65);e.setEulerAngles(90,0,0);e.setLocalScale(5.5,1,5.5);this.regions.get('portal').root.addChild(e);}
+    // Ohm's first heartbeat: a cyan light under the glass, and its glow on the pedestal.
+    this.ohmSpark=glow('El primer latido de Ohm',[0,0,0],1,'#86ecff',this.app.root);this.ohmSpark.entity.enabled=false;
+    {const e=new Entity('Luz del primer latido');e.addComponent('light',{type:'omni',color:color('#9ff0ff'),intensity:0,range:5,castShadows:false});e.enabled=false;this.app.root.addChild(e);this.ohmSparkLight=e;}
     this.portalGlow=glow('La luz del Portal Ω',[KINGDOM.portal.x,2.8,KINGDOM.portal.z-5.45],5.2,'#73cbd3',this.regions.get('portal').root);
     // The festival the village kept waiting for: after the first lesson the Plaza's festoons
     // light up and the ribbons they bought "anyway" hang in the morning wind.
@@ -384,23 +684,37 @@ export class PlayCanvasWorld {
     this.beaconLight=new Entity('Luz restaurada del Faro');this.beaconLight.addComponent('light',{type:'omni',range:55,color:color('#ffdf9f'),intensity:0});this.beaconLight.setPosition(KINGDOM.lighthouse.x,18,KINGDOM.lighthouse.z-25.08);this.regions.get('lighthouse').root.addChild(this.beaconLight);
   }
   updateEnvironment(dt,reduced){
-    const f=this.state.flags,phase=journeyPhase(this.state),inside=this.area.id==='workshop',mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
-    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}const lit=!inside||f.workshop;this.sun.light.intensity+=((inside?(lit?.85:.5):phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,color(phase.sun),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?(lit?'#7c7967':'#4d5a63'):n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':phase.sky),mix);
+    const f=this.state.flags,phase=journeyPhase(this.state),inside=this.indoors(),mix=1-Math.exp(-dt*.8);this.lampLevel??=phase.lamps;this.lampLevel+=(phase.lamps-this.lampLevel)*mix;
+    const n=this.lampLevel;if(this.wasInside!==inside){this.wasInside=inside;if(inside)this.camera.camera.clearColor=color('#000000');}const lit=!inside||!!this.home||f.workshop;this.sun.light.intensity+=((inside?(this.home?.16:lit?.85:.5):phase.intensity*.5)-this.sun.light.intensity)*mix;this.sun.light.color.lerp(this.sun.light.color,xySun(color(phase.sun)),mix);this.app.scene.ambientLight.lerp(this.app.scene.ambientLight,color(inside?(this.home?(XY?'#6a5a4c':'#3a2e26'):lit?(XY?'#9a9682':'#7c7967'):(XY?'#7d8a96':'#4d5a63')):XY?(n>.7?'#7d93c4':'#a9bcd6'):n>.7?'#687f9b':'#92a7a0'),mix);this.camera.camera.clearColor.lerp(this.camera.camera.clearColor,color(inside?'#000000':(XY&&XY_SKIES[phase.id])||phase.sky),mix);
     // A place nobody has restored yet is literally dimmer: muted and cool. Its colour floods
     // back with the restoration, and crossing into a forgotten place drains it again.
     const alive=f[power[this.area.id]]?1:0;this.vitality??=alive;
+    // Every outdoor place dries or greens on its own: the ground and the plants carry the forgotten
+    // look, so the people and the installations keep their colour against it.
+    {this.areaLife??={};let changed=!this.lifeApplied;const reach=[];
+      for(const id of Object.keys(AREAS).filter(isExterior)){const want=f[power[id]]?1:0,was=this.areaLife[id]??want,now=was+(want-was)*Math.min(1,dt*(want>was?.55:2));if(Math.abs(now-(this.lifeShown?.[id]??-1))>.015)changed=true;this.areaLife[id]=now;const [ox,oz]=this.data.areas[id].offset,[tw,td]=travelBounds(id);reach.push(ox,oz,Math.max(tw,td)*.62,now);}
+      this.lifeClock=(this.lifeClock||0)+dt;
+      if(changed&&this.lifeClock>.12){this.lifeClock=0;this.lifeApplied=true;this.lifeShown={...this.areaLife};updateGroundLife(this.grounds||[],new Float32Array(reach));recolorFlora(this,this.areaLife);
+        for(const l of this.living||[]){if(!isExterior(l.area)&&l.area!=='landscape')continue;setDry(l.material,1-(l.area==='landscape'?WILD_LIFE:this.areaLife[l.area]??1));}}}
     this.restoration=Math.max(0,(this.restoration||0)-dt);this.vitality+=(alive-this.vitality)*Math.min(1,dt*(this.restoration>0?.75:alive?.5:1.2));const v=this.vitality;
-    if(this.frame?.enabled){const base=GRADES[inside?'inside':phase.id]||GRADES.morning,g=this.grade,target=[base[0]*(.58+.42*v),base[1]*(.94+.06*v),base[2]*(.97+.03*v),base[3]*(1.05-.05*v),base[4]*(.93+.07*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
+    if(this.frame?.enabled){const grades=XY?XY_GRADES:GRADES,base=grades[inside?'inside':phase.id]||grades.morning,g=this.grade,target=[base[0]*(.86+.14*v),base[1]*(.97+.03*v),base[2]*(.99+.01*v),base[3]*(1.03-.03*v),base[4]*(.97+.03*v)];let moved=0;for(let i=0;i<5;i++){const d=(target[i]-g[i])*mix;g[i]+=d;moved+=Math.abs(d);}
       if(moved>.0005||!this.gradeApplied){this.gradeApplied=true;const f=this.frame.grading;f.saturation=g[0];f.tint=new Color(g[1],g[2],g[3]);f.brightness=g[4];this.frame.update();}}
-    for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?1.6:n*2.2):0;}
+    for(const light of this.lights){const active=f[power[light.area]]||f.beacon_lens;light.entity.light.intensity=active?(light.area==='workshop'?2.4:n*3.2):0;light.entity.light.range=light.area==='workshop'?11:9;}
     for(const glow of this.lampGlows||[]){const active=f[power[glow.area]]||f.beacon_lens;glow.entity.enabled=!!active&&(glow.area==='workshop'||n>.01);glow.material.opacity=(glow.area==='workshop'?.4:n*.42)*(reduced?1:.97+Math.sin(this.clock*1.8)*.03);glow.material.update();}
     this.portalSurface?.setParameter('uPortalTime',reduced?0:this.clock);
     if(this.festival){const on=!!f.epilogue_shared&&!inside;this.festival.root.enabled=on;if(on)for(const g of this.festival.glows){g.material.opacity=(.35+.45*n)*(reduced?1:.9+Math.sin(this.clock*2.3+g.entity.getPosition().x)*.1);g.material.update();}}
     if(this.portalGlow&&!this.portalArrival){this.portalGlow.material.opacity=.14+(reduced?0:Math.sin(this.clock*.9)*.04);this.portalGlow.material.update();}
     if(this.beaconGlow){this.beaconGlow.entity.enabled=!!f.beacon_lens;this.beaconLight.light.intensity=f.beacon_lens?1.5+2.2*n:0;}
-    for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color('#ffc57d');g.material.emissiveIntensity=level;g.material.update();}
+    for(const g of this.glasses){const active=f[power[g.area]]||f.beacon_lens,level=active?(g.area==='workshop'?.8:n):.02;g.material.emissive=color(g.area==='workshop'?'#ffc57d':'#ff9f45');g.material.emissiveIntensity=g.area==='workshop'?level:level*1.5;g.material.update();}
     for(const d of this.dynamics){const e=d.entity,flag=!!f[d.flag],motion=reduced?0:1;
-      if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);}
+      if(d.kind==='quiet-mount'&&d.part==='lamp'&&d.lampMode==='flicker')this.lightQuietMount(d,reduced?0:this.clock);
+      if(d.kind==='gate'){const wanted=f.gate?1:0;d.progress+=(wanted-d.progress)*Math.min(1,dt*1.2);e.setPosition(d.pivot[0],d.pivot[1]+d.progress*5.8,d.pivot[2]);this.gateProgress=d.progress;}
+      // The lifting gear follows the leaf (src/world-gateway.js setPose): the chain winds from the
+      // leaf's top up to the drive, the counterweight drops, the drive turns.
+      if(['gate-chain','gate-weight','gate-drive'].includes(d.kind)){const k=this.gateProgress??(f.gate?1:0);
+        if(d.kind==='gate-chain'){const bottom=k*5.8+.55,top=8.35;e.setPosition(d.pivot[0],(bottom+top)/2,d.pivot[2]);e.setLocalScale(1,Math.max(.01,(top-bottom)/7.8),1);}
+        if(d.kind==='gate-weight')e.setPosition(d.pivot[0],d.pivot[1]-k*5,d.pivot[2]);
+        if(d.kind==='gate-drive')e.setRotation(d.rotation.setFromAxisAngle(d.axle,d.side*k*414));}
       if(d.kind==='lever'){d.angle+=((flag?-37:37)-d.angle)*Math.min(1,dt*8);e.setEulerAngles(d.axis==='z'?0:d.angle,0,d.axis==='z'?d.angle:0);}
       if(['wheel','gear','optic'].includes(d.kind)){const enabled=d.receiver?d.feedback?.moving:d.flag?flag:d.area==='spring'?(d.kind==='wheel'?(f.spring_sluice??f.pump):(f.spring_sluice??f.pump)&&(f.spring_coupling??f.pump)):d.kind==='optic'?f.beacon_network&&f.tower_lens_free:true;if(enabled)d.angle+=dt*d.speed*57.3*motion;e.setRotation(d.rotation.setFromAxisAngle(d.axle,d.angle));}
       if(d.kind==='boat'){e.setPosition(d.pivot[0],d.pivot[1]+Math.sin(this.clock*.8)*.055*motion,d.pivot[2]);}
@@ -428,7 +742,7 @@ export class PlayCanvasWorld {
     // The beam turns on its own; in the finale it swings to follow the camera across the kingdom.
     this.beamAngle=(this.beamAngle??0)+dt*(reduced?.05:.18);
     if(this.cinematic?.timeline.id==='beacon_lens'&&this.cinematic.elapsed>7){const aim=Math.atan2(this.focus.z-(KINGDOM.lighthouse.z-25.08),this.focus.x-KINGDOM.lighthouse.x);let d=aim-this.beamAngle;d=Math.atan2(Math.sin(d),Math.cos(d));this.beamAngle+=d*Math.min(1,dt*1.6);}
-    const a=this.beamAngle;this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();
+    const a=this.beamAngle;this.beacon.setPosition(KINGDOM.lighthouse.x,17.2,KINGDOM.lighthouse.z-25.08);this.beacon.setEulerAngles(0,-a*57.3,0);this.beaconMaterial.opacity=.1+.5*n;this.beaconMaterial.update();if(this.beaconPool){this.beaconPool.opacity=.3*n;this.beaconPool.update();}
   }
   resize(){const low=this.state.settings?.quality==='low';this.appliedQuality=low?'low':'high';this.app.graphicsDevice.maxPixelRatio=Math.min(devicePixelRatio,low?1:1.7);this.app.resizeCanvas();if(this.sun)this.sun.light.castShadows=!low;if(this.frame)this.frame.enabled=!low;}
   dispose(){if(this.disposed)return;this.disposed=true;removeEventListener('beforeunload',this.destroy);this.app.destroy();}

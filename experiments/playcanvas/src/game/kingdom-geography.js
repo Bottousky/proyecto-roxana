@@ -1,4 +1,4 @@
-import {AREAS} from './content.js';
+import {AREAS,WORLD_SYSTEMS,DIALOGUE_EFFECTS} from './content.js';
 
 // Metres in a shared, north-up territory. Workshops are interiors of real buildings.
 export const KINGDOM = Object.freeze({
@@ -16,7 +16,23 @@ export const EXTERIORS=Object.keys(KINGDOM).filter(id=>id!=='workshop');
 // The gate stands on the western embankment; the canal passes OUTSIDE its bastion.
 export const ROAD_CANAL_X=19.8;
 // Keep the canal on the east bank of each settlement, including the river mouth.
-export const WATERCOURSE=[[-8,110],[-8,56],[-8,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
+export const WATERCOURSE_BENDS=[[-8,110],[-8,56],[-8,32],[22,16],[22,-16],[53.8,-32],[53.8,-64],[32,-80],[32,-110],[-12,-126],[-12,-158],[14,-174],[14,-210],[54,-226],[54,-245]];
+// A river never turns on a set square: every bend becomes an arc of up to 6 m radius. The
+// rounded course is the one drawn AND the one that stops a walker, so both always agree.
+// The Calzada builds its own straight canal between bends 5 and 6: those two stay exact.
+function roundBends(points,radius=6,steps=5,exact=new Set([5,6])){
+  const out=[points[0]];
+  for(let i=1;i<points.length-1;i++){
+    if(exact.has(i)){out.push(points[i]);continue;}
+    const [a,b,c]=[points[i-1],points[i],points[i+1]],l1=Math.hypot(b[0]-a[0],b[1]-a[1]),l2=Math.hypot(c[0]-b[0],c[1]-b[1]),r=Math.min(radius,l1*.45,l2*.45);
+    const p=[b[0]+(a[0]-b[0])/l1*r,b[1]+(a[1]-b[1])/l1*r],q=[b[0]+(c[0]-b[0])/l2*r,b[1]+(c[1]-b[1])/l2*r];
+    for(let k=0;k<=steps;k++){const t=k/steps,u=1-t;out.push([+(u*u*p[0]+2*u*t*b[0]+t*t*q[0]).toFixed(3),+(u*u*p[1]+2*u*t*b[1]+t*t*q[1]).toFixed(3)]);}
+  }
+  out.push(points.at(-1));return out;
+}
+export const WATERCOURSE=roundBends(WATERCOURSE_BENDS);
+// The irrigation run begins at bend 6; the village canal ends at bend 5 (see kingdom-landscape).
+export const WATERCOURSE_SPLIT=WATERCOURSE.findIndex(p=>p[0]===WATERCOURSE_BENDS[6][0]&&p[1]===WATERCOURSE_BENDS[6][1]);
 export function inKingdomWater(id,x,z,margin=0){
   if(!isExterior(id))return false;const [wx,wz]=toKingdom(id,[x,z]);
   for(let i=1;i<WATERCOURSE.length;i++)if(segmentDistance([wx,wz],WATERCOURSE[i-1],WATERCOURSE[i])<2.3+margin)return true;
@@ -57,6 +73,41 @@ export function nextPassage(from,to){
   while(queue.length){const [id,path]=queue.shift();if(id===to)return path[0]||null;
     for(const exit of AREAS[id]?.exits||[])if(!seen.has(exit.target)){seen.add(exit.target);queue.push([exit.target,[...path,exit]]);}}
   return null;
+}
+/** Where the next step is in this place: the passage toward the objective's place, or its object here.
+ * When that object still waits for something (a bench that cannot work until two closures are joined),
+ * the step is the lever that is missing, followed through the world's systems (ciclo 30: a player
+ * stood by Lumen's bench without seeing that the closures on the floor were the way). */
+export function guideTarget(state,objective){
+  const exit=nextPassage(state.area,objective?.area);
+  if(exit)return {x:exit.x,z:exit.z};
+  const objects=AREAS[state.area]?.objects||[],flags=state.flags||{};
+  const missingLever=(needs,seen=new Set())=>{
+    for(const flag of needs||[]){
+      if(flags[flag]||seen.has(flag))continue;seen.add(flag);
+      // A join someone does for the player after talking (Nereo at the Faro's base): the step is that person.
+      const person=Object.entries(DIALOGUE_EFFECTS).filter(([,e])=>e.flags?.includes(flag)).map(([by])=>objects.find(o=>o.kind==='npc'&&o.dialogue===by)).find(Boolean);if(person)return person;
+      const lever=objects.find(o=>o.kind==='lever'&&!o.story&&o.flag===flag&&(!o.requires||o.requires.every(f=>flags[f])));if(lever)return lever;
+      const system=WORLD_SYSTEMS.find(w=>w.flag===flag&&w.area===state.area);
+      // A lever that has to be opened comes first (a damaged branch to isolate, a short to lift):
+      // joining the healthy line before it would trip the protection.
+      const open=system&&(system.off||[]).find(f=>flags[f]),opener=open&&objects.find(o=>o.kind==='lever'&&!o.story&&o.flag===open);if(opener)return opener;
+      const deeper=system&&missingLever(system.requires,seen);if(deeper)return deeper;
+    }
+    return null;
+  };
+  const target=objects.find(o=>o.id===objective?.object);
+  // An objective that points at one lever of a larger installation (the Calzada's copper bridge):
+  // the step is whichever lever of that installation is still wrong, a short to open first.
+  if(target?.kind==='lever'){
+    const system=WORLD_SYSTEMS.find(w=>w.area===state.area&&[...(w.requires||[]),...(w.off||[])].includes(target.flag));
+    if(system&&!flags[system.flag]){
+      const wrong=(system.off||[]).find(f=>flags[f])??(system.requires||[]).find(f=>!flags[f]&&objects.some(o=>o.kind==='lever'&&!o.story&&o.flag===f));
+      const lever=objects.find(o=>o.kind==='lever'&&!o.story&&o.flag===wrong);if(lever)return {x:lever.x,z:lever.z};
+    }
+  }
+  const step=target&&missingLever(target.requires)||target;
+  return step?{x:step.x,z:step.z}:null;
 }
 export function travelBearing(state,position,objective){
   const exit=nextPassage(state.area,objective?.area);

@@ -1,0 +1,42 @@
+{
+ "personaje": "Marín",
+ "alto_mm": 90.0,
+ "piezas": [
+  {
+   "pieza": "pelo",
+   "caras": 158996,
+   "archivo": "pieza-pelo.stl"
+  },
+  {
+   "pieza": "piel",
+   "caras": 108576,
+   "archivo": "pieza-piel.stl"
+  },
+  {
+   "pieza": "cuero",
+   "caras": 181205,
+   "archivo": "pieza-cuero.stl"
+  },
+  {
+   "pieza": "delantal",
+   "caras": 254439,
+   "archivo": "pieza-delantal.stl"
+  },
+  {
+   "pieza": "pantalon",
+   "caras": 114419,
+   "archivo": "pieza-pantalon.stl"
+  },
+  {
+   "pieza": "camisa",
+   "caras": 80623,
+   "archivo": "pieza-camisa.stl"
+  },
+  {
+   "pieza": "chaleco",
+   "caras": 79234,
+   "archivo": "pieza-chaleco.stl"
+  }
+ ],
+ "nota": "Piezas de superficie separadas por color, sin espesor propio: sirven para asignar filamentos sobre la figura entera o para pintar. La versión para producción suma pose de impresión, base, encastres y control de espesor mínimo."
+}

@@ -1,0 +1,15 @@
+Saved `frente-apose.png` using the built-in image_gen tool.
+
+- Size: **1199 × 1312 pixels**, **1,261,775 bytes**
+- Alpha: **No**
+
+Exact prompt used:
+
+```text
+Use case: stylized-concept.
+Generate exactly one image: a single full-body character model sheet view of Yesca, the young blacksmith of the terraces. Use the attached sprite sheet only as the character reference; preserve the exact same outfit, colours and hairstyle. Do not reproduce the sprite sheet layout or background.
+Pose and composition: exact front view, facing the viewer squarely, standing straight in a relaxed A-pose, arms angled gently out and down, hands relaxed, feet planted evenly. Neutral friendly expression. One character only, centred, entire body visible with generous margin around hair, hands and boots.
+Character: sturdy and cheerful, proportions about 4.5 to 5 heads tall; a big bright copper-orange ponytail, freckles, brass goggles with teal lenses on her forehead, an orange shirt with rolled sleeves, a dark leather work apron with crossed straps over a khaki skirt-apron, dark trousers, brown boots. Match the reference's garment construction, colours, hairstyle and accessories faithfully.
+Style: rendered like a character of Pokemon X and Y (Nintendo 3DS) upscaled in an emulator: a clean 3D toon-shaded figure, large expressive anime eyes painted flat, smooth simple shapes, two-tone cel shading with soft rim light, clean saturated colours. No pixel art, no texture noise.
+Background: plain pure white, fully opaque. No ground shadow, no cast shadow, no text, no labels, no border, no extra objects or additional views.
+```

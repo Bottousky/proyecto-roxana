@@ -1,0 +1,39 @@
+{
+ "regiones": [
+  {
+   "nombre": "piel",
+   "muestra": "#c98d55",
+   "tenible": "piel"
+  },
+  {
+   "nombre": "pelo",
+   "muestra": "#2a1f1c",
+   "tenible": "pelo"
+  },
+  {
+   "nombre": "capa",
+   "muestra": "#7e4b72",
+   "tenible": "ropa"
+  },
+  {
+   "nombre": "vestido",
+   "muestra": "#3f4352",
+   "tenible": "ropa2"
+  },
+  {
+   "nombre": "blusa",
+   "muestra": "#efd9b0",
+   "tenible": null
+  },
+  {
+   "nombre": "oro",
+   "muestra": "#e6ad5c",
+   "tenible": null
+  },
+  {
+   "nombre": "cuero",
+   "muestra": "#7a4a26",
+   "tenible": null
+  }
+ ]
+}

@@ -72,6 +72,38 @@ esquemas y vocabulario. Durante unos cuarenta años, esa relación se desgasta:
 La restauración vuelve a unir observación, explicación y transmisión. Conserva
 cicatrices: el objetivo es una comunidad capaz de mantener su futuro.
 
+## Los herederos de la Luz
+
+Los sabios de Ohmdal (Lumen, Vega, la Consejera, Yesca, Nereo) son herederos de una
+magia que no terminan de conocer. Lo que los Maestros les dejaron sobrevivió como
+palabras y gestos, y se dice sobre el cobre como un conjuro: «paño seco, tres vueltas,
+lámpara nueva»; «primero el agua, después el eje»; «la Luz es una sola». Cada oficio
+guarda los suyos, aprendidos de padres, maestras y antecesores. Para ellos la Luz es
+algo vivo y caprichoso: se la atiende, se la respeta, se le habla.
+
+Por eso desconfían de lo que se puede predecir. Los números de los Maestros quedaron
+asociados a promesas incumplidas y a incendios; «la Luz se ofende si la cuentan»,
+dicen en el taller, y los fareros no escriben el ritmo del Faro para que el Faro no
+se olvide de quien lo cuida. Ohm, un instrumento de los Maestros que mide, despierta
+recelo antes que admiración.
+
+Cada conjuro encierra una idea que alguna vez funcionó y hoy falla, y que es, a la vez,
+una idea errónea clásica sobre los circuitos: la lámpara como culpable, más Luz como
+mejor, la unión que deja pasar y no puede robar, la Luz que se reparte entre casas, la
+fuente que entrega siempre lo mismo, el cobre que descansa de a uno, las voces en fila,
+la lente templada a oscuras. En cada instalación el cobre pone a prueba el conjuro de
+quien la cuida. Nadie es ridiculizado: el conjuro se conserva escrito, y al lado queda
+lo que mostró el cobre.
+
+Comprender no apaga la maravilla. El arco de los herederos no termina en abandonar sus
+ritos sino en saber qué hace cada verso: Lumen sigue dando tres vueltas porque le
+gustan; Vega sigue cantando las manivelas; la Consejera deja el dicho de la fundación
+y escribe debajo «cada camino, su Luz»; Nereo escribe el ritmo en números y el Faro lo
+reconoce igual.
+
+El vocabulario, las creencias y los ritos del Oficio, con lo que cada uno tiene de verdad, están
+en [docs/OFICIO-DE-LA-LUZ.md](docs/OFICIO-DE-LA-LUZ.md).
+
 ## Habitantes
 
 ### El estudiante
@@ -104,7 +136,8 @@ otra persona y continuar sin el protagonista.
 
 ### Lumen
 
-Reparador de la Plaza. Tiene destreza, experiencia y procedimientos heredados.
+Reparador de la Plaza. Tiene destreza, experiencia y procedimientos heredados que
+recita como conjuros, el primero de los herederos que conoce el estudiante.
 Confunde a veces coincidencia y causa porque así logró mantener servicios con
 recursos escasos. Su conocimiento merece respeto. Al comprender por qué una
 reparación funciona, convierte su taller en un banco de conocimiento compartido.
@@ -169,6 +202,13 @@ Más allá de La Luz quedan la Casa de Espejos y las Esclusas; el Puerto y el
 Corazón Nuevo; el Tribunal y la Casa de Compuertas; la Antena y el Observatorio;
 y El Empalme. Son lugares posibles para explorar ritmos, señales, máquinas,
 decisiones, comunicaciones e integración. Sus historias están por desarrollar.
+
+La **Casa de Compuertas** ya se ve desde La Luz. Está al oeste del Manantial, al pie del
+**Monte Quieto**: una central de agua antigua y callada, con una represa de piedra que guarda
+un embalse en una hondonada. Su canal viejo alimenta la roca donde nace el acueducto del
+Manantial. Cuando el Faro vuelve a encenderse, en su ventana se prende una luz que nadie
+encendió. Se sostiene si el embalse quedó alto y parpadea si las Terrazas se llevaron el agua
+primero. La abuela de Edda decía que esa luz avisaba algo. Es el umbral del Arco II.
 
 Roxana también conserva otros Mundos Aplicados como horizonte narrativo:
 

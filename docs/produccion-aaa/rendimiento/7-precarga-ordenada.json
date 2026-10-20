@@ -1,0 +1,137 @@
+{
+ "site": "http://127.0.0.1:4192/proyecto-roxana/",
+ "at": "2026-10-20T02:11:27.718Z",
+ "escuela": {
+  "requests": 23,
+  "fromCache": 0,
+  "bytesMB": 3.55,
+  "byTypeMB": {
+   "Image": 1.5,
+   "Fetch": 1.25,
+   "Script": 0.64,
+   "Font": 0.14,
+   "Stylesheet": 0.01,
+   "Document": 0
+  },
+  "fcp": 276,
+  "lcp": 276,
+  "domContentLoaded": 919,
+  "load": 992,
+  "longTasksMs": 680,
+  "longTasks": 5,
+  "heapMB": 96.3,
+  "networkIdleMs": 7806,
+  "scriptMs": 613,
+  "errors": []
+ },
+ "escuelaRepetida": {
+  "requests": 23,
+  "fromCache": 0,
+  "bytesMB": 0,
+  "byTypeMB": {
+   "Document": 0,
+   "Font": 0,
+   "Script": 0,
+   "Stylesheet": 0,
+   "Image": 0,
+   "Fetch": 0
+  }
+ },
+ "titulo": {
+  "requests": 42,
+  "fromCache": 0,
+  "bytesMB": 17.96,
+  "byTypeMB": {
+   "Fetch": 16.91,
+   "Script": 0.71,
+   "Image": 0.23,
+   "Font": 0.07,
+   "Stylesheet": 0.04,
+   "Document": 0
+  },
+  "fcp": 324,
+  "lcp": 324,
+  "domContentLoaded": 291,
+  "load": 872,
+  "longTasksMs": 0,
+  "longTasks": 0,
+  "heapMB": 58.6,
+  "titleReadyMs": 314,
+  "networkIdleMs": 17585,
+  "scriptMs": 37,
+  "errors": []
+ },
+ "partidaNueva": {
+  "requests": 32,
+  "fromCache": 0,
+  "bytesMB": 0.09,
+  "byTypeMB": {
+   "Image": 0.07,
+   "Font": 0.02,
+   "XHR": 0,
+   "Fetch": 0
+  },
+  "worldMs": 3662,
+  "heapMB": 194
+ },
+ "partidaNuevaTotal": {
+  "requests": 42,
+  "fromCache": 0,
+  "bytesMB": 4.19,
+  "byTypeMB": {
+   "XHR": 3.39,
+   "Image": 0.78,
+   "Font": 0.02,
+   "Fetch": 0
+  },
+  "quietMs": 18840,
+  "heapMB": 118.6
+ },
+ "tituloRepetido": {
+  "requests": 42,
+  "fromCache": 0,
+  "bytesMB": 8.57,
+  "byTypeMB": {
+   "Fetch": 8.57,
+   "Document": 0,
+   "Stylesheet": 0,
+   "Script": 0,
+   "Image": 0,
+   "Font": 0
+  }
+ },
+ "partidaInmediata": {
+  "requests": 74,
+  "fromCache": 0,
+  "bytesMB": 18.05,
+  "byTypeMB": {
+   "Fetch": 16.91,
+   "Script": 0.71,
+   "Image": 0.3,
+   "Font": 0.09,
+   "Stylesheet": 0.04,
+   "Document": 0,
+   "XHR": 0
+  },
+  "worldMs": 18877
+ },
+ "mundo": [
+  {
+   "label": "quieto (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 2.7,
+   "scriptMsPerFrame": 2.57,
+   "layoutsPerSec": 0.5,
+   "styleRecalcsPerSec": 11.9
+  },
+  {
+   "label": "caminando (Portal)",
+   "fps": 60,
+   "mainThreadMsPerFrame": 2.82,
+   "scriptMsPerFrame": 2.66,
+   "layoutsPerSec": 9.9,
+   "styleRecalcsPerSec": 9.9
+  }
+ ],
+ "mundoErrores": []
+}

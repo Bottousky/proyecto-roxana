@@ -2,22 +2,28 @@ import {validatePendingCinematic} from './cinematic-progress.js';
 import {normalizeJournalData} from './field-notes.js';
 import {normalizeJourneyTime} from './story-time.js';
 
-export const SAVE_KEY = 'ohmdal.la-luz.v1';
+// ?tramo=<lugar> (sólo para pruebas): una partida aparte que empieza en ese lugar, sin tocar la del jugador.
+const TRAMO = (() => { try { return new URLSearchParams(globalThis.location?.search || '').get('tramo') || ''; } catch { return ''; } })().replace(/[^a-z]/g, '');
+export const SAVE_KEY = 'ohmdal.la-luz.v1' + (TRAMO ? `.tramo-${TRAMO}` : '');
 export const SETTINGS_KEY = 'ohmdal.settings.v1';
 export const AREA_IDS = ['portal','plaza','workshop','road','spring','castle','terraces','lake','lighthouse'];
-export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:36, clickToWalk:false};
+export const DEFAULT_SETTINGS = {volume:0.55, muted:false, reducedMotion:false, quality:'high', textSpeed:60, clickToWalk:true, lumenMarks:false};
 
 export function freshState(settings = {}) {
-  return {version:1,area:'portal',position:null,flags:{},seen:[],secrets:[],visited:[],puzzles:{},fieldNotes:[],personalNotes:{},journeyTime:{phase:0},activeDialogue:null,activeCinematic:null,endingPending:false,playtime:0,createdAt:Date.now(),savedAt:Date.now(),settings:{...DEFAULT_SETTINGS,...settings}};
+  return {version:1,area:'portal',position:null,flags:{},seen:[],secrets:[],visited:[],puzzles:{},fieldNotes:[],personalNotes:{},known:[],playerName:'',journeyTime:{phase:0},activeDialogue:null,activeCinematic:null,endingPending:false,playtime:0,createdAt:Date.now(),savedAt:Date.now(),settings:{...DEFAULT_SETTINGS,...settings}};
 }
 function record(value) { return value && typeof value === 'object' && !Array.isArray(value); }
 function settingsFrom(value) {
   const result={...DEFAULT_SETTINGS};
   if(!record(value))return result;
   if(Number.isFinite(value.volume))result.volume=Math.max(0,Math.min(1,value.volume));
-  for(const key of ['muted','reducedMotion','clickToWalk'])if(typeof value[key]==='boolean')result[key]=value[key];
+  for(const key of ['muted','reducedMotion','lumenMarks'])if(typeof value[key]==='boolean')result[key]=value[key];
+  // Walking with a click is on by default since ciclo 30 (a first player clicked the ground and nothing
+  // happened). Only a choice made in the options, marked as such, keeps it off.
+  if(value.clickWalkChosen===true&&typeof value.clickToWalk==='boolean'){result.clickToWalk=value.clickToWalk;result.clickWalkChosen=true;}
   if(['high','low'].includes(value.quality))result.quality=value.quality;
-  if(Number.isFinite(value.textSpeed)&&value.textSpeed>0)result.textSpeed=Math.min(9999,value.textSpeed);
+  // The old default pace (36) gives way to the new one; a pace chosen otherwise stays.
+  if(Number.isFinite(value.textSpeed)&&value.textSpeed>0&&value.textSpeed!==36)result.textSpeed=Math.min(9999,value.textSpeed);
   return result;
 }
 export function validateState(data) {
@@ -28,6 +34,10 @@ export function validateState(data) {
   for(const key of ['flags','puzzles']) if(record(data[key])) state[key]=data[key];
   for(const key of ['seen','secrets','visited']) if(Array.isArray(data[key])) state[key]=[...new Set(data[key].filter(x=>typeof x==='string'))];
   state.visited=state.visited.filter(id=>AREA_IDS.includes(id));
+  // Who the player has met. A save from before names were learned has none: null asks the game to
+  // work it out from the conversations already seen.
+  state.known=Array.isArray(data.known)?[...new Set(data.known.filter(x=>typeof x==='string'))]:null;
+  if(typeof data.playerName==='string')state.playerName=data.playerName.trim().slice(0,40);
   if(Number.isFinite(data.playtime) && data.playtime>=0) state.playtime=data.playtime;
   if(Number.isFinite(data.createdAt)) state.createdAt=data.createdAt;
   if(Number.isFinite(data.savedAt)) state.savedAt=data.savedAt;

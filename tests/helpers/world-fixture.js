@@ -9,7 +9,7 @@ export function buildCollisionWorld(id,{flags={},spawn,state:savedState,continuo
   const world=Object.create(World.prototype),state=savedState||freshState();
   if(!savedState){state.area=id;state.flags={...AREAS[id].initialFlags,...flags};}
   const art=new THREE.Texture();
-  const textures=Object.fromEntries(['stone','wood','roof','ground','cobble','glow','foliage','fern'].map(key=>[key,new THREE.Texture()]));
+  const textures=Object.fromEntries(['stone','wood','roof','ground','cobble','glow','foliage','fern','timber'].map(key=>[key,new THREE.Texture()]));
   const geo={box:new THREE.BoxGeometry(1,1,1),sphere:new THREE.SphereGeometry(1,12,8),ico:new THREE.IcosahedronGeometry(1,1),cylinder:new THREE.CylinderGeometry(1,1,1,16),cone:new THREE.ConeGeometry(1,1,12),plane:new THREE.PlaneGeometry(1,1),torus:new THREE.TorusGeometry(1,.1,8,40)};
   Object.assign(world,{
     state,clock:0,inspect:false,area:null,scene:new THREE.Scene(),

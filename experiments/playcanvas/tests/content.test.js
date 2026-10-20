@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { AREAS, CHARACTERS, DIALOGUES, JOURNAL, OHM_CHATTER, PUZZLE_STORY, WORLD_SYSTEMS, evaluateWorld, getObjective, resolveDialogue } from '../src/game/content.js';
+import { SIDE_BENCHES, AREAS, CHARACTERS, DIALOGUES, JOURNAL, OHM_CHATTER, PUZZLE_STORY, WORLD_SYSTEMS, evaluateWorld, getObjective, resolveDialogue } from '../src/game/content.js';
 
 const meets = (state, requirements = []) => requirements.every(flag => state.flags[flag]);
 const refresh = state => evaluateWorld(state).forEach(system => { state.flags[system.flag] = system.active; });
@@ -19,7 +19,7 @@ test('every staged conversation, character and exit resolves inside the shipped 
       ['dialogue', 'lockedDialogue', 'afterDialogue'].forEach(key => checkDialogue(object[key], object.id));
       if (object.character) assert.ok(CHARACTERS[object.character], `${object.id}: character`);
       if (object.target) assert.ok(AREAS[object.target], `${object.id}: exit target`);
-      if (object.puzzle) assert.ok(PUZZLE_STORY[object.puzzle], `${object.id}: puzzle story`);
+      if (object.puzzle) assert.ok(PUZZLE_STORY[object.puzzle] || ((object.optional || object.mini) && SIDE_BENCHES[object.puzzle]), `${object.id}: puzzle story`);
       assert.ok(Math.abs(object.x) < area.bounds[0] / 2, `${object.id}: x inside playable bounds`);
       assert.ok(Math.abs(object.z) < area.bounds[1] / 2, `${object.id}: z inside playable bounds`);
     }
@@ -82,7 +82,8 @@ test('a fresh visitor can physically reach every required world control and comm
   }
 
   assert.deepEqual([...reached].sort(), Object.keys(AREAS).sort(), 'Every area can be entered');
-  assert.deepEqual([...solved].sort(), Object.keys(PUZZLE_STORY).sort(), 'Every required workbench can be reached');
+  assert.deepEqual([...solved].filter(id => !SIDE_BENCHES[id]).sort(), Object.keys(PUZZLE_STORY).sort(), 'Every required workbench can be reached');
+  assert.ok(solved.has('drawer'), 'The optional drawer can be reached too');
   assert.equal(state.flags.beacon_lens, true, 'The Lighthouse can be restored');
   assert.ok(changedControls.has('road_bypass'), 'The spatial bypass was actually operated');
   assert.ok(changedControls.has('castle_branch_closed'), 'The damaged branch was actually isolated');
@@ -160,4 +161,26 @@ test('a newcomer receives observations before optional electrical formalization'
     }
   }
   assert.equal(JOURNAL.find(entry => entry.id === 'arrival').explanation, undefined, 'The blank journal does not front-load a lesson');
+});
+
+test("Vega's song is put to the test: coupling the axle before the water gets its own start", async () => {
+  const { toggleMemory, resolveDialogue } = await import('../src/game/content.js');
+  const flags = {};
+  Object.assign(flags, toggleMemory('spring_coupling', flags)); flags.spring_coupling = true;
+  assert.equal(flags.spring_backwards, true, 'the axle went first');
+  Object.assign(flags, toggleMemory('spring_sluice', flags)); flags.spring_sluice = true;
+  assert.match(resolveDialogue('spring_ready', { flags }).map(l => l.text).join(' '), /Para eso era el canto/);
+  const inOrder = {};
+  Object.assign(inOrder, toggleMemory('spring_sluice', inOrder)); inOrder.spring_sluice = true;
+  Object.assign(inOrder, toggleMemory('spring_coupling', inOrder)); inOrder.spring_coupling = true;
+  assert.doesNotMatch(resolveDialogue('spring_ready', { flags: inOrder }).map(l => l.text).join(' '), /canto/);
+});
+
+test('an inhabitant notices when the player opens a lever they had just joined', async () => {
+  const { unjoinDialogue, DIALOGUES } = await import('../src/game/content.js');
+  assert.equal(unjoinDialogue('tower_return', { flags: { tower_return: false }, seen: ['nereo_tower'] }), 'unjoin_tower_return');
+  assert.match(DIALOGUES.unjoin_tower_return.map(l => l.text).join(' '), /lo uní yo/);
+  assert.equal(unjoinDialogue('tower_return', { flags: { tower_return: true }, seen: ['nereo_tower'] }), null, 'closing it again says nothing');
+  assert.equal(unjoinDialogue('tower_return', { flags: { tower_return: false }, seen: [] }), null, 'before Nereo joined it, it is just a lever');
+  assert.equal(unjoinDialogue('road_send', { flags: {}, seen: [] }), null);
 });

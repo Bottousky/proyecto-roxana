@@ -1,4 +1,4 @@
-import { renderWorldMap, mapStyles } from './world-map.js';
+import { renderKingdomMap, bindKingdomMap } from './kingdom-map.js';
 import '@fontsource/cormorant-garamond/latin-400.css';
 import '@fontsource/cormorant-garamond/latin-500.css';
 import '@fontsource/cormorant-garamond/latin-600.css';
@@ -14,10 +14,11 @@ import './travel-instrument.css';
 import './art-polish.css';
 import './journey-ui.css';
 import './hud.css';
-import {renderJourneyGuide,bindMapViews} from './journey-guide.js';
+import './journal.css';
+import {renderJourneyGuide} from './journey-guide.js';
 import {PuzzleWorkbench,PUZZLES,getBenchEvidence} from './puzzles.js';
 import {renderJournal,recordFieldObservation} from './journal.js';
-import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
+import {AREAS,CHARACTERS,DIALOGUES,JOURNAL,PUZZLE_STORY,WORLD_SYSTEMS,OHM_CHATTER,DIALOGUE_EFFECTS,LESSON_GIFTS,SIDE_BENCHES,toggleMemory,unjoinDialogue,lessonGift,getObjective,resolveDialogue,resolveDialogueId,evaluateWorld} from './content.js';
 import {AudioDirector} from './audio.js';
 import {measureWorld} from './world-circuits.js';
 import {freshState,loadState,saveState,loadSettings,SETTINGS_KEY,hasRequirements,minutes,validateState} from './state.js';
@@ -35,12 +36,12 @@ document.querySelector('#app').innerHTML=`
     <div class="title-art"></div><div class="title-shade"></div><div class="title-dust"></div>
     <div class="title-content"><div class="eyebrow title-eyebrow">UNA AVENTURA EN LOS MUNDOS APLICADOS</div><div class="title-sigil">Ω</div><h1>OHMDAL</h1><div class="title-rule"><span></span>LA LUZ<span></span></div><p class="title-tagline">El mundo no perdió su luz.<br>Olvidó cómo encenderla.</p>
     <nav class="title-menu" aria-label="Menú principal"><button id="continue" class="primary hidden">Continuar el viaje ${svg('arrow')}</button><button id="new-game" class="primary">Cruzar el Portal ${svg('arrow')}</button><button id="title-settings" class="quiet">Opciones</button></nav>
-    <p id="save-description" class="save-description"></p></div><div class="title-foot"><span>ARCO I · LA PREGUNTA OLVIDADA</span><span>Explorá. Escuchá. Experimentá.</span></div>
+    <p id="save-description" class="save-description"></p><p class="rotate-hint"><span aria-hidden="true">⟳</span>Ohmdal se juega mejor con el teléfono apaisado.</p></div><div class="title-foot"><span>ARCO I · LA PREGUNTA OLVIDADA</span><span>Explorá. Escuchá. Experimentá.</span></div>
   </section>
   <div id="hud" class="hidden"><header class="hud-top"><div class="place"><span class="eyebrow" id="chapter-label">OHMDAL · LA LUZ</span><h2 id="area-name"></h2><p id="area-subtitle"></p></div><nav class="hud-tools" aria-label="Herramientas de viaje"><button id="journal-button" class="icon-button" aria-label="Bitácora (J)" title="Bitácora · J">${svg('book')}<span class="tool-label">Bitácora</span><kbd>J</kbd><i id="journal-dot" class="hidden"></i></button><button id="map-button" class="icon-button" aria-label="Mapa (M)" title="Mapa · M">${svg('map')}<span class="tool-label">Mapa</span><kbd>M</kbd></button><button id="guide-button" class="icon-button" aria-label="Guía de viaje (H)" title="Guía de viaje · H">${svg('star')}<span class="tool-label">Guía</span></button><button id="pause-button" class="icon-button" aria-label="Pausa y opciones (Escape)">${svg('menu')}<span class="tool-label">Pausa</span><kbd>Esc</kbd></button></nav></header>
     <div class="objective" id="objective"><span class="objective-glyph" aria-hidden="true">◇</span><div><button id="objective-toggle" aria-expanded="true" aria-controls="objective-detail"><span class="eyebrow">UNA PREGUNTA ABIERTA</span><span id="objective-title"></span><span class="objective-fold" aria-hidden="true">⌄</span></button><small id="objective-detail"></small></div></div>
     <div id="interaction" class="interaction hidden"><button id="interact-button"><kbd>E</kbd><span id="interaction-label"></span></button><button id="field-measure" class="field-measure hidden"><kbd>Q</kbd> Mirar con Ohm</button></div>
-    <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Guardar instrumento">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
+    <aside id="field-meter" class="field-meter hidden" aria-label="Observación de Ohm" aria-live="polite"><button id="close-field-meter" aria-label="Cerrar la observación (Esc)" title="Cerrar · Esc">×</button><span class="eyebrow">OHM · UNA OBSERVACIÓN</span><h3 id="field-title"></h3><p id="field-observation"></p><details id="field-details"><summary>Ver las lecturas</summary><div class="field-readings"><div><strong id="field-voltage"></strong><small>V · TENSIÓN</small></div><div><strong id="field-current"></strong><small>A · CORRIENTE</small></div></div><p id="field-reference" class="field-reference"></p><p class="field-guide">La tensión compara dos puntos. La corriente indica cuánto circula por un camino. Una raya significa que Ohm no puede fijar esa lectura; no significa cero.</p></details></aside>
     <div id="ohm-bubble" class="ohm-bubble hidden"><span class="ohm-eye"></span><p></p></div>
     <div class="hud-bottom"><span id="control-reminder"><kbd>W A S D</kbd> caminar <span>·</span> <kbd>Shift</kbd> correr <span>·</span> clic para ir</span><span id="save-indicator" role="status">◈ Bitácora al día</span></div>
     <div id="touch-controls"><div class="dpad"><button data-dir="up" aria-label="Caminar hacia arriba">↑</button><button data-dir="left" aria-label="Caminar a la izquierda">←</button><button data-dir="down" aria-label="Caminar hacia abajo">↓</button><button data-dir="right" aria-label="Caminar a la derecha">→</button></div><button id="touch-interact" aria-label="Interactuar" disabled>Acercate</button></div>
@@ -66,6 +67,10 @@ let playingCinematic=false;
 let chatterClock=0;
 let objectiveSignature='',objectiveUntil=0,hudUntil=0,travelTick=0;
 let intendedInteraction=null;
+// The key that closes a conversation must not reopen it: talking again to whoever was in reach
+// needs a short pause, and every press during that pause (a hurried reader) extends it.
+// Anything else in reach can be used at once.
+let interactAfter=0,interactAfterId=null;
 let activeMeasurement=null,measurementAvailable=false,lastMeasuredFlags='',lastMeasurementCandidate='';
 const dialogueQueue=[];
 function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,due:performance.now()+delay,area});}
@@ -73,7 +78,7 @@ function queueDialogue(id,delay=0,area=state.area){if(id)dialogueQueue.push({id,
 function show(node,value=true){(typeof node==='string'?$(node):node).classList.toggle('hidden',!value);if(node==='#dialogue')$('#hud').classList.toggle('conversing',value);}
 function toast(text,duration=3600){$('#toast').textContent=text;show('#toast');clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>show('#toast',false),duration);}
 function sound(name){try{audio.play(name);}catch{}}
-function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);}
+function storeSettings(){try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(settings));}catch{}state.settings={...settings};audio.setVolume(settings.volume);audio.setMuted(settings.muted);document.documentElement.classList.toggle('reduced-motion',settings.reducedMotion);document.documentElement.classList.toggle('lumen-marks',!!settings.lumenMarks);}
 storeSettings();
 
 function refreshTitle(){
@@ -129,7 +134,9 @@ function renderFieldMeasurement(){
   const reading=measureWorld(state.area,state,activeMeasurement.id);
   if(!reading){activeMeasurement=null;show('#field-meter',false);return;}
   const fmt=v=>v===null?'— —':Number(v).toLocaleString('es-AR',{minimumFractionDigits:2,maximumFractionDigits:2});
-  $('#field-title').textContent=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id)?.label||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
+  const measured=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);
+  // A lever's label is what E will do next; the observation names the thing itself (jugador 21).
+  $('#field-title').textContent=(measured?.kind==='lever'?reading.title:measured?.label)||reading.title;$('#field-voltage').textContent=fmt(reading.voltage);$('#field-current').textContent=fmt(reading.current);
   $('#field-reference').textContent=reading.reference;$('#field-observation').textContent=reading.notice;
   $('#field-meter').classList.toggle('fault',Boolean(reading.overloaded));
 }
@@ -150,7 +157,7 @@ function initWorld(){
     onClose:()=>{
       show('#workbench',false);world.setInspection(false);mode='world';show('#hud');held.clear();persist();$('#world').focus({preventScroll:true});
       const solved=pendingPuzzleResult;pendingPuzzleResult=null;
-      if(solved){if(solved==='beacon_lens')runFinale();else if(state.activeCinematic?.id===solved)playPendingCinematic();else{world.playRestoration?.(solved);audio.playRestoration?.(solved);queueDialogue(PUZZLE_STORY[solved]?.complete,500);}}
+      if(solved){if(solved==='beacon_lens')runFinale();else if(state.activeCinematic?.id===solved)playPendingCinematic();else{world.playRestoration?.(solved);audio.playRestoration?.(solved);queueDialogue(PUZZLE_STORY[solved]?.complete??SIDE_BENCHES[solved]?.complete,500);}}
     },
     onSolve:(id,result)=>{
       state.flags[id]=true;
@@ -217,7 +224,7 @@ async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   clearTimeout(arrivalTimeout);
   if(initial&&first){$('#arrival h2').textContent=AREAS[id].name;$('#arrival p').textContent=AREAS[id].subtitle||'';show('#arrival');arrivalTimeout=setTimeout(()=>show('#arrival',false),2400);}
   $('#world').focus({preventScroll:true});persist();
-  if(first && AREAS[id].entryDialogue)queueDialogue(AREAS[id].entryDialogue,initial?1400:1200,id);
+  {const entry=AREAS[id].entryDialogue;if(entry&&!state.seen.includes(entry)&&!dialogueQueue.some(q=>q.id===entry))queueDialogue(entry,initial?1400:1200,id);}
 }
 
 function linesFor(id){
@@ -267,7 +274,7 @@ function nextLine(){
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
   const effect=typeof dialogue.id==='string'&&DIALOGUE_EFFECTS[dialogue.id];if(effect){for(const f of effect.flags)state.flags[f]=true;world?.updateFlags?.(state);refreshWorldSystems();}
-  show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
+  show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';interactAfter=performance.now()+450;interactAfterId=nearby?.id??null;$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
 }
 
 function bubble(text){if(mode!=='world'||!$('#field-meter').classList.contains('hidden'))return;$('#ohm-bubble p').textContent=text;show('#ohm-bubble');bubbleUntil=performance.now()+6500;}
@@ -277,7 +284,9 @@ function interact(obj=nearby){
   intendedInteraction=null;
   sound('interact');held.clear();
   if(!hasRequirements(state,obj.requires)){
-    if(obj.lockedDialogue)speak(obj.lockedDialogue);else bubble('Todavía hay algo que observar antes de seguir.');return;
+    // A bench locked for more than one reason says the one that is missing (the Manantial: levers, then Tala).
+    const missing=(obj.requires??[]).find(f=>!hasRequirements(state,[f])),locked=obj.lockedBy?.[missing]??obj.lockedDialogue;
+    if(locked)speak(locked);else bubble('Todavía hay algo que observar antes de seguir.');return;
   }
   if(obj.target){if(world.followPassage(obj))return;enterArea(obj.target,obj.spawn);return;}
   if(obj.secret){
@@ -290,9 +299,9 @@ function interact(obj=nearby){
     if(action.type==='toggle'){
       const latched=WORLD_SYSTEMS.find(system=>(system.requires?.includes(action.flag)||system.off?.includes(action.flag))&&state.flags[system.latch]);
       if(latched){bubble('Los mandos quedaron asegurados al poner esta instalación en servicio.');return;}
-      state.flags[action.flag]=!state.flags[action.flag];sound('switch');
+      Object.assign(state.flags,toggleMemory(action.flag,state.flags));state.flags[action.flag]=!state.flags[action.flag];sound('switch');
       toast(state.flags[action.flag]?(action.onText||'Contacto cerrado'):(action.offText||'Contacto abierto'));
-      refreshWorldSystems();persist();return;
+      refreshWorldSystems();persist();const undone=unjoinDialogue(action.flag,state);if(undone)speak(undone);return;
     }
     if(action.type==='inspect'){
       const first=!state.flags[action.flag];state.flags[action.flag]=true;refreshWorldSystems();persist();
@@ -303,6 +312,8 @@ function interact(obj=nearby){
   }
   if(obj.puzzle){
     const open=()=>openPuzzle(obj.puzzle);
+    // A neighbour whose minijuego is done just talks; a bench reopens for a look.
+    if(state.flags[obj.puzzle]&&obj.kind==='npc'){speak(obj.afterDialogue||obj.dialogue,null,obj.id);return;}
     if(state.flags[obj.puzzle]){const after=obj.afterDialogue||PUZZLE_STORY[obj.puzzle]?.complete;if(after&&!state.seen.includes(after))speak(after,open);else open();return;}
     const arrival=obj.dialogue||PUZZLE_STORY[obj.puzzle]?.arrival;
     if(arrival&&!state.seen.includes(arrival))speak(arrival,open);else open();return;
@@ -312,7 +323,7 @@ function interact(obj=nearby){
 }
 function openPuzzle(id){mode='puzzle';held.clear();show('#hud',false);show('#arrival',false);world.setInspection(true);show('#workbench');workbench.open(id,state.puzzles[id]);}
 
-function closeModal(){for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
+function closeModal(){for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=false;if($('.ending-modal')){recordEndingDismissed(state);persist();}show('#modal-layer',false);$('#modal-layer').innerHTML='';mode=modalReturn;held.clear();if(mode!=='world'&&modalFocus?.isConnected&&!modalFocus.closest('.hidden'))modalFocus.focus({preventScroll:true});else if(mode==='world')$('#world').focus({preventScroll:true});}
 function modal(html,kind='standard'){
   if(mode!=='modal'){modalReturn=mode;modalFocus=document.activeElement;}
   mode='modal';held.clear();show('#interaction',false);for(const node of [$('#hud'),$('#world'),$('#title-screen')])node.inert=true;
@@ -327,6 +338,28 @@ function openJournal(selected){
   const current=document.querySelector('.book-index [aria-current=page]');if(current){const list=current.parentElement;list.scrollTop=current.offsetTop-list.clientHeight/2+current.offsetHeight/2;}
   document.querySelectorAll('button[data-journal-page]').forEach(button=>button.onclick=()=>{openJournal(button.dataset.journalPage);$('.book-leaf')?.scrollIntoView({block:'nearest'});});
   $('#personal-journal-note')?.addEventListener('input',event=>{state.personalNotes||={};state.personalNotes[event.target.dataset.noteFor]=event.target.value.slice(0,1200);persist();});
+  document.querySelectorAll('[data-journal-download]').forEach(button=>button.onclick=()=>downloadBitacora(button.dataset.journalDownload));
+  if(journalDownload)showDownloadProgress();
+}
+// The Bitácora as a file the player keeps: built in the browser on demand (the PDF tools load only then),
+// as A4 spreads to read or print at home, or as A5 pages for a print shop.
+let journalDownload=null;
+function showDownloadProgress(){
+  const buttons=document.querySelectorAll('[data-journal-download]');
+  buttons.forEach(b=>{b.disabled=!!journalDownload?.busy;});
+  const main=document.querySelector('[data-journal-download="spreads"]');if(main&&journalDownload)main.textContent=journalDownload.label;
+}
+async function downloadBitacora(layout){
+  if(journalDownload?.busy)return;
+  journalDownload={busy:true,label:'Encuadernando…'};showDownloadProgress();
+  try{
+    const {downloadJournal}=await import('./journal-pdf.js');
+    const result=await downloadJournal(state,{layout,puzzles:PUZZLES,evidenceFor:getBenchEvidence,onProgress:(done,total)=>{journalDownload.label=`Encuadernando… ${done}/${total}`;showDownloadProgress();}});
+    journalDownload={busy:false,label:'Descargada ✓'};sound('page');
+    console.info(`Bitácora: ${result.filename}, ${result.sheets} hojas, ${(result.bytes/1048576).toFixed(1)} MB`);
+  }catch(error){console.error(error);journalDownload={busy:false,label:'No se pudo armar. Probá de nuevo'};}
+  showDownloadProgress();
+  setTimeout(()=>{if(journalDownload&&!journalDownload.busy){journalDownload=null;const main=document.querySelector('[data-journal-download="spreads"]');if(main)main.textContent='Descargar la Bitácora';}},6000);
 }
 
 function openGuide(){
@@ -338,18 +371,20 @@ function openGuide(){
 
 function openMap(){
   if(!started||!['world','modal'].includes(mode))return;
-  modal(`<style>${mapStyles}</style>${renderWorldMap(state,{position:world.getPlayerPosition(),inhabitants:world.getInteractions().filter(o=>o.kind==='npc'),objectiveArea:getObjective(state)?.area})}`,'map-modal');
-  bindMapViews($('#modal-layer'));
+  // The kingdom map: the world painted from above, with the journey drawn over it.
+  modal(renderKingdomMap(state,{position:world.getPlayerPosition(),facing:world.lastStep,inhabitants:world.getInteractions().filter(o=>o.kind==='npc')}),'kingdom-map');
+  sound('map');
+  bindKingdomMap($('#modal-layer'),{onTravel:id=>{if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);}});
   $('[data-map-guide]').onclick=openGuide;
-  document.querySelectorAll('[data-area]').forEach(button=>button.onclick=()=>{const id=button.dataset.area;if(!state.visited.includes(id)||!AREAS[id])return;closeModal();if(id!==state.area)enterArea(id);});
 }
 
 function openOptions(){
   const titleMode=mode==='title';
-  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic en el suelo para caminar. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
+  modal(`<div class="eyebrow">${titleMode?'OHMDAL · LA LUZ':'UN MOMENTO EN EL CAMINO'}</div><h2>${titleMode?'Preparar el viaje':'Tomá un respiro'}</h2><div class="options-list"><label><span>Sonido<span class="setting-note">Música y ambiente originales</span></span><input id="volume" type="range" min="0" max="1" step="0.05" value="${settings.volume}" aria-label="Volumen"/></label><label><span>Silenciar</span><input id="mute" type="checkbox" ${settings.muted?'checked':''}/></label><label><span>Movimiento suave<span class="setting-note">Reduce transiciones y efectos de cámara</span></span><input id="motion" aria-label="Movimiento suave" type="checkbox" ${settings.reducedMotion?'checked':''}/></label><label><span>Las marcas de Lumen<span class="setting-note">Cada anillo de las piedras lleva la inicial de su color</span></span><input id="lumen-marks" aria-label="Las marcas de Lumen" type="checkbox" ${settings.lumenMarks?'checked':''}/></label><label><span>Detalle visual</span><select id="quality" aria-label="Detalle visual"><option value="high" ${settings.quality==='high'?'selected':''}>Alto</option><option value="low" ${settings.quality==='low'?'selected':''}>Ligero</option></select></label><label><span>Lectura instantánea</span><input id="text-speed" type="checkbox" ${settings.textSpeed>=999?'checked':''}/></label></div><div class="controls-guide"><p><kbd>W A S D</kbd> o <kbd>↑ ← ↓ →</kbd> Caminar</p><p><kbd>E</kbd> Interactuar <span>·</span> <kbd>Shift</kbd> Correr</p><p><kbd>J</kbd> Bitácora <span>·</span> <kbd>M</kbd> Mapa <span>·</span> <kbd>H</kbd> Guía</p><p><kbd>Q</kbd> Medir junto a una instalación <span>·</span> <kbd>Esc</kbd> Pausa</p><p>Clic en el suelo para caminar. <kbd>↵</kbd> para seguir una conversación.</p></div><div class="options-actions"><button class="primary" id="resume-option">${titleMode?'Volver':'Continuar el viaje'} ${svg('arrow')}</button><button class="quiet" id="fullscreen">Pantalla completa</button>${started?'<button class="quiet" id="export-save">Exportar bitácora</button><button class="quiet" id="return-title">Guardar y volver al inicio</button>':''}<button class="quiet import-label" id="import-open">Importar bitácora</button><input id="import-save" type="file" accept=".json" hidden/></div>`,'options-modal');
   $('#volume').oninput=e=>{settings.volume=Number(e.target.value);storeSettings();};
   $('#mute').onchange=e=>{settings.muted=e.target.checked;storeSettings();};
   $('#motion').onchange=e=>{settings.reducedMotion=e.target.checked;storeSettings();};
+  $('#lumen-marks').onchange=e=>{settings.lumenMarks=e.target.checked;storeSettings();};
   $('#quality').onchange=e=>{settings.quality=e.target.value;storeSettings();world?.resize();};
   $('#text-speed').onchange=e=>{settings.textSpeed=e.target.checked?9999:36;storeSettings();};
   $('#resume-option').onclick=closeModal;
@@ -422,7 +457,7 @@ $('#dialogue-text').onclick=nextLine;
 $('#skip-cinematic').onclick=skipCinematic;
 $('#world').addEventListener('pointerdown',event=>{
   if(mode!=='world'||event.button!==0)return;
-  const object=world.pickInteraction(event.clientX,event.clientY);
+  const object=world.guidePick?.(event.clientX,event.clientY)||world.pickInteraction(event.clientX,event.clientY);
   intendedInteraction=null;
   if(object){if(world.canInteractWith(object))interact(object);else if(world.approachInteraction(object))intendedInteraction=object.id;return;}
   const point=world.pick(event.clientX,event.clientY);if(point)world.setTarget(point);activePointer={x:event.clientX,y:event.clientY};
@@ -452,11 +487,12 @@ window.addEventListener('keydown',event=>{
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','Enter','Escape'].includes(event.key))event.preventDefault();
   if(event.key==='Escape'){
     if(event.repeat)return;
-    if(mode==='dialogue')nextLine();else if(mode==='world')openOptions();return;
+    // Escape puts Ohm's instrument away first, then pauses (ciclo 30).
+    if(mode==='dialogue')nextLine();else if(mode==='world'&&activeMeasurement){activeMeasurement=null;show('#field-meter',false);}else if(mode==='world')openOptions();return;
   }
   if(mode==='dialogue'){const pick=dialogue?.lines[dialogue.index]?.choices?.[Number(event.key)-1];if(pick&&!event.repeat){chooseInDialogue(pick.id);return;}if(['Enter','e','E',' '].includes(event.key)&&!event.repeat)nextLine();return;}
   if(mode!=='world')return;
-  if(['e','E','Enter',' '].includes(event.key)){if(!event.repeat)interact();return;}
+  if(['e','E','Enter',' '].includes(event.key)){const now=performance.now();if(event.key==='Enter'?now<interactAfter+950&&nearby:now<interactAfter&&nearby&&nearby.id===interactAfterId){if(event.key!=='Enter')interactAfter=now+450;}else if(!event.repeat)interact();return;}
   if(['h','H','?'].includes(event.key)){if(!event.repeat)openGuide();return;}
   if(['j','J'].includes(event.key)){openJournal();return;}
   if(['m','M'].includes(event.key)){openMap();return;}
@@ -470,12 +506,14 @@ window.addEventListener('beforeunload',persist);
 window.addEventListener('resize',()=>world?.resize());
 
 function loop(now){
-  const dt=document.hidden?0:Math.min((now-lastTime)/1000,0.05);lastTime=now;
+  // A slow frame (a weak phone, a throttled window) is caught up in steps of at most 50 ms, up to a
+  // quarter second: walking keeps its pace instead of slowing down with the frame rate (ciclo 30).
+  const elapsed=document.hidden?0:Math.min((now-lastTime)/1000,0.25),steps=Math.max(1,Math.ceil(elapsed/0.05)),dt=elapsed/steps;lastTime=now;
   if(world && started && mode!=='title'&&!document.hidden&&!world.preparingJourney){
     const x=mode==='world'?Number(held.has('d')||held.has('D')||held.has('ArrowRight'))-Number(held.has('a')||held.has('A')||held.has('ArrowLeft')):0;
     const z=mode==='world'?Number(held.has('s')||held.has('S')||held.has('ArrowDown'))-Number(held.has('w')||held.has('W')||held.has('ArrowUp')):0;
     if(x||z||mode!=='world')intendedInteraction=null;
-    world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
+    for(let i=0;i<steps;i++)world.update(dt,state,{x,z,run:held.has('Shift'),paused:mode!=='world'});
     if(world.getAudioScene)audio.updateWorld?.(world.getAudioScene());
     if(mode==='cinematic'){
       const scene=world.getCinematicState();
@@ -494,7 +532,7 @@ function loop(now){
       if(dialogueQueue.length&&dialogueQueue[0].due<=now&&world.isInsidePlace())speak(dialogueQueue.shift().id);
     }
     if(mode==='world'){
-      state.playtime+=dt;autosave+=dt;
+      state.playtime+=elapsed;autosave+=elapsed;
       nearby=world.getNearby();
       $('#touch-interact').disabled=!nearby;$('#touch-interact').textContent=nearby?'Interactuar':'Acercate';
       $('#touch-interact').setAttribute('aria-label',nearby?.label||'Acercate a una persona o instalación');
@@ -517,7 +555,7 @@ function loop(now){
       }
       if(activeMeasurement){const position=world.getPlayerPosition();const inReach=Math.hypot(position[0]-activeMeasurement.x,position[1]-activeMeasurement.z)<4;show('#field-meter',inReach);const flags=JSON.stringify(state.flags);if(flags!==lastMeasuredFlags){lastMeasuredFlags=flags;renderFieldMeasurement();if(inReach){const object=AREAS[state.area].objects.find(o=>o.id===activeMeasurement.id);if(recordFieldObservation(state,object,measureWorld(state.area,state,activeMeasurement.id)))show('#journal-dot');}}}
       if(autosave>5){autosave=0;persist();}
-      chatterClock+=dt;
+      chatterClock+=elapsed;
       if(state.flags.awaken&&chatterClock>38&&$('#field-meter').classList.contains('hidden')){
         chatterClock=0;
         const line=(OHM_CHATTER[state.area]||[]).find(c=>!state.seen.includes(c.id)&&hasRequirements(state,c.requires)&&!(c.unless||[]).some(f=>state.flags[f]));
@@ -526,7 +564,7 @@ function loop(now){
     }else {show('#interaction',false);show('#field-meter',false);}
   }
   if(mode==='dialogue'&&dialogue){
-    const line=dialogue.lines[dialogue.index];typing+=dt*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
+    const line=dialogue.lines[dialogue.index];typing+=elapsed*settings.textSpeed;const amount=Math.min(line.text.length,Math.floor(typing));
     if(amount>typed){typed=amount;$('#dialogue-text').textContent=line.text.slice(0,typed);}
   }
   if(now>bubbleUntil)show('#ohm-bubble',false);
@@ -534,4 +572,5 @@ function loop(now){
 }
 requestAnimationFrame(loop);
 // Development-only inspection of the actual game; excluded from production.
-if(import.meta.env.DEV)window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench}};
+// Read-only inspection for tests: development, or a measurement build (VITE_INSPECT=1), never the shipped one.
+if(import.meta.env.DEV||import.meta.env.VITE_INSPECT==='1')window.__ohmdal={get state(){return state},get world(){return world},get mode(){return mode},get nearby(){return nearby},get workbench(){return workbench}};

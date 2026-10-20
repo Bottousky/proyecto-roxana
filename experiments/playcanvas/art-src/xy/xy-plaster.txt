@@ -1,0 +1,5 @@
+Saved `xy-plaster.png` — **1024×1024**, **1,081,808 bytes**. Generated with built-in image_gen.
+
+Exact prompt:
+
+> Generate exactly one square image, 1024x1024 pixels. Front view seamless smooth cream white plaster wall with very subtle soft patches. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, flat even light). It must tile seamlessly on all four edges: matching left/right and top/bottom boundaries with continuous colour and patches. Fill the entire image with the plaster surface, viewed straight on, without perspective, borders, text, objects, cracks or seams.

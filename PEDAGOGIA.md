@@ -21,6 +21,18 @@ distintas. Las ayudas dirigen la atención hacia evidencia disponible. Una
 combinación arbitraria, un cuestionario que abre una puerta o una respuesta
 memorizada no reemplazan ese razonamiento.
 
+## Números y cuentas
+
+En La Luz no hay cuentas obligatorias. Los mandos se mueven por posiciones y los instrumentos
+hablan con palabras y una escala; los números aparecen cuando se piden y, después de cada
+reparación, en lo que vio Ohm, siempre con los valores del propio montaje. La matemática que sí
+se ejercita es el razonamiento proporcional: el doble de freno no da la mitad de corriente cuando
+la pieza también frena; la mitad de corriente da un cuarto del calor; dos brazos iguales se
+reparten el empuje por mitades. Lo pide alguien que lo necesita (Nereo anota en el libro del
+farero la marca que debería ver el próximo cuidador) o lo comenta Ohm al girar un freno; nunca
+abre ni cierra una puerta. Las cuentas formales (V = I × R para despejar valores, equivalentes,
+divisores calculados) llegan en arcos posteriores, cuando la intuición ya está armada.
+
 ## Competencias que atraviesan el viaje
 
 | Competencia | Evidencia de comprensión |

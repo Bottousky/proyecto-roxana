@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {findPath} from '../src/navigation.js';
+import {moveWithCollisions} from '../src/collision.js';
 function assertClear(start,path,obstacles){let a=start;for(const b of path){for(let t=0;t<=1;t+=.01){const x=a[0]+(b[0]-a[0])*t,z=a[1]+(b[1]-a[1])*t;assert.ok(!obstacles.some(o=>Math.abs(x-o.x)<o.w+.34&&Math.abs(z-o.z)<o.d+.34),'route crosses an obstacle');}a=b;}}
 test('click-to-walk routes around a building through real open space',()=>{const obstacles=[{x:0,z:0,w:2,d:3}],start=[-6,0],goal=[6,0];const path=findPath(start,goal,[20,20],obstacles);assert.ok(path.length>1);assert.deepEqual(path.at(-1),goal);assertClear(start,path,obstacles);});
 test('direct unobstructed walking remains direct',()=>assert.deepEqual(findPath([0,0],[5,5],[20,20],[]),[[5,5]]));
@@ -43,4 +44,22 @@ test('pathfinding does not teleport an embedded or out-of-bounds start to a safe
   const wall=[{x:0,z:0,w:.5,d:6}];
   assert.deepEqual(findPath([0,0],[3,0],[12,12],wall),[]);
   assert.deepEqual(findPath([-9,0],[-3,0],[12,12],wall),[]);
+});
+
+test('a walker resting against a railing still gets a route, leaving from its own side',()=>{
+  // The Lago's dock: the player slid along the railing and stopped 2 cm inside its clearance; click-to-walk
+  // and the approach to the reeds' lever found no route at all from there.
+  const railing=[{x:0,z:0,w:4,d:.1}],start=[1,.42],goal=[6,-3];
+  const path=findPath(start,goal,[20,20],railing,{radius:.34});
+  assert.ok(path.length,'A route exists');
+  assert.ok(path[0][1]>=.44,'It starts on the walker\'s side of the railing');
+  assertClear(path[0],path.slice(1),railing);
+  assert.deepEqual(path.at(-1),goal);
+});
+
+test('a walker grazing a railing can always step away from it',()=>{
+  // The Lago's dock: after talking to Nereo the traveller rested 2 cm inside the railing's clearance
+  // and no key moved it any more.
+  const railing=[{x:0,z:0,w:4,d:.1}],start=[1,.42],opts={radius:.34};
+  for(const delta of [[-.2,0],[0,.2],[.2,0],[-.14,.14]]){const end=moveWithCollisions(start,delta,[20,20],railing,opts);assert.ok(Math.hypot(end[0]-start[0],end[1]-start[1])>.05,`moves ${delta}`);assert.ok(end[1]>=.44,'stays on its side');}
 });

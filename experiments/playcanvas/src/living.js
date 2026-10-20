@@ -1,0 +1,42 @@
+import {SHADERLANGUAGE_GLSL} from 'playcanvas';
+import {XY} from './style.js';
+
+// Leaves, ferns, hedges, crops and sown plants share one albedo: PlayCanvas's own, then pulled
+// toward the forgotten kingdom. Nothing green ever reaches a garden's saturation, and around a
+// place nobody has restored the green dries to straw and grey olive. People, copper and the
+// installations keep their colour against it: that difference is what the eye follows.
+// uDry: 0 alive … 1 forgotten, per material. Sown plants carry their place's life in vertex alpha.
+const livingPS=`
+uniform vec3 material_diffuse;
+uniform float uDry;
+uniform float uLifeInAlpha;
+void getAlbedo() {
+	dAlbedo = material_diffuse.rgb;
+	#ifdef STD_DIFFUSE_TEXTURE
+		dAlbedo *= {STD_DIFFUSE_TEXTURE_DECODE}(texture2DBias({STD_DIFFUSE_TEXTURE_NAME}, {STD_DIFFUSE_TEXTURE_UV}, textureBias)).{STD_DIFFUSE_TEXTURE_CHANNEL};
+	#endif
+	float dry = uDry;
+	#ifdef STD_DIFFUSE_VERTEX
+		dAlbedo *= saturate(vVertexColor.{STD_DIFFUSE_VERTEX_CHANNEL});
+		dry = max(dry, (1.0 - vVertexColor.a) * uLifeInAlpha);
+	#endif
+	float lum = dot(dAlbedo, vec3(0.3, 0.59, 0.11));
+	#ifdef XY_LOOK
+		// X and Y: no grey. A forgotten place turns autumn gold and keeps its colour.
+		// Ciclo 30: only a hint of autumn (a whole yellow wood shouted over everything), and the same
+		// calmer green as the lawn.
+		dAlbedo = mix(dAlbedo, vec3(lum * 1.3, lum * 1.12, lum * 0.55), dry * 0.32);
+		{float l2 = dot(dAlbedo, vec3(0.3, 0.59, 0.11)); dAlbedo = mix(vec3(l2), dAlbedo, 0.88) * vec3(0.86, 0.94, 0.86);}
+	#else
+		dAlbedo = mix(dAlbedo, vec3(lum), 0.2);
+		dAlbedo = mix(dAlbedo, vec3(lum * 1.2, lum * 1.0, lum * 0.6), dry * 0.8) * (1.0 - 0.14 * dry);
+	#endif
+}
+`;
+export function makeLiving(material,{lifeInAlpha=false}={}){
+  material.shaderChunksVersion='2.22';
+  material.getShaderChunks(SHADERLANGUAGE_GLSL).set('diffusePS',(XY?'#define XY_LOOK\n':'')+livingPS);
+  material.setParameter('uDry',0);material.setParameter('uLifeInAlpha',lifeInAlpha?1:0);material.update();
+  return material;
+}
+export function setDry(material,dry){material.setParameter('uDry',Math.max(0,Math.min(1,dry)));}

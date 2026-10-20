@@ -1,6 +1,8 @@
 import * as THREE from 'three';
-import {EXTERIORS,KINGDOM,WATERCOURSE,passageGeometry,corridorX} from './kingdom-geography.js';
+import {EXTERIORS,KINGDOM,WATERCOURSE,WATERCOURSE_SPLIT,passageGeometry,corridorX} from './kingdom-geography.js';
 import {buildWatersideArt} from './waterside-art.js';
+import {buildQuietMount} from './quiet-mount-art.js';
+import {AREA_LAYOUTS,backdropYards} from './world-layout.js';
 
 function ribbon(owner,points,width,material,y=.073){
   const positions=[];
@@ -33,6 +35,9 @@ export function buildKingdomLandscape(owner){
     const highland=[p.from,p.to].includes('castle'),orchard=[p.from,p.to].includes('terraces');
     const routeMaterial=p.bridge?stone:owner.mat(highland?'#b5a18b':orchard?'#b8ad87':'#b5b29a','cobble');owner.worldMapped(routeMaterial,5);
     ribbon(owner,points,4.1,routeMaterial,p.bridge?.13:.073).name=p.bridge?'faro-causeway':'continuous-road';
+    // The village houses along the road keep their gardens and facades free of the copse.
+    const yards=[p.from,p.to].includes('plaza')?backdropYards(AREA_LAYOUTS.plaza).map(b=>({...b,x:b.x+KINGDOM.plaza.x,z:b.z+KINGDOM.plaza.z})):[];
+    const inYard=(x,z,margin)=>yards.some(b=>Math.abs(x-b.x)<b.w/2+margin&&Math.abs(z-b.z)<b.d/2+margin);
     const detour=p.routes.find(route=>route.id==='woodland-loop');
     const nearDetour=(x,z,margin=0)=>detour?.points.some(point=>Math.hypot(point[0]-x,point[1]-z)<detour.width/2+margin);
     if(detour){const trail=owner.mat('#afaa8d','ground');owner.worldMapped(trail,5);ribbon(owner,detour.points,detour.width,trail,.075).name='woodland-loop';
@@ -55,9 +60,9 @@ export function buildKingdomLandscape(owner){
           const [kx,kz]=offset(2.22);
           if((k+i+(side>0?2:0))%5<3&&!nearDetour(kx,kz,.5)){const kerb=owner.box(kx,.11,kz,.28,.22,.8,dark);kerb.rotation.y=Math.atan2(-nz,nx);}
           const [fx,fz]=offset(3.1);
-          if((k*3+i+(side>0?1:0))%7===0&&!nearDetour(fx,fz,1)){const plants=owner.mesh('plane',fern,fx,.5,fz,1.55,1.05,1);plants.rotation.y=(k%3)*.35;}
+          if((k*3+i+(side>0?1:0))%7===0&&!nearDetour(fx,fz,1)&&!inYard(fx,fz,.3)){const plants=owner.mesh('plane',fern,fx,.5,fz,1.55,1.05,1);plants.rotation.y=(k%3)*.35;}
           const [tx,tz]=offset(6+k%3),size=highland?4.8:6.6;
-          if((k+i+(side>0?3:0))%9===0&&!nearDetour(tx,tz,3)){const tree=owner.mesh('plane',trees[(i+k)%trees.length],tx,size/2,tz,size*.78,size,1);tree.name='shared-copse';}
+          if((k+i+(side>0?3:0))%9===0&&!nearDetour(tx,tz,3)&&!inYard(tx,tz,2.5)){const tree=owner.mesh('plane',trees[(i+k)%trees.length],tx,size/2,tz,size*.78,size,1);tree.name='shared-copse';}
           const [rx,rz]=offset(4.3);
           if(highland&&k%6===0&&!nearDetour(rx,rz,1.2)){const rock=owner.mesh('ico',stone,rx,.4,rz,1.5,.85,1.1);rock.rotation.y=k*.8;rock.name='upland-outcrop';}
         }
@@ -73,8 +78,8 @@ export function buildKingdomLandscape(owner){
   const bed=ribbon(owner,river,4.6,dark,.032);bed.name='kingdom-watercourse-bed';
   const waterTemplate=owner.water(0,0,0,.01,.01),water=waterTemplate.material;owner.root.remove(waterTemplate);
   water.uniforms.channel.value=1;
-  ribbon(owner,river.slice(0,6),3.95,water,.065).name='kingdom-village-canal';
-  ribbon(owner,river.slice(6),3.95,water,.065).name='kingdom-irrigation-channel';
+  ribbon(owner,river.slice(0,WATERCOURSE_SPLIT),3.95,water,.065).name='kingdom-village-canal';
+  ribbon(owner,river.slice(WATERCOURSE_SPLIT),3.95,water,.065).name='kingdom-irrigation-channel';
   // The aqueduct is elevated. Its wheel discharges through the LOWER basin,
   // into a covered culvert under the house's approach and then the valley canal.
   const drainZ=KINGDOM.spring.z-5.58;
@@ -90,6 +95,8 @@ export function buildKingdomLandscape(owner){
   for(let i=0;i<14;i++){
     const mountain=owner.mesh('cone',dark,-68+i*12,6,-347-(i%3)*8,14,16+i%4*3,17);mountain.castShadow=false;mountain.name='kingdom-distant-mountain';
   }
+  // West of the Manantial, the Monte Quieto and its Casa de Compuertas (see quiet-mount.js).
+  buildQuietMount(owner,{water,stone,dark,wood});
   owner.root=root;
   return {connections,water};
 }

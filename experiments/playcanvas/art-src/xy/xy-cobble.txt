@@ -1,0 +1,4 @@
+Saved `xy-cobble.png` — 1024×1024, 1,354,735 bytes. Generated using the built-in image_gen tool.
+
+Exact prompt:
+> Generate exactly one square 1024x1024 image. Top-down seamless village street paving of rounded smooth stones, light warm cream and pale grey stones of varied size with soft taupe gaps, friendly and clean. Style: clean hand-painted game texture for a modern cel-shaded 3D handheld RPG town (soft, bright, simple shapes, gentle large-scale colour variation, crisp but soft edges, very low detail, no pixel art, no photographic noise, no grain, no lighting gradient, no shadows cast across it, flat even light). It must tile seamlessly on all four edges: stone shapes and colours crossing the left edge continue exactly at the right edge, and those crossing the top edge continue exactly at the bottom edge. Edge-to-edge paving only, orthographic top-down view, no border, no text, no objects.

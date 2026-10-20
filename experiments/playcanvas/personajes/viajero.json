@@ -1,0 +1,17 @@
+{
+  "nombre": "El viajero",
+  "nota": "Regiones de color del viajero. 'colores': muestras del color en el maestro (scripts/blender/regiones.py explorar); 'z': franja de alturas permitida (m, el personaje mide 2 m); 'forzar': cajas que deciden por forma. 'tenible': la región que se puede teñir en el juego. 'muestra': el color de la región en el kit.",
+  "suavizado": 6,
+  "regiones": [
+    { "nombre": "piel", "tenible": "piel", "muestra": "#f0c7a6", "colores": ["#eec9ab", "#be987f"], "z": [0.85, 1.85],
+      "forzar": [{ "absx": [0.37, 0.7], "z": [0.6, 1.0] }] },
+    { "nombre": "pelo", "tenible": "pelo", "muestra": "#6a4532", "colores": ["#6e4e3e", "#5e4337", "#423029"], "z": [1.5, 2.0] },
+    { "nombre": "ojos", "muestra": "#3f7899", "colores": ["#4a83a3", "#1e2a33", "#f4f4f4"], "z": [1.62, 1.76] },
+    { "nombre": "abrigo", "tenible": "ropa", "muestra": "#2f6f80", "colores": ["#3a606d", "#355762", "#2c4852", "#22363d"], "z": [0.62, 1.6] },
+    { "nombre": "camisa", "tenible": "ropa2", "muestra": "#ece3cc", "colores": ["#e3dac3", "#7e7a6f"], "z": [0.9, 1.52] },
+    { "nombre": "bufanda", "tenible": "bufanda", "muestra": "#e5a63d", "colores": ["#d2984c", "#99703d"], "z": [0.9, 1.62] },
+    { "nombre": "pantalon", "muestra": "#4a4846", "colores": ["#474444", "#272626"], "z": [0.25, 1.0] },
+    { "nombre": "cuero", "muestra": "#7a4f33", "colores": ["#6e4e3e", "#5e4337", "#423029"], "z": [0.0, 1.45] },
+    { "nombre": "metal", "muestra": "#c9a356", "colores": ["#c9a55a", "#a8843c"], "z": [0.6, 1.5] }
+  ]
+}
