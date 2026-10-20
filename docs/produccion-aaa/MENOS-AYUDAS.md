@@ -40,3 +40,16 @@ puesto las escenas que ya vio (`enterArea` en `src/game/main.js`).
 
 - NO VERIFICADO con personas: el próximo paso es una prueba con alguien de 12 a 15 años, desde cero.
 - El mapa del reino no se volvió a hornear (los cambios de escena son chicos).
+
+## 2026-10-20 · Lo que vio el usuario al jugar
+
+- **Edda tapada por el diálogo.** Esperaba al sur del Portal, debajo del cuadro de texto. Ahora sale
+  corriendo de su casa cuando el viajero cruza (`World.playPortalArrival`) y lo recibe a su lado; después
+  espera junto al pedestal, del lado de arriba. En una pantalla alta (teléfono vertical), mientras hay
+  diálogo, la cámara sube al viajero y a quien habla por encima del cuadro (`dialogueClear`).
+- **Volúmenes que estorbaban.** Fuera las dos filas de bloques y rocas del Portal (delante de la casa
+  de Edda y del otro lado), los cuatro banquitos sueltos en el medio del taller de Lumen y los cajones
+  entre la casa y la estatua de la Plaza. El resto del paisaje no se movió.
+- **Ohm en el pedestal** es la misma figura 3D que acompaña al viajero, apagada mientras duerme.
+- **«Justo hoy no me contesta»** contradecía la historia: Ohm calla desde antes de que Edda naciera.
+- **La escuela** muestra en el aula de Electrónica la portada actual del juego, no la ilustración vieja.

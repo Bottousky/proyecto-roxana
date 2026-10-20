@@ -127,6 +127,15 @@ export async function attachFigure(app,actor,url,pitch,{chosen,size=1}={}){
   if(actor.figure.bones)actor.figure.setAppearance=await applyAppearance(app,model,url.replace(/\.glb$/,'')+'-regiones.json',url.replace(/\.glb$/,'')+'-regiones.webp',chosen??{});
   celShade(app);updateFigure(actor,0,0,0);
 }
+// A figure lit less than its copies (Ohm asleep on his pedestal, then waking), without touching the
+// materials they share: its own darker diffuse and ambient on each mesh. 1 lifts the override.
+export function shadeFigure(actor,level){
+  const f=actor.figure;level=Math.round(level*50)/50;if(!f||f.shade===level)return;f.shade=level;
+  const lin=(c,k)=>[c.r**2.2*k,c.g**2.2*k,c.b**2.2*k];
+  for(const r of f.model.findComponents('render'))for(const mi of r.meshInstances){if(!(mi.material instanceof StandardMaterial))continue;
+    if(level>=1){mi.deleteParameter('material_diffuse');mi.deleteParameter('material_ambient');continue;}
+    mi.setParameter('material_diffuse',lin(mi.material.diffuse,level));mi.setParameter('material_ambient',lin(mi.material.ambient,level));}
+}
 export function updateFigure(actor,dx,dz,dt){
   const f=actor.figure;if(!f)return;const a=actor.animation;f.time+=dt;
   if(Math.hypot(dx,dz)>1e-4){const want=Math.atan2(dx,dz)*180/Math.PI;let d=want-f.heading;d-=360*Math.round(d/360);f.heading+=d*Math.min(1,dt*12);}

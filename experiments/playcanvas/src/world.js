@@ -1,5 +1,5 @@
 import {CameraFrame,Texture,PIXELFORMAT_RGBA8,ADDRESS_CLAMP_TO_EDGE,Application,Entity,Mesh,MeshInstance,StandardMaterial,Color,Vec3,Vec2,Quat,Script,PROJECTION_ORTHOGRAPHIC,PROJECTION_PERSPECTIVE,FILLMODE_FILL_WINDOW,RESOLUTION_AUTO,CULLFACE_NONE,CULLFACE_BACK,BLEND_NORMAL,BLEND_ADDITIVEALPHA,TONEMAP_ACES,SEMANTIC_NORMAL,SEMANTIC_COLOR,TYPE_INT8,TYPE_UINT8} from 'playcanvas';
-import {XY,XY_LENS,XY_GRADES,XY_SKIES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,FIGURE_URL,FIGURES,chosenAppearance} from './style.js';
+import {XY,XY_LENS,XY_GRADES,XY_SKIES,celShade,xyFrame,xySun,PEOPLE_3D,attachFigure,updateFigure,shadeFigure,FIGURE_URL,FIGURES,chosenAppearance} from './style.js';
 import {surface,actorArt,blankActorArt} from './art.ts';
 import {AREAS,WORLD_SYSTEMS} from './game/content.js';
 import {KINGDOM,isExterior,inKingdomWater,inTravelCorridor,travelBounds,passagesFor,passageGeometry,toKingdom,fromKingdom} from './game/kingdom-geography.js';
@@ -7,7 +7,7 @@ import {lakeShoreX,AREA_LAYOUTS,pointOnPaving} from './game/world-layout.js';
 import {findPath} from './game/navigation.js';
 import {moveWithCollisions,isPositionClear} from './game/collision.js';
 import {advanceActor,idleActor,actorDirection} from './game/actor-animation.js';
-import {initializeInhabitants,updateInhabitants,getInhabitantInteractions,companionInteraction,beginInhabitantConversation,faceInhabitantSpeaker,endInhabitantConversation} from './game/world-inhabitants.js';
+import {GREETING_DOOR,initializeInhabitants,updateInhabitants,getInhabitantInteractions,companionInteraction,beginInhabitantConversation,faceInhabitantSpeaker,endInhabitantConversation} from './game/world-inhabitants.js';
 import {inInteractionReach,approachInteraction} from './game/world-interaction.js';
 import {describeWorldAudio} from './game/world-audio.js';
 import {journeyPhase} from './game/story-time.js';
@@ -180,11 +180,14 @@ export class PlayCanvasWorld {
     // The traveller and Ohm, together (a missing Ohm model keeps the sprite).
     if(PEOPLE_3D)await Promise.all([attachFigure(this.app,this.playerActor,FIGURE_URL,LENS.pitch||28.37,{chosen:chosenAppearance()}),attachFigure(this.app,this.ohmActor,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{})]);
     this.sleeping=await this.makeActor('ohm',3.5,0,'portal');this.sleeping.g.position.y=1.1;
+    // Asleep on his pedestal he is the same 3D figure he will be at the traveller's heels, only dimmer (the
+    // user: the drawing stood out among the 3D people). Same model, already downloaded for the companion.
+    if(PEOPLE_3D)await attachFigure(this.app,this.sleeping,FIGURES.ohm.url,LENS.pitch||28.37,{size:FIGURES.ohm.size}).catch(()=>{});
     for(const lamp of data.lights){const e=new Entity('Farol · '+lamp.area);e.addComponent('light',{type:'omni',color:color('#ffd399'),intensity:0,range:6,castShadows:false});e.setPosition(...lamp.position);this.regions.get(lamp.area).root.addChild(e);this.lights.push({area:lamp.area,entity:e});}
     this.buildAtmosphere();await this.buildLightEffects();this.buildFocusRing();this.buildBurst();await this.buildDust();this.gridSpans=buildGrid(this.app,this.regions.get('landscape').root,()=>.05);this.buildShafts();this.app.start();
   }
   async makeActor(name,x,z,area,object){
-    // In 3D only Ohm asleep on his pedestal is a drawing; the others' sheets wait in case a model fails.
+    // In 3D Ohm keeps his drawn sheet in case his small model fails; the others' sheets wait for the same.
     const drawn=!PEOPLE_3D||name==='ohm';if(drawn&&!this.sprites.has(name))this.sprites.set(name,await actorArt(this.app,name));
     const e=new Entity(name);e.addComponent('sprite',{type:'simple',sprite:drawn?this.sprites.get(name):blankActorArt(this.app),frame:0});e.sprite.material=e.sprite.material.clone();e.sprite.material.depthWrite=true;e.sprite.material.alphaTest=.22;e.setEulerAngles(-(LENS.pitch||28.37),0,0);this.app.root.addChild(e);e.addComponent('script');const script=e.script.create(ActorSprite);
     return {name,area,entity:e,script,phase:this.allActors.length*.71,animation:idleActor(),g:{position:new Position(x,0,z),visible:true,userData:{interaction:object}}};
@@ -420,6 +423,18 @@ export class PlayCanvasWorld {
     const [ox,oz]=this.data.areas.portal.offset,to=this.player.position.toArray(),from=[to[0],to[2]-1.7];
     this.portalArrival={t:0,from,to:[to[0],to[2]]};this.player.position.set(from[0],this.groundHeight(...from),from[1]);
     this.fireBurst([ox,this.groundHeight(0,-4.4),-4.4+oz],'#9ff2ff');
+
+    // Edda hears the Portal and runs out of her house to the traveller (the user: she was hidden under
+    // the dialogue box, standing south of the dais).
+    const edda=(this.actors||[]).find(a=>a.inhabitant?.plan?.stage==='greeting-the-traveller'&&a.g.visible);
+    if(edda&&!this.state?.settings?.reducedMotion){const door=this.nearestWalkable(GREETING_DOOR),spot=edda.inhabitant.stops[0];edda.g.position.set(door[0],this.groundHeight(...door),door[1]);edda.scripted={t:0,route:findPath(door,spot,this.bounds,this.obstacles,{radius:.34,isWalkable:(x,z)=>this.walkableLand(x,z)})};}
+  }
+  // A scripted walk that goes on during the arrival and its first lines, when everyone else waits.
+  updateGreeting(dt,reduced){
+    for(const a of this.actors||[]){const s=a.scripted;if(!s)continue;s.t+=dt;const p=a.g.position,old=[p.x,p.z];
+      if(s.t>.6){let left=dt*2.6;while(left>0&&s.route.length){const q=s.route[0],d=Math.hypot(q[0]-p.x,q[1]-p.z);if(d<=left){p.x=q[0];p.z=q[1];s.route.shift();left-=d;}else{p.x+=(q[0]-p.x)/d*left;p.z+=(q[1]-p.z)/d*left;left=0;}}p.set(p.x,this.groundHeight(p.x,p.z),p.z);}
+      this.animateActor(a,p.x-old[0],p.z-old[1],dt,{paused:false,reducedMotion:reduced});
+      if(s.t>.6&&!s.route.length){a.scripted=null;const q=this.player.position;a.animation=idleActor(actorDirection(q.x-p.x,q.z-p.z,a.animation.direction));this.animateActor(a,0,0,0,{paused:true});}}
   }
   updatePortalArrival(dt,reduced){
     const a=this.portalArrival;if(!a)return;a.t+=dt;const t=a.t,p=this.player.position,sprite=this.playerActor.entity.sprite;
@@ -456,7 +471,7 @@ export class PlayCanvasWorld {
       a.entity.setPosition(p.x+ox,p.y,p.z+oz);
       // Idle breathing: feet stay planted (bottom pivot), each actor on its own phase.
       const breathe=this.state.settings?.reducedMotion||a.animation?.moving?0:Math.sin(this.clock*2.1+a.phase)*.014;a.entity.setLocalScale(1-breathe*.4,1+breathe,1);
-      const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:a===this.ohmActor?this.ohmWake():1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);
+      const night=inside?0:(this.lampLevel||0),sleep=a===this.sleeping?.52:a===this.ohmActor?this.ohmWake():1;a.entity.sprite.color=new Color((1-night*.22)*sleep,(1-night*.14)*sleep,(1-night*.03)*sleep);if(a.figure&&a.name==='ohm')shadeFigure(a,sleep);
       if(a.shadow){a.shadow.enabled=a.entity.enabled;a.shadow.setPosition(p.x+ox,.105,p.z+oz+.06);}
     }
   }
@@ -491,7 +506,7 @@ export class PlayCanvasWorld {
         if(exit)this.followPassage(exit);else this.setTarget(this.area.spawn);}}
     this.walking=Math.hypot(p.x-old[0],p.z-old[1])>.0001;if(this.walking){const l=Math.hypot(p.x-old[0],p.z-old[1]);this.lastStep=[(p.x-old[0])/l,(p.z-old[1])/l];}if(this.portalArrival)this.updatePortalArrival(dt,reduced);else this.animateActor(this.playerActor,p.x-old[0],p.z-old[1],dt,{paused,reducedMotion:reduced});
     this.updateDust(dt,!!input.run&&this.walking&&!paused,reduced);
-    this.updateCompanion(dt,paused,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
+    this.updateCompanion(dt,paused,reduced);this.updateGreeting(dt,reduced);updateInhabitants(this,dt,state,{paused,reducedMotion:reduced});
     // Neighbours share time and state; errands continue without resetting at a boundary.
     for(const [id,r] of this.regions)if(id!==this.area.id&&id!=='landscape'&&r.actors.length&&Math.abs((KINGDOM[id]?.z||0)-(KINGDOM[this.area.id]?.z||0))<80){const ctx=this.context(id);updateInhabitants(ctx,dt,state,{paused,reducedMotion:reduced});}
     this.syncActors();this.updateAwakening(dt,reduced);this.speakingBounce(dt,reduced);this.celebrate(dt,reduced);this.updateFocusRing(dt,paused,reduced);this.updateGuide(dt,paused,reduced);this.updateBurst(dt,reduced);this.updateEnvironment(dt,reduced);const [ox,oz]=this.data.areas[this.area.id].offset;
@@ -505,6 +520,14 @@ export class PlayCanvasWorld {
         if(at&&Number.isFinite(at.x)){shift.x=Math.max(-7,Math.min(7,shift.x+(at.x/this.canvas.clientWidth-aim.x)*dt*30));shift.z=Math.max(-7,Math.min(7,shift.z+(at.y/this.canvas.clientHeight-aim.y)*dt*30));}
         wanted.set(p.x+ox+shift.x,p.y+.9,p.z+oz+shift.z);rest.zoom=this.portraitZoom||(tall?1.7:2.3);}
       else this.portraitShift=null;
+      // On a tall screen (a phone held upright) the dialogue box covers much of the view: the camera slides until the
+      // traveller, and whoever speaks beside them, stand in the middle of the space left above it.
+      const clear=!this.portrait&&this.dialogueClear>0&&this.canvas.clientHeight>this.canvas.clientWidth?this.dialogueClear:null;
+      if(clear){const s=this.speaking?.actor,q=s&&s!==this.playerActor&&s.entity.enabled&&Math.hypot(s.g.position.x-p.x,s.g.position.z-p.z)<6?s.g.position:null,
+          at=this.getScreenPosition({x:q?(p.x+q.x)/2:p.x,z:q?(p.z+q.z)/2:p.z,ground:true}),shift=this.dialogueShift??={x:0,z:0};
+        if(at&&Number.isFinite(at.x)){shift.x=Math.max(-6,Math.min(6,shift.x+(at.x/this.canvas.clientWidth-.5)*dt*20));shift.z=Math.max(-6,Math.min(6,shift.z+(at.y/this.canvas.clientHeight-clear*.62)*dt*20));}
+        wanted.x+=shift.x;wanted.z+=shift.z;}
+      else this.dialogueShift=null;
       // Conversations keep the camera where the interaction began: the portrait says who speaks.
       this.focus.lerp(this.focus,wanted,1-Math.exp(-dt*3.6));this.currentZoom+=((this.inspect&&!this.portrait?1.45:rest.zoom)-this.currentZoom)*(1-Math.exp(-dt*2.6));this.cameraOffset.lerp(this.cameraOffset,new Vec3(0,13.5,25),1-Math.exp(-dt*2.6));}
     this.positionCamera();this.focusFrame();this.updateSeeThrough();

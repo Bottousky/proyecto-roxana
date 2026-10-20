@@ -123,7 +123,7 @@ export const DIALOGUES = {
     ['edda', 'No desde antes de que yo naciera. Mi abuela recibía acá a los Maestros del Instituto. Yo lo barro todas las mañanas, por si acaso, y hoy fue el «por si acaso». ¡Perdón! Soy Edda. ¿Y vos?'],
     ['player', '{nombre}. Vengo del Instituto Roxana.'],
     ['edda', '{nombre}, del Instituto. Lo voy a anotar en el libro de llegadas con mi mejor letra. Mi abuela se moriría de envidia.', 'happy'],
-    ['edda', 'Y justo hoy el pequeño de bronce del pedestal no me contesta. Vení: capaz entre los dos encontramos algo.']),
+    ['edda', 'Lo que no te puedo presentar es al pequeño de bronce del pedestal: hace años que nadie le escucha una palabra. Vení: capaz entre los dos encontramos algo.']),
   edda_portal: d(
     ['edda', 'Limpié el polvo. Giré esa manivela. Hasta le dije por favor.'],
     ['player', '¿Y nada?'],
@@ -1005,7 +1005,7 @@ export const JOURNAL = [
 ];
 
 const objectives = [
-  ['awaken', { title: 'Una pequeña luz', detail: 'Edda encontró un pequeño de bronce que no despierta. Mirá con ella qué le falta.', area: 'portal', object: 'ohm_pedestal' }],
+  ['awaken', { title: 'Una pequeña luz', detail: 'El pequeño de bronce del pedestal no habla desde antes de que Edda naciera. Mirá con ella qué le falta.', area: 'portal', object: 'ohm_pedestal' }],
   ['workshop', { title: 'El oficio de preguntar', detail: 'Lumen cambió tres veces la lámpara de su mesa y sigue sin encender. Algo más está fallando.', area: 'workshop', object: 'workbench' }],
   ['bridge_ready', { title: 'El otro lado de la puerta', detail: 'Edda unió los postes como en el dibujo viejo y las balizas de la Calzada no responden. En el medio hay un puente de cobre que el dibujo no tiene.', area: 'road', object: 'road_bypass' }, 'gate'],
   ['gate', { title: 'El otro lado de la puerta', detail: 'Las balizas responden, pero el cerrojo de la Puerta empuja para el lado equivocado.', area: 'road', object: 'gate_panel' }],

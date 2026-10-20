@@ -36,6 +36,7 @@ const aim = id => page.evaluate(id => {
   const top = Math.min(190, r.height * .24), bottom = Math.min(230, r.height * .1);
   const free = p => { const hit = document.elementFromPoint(p.x + r.left, p.y + r.top); return !hit || hit === w.canvas || hit.closest?.('#world') && !hit.closest('button,a,.hud-top,.hud-tools,#touch-controls,.objective,.interaction'); };
   const inside = p => p.visible && p.x > 30 && p.x < r.width - 30 && p.y > top && p.y < r.height - bottom && free(p);
+  if (!o) return null; // the place changed between two reads (a crossing): the next try looks again
   const own = w.getScreenPosition(o); if (inside(own)) return { x: own.x + r.left, y: own.y + r.top, direct: true };
   const dx = o.x - px, dz = o.z - pz, d = Math.hypot(dx, dz), k = Math.min(1, 3.5 / d), spot = w.getScreenPosition({ x: px + dx * k, z: pz + dz * k, ground: true });
   const at = { x: Math.max(30, Math.min(r.width - 30, spot.x)), y: Math.max(top, Math.min(r.height - bottom, spot.y)) };
@@ -44,11 +45,15 @@ const aim = id => page.evaluate(id => {
   for (let t = 0; t < 1 && !free(at); t += .1) { at.x += (me.x - at.x) * .2; at.y += (me.y - at.y) * .2; }
   return { x: at.x + r.left, y: at.y + r.top, direct: false };
 }, id);
+// After a scene on a tall screen the camera glides back over the traveller (it had lifted them above the
+// dialogue box): a player waits for the view to stop before tapping what floats in it.
+const settleCamera = async () => { for (let i = 0; i < 30; i++) { const d = await page.evaluate(() => new Promise(done => { const f = window.__ohmdal.world.focus, a = [f.x, f.z]; setTimeout(() => done(Math.hypot(f.x - a[0], f.z - a[1])), 120); })); if (d < .01) return; } };
 async function reach(id, { until = g => g.near === id || g.mode !== 'world', tries = 30 } = {}) {
   for (let i = 0; i < tries; i++) {
     const g = await game(); if (until(g)) return g;
     if (g.mode === 'dialogue') { await read(); continue; }
-    const s = await aim(id); await touch(s.x, s.y);
+    await settleCamera();
+    const s = await aim(id); if (!s) { await page.waitForTimeout(200); continue; } await touch(s.x, s.y);
     // Like a player, wait while the traveller is still walking where they were sent.
     await page.waitForTimeout(300);
     for (let k = 0; k < 40 && await page.evaluate(() => { const w = window.__ohmdal.world; return !!(w.target || w.route?.length); }); k++) await page.waitForTimeout(150);
@@ -92,7 +97,15 @@ assert.equal((await game()).flags.awaken, true);
 await capture('ohm-en-el-mundo');
 
 // Botón de interactuar: acercarse a Edda tocando el suelo junto a ella y usar el botón.
-await reach('edda_portal', { until: g => g.near === 'edda_portal' });
+// The ground on her far side from the pedestal, so she is what is at hand (a tap on her would just talk).
+for (let i = 0; i < 12 && (await game()).near !== 'edda_portal'; i++) {
+  await settleCamera();
+  const spot = await page.evaluate(() => { const w = window.__ohmdal.world, e = w.getInteractions().find(o => o.id === 'edda_portal'), r = w.canvas.getBoundingClientRect(), p = w.getScreenPosition({ x: e.x - 1, z: e.z + .3, ground: true }); return { x: p.x + r.left, y: p.y + r.top }; });
+  await touch(spot.x, spot.y); await page.waitForTimeout(300);
+  for (let k = 0; k < 40 && await page.evaluate(() => { const w = window.__ohmdal.world; return !!(w.target || w.route?.length); }); k++) await page.waitForTimeout(150);
+  if ((await game()).mode === 'dialogue') await read();
+}
+assert.equal((await game()).near, 'edda_portal', 'junto a Edda, ella es lo que está a mano');
 assert.equal(await page.locator('#touch-interact').isDisabled(), false, 'el botón se habilita cerca de alguien');
 await tapEl('#touch-interact'); await page.waitForTimeout(300);
 assert.equal((await game()).mode, 'dialogue', 'el botón de interactuar abre la conversación'); await read();
@@ -138,7 +151,9 @@ for (let i = 0; i < 80; i++) { g = await game(); if (g.mode === 'cinematic') { a
 assert.equal((await game()).flags.workshop, true, 'el taller quedó en servicio');
 await capture('taller-encendido');
 // Junto a la mesa en servicio, medir con Ohm (botón táctil), guardarlo y comprobar que no vuelve solo.
+// After the scene the camera settles back over the traveller: walk up to the bench if it is not at hand.
 for (let i = 0; i < 20 && (await game()).near !== 'workbench'; i++) await page.waitForTimeout(200);
+await reach('workbench'); await settleCamera();
 await tapEl('#field-measure'); await page.waitForTimeout(300);
 assert.equal(await page.locator('#field-meter').isVisible(), true, 'el botón de medir abre el instrumento de Ohm');
 await capture('medir');

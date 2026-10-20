@@ -229,13 +229,13 @@ async function startGame(resume=false){
   const art=await (assetLoadFailed?world.loadArtAssets():world.assetsReady);
   assetLoadFailed=!art.ok;
   if(assetLoadFailed){
-    show('#transition',false);show('#title-screen');show('#hud',false);show('#dialogue',false);started=false;mode='title';
+    show('#transition',false);show('#title-screen');show('#hud',false);hideDialogueBox();started=false;mode='title';
     console.warn('Ohmdal: no se pudieron cargar las imágenes',art.missing);
     modal('<div class="eyebrow">LOS CAMINOS ESTÁN ESPERANDO</div><h2>Falta cargar el arte</h2><p class="modal-intro">No se pudieron abrir todas las imágenes de Ohmdal. Abrí «Jugar PlayCanvas.cmd» para iniciar el servidor local y volvé a intentar.<br>Tu bitácora guardada sigue disponible.</p><div class="options-actions"><button class="primary" id="retry-art">Volver a intentar</button></div>','options-modal');
     $('#retry-art').onclick=()=>{closeModal();startGame(resume);};
     return;
   }
-  world.cancelCinematic();playingCinematic=false;pendingPuzzleResult=null;dialogue=null;dialogueEnd=null;show('#cinematic',false);show('#dialogue',false);
+  world.cancelCinematic();playingCinematic=false;pendingPuzzleResult=null;dialogue=null;dialogueEnd=null;show('#cinematic',false);hideDialogueBox();
   dialogueQueue.length=0;started=true;mode='world';show('#title-screen',false);show('#hud');held.clear();
   refreshWorldSystems(true);
   await enterArea(state.area,state.position,{initial:true});
@@ -252,7 +252,7 @@ function wait(ms){return new Promise(resolve=>setTimeout(resolve,ms));}
 async function enterArea(id,spawn=null,{initial=false,continuous=false}={}){
   if(transitioning||!AREAS[id])return;
   transitioning=true;if(!continuous){mode='transition';held.clear();world.cancelCinematic();}
-  show('#interaction',false);show('#dialogue',false);show('#arrival',false);
+  show('#interaction',false);hideDialogueBox();show('#arrival',false);
   playingCinematic=false;show('#cinematic',false);
   if(!continuous){$('#transition-name').textContent=AREAS[id].name;show('#transition');if(!initial)await wait(settings.reducedMotion?0:110);}
   state.area=id;state.position=spawn||AREAS[id].spawn;
@@ -294,7 +294,14 @@ function speak(id,onEnd=null,target=null){
   if(typeof id==='string'&&!state.seen.includes(id))state.seen.push(id);
 }
 const portraits={edda:'edda',ohm:'ohm',lumen:'lumen',nereo:'nereo',vega:'vega',consejera:'consejera',yesca:'yesca',marin:'marin',tala:'tala',player:'player'};
+// Where the dialogue box begins, as a share of the world's height: on a tall screen the box covers the
+// lower half, and the camera lifts the traveller and whoever speaks above it (World dialogueClear).
+function hideDialogueBox(){show('#dialogue',false);if(world)world.dialogueClear=null;}
+function measureDialogueBox(){if(!world||mode!=='dialogue')return;const box=$('#dialogue').getBoundingClientRect(),view=$('#world').getBoundingClientRect();world.dialogueClear=view.height?(box.top-view.top)/view.height:null;}
+// The box grows as the line types itself: follow its size, not only its first frame.
+if('ResizeObserver' in window)new ResizeObserver(measureDialogueBox).observe($('#dialogue'));
 function renderLine(){
+  requestAnimationFrame(measureDialogueBox);
   const line=dialogue.lines[dialogue.index];
   // A name appears in the box when it is said in front of its owner: if the speaker says it,
   // the label changes as the typing reaches the name.
@@ -335,7 +342,7 @@ function nextLine(){
   if(dialogue.id==='lighthouse_epilogue'){state.flags.epilogue_shared=true;refreshHUD();}
   world?.endInhabitantConversation?.();
   const effect=typeof dialogue.id==='string'&&DIALOGUE_EFFECTS[dialogue.id];if(effect){for(const f of effect.flags)state.flags[f]=true;world?.updateFlags?.(state);refreshWorldSystems();}
-  show('#dialogue',false);dialogue=null;state.activeDialogue=null;mode='world';interactAfter=performance.now()+450;interactAfterId=nearby?.id??null;$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
+  hideDialogueBox();dialogue=null;state.activeDialogue=null;mode='world';interactAfter=performance.now()+450;interactAfterId=nearby?.id??null;$('#world').focus({preventScroll:true});persist();const cb=dialogueEnd;dialogueEnd=null;cb?.();
 }
 
 function bubble(text){if(mode!=='world'||!$('#field-meter').classList.contains('hidden'))return;$('#ohm-bubble p').textContent=text;show('#ohm-bubble');bubbleUntil=performance.now()+6500;}
@@ -486,7 +493,7 @@ function playPendingCinematic(){
   const pending=state.activeCinematic;if(!pending||playingCinematic)return;
   playingCinematic=true;mode='cinematic';held.clear();activePointer=null;
   world.target=null;world.route=[];world.setInspection(false);world.updateFlags(state);
-  clearTimeout(arrivalTimeout);show('#hud',false);show('#arrival',false);show('#dialogue',false);show('#interaction',false);show('#ohm-bubble',false);show('#toast',false);
+  clearTimeout(arrivalTimeout);show('#hud',false);show('#arrival',false);hideDialogueBox();show('#interaction',false);show('#ohm-bubble',false);show('#toast',false);
   world.playRestoration(pending.id);
   if(pending.id!=='beacon_lens')audio.playRestoration?.(pending.id);
   if(pending.id==='beacon_lens'){dialogueQueue.length=0;audio.finale();}

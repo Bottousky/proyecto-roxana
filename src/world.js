@@ -372,7 +372,9 @@ export class World {
     // The Porteros' punt, moored on the canal that once carried visitors down to the village.
     this.portersLanding(15.2,1.6);
     for(const [x,z,s] of [[11.6,-8.6,1.25],[12.2,8.8,1.1],[20.4,-10.5,1.5],[20.8,9.5,1.6]])this.tree(x,z,s);
-    for(let side of [-1,1]){for(let j=0;j<4;j++){this.box(side*(6.9+j*.9),.35,-2.4+j*.13,.75,.6+this.rand()*.35,.9,this.m.stoneDark);this.solid(side*(6.9+j*.9),-2.4+j*.13,.75,.9);this.rock(side*(7.5+j*.9),-1.5,.3+this.rand()*.35);}this.tree(side*9,d*.64,1.7);this.tree(side*14,d*.7,1.9);}
+    // The rows of fallen blocks and rocks on either side of the dais stood in front of Edda's house and in
+    // the way, and said nothing (the user, 2026-10-20). Their draws stay so the rest of the scenery keeps its place.
+    for(let side of [-1,1]){for(let j=0;j<20;j++)this.rand();this.tree(side*9,d*.64,1.7);this.tree(side*14,d*.7,1.9);}
   }
   portersLanding(x,z){
     const g=this.group(x,.16,z);g.name='porteros-punt';
@@ -397,7 +399,6 @@ export class World {
     this.banner(-2.65,-15.2,3.2);this.banner(2.65,-15.2,3.2);
     const festoon=t=>[-7.5+18.1*t,3.2-Math.sin(t*Math.PI)*.5,-5.2+2.4*t];
     for(let i=0;i<7;i++){const a=festoon(i/7),b=festoon((i+.5)/7),c=festoon((i+1)/7);this.cable([a,b,c],this.m.darkwood);const bulb=this.sphere(b[0],b[1]-.12,b[2],.11,this.m.glass);bulb.castShadow=false;}
-    for(const [x,z] of this.layout.adjustments.find(a=>a.id==='plaza-crates').positions)this.crate(x,z,.6);
     for(const [x,z] of this.layout.adjustments.find(a=>a.id==='plaza-barrels').positions)this.barrel(x,z,.7);
   }
   fountain(x,z,r=1.5){const g=buildFountain(this,x,z,r),b=g.userData.landmark.footprint;this.solid(b.x,b.z,b.w,b.d,'fountain');return g;}
@@ -431,7 +432,6 @@ export class World {
     this.hangingLamp(-3,0,5.5);this.hangingLamp(5,-4,5.6);this.hangingLamp(-7,6,5.2);
     for(const side of [-1,1]){const x=side*(w/2-1.5);this.solid(x,-3,1.4,9,"workshop-shelves");for(let y=1.2;y<4.4;y+=1.0){this.box(x,y,-3.0,1.4,.14,9,this.m.darkwood);for(let k=0;k<11;k++){const z=-6.8+k*.76;this.box(x+(this.rand()-.5)*.55,y+.2,z,.18+this.rand()*.2,.25+this.rand()*.35,.32,k%4===0?this.m.leaf:k%3?this.m.redcloth:this.m.brass);}}}
     for(let k=0;k<4;k++){const x=-5.5+k*2.1;this.box(x,2.45,-d/2+.75,1.6,1.0,.06,this.m.darkwood);for(let j=0;j<4;j++){this.beam([x-.5+j*.3,2.5,-d/2+.88],[x-.5+j*.3,2.12,-d/2+.88],.05,this.m.metal);this.torus(x-.5+j*.3,2.65,-d/2+.9,.1,.025,this.m.brass);}}
-    for(const pos of [[-3,-4],[5,0],[-6,5],[6,6]])this.stool(...pos);
     // Copper wire on spools, the raw material of every repair: aged copper, never glowing.
     const copper=this.mat('#9c5f3c',null,{metalness:.55,roughness:.55});
     for(const [x,z] of [[-8.2,-3.3],[7.6,2.6]]){this.cylinder(x,.06,z,.6,.12,this.m.darkwood);this.cylinder(x,.46,z,.42,.7,copper);this.cylinder(x,.86,z,.6,.12,this.m.darkwood);this.solid(x,z,1.2,1.2,'workshop-copper-spool');}

@@ -3,6 +3,8 @@ import { findPath } from './navigation.js';
 import { isSegmentClear } from './collision.js';
 
 const has = (state, flag) => Boolean(state.flags?.[flag]);
+/** Where Edda stops to welcome a traveller in the Portal, coming from the door of her house. */
+export const GREETING_DOOR = [-10.36, -4.5], GREETING_SPOT = [-1.8, -1.7];
 
 /** Small authored errands; positions are world X/Z, not animation offsets. */
 export function inhabitantPlan(area, object, state = {}) {
@@ -15,7 +17,11 @@ export function inhabitantPlan(area, object, state = {}) {
   switch (object.id) {
     case 'edda_portal':
       plan.present = !f.workshop;
-      set(f.awaken ? 'drawing-the-return' : 'examining-ohm', f.awaken ? [[-3.2, -1.8], [-1.8, -3.4]] : [[-4, 2], [-2.8, .8]], [3.5, 0]); break;
+      // A traveller who has just crossed finds Edda beside them (she runs out of her house: World
+      // playPortalArrival), above the dialogue box rather than below it; after the welcome she goes to the
+      // pedestal with them.
+      if (Array.isArray(state.seen) && !state.seen.includes('portal_arrival') && !f.awaken) set('greeting-the-traveller', [GREETING_SPOT, [-2.4, -1.1]], [0, -2.4]);
+      else set(f.awaken ? 'drawing-the-return' : 'examining-ohm', f.awaken ? [[-3.2, -1.8], [-1.8, -3.4]] : [[5.2, -1.4], [5.7, -.5]], [3.5, 0]); break;
     case 'edda_plaza':
       plan.present = !f.workshop || (final && Boolean(f.epilogue_shared));
       set(final ? 'festival-notes' : 'public-history', final ? [[-4.8, 4.8], [-3.8, 4.4]] : [[-5, 3], [-5.2, 1.3]], [-6.4, -3.9]); break;
@@ -142,7 +148,7 @@ function walkErrand(world, actor, dt) {
 /** Update only human NPCs; World still owns the player and Ohm's following. */
 export function updateInhabitants(world, dt, state, { paused = false, reducedMotion = false } = {}) {
   for (const actor of world.actors || []) {
-    if (actor.g === world.player) continue;
+    if (actor.g === world.player || actor.scripted) continue; // a scripted walk (World.playPortalArrival) moves itself
     const x = actor.g.position.x, z = actor.g.position.z;
     if (actor.inhabitant) {
       adoptPlan(world, actor, inhabitantPlan(world.area.id, actor.inhabitant.object, state));

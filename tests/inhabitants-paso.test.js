@@ -24,14 +24,17 @@ test('nobody waits on the way between two things the player uses', () => {
       const own = [...area.objects.filter(o => ((o.kind === 'lever' && !o.story) || ['panel', 'beacon'].includes(o.kind)) && !SIDE_BENCHES[o.puzzle]), ...(area.exits || [])].map(o => [o.id, [o.x, o.z]]);
       if (area.spawn) own.push(['llegada', area.spawn]);
       for (const person of area.objects.filter(o => o.kind === 'npc')) {
-        const plan = inhabitantPlan(id, person, { flags });
-        if (!plan.present) continue;
-        for (const stop of plan.stops) {
-          for (const lever of area.objects.filter(o => o.kind === 'lever' && !o.story)) if (Math.hypot(stop[0] - lever.x, stop[1] - lever.z) < 2) blocked.add(`${id}: ${person.id} en ${stop} junto a ${lever.id}`);
-          if (Math.hypot(stop[0] - person.x, stop[1] - person.z) < .01) continue;
-          for (let i = 0; i < own.length; i++) for (let j = i + 1; j < own.length; j++) {
-            const [a, pa] = own[i], [b, pb] = own[j], ends = Math.min(Math.hypot(stop[0] - pa[0], stop[1] - pa[1]), Math.hypot(stop[0] - pb[0], stop[1] - pb[1]));
-            if (ends > 2.2 && segment(stop, pa, pb) < 1) blocked.add(`${id}: ${person.id} en ${stop} entre ${a} y ${b}`);
+        // Before the arrival scene has been heard (seen: []), Edda waits beside the traveller to welcome them.
+        const plans = [inhabitantPlan(id, person, { flags }), ...(k === 0 ? [inhabitantPlan(id, person, { flags, seen: [] })] : [])];
+        for (const plan of plans) {
+          if (!plan.present) continue;
+          for (const stop of plan.stops) {
+            for (const lever of area.objects.filter(o => o.kind === 'lever' && !o.story)) if (Math.hypot(stop[0] - lever.x, stop[1] - lever.z) < 2) blocked.add(`${id}: ${person.id} en ${stop} junto a ${lever.id}`);
+            if (Math.hypot(stop[0] - person.x, stop[1] - person.z) < .01) continue;
+            for (let i = 0; i < own.length; i++) for (let j = i + 1; j < own.length; j++) {
+              const [a, pa] = own[i], [b, pb] = own[j], ends = Math.min(Math.hypot(stop[0] - pa[0], stop[1] - pa[1]), Math.hypot(stop[0] - pb[0], stop[1] - pb[1]));
+              if (ends > 2.2 && segment(stop, pa, pb) < 1) blocked.add(`${id}: ${person.id} en ${stop} entre ${a} y ${b}`);
+            }
           }
         }
       }

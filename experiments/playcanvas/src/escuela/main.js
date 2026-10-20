@@ -236,7 +236,7 @@ function bindDireccion(){
 function renderTaller(id){
   const w=worldByRoom(id);
   const hero=w.id==='ohmdal'
-    ?`<section class="world-hero" style="--cover:url('${asset('/assets/cover.webp')}')"><div class="hero-shade"></div><div class="hero-text"><span class="eyebrow">Mundo aplicado · ${esc(w.verb)}</span><h3>OHMDAL</h3><p class="rule">LA LUZ</p><p>El mundo no perdió su luz. Olvidó cómo encenderla.</p></div></section>`
+    ?`<section class="world-hero" style="--cover:url('${asset('/escuela/ohmdal-portada.webp')}')"><div class="hero-shade"></div><div class="hero-text"><span class="eyebrow">Mundo aplicado · ${esc(w.verb)}</span><h3>OHMDAL</h3><p class="rule">LA LUZ</p><p>El mundo no perdió su luz. Olvidó cómo encenderla.</p></div></section>`
     :`<section class="world-hero generated" style="--c:${w.color}"><span class="hero-glyph" aria-hidden="true">${esc(w.glyph)}</span><div class="hero-shade"></div><div class="hero-text"><span class="eyebrow">Mundo aplicado · ${esc(w.verb)}</span><h3>${esc(w.name.toUpperCase())}</h3><p class="rule">${esc(w.discipline.toUpperCase())}</p><p>${esc(w.entry.name)}: todavía en preparación.</p></div></section>`;
   if(w.id!=='ohmdal')return `${hero}
   <div class="cta-row"><button class="primary" disabled>${svg('lock')} Entrada en preparación</button>${w.entry.preview&&!document.body.classList.contains('light')?`<button class="quiet" id="preview-entry">${svg('play')} Ver la entrada</button>`:`<span class="meta">Verbo central: ${esc(w.verb)}</span>`}</div>

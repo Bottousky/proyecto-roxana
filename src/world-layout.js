@@ -71,7 +71,6 @@ export const AREA_LAYOUTS = {
     ],
     exclusions: [],
     adjustments: [
-      { id: 'plaza-crates', reason: 'Almacén junto al costado este, fuera de la fachada y su explanada', positions: [[-7.7, 0], [-7.7, .8], [-6.9, 0], [-6.9, .8]] },
       { id: 'plaza-barrels', reason: 'Almacén al este del Mercado, entre el cimiento y el muro, fuera de su puerta y explanada', positions: [[17.8, 1.3], [17.8, 2.2], [17.8, 3.1], [17.8, 4]] },
     ],
   },
